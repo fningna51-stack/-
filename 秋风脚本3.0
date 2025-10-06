@@ -149,6 +149,11 @@ local GameTab = Window:Tab({Title = "99夜脚本", Icon = "gamepad"})
 local VisualTab = Window:Tab({Title = "视觉效果", Icon = "eye"})
 local MiscTab = Window:Tab({Title = "死铁轨", Icon = "settings"})
 
+MainTab:Button({Title = "防摔落伤害脚本", Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/cytj777i/Fall-injury/main/防止摔落伤害"))()
+    print("防摔落伤害脚本已加载")
+end})
+
 MainTab:Button({Title = "r15打飞机墨水禁止脚本", Callback = function()
     loadstring(game:HttpGet("https://pastefy.app/YZoglOyJ/raw"))()
     print("r15打飞机墨水禁用脚本已加载")
