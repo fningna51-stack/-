@@ -199,6 +199,115 @@ PlayerTab:Toggle({Title = "无限跳跃", Value = false, Callback = function(sta
 end}
 
 PlayerTab:Slider({
+    Title = "飞行", 
+    Step = 1, 
+    Value = {Min = 0, Max = 1, Default = 0}, 
+    Callback = function(value)
+        local player = game.Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        local flyLoop
+        
+        -- 飞行控制参数
+        local flySpeed = 50  -- 基础飞行速度
+        local flying = false
+        local bodyGyro
+        local bodyVelocity
+        
+        -- 飞行功能核心
+        local function startFlying()
+            if not humanoid or flying then return end
+            
+            -- 确保角色站立（防止游泳/坠落状态干扰）
+            humanoid:ChangeState(Enum.HumanoidStateType.Landed)
+            
+            -- 创建飞行控制组件
+            bodyGyro = Instance.new("BodyGyro")
+            bodyGyro.Name = "FlyGyro"
+            bodyGyro.P = 10000
+            bodyGyro.D = 100
+            bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+            bodyGyro.CFrame = character:GetPivot()
+            bodyGyro.Parent = character:FindFirstChild("HumanoidRootPart") or character.PrimaryPart
+            
+            bodyVelocity = Instance.new("BodyVelocity")
+            bodyVelocity.Name = "FlyVelocity"
+            bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+            bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+            bodyVelocity.Parent = character:FindFirstChild("HumanoidRootPart") or character.PrimaryPart
+            
+            flying = true
+            
+            -- 飞行控制循环
+            flyLoop = game:GetService("RunService").Heartbeat:Connect(function()
+                if not flying or not character:FindFirstChild("HumanoidRootPart") then return end
+                
+                local rootPart = character:FindFirstChild("HumanoidRootPart") or character.PrimaryPart
+                if not rootPart then return end
+                
+                -- 获取输入方向
+                local camera = workspace.CurrentCamera
+                local forward = camera.CFrame.LookVector
+                local right = camera.CFrame.RightVector
+                local up = Vector3.new(0, 1, 0)
+                
+                local direction = Vector3.new(0, 0, 0)
+                
+                -- WASD 控制
+                if userInputService:IsKeyDown(Enum.KeyCode.W) then direction += forward end
+                if userInputService:IsKeyDown(Enum.KeyCode.S) then direction -= forward end
+                if userInputService:IsKeyDown(Enum.KeyCode.D) then direction += right end
+                if userInputService:IsKeyDown(Enum.KeyCode.A) then direction -= right end
+                if userInputService:IsKeyDown(Enum.KeyCode.Space) then direction += up end
+                if userInputService:IsKeyDown(Enum.KeyCode.LeftShift) then direction -= up end
+                
+                -- 标准化方向并应用速度
+                if direction.Magnitude > 0 then
+                    direction = direction.Unit * flySpeed
+                end
+                
+                -- 应用飞行速度
+                bodyVelocity.Velocity = direction
+                bodyGyro.CFrame = camera.CFrame
+            end)
+            
+            print("飞行已开启")
+        end
+        
+        local function stopFlying()
+            if not flying then return end
+            
+            -- 断开连接
+            if flyLoop then
+                flyLoop:Disconnect()
+                flyLoop = nil
+            end
+            
+            -- 移除飞行组件
+            local rootPart = character:FindFirstChild("HumanoidRootPart") or character.PrimaryPart
+            if rootPart then
+                if rootPart:FindFirstChild("FlyGyro") then
+                    rootPart.FlyGyro:Destroy()
+                end
+                if rootPart:FindFirstChild("FlyVelocity") then
+                    rootPart.FlyVelocity:Destroy()
+                end
+            end
+            
+            flying = false
+            print("飞行已关闭")
+        end
+        
+        -- 根据滑块值开启或关闭飞行
+        if value == 1 then
+            startFlying()
+        else
+            stopFlying()
+        end
+    end
+})
+
+PlayerTab:Slider({
     Title = "穿墙", 
     Step = 1, 
     Value = {Min = 0, Max = 1, Default = 0}, 
