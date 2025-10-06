@@ -2,7 +2,7 @@
 local function CheckLicense()
     -- 预设的有效卡密列表
     local validLicenses = {
-        "ks小秋4588",  -- 示例卡密
+        "快手小秋",  -- 示例卡密
     }
     
     -- 创建卡密输入界面
