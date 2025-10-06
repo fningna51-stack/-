@@ -177,14 +177,9 @@ MainTab:Button({Title = "灾害黑洞脚本", Callback = function()
     print("灾害黑洞脚本已加载")
 end})
 
-MainTab:Button({Title = "r15飞行脚本", Callback = function()
+MainTab:Button({Title = "无敌少侠飞行脚本", Callback = function()
     loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Invinicible-Flight-R15-45414"))()
-    print("r15脚本已加载")
-end})
-
-MainTab:Button({Title = "r6飞行脚本", Callback = function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/%E6%97%A0%E6%95%8C%E5%B0%91%E4%BE%A0%E9%A3%9E%E8%A1%8Cr6.txt"))()
-    print("r6飞行已加载")
+    print("无敌少侠脚本已加载")
 end})
 
 MainTab:Button({Title = "叶脚本", Callback = function()
