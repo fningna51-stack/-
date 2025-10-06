@@ -196,25 +196,46 @@ PlayerTab:Toggle({Title = "无限跳跃", Value = false, Callback = function(sta
     else
         print("无限跳跃已禁用")
     end
-end})
+end}
 
 PlayerTab:Slider({
-    Title = "穿墙强度", -- 虽然不太合理，但按你要求的格式
-    Step = 1,
-    Value = {Min = 0, Max = 1, Default = 0}, -- 0关闭，1开启
+    Title = "穿墙", 
+    Step = 1, 
+    Value = {Min = 0, Max = 1, Default = 0}, 
     Callback = function(value)
-        local NoclipEnabled = value == 1
+        local player = game.Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local noclipLoop
         
-        local Character = game.Players.LocalPlayer.Character
-        if Character then
-            for _, part in pairs(Character:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = not NoclipEnabled
+        -- 穿墙功能核心
+        local function noclip()
+            for _, part in pairs(character:GetDescendants()) do
+                if part:IsA("BasePart") and part.CanCollide then
+                    part.CanCollide = false
                 end
             end
         end
         
-        print("穿墙状态: " .. (NoclipEnabled and "开启" or "关闭"))
+        -- 停止之前的循环（如果存在）
+        if noclipLoop then
+            noclipLoop:Disconnect()
+            noclipLoop = nil
+        end
+        
+        if value == 1 then
+            -- 开启穿墙
+            noclip() -- 立即执行一次
+            noclipLoop = game:GetService("RunService").Stepped:Connect(noclip) -- 持续更新
+            print("穿墙已开启")
+        else
+            -- 关闭穿墙
+            for _, part in pairs(character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = true
+                end
+            end
+            print("穿墙已关闭")
+        end
     end
 })
 
