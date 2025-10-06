@@ -149,11 +149,6 @@ local GameTab = Window:Tab({Title = "99夜脚本", Icon = "gamepad"})
 local VisualTab = Window:Tab({Title = "视觉效果", Icon = "eye"})
 local MiscTab = Window:Tab({Title = "死铁轨", Icon = "settings"})
 
-MainTab:Button({Title = "恼红脚本", Callback = function()
-    loadstring(game:HttpGet("https://pastefy.app/PkYWvKhM/raw"))() 
-    print("恼红已加载")
-end})
-
 MainTab:Button({Title = "r15打飞机墨水禁止脚本", Callback = function()
     loadstring(game:HttpGet("https://pastefy.app/YZoglOyJ/raw"))()
     print("r15打飞机墨水禁用脚本已加载")
@@ -272,6 +267,11 @@ end})
 VisualTab:Slider({Title = "视野距离", Step = 1, Value = {Min = 100, Max = 10000, Default = 1000}, Callback = function(value)
     game.Lighting.FogEnd = value
     print("视野距离设置为: " .. value)
+end})
+
+MiscTab:Button({Title = "恼红脚本", Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/Ringta"))()
+    print("脑红脚本已加载")
 end})
 
 MiscTab:Button({Title = "死铁轨传送脚本", Callback = function()
