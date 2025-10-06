@@ -4,7 +4,10 @@ local function CheckLicense()
     local validLicenses = {
         "小秋4588",  -- 示例卡密
     }
-    
+    local validLicenses = {
+        "小秋我爱你",  -- 示例卡密
+    }
+
     -- 创建卡密输入界面
     local screenGui = Instance.new("ScreenGui")
     screenGui.Name = "LicenseGui"
