@@ -198,6 +198,26 @@ PlayerTab:Toggle({Title = "无限跳跃", Value = false, Callback = function(sta
     end
 end})
 
+PlayerTab:Slider({
+    Title = "穿墙强度", -- 虽然不太合理，但按你要求的格式
+    Step = 1,
+    Value = {Min = 0, Max = 1, Default = 0}, -- 0关闭，1开启
+    Callback = function(value)
+        local NoclipEnabled = value == 1
+        
+        local Character = game.Players.LocalPlayer.Character
+        if Character then
+            for _, part in pairs(Character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = not NoclipEnabled
+                end
+            end
+        end
+        
+        print("穿墙状态: " .. (NoclipEnabled and "开启" or "关闭"))
+    end
+})
+
 PlayerTab:Slider({Title = "移动速度", Step = 1, Value = {Min = 16, Max = 200, Default = 16}, Callback = function(value)
     if game.Players.LocalPlayer.Character then
         game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
