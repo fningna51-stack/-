@@ -227,16 +227,6 @@ GameTab:Button({Title = "力量传奇脚本", Callback = function()
     print("力量传奇脚本已启用")
 end})
 
-GameTab:Button({Title = "doors最强脚本", Callback = function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/YxZad/wdwadXz/refs/heads/main/YEHAX.lua"))()
-    print("doors最强脚本已启用")
-end})
-
-GameTab:Button({Title = "doors主播同款", Callback = function()
-    loadstring(game:HttpGet(("https://raw.githubusercontent.com/mstudio45/poopdoors_edited/main/poopdoors_edited.lua"),true))() 
-    print("doors主播同款已启用")
-end})
-
 GameTab:Button({Title = "xa脚本doors", Callback = function()
     --[[Doors Blackking And BobHub脚本汉化]]loadstring(game:HttpGet("\104\116\116\112\115\58\47\47\112\97\115\116\101\98\105\110\46\99\111\109\47\114\97\119\47\54\53\84\119\84\56\106\97"))()
     print("xa脚本doors已启用")
@@ -282,16 +272,6 @@ end})
 MiscTab:Button({Title = "死铁轨传送脚本", Callback = function()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/gumanba/Scripts/refs/heads/main/DeadRails", true))()
     print("死铁轨传送脚本已加载")
-end})
-
-MiscTab:Button({Title = "死铁轨攻速脚本", Callback = function()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/HeadHarse/DeadRails/refs/heads/main/V4SWING"))()
-    print("死铁轨攻速脚本已加载")
-end})
-
-MiscTab:Button({Title = "红叶", Callback = function()
-(loadstring or load)(game:HttpGet("https://getnative.cc/script/loader"))()
-    print("红叶已加载")
 end})
 
 MiscTab:Button({Title = "仿红叶", Callback = function()
