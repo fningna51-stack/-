@@ -149,6 +149,11 @@ local GameTab = Window:Tab({Title = "99夜脚本", Icon = "gamepad"})
 local VisualTab = Window:Tab({Title = "视觉效果", Icon = "eye"})
 local MiscTab = Window:Tab({Title = "死铁轨", Icon = "settings"})
 
+MainTab:Button({Title = "墨水脚本", Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/Ringta"))()
+    print("墨水脚本已加载")
+end})
+
 MainTab:Button({Title = "r15打飞机墨水禁止脚本", Callback = function()
     loadstring(game:HttpGet("https://pastefy.app/YZoglOyJ/raw"))()
     print("r15打飞机墨水禁用脚本已加载")
