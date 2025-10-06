@@ -212,6 +212,11 @@ PlayerTab:Slider({Title = "跳跃高度", Step = 1, Value = {Min = 50, Max = 200
     end
 end})
 
+GameTab:Button({Title = "力量传奇脚本", Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/jiankeQWQ/JianKeStudio/main/liliangchuanqi"))()
+    print("力量传奇脚本已启用")
+end})
+
 GameTab:Button({Title = "doors最强脚本", Callback = function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/YxZad/wdwadXz/refs/heads/main/YEHAX.lua"))()
     print("doors最强脚本已启用")
