@@ -259,6 +259,11 @@ VisualTab:Slider({Title = "视野距离", Step = 1, Value = {Min = 100, Max = 10
     print("视野距离设置为: " .. value)
 end})
 
+MiscTab:Button({Title = "飞行无回拉", Callback = function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/yes1nt/yes/refs/heads/main/DeadrailsTrial/Deadrails%20Trial%20V2"))()
+    print("飞行无回拉已加载")
+end})
+
 MiscTab:Button({Title = "刷债券无卡密", Callback = function()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/thantzy/thanhub/refs/heads/main/thanv1"))()
     print("刷债券无卡密已加载")
