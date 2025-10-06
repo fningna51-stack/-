@@ -270,7 +270,7 @@ VisualTab:Slider({Title = "视野距离", Step = 1, Value = {Min = 100, Max = 10
 end})
 
 MiscTab:Button({Title = "恼红脚本", Callback = function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/Ringta"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/DynaFetchy/Scripts/refs/heads/main/Loader.lua"))()
     print("脑红脚本已加载")
 end})
 
