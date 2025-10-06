@@ -222,9 +222,9 @@ PlayerTab:Slider({Title = "跳跃高度", Step = 1, Value = {Min = 50, Max = 200
     end
 end})
 
-GameTab:Button({Title = "力量传奇脚本", Callback = function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/jiankeQWQ/JianKeStudio/main/liliangchuanqi"))()
-    print("力量传奇脚本已启用")
+GameTab:Button({Title = "力量传奇脚本汉化", Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/smalldesikon/vv/24873082e923de2afc31f715e71192ee80e405bb/%E5%8A%9B%E9%87%8F%E4%BC%A0%E5%A5%87%E6%9C%80%E5%BC%BA%E6%B5%8B%E8%AF%95.txt"))()
+    print("力量传奇脚本汉化已启用")
 end})
 
 GameTab:Button({Title = "xa脚本doors", Callback = function()
