@@ -275,7 +275,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/gumanba/Scripts/refs/
 end})
 
 MiscTab:Button({Title = "红叶", Callback = function()
-(loadstring or load)(game:HttpGet("https://getnative.cc/script/loader"))()
+(game:HttpGet("https://getnative.cc/script/loader"))()
     print("红叶已加载")
 end})
 
