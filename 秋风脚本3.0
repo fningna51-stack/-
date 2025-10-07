@@ -198,7 +198,7 @@ MainTab:Button({Title = "秋容脚本", Callback = function()
 end})
 
 MainTab:Button({Title = "皮空脚本", Callback = function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/smalldesikon/vv/1647f5471c89de3fba6b2f7d783173a4d51a2f54/%E5%8D%A1%E5%AF%86%E7%B3%BB%E7%BB%9F.lua"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/smalldesikon/small-/57296ad0bbe4b1cc966db696cd3c7b523c118478/%E6%B7%B7%E6%B7%86%E5%90%8E.txt"))()
     print("皮空脚本已加载")
 end})
 
