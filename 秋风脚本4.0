@@ -1,0 +1,483 @@
+-- 卡密验证系统（添加在脚本最前面）
+local function CheckLicense()
+    -- 预设的有效卡密列表
+    local validLicenses = {
+        "小秋4588",
+        "小秋我爱你",
+        -- 可以添加更多卡密
+    }
+
+    -- 创建卡密输入界面
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "LicenseGui"
+    screenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+    
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 350, 0, 250)
+    frame.Position = UDim2.new(0.5, -175, 0.5, -125)
+    frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    frame.BorderSizePixel = 0
+    frame.Parent = screenGui
+    
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(0, 350, 0, 50)
+    title.Position = UDim2.new(0, 0, 0, 10)
+    title.Text = "秋风脚本 - 卡密验证"
+    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.Font = Enum.Font.GothamBold
+    title.TextSize = 24
+    title.BackgroundTransparency = 1
+    title.Parent = frame
+    
+    local desc = Instance.new("TextLabel")
+    desc.Size = UDim2.new(0, 330, 0, 40)
+    desc.Position = UDim2.new(0, 10, 0, 60)
+    desc.Text = "请输入您的卡密以继续使用脚本"
+    desc.TextColor3 = Color3.fromRGB(200, 200, 200)
+    desc.Font = Enum.Font.Gotham
+    desc.TextSize = 16
+    desc.BackgroundTransparency = 1
+    desc.Parent = frame
+    
+    local inputBox = Instance.new("TextBox")
+    inputBox.Size = UDim2.new(0, 330, 0, 40)
+    inputBox.Position = UDim2.new(0, 10, 0, 110)
+    inputBox.PlaceholderText = "在此输入您的卡密"
+    inputBox.Text = ""
+    inputBox.ClearTextOnFocus = false
+    inputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+    inputBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    inputBox.BorderSizePixel = 0
+    inputBox.Font = Enum.Font.Gotham
+    inputBox.TextSize = 16
+    inputBox.Parent = frame
+    
+    local submitButton = Instance.new("TextButton")
+    submitButton.Size = UDim2.new(0, 330, 0, 40)
+    submitButton.Position = UDim2.new(0, 10, 0, 160)
+    submitButton.Text = "验证卡密"
+    submitButton.BackgroundColor3 = Color3.fromHex("4F46E5")
+    submitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    submitButton.Font = Enum.Font.GothamBold
+    submitButton.TextSize = 16
+    submitButton.BorderSizePixel = 0
+    submitButton.Parent = frame
+    
+    local messageLabel = Instance.new("TextLabel")
+    messageLabel.Size = UDim2.new(0, 330, 0, 30)
+    messageLabel.Position = UDim2.new(0, 10, 0, 210)
+    messageLabel.Text = ""
+    messageLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+    messageLabel.Font = Enum.Font.Gotham
+    messageLabel.TextSize = 14
+    messageLabel.BackgroundTransparency = 1
+    messageLabel.Parent = frame
+    
+    -- 验证函数
+    local function VerifyLicense(license)
+        for _, validLicense in ipairs(validLicenses) do
+            if license == validLicense then
+                return true
+            end
+        end
+        return false
+    end
+    
+    -- 创建验证完成信号
+    local verifiedEvent = Instance.new("BindableEvent")
+    
+    -- 等待用户输入并验证
+    submitButton.MouseButton1Click:Connect(function()
+        local license = inputBox.Text:gsub("%s+", "") -- 去除空格
+        
+        if license == "" then
+            messageLabel.Text = "请输入卡密！"
+            return
+        end
+        
+        if VerifyLicense(license) then
+            messageLabel.Text = "验证成功，正在快速加载脚本..."
+            messageLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+            
+            -- 立即触发验证完成事件，不等待
+            verifiedEvent:Fire(true)
+        else
+            messageLabel.Text = "卡密无效，请重试"
+            messageLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+        end
+    end)
+    
+    -- 允许按回车键提交
+    inputBox.FocusLost:Connect(function(enterPressed)
+        if enterPressed then
+            submitButton.MouseButton1Click:Fire()
+        end
+    end)
+    
+    -- 等待验证通过
+    local success = verifiedEvent.Event:Wait()
+    screenGui:Destroy()
+    return success
+end
+
+-- 执行卡密验证
+local success, result = pcall(CheckLicense)
+if not success or not result then
+    warn("卡密验证失败或用户取消")
+    return
+end
+
+print("卡密验证成功，开始快速加载脚本...")
+
+-- 立即加载主脚本内容，不等待
+-- 这里直接放置你的脚本主体内容，或者使用loadstring加载
+-- [[ 你的脚本主体代码开始 ]]
+
+-- 高级防检测与反作弊系统
+local AntiCheat = {
+    Enabled = true,
+    LastCheck = tick(),
+    DetectionCount = 0,
+    MaxDetectionThreshold = 3,
+    SafeMode = false
+}
+
+-- 常见反作弊检测函数
+local function CheckAntiCheat()
+    -- 检测常见反作弊系统
+    local knownAC = {
+        "BadgerAC",
+        "EAC",
+        "SimpleSpy",
+        "SynapseXDetection",
+        "ScriptWareDetector",
+        "KRNL_AC",
+        "FluxusAC",
+        "VegaX_AC"
+    }
+    
+    for _, acName in pairs(knownAC) do
+        if getgenv()[acName] or rawget(_G, acName) then
+            return true, acName
+        end
+    end
+    
+    -- 检查环境异常
+    if getgenv().__PROTECTOR or rawget(_G, "__PROTECTOR") then
+        return true, "GenericProtector"
+    end
+    
+    -- 检查注入痕迹
+    if debug.getinfo(1).source:find("InjectedScript") then
+        return true, "InjectionDetection"
+    end
+    
+    return false, nil
+end
+
+-- 伪装函数
+local function CamouflageEnvironment()
+    -- 伪装常用检测点
+    local fakeEnv = {
+        __PROTECTOR = nil,
+        __ANTICHEAT = nil,
+        __DETECTED = nil,
+        ScriptContext = {
+            GetScripts = function() return {} end
+        },
+        GetObjects = function() return {} end
+    }
+    
+    for k, v in pairs(fakeEnv) do
+        if not rawget(_G, k) then
+            rawset(_G, k, v)
+        end
+    end
+    
+    -- 伪装内存使用
+    if setfpscap then
+        setfpscap(60)
+    end
+    
+    -- 伪装脚本执行环境
+    if hookfunction then
+        local old = hookfunction
+        hookfunction = function(f, new)
+            return old(f, new)
+        end
+    end
+end
+
+-- 反检测主函数
+local function RunAntiDetection()
+    -- 初始检查
+    local detected, acName = CheckAntiCheat()
+    if detected then
+        AntiCheat.DetectionCount = AntiCheat.DetectionCount + 1
+        warn("[AntiCheat] 检测到反作弊系统: "..acName)
+        
+        if AntiCheat.DetectionCount >= AntiCheat.MaxDetectionThreshold then
+            AntiCheat.SafeMode = true
+            warn("[AntiCheat] 安全模式已激活")
+        end
+    end
+    
+    -- 定期检查
+    if tick() - AntiCheat.LastCheck > 30 then
+        AntiCheat.LastCheck = tick()
+        CamouflageEnvironment()
+    end
+    
+    -- 安全模式处理
+    if AntiCheat.SafeMode then
+        -- 禁用高风险功能
+        if game:GetService("Players").LocalPlayer.Character then
+            game:GetService("Players").LocalPlayer.Character:WaitForChild("Humanoid").WalkSpeed = 16
+            game:GetService("Players").LocalPlayer.Character:WaitForChild("Humanoid").JumpPower = 50
+        end
+        
+        -- 清理痕迹
+        for _, v in pairs(getgc()) do
+            if type(v) == "table" and rawget(v, "__ANTICHEAT_FLAG") then
+                v.__ANTICHEAT_FLAG = nil
+            end
+        end
+    end
+end
+
+-- 执行伪装和反检测
+CamouflageEnvironment()
+
+-- 创建定期检查循环
+coroutine.wrap(function()
+    while AntiCheat.Enabled and wait(5) do
+        RunAntiDetection()
+    end
+end)()
+
+-- 脚本卸载时的清理
+game:GetService("Players").LocalPlayer.CharacterAdded:Connect(function()
+    if AntiCheat.SafeMode then
+        wait(1)
+        if game:GetService("Players").LocalPlayer.Character then
+            game:GetService("Players").LocalPlayer.Character:WaitForChild("Humanoid").WalkSpeed = 16
+            game:GetService("Players").LocalPlayer.Character:WaitForChild("Humanoid").JumpPower = 50
+        end
+    end
+end)
+
+game:GetService("Players").LocalPlayer.CharacterRemoving:Connect(function()
+    -- 清理内存痕迹
+    for _, v in pairs(getgc()) do
+        if type(v) == "table" and rawget(v, "__SCRIPT_FLAG") then
+            v.__SCRIPT_FLAG = nil
+        end
+    end
+end)
+
+-- 禁用某些高风险功能的安全模式版本
+local function SafeModeWrapper(func)
+    return function(...)
+        if AntiCheat.SafeMode then
+            warn("[安全模式] 此功能已被临时禁用")
+            return nil
+        end
+        return func(...)
+    end
+end
+
+-- 应用安全模式包装器到高风险功能
+if not AntiCheat.SafeMode then
+    -- 对需要保护的功能应用包装器
+    -- 例如:
+    -- originalFlyFunction = FlyFunction
+    -- FlyFunction = SafeModeWrapper(originalFlyFunction)
+end
+
+print("高级防检测系统已加载")
+
+-- ... 其余原有代码保持不变 ...
+local Window = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))():CreateWindow({
+    Title = "秋风脚本",
+    Icon = "star",
+    Author = "脚本开发者快手小秋",
+    Folder = "ScriptHub",
+    Size = UDim2.fromOffset(600, 400),
+    Transparent = true,
+    Theme = "Dark",
+    User = {
+        Enabled = true,
+        Callback = function() 
+            print("用户信息被点击") 
+        end,
+        Anonymous = false
+    },
+})
+
+Window:EditOpenButton({
+    Title = "打开脚本菜单",
+    Icon = "grid",
+    CornerRadius = UDim.new(0, 12),
+    StrokeThickness = 1,
+    Color = ColorSequence.new(
+        Color3.fromHex("4F46E5"),
+        Color3.fromHex("EC4899")
+    ),
+    Draggable = true,
+})
+
+local MainTab = Window:Tab({Title = "通用脚本", Icon = "home"})
+local PlayerTab = Window:Tab({Title = "玩家设置", Icon = "user"})
+local GameTab = Window:Tab({Title = "99夜脚本", Icon = "gamepad"})
+local VisualTab = Window:Tab({Title = "视觉效果", Icon = "eye"})
+local MiscTab = Window:Tab({Title = "死铁轨", Icon = "settings"})
+
+MainTab:Button({Title = "防摔落伤害脚本", Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/cytj777i/Fall-injury/main/防止摔落伤害"))()
+    print("防摔落伤害脚本已加载")
+end})
+
+MainTab:Button({Title = "r15打飞机墨水禁止脚本", Callback = function()
+    loadstring(game:HttpGet("https://pastefy.app/YZoglOyJ/raw"))()
+    print("r15打飞机墨水禁用脚本已加载")
+end})
+
+MainTab:Button({Title = "r6大飞机墨水禁止脚本", Callback = function()
+    loadstring(game:HttpGet("https://pastefy.app/wa3v2Vgm/raw"))()
+    print("r6打飞机墨水禁用脚本已加载")
+end})
+
+MainTab:Button({Title = "自然灾害通用脚本", Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/2dgeneralspam1/scripts-and-stuff/master/scripts/LoadstringUjHI6RQpz2o8", true))()
+    print("自然灾害通用脚本已加载")
+end})
+
+MainTab:Button({Title = "灾害黑洞脚本", Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/%E5%8F%8C%E7%8E%AF%E6%8E%A7%E5%88%B6%E9%BB%91%E6%B4%9E.txt"))()
+    print("灾害黑洞脚本已加载")
+end})
+
+MainTab:Button({Title = "无敌少侠飞行脚本", Callback = function()
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Invinicible-Flight-R15-45414"))()
+    print("无敌少侠脚本已加载")
+end})
+
+MainTab:Button({Title = "叶脚本", Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/roblox-ye/QQ515966991/refs/heads/main/ROBLOX-CNVIP-XIAOYE.lua"))()
+    print("叶脚本已加载")
+end})
+
+MainTab:Button({Title = "皮脚本", Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/xiaopi77/xiaopi77/main/QQ1002100032-Roblox-Pi-script.lua"))()
+    print("皮脚本已加载")
+end})
+
+MainTab:Button({Title = "秋容脚本", Callback = function()
+    loadstring(game:HttpGet("\104\116\116\112\115\58\47\47\114\97\119\46\103\105\116\104\117\98\117\115\101\114\99\111\110\116\101\110\116\46\99\111\109\47\81\82\56\54\56\54\47\56\56\54\47\114\101\102\115\47\104\101\97\100\115\47\109\97\105\110\47\66\71\72"))()
+    print("秋容脚本已加载")
+end})
+
+MainTab:Button({Title = "皮空脚本", Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/smalldesikon/small-/57296ad0bbe4b1cc966db696cd3c7b523c118478/%E6%B7%B7%E6%B7%86%E5%90%8E.txt"))()
+    print("皮空脚本已加载")
+end})
+
+PlayerTab:Toggle({Title = "无限跳跃", Value = false, Callback = function(state)
+    if state then
+        loadstring(game:HttpGet("https://example.com/infinitejump.lua"))()
+        print("无限跳跃已启用")
+    else
+        print("无限跳跃已禁用")
+    end
+end})
+
+PlayerTab:Slider({Title = "移动速度", Step = 1, Value = {Min = 16, Max = 200, Default = 16}, Callback = function(value)
+    if game.Players.LocalPlayer.Character then
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
+        print("移动速度设置为: " .. value)
+    end
+end})
+
+PlayerTab:Slider({Title = "跳跃高度", Step = 1, Value = {Min = 50, Max = 200, Default = 50}, Callback = function(value)
+    if game.Players.LocalPlayer.Character then
+        game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
+        print("跳跃高度设置为: " .. value)
+    end
+end})
+
+GameTab:Button({Title = "力量传奇脚本汉化", Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/smalldesikon/vv/24873082e923de2afc31f715e71192ee80e405bb/%E5%8A%9B%E9%87%8F%E4%BC%A0%E5%A5%87%E6%9C%80%E5%BC%BA%E6%B5%8B%E8%AF%95.txt"))()
+    print("力量传奇脚本汉化已启用")
+end})
+
+GameTab:Button({Title = "xa脚本doors", Callback = function()
+    --[[Doors Blackking And BobHub脚本汉化]]loadstring(game:HttpGet("\104\116\116\112\115\58\47\47\112\97\115\116\101\98\105\110\46\99\111\109\47\114\97\119\47\54\53\84\119\84\56\106\97"))()
+    print("xa脚本doors已启用")
+end})
+
+GameTab:Button({Title = "99夜汉化虚空", Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/99%E5%A4%9C%E8%99%9A%E7%A9%BA.txt"))()
+    print("99夜汉化虚空已启用")
+end})
+
+GameTab:Button({Title = "op级汉化", Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/99Nights"))()
+    print("op级汉化已启用")
+end})
+
+VisualTab:Toggle({Title = "夜视模式", Value = false, Callback = function(state)
+    if state then
+        game.Lighting.Ambient = Color3.new(1, 1, 1)
+        game.Lighting.Brightness = 2
+        print("夜视模式已启用")
+    else
+        game.Lighting.Ambient = Color3.new(0, 0, 0)
+        game.Lighting.Brightness = 1
+        print("夜视模式已禁用")
+    end
+end})
+
+VisualTab:Toggle({Title = "全亮度", Value = false, Callback = function(state)
+    if state then
+        game.Lighting.GlobalShadows = false
+        print("全亮度已启用")
+    else
+        game.Lighting.GlobalShadows = true
+        print("全亮度已禁用")
+    end
+end})
+
+VisualTab:Slider({Title = "视野距离", Step = 1, Value = {Min = 100, Max = 10000, Default = 1000}, Callback = function(value)
+    game.Lighting.FogEnd = value
+    print("视野距离设置为: " .. value)
+end})
+
+MiscTab:Button({Title = "恼红脚本", Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/DynaFetchy/Scripts/refs/heads/main/Loader.lua"))()
+    print("脑红脚本已加载")
+end})
+
+MiscTab:Button({Title = "死铁轨传送脚本", Callback = function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/gumanba/Scripts/refs/heads/main/DeadRails", true))()
+    print("死铁轨传送脚本已加载")
+end})
+
+MiscTab:Button({Title = "仿红叶", Callback = function()
+loadstring(game:HttpGet("https://rawscripts.net/raw/Dead-Rails-Alpha-FLY-in-Dead-Rails-One-Click-Script-KEYLESS-by-Moondiety-39179"))()
+    print("仿红叶已加载")
+end})
+
+MiscTab:Separator({Text = "工具类"})
+
+MiscTab:Button({Title = "复制游戏ID", Callback = function()
+    setclipboard(tostring(game.PlaceId))
+    print("游戏ID已复制到剪贴板")
+end})
+
+MiscTab:Button({Title = "复制玩家ID", Callback = function()
+    setclipboard(tostring(game.Players.LocalPlayer.UserId))
+    print("玩家ID已复制到剪贴板")
+end})
+
+print("脚本UI已加载完成！")
+print("使用鼠标点击屏幕上的按钮打开菜单")
