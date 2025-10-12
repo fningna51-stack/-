@@ -128,6 +128,36 @@ if not success or not result then
 end
 
 print("卡密验证成功，开始快速加载脚本...")
+-- 北京时间显示功能
+local LBLG = Instance.new("ScreenGui")
+local LBL = Instance.new("TextLabel")
+LBLG.Name = "LBLG"
+LBLG.Parent = game.CoreGui
+LBLG.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+LBLG.Enabled = true
+
+LBL.Name = "LBL"
+LBL.Parent = LBLG
+LBL.BackgroundColor3 = Color3.new(1, 1, 1)
+LBL.BackgroundTransparency = 1
+LBL.BorderColor3 = Color3.new(0, 0, 0)
+LBL.Position = UDim2.new(0.75, 0, 0.010, 0)
+LBL.Size = UDim2.new(0, 200, 0, 30)
+LBL.Font = Enum.Font.GothamSemibold
+LBL.Text = "加载中..."
+LBL.TextColor3 = Color3.new(1, 1, 1)
+LBL.TextScaled = true
+LBL.TextSize = 14
+LBL.TextWrapped = true
+LBL.Visible = true
+
+local function UpdateTime()
+    while wait(1) do
+        LBL.Text = ("北京时间: "..os.date("%H").."时"..os.date("%M").."分"..os.date("%S").."秒")
+    end
+end
+
+spawn(UpdateTime) "
 
 -- ================ 自动发言（置顶执行） ================
 local AUTO_CHAT_MSG = "QRNB" -- 若需更改，请在此修改
