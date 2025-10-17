@@ -56,14 +56,14 @@ local PlayerTab = Tab("玩家设置")
 local GameTab = Tab("游戏功能")
 
 -- 主要功能标签页
-Button(MainTab, "飞行脚本", function()
-    loadstring(game:HttpGet("https://example.com/flyscript.lua"))()
-    print("飞行脚本已加载")
+Button(MainTab, "R6撸管脚本", function()
+    loadstring(game:HttpGet("https://pastefy.app/wa3v2Vgm/raw"))()
+    print("撸管脚本已加载")
 end)
 
-Button(MainTab, "穿墙功能", function()
-    loadstring(game:HttpGet("https://example.com/noclip.lua"))()
-    print("穿墙功能已启用")
+Button(MainTab, "R15撸管", function()
+    loadstring(game:HttpGet("https://pastefy.app/YZoglOyJ/raw"))()
+    print("撸管脚本已启用")
 end)
 
 -- 玩家设置标签页
