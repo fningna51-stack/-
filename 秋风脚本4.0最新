@@ -133,6 +133,11 @@ function loadMainScript()
 
     -- 主要功能标签页
 
+Button(MainTab, "黑洞脚本", function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/%E7%A3%81%E9%93%81%E9%BB%91%E6%B4%9EV2.txt"))()
+        print("黑洞已加载")
+    end)
+
 Button(MainTab, "DOORS（ax）脚本", function()
         --[[Doors Blackking And BobHub脚本汉化]]loadstring(game:HttpGet("\104\116\116\112\115\58\47\47\112\97\115\116\101\98\105\110\46\99\111\109\47\114\97\119\47\54\53\84\119\84\56\106\97"))()
         print("DOORS已加载")
@@ -167,6 +172,11 @@ Button(MainTab, "DOORS（ax）脚本", function()
 Button(MainTab, "皮空脚本", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/smalldesikon/small-/57296ad0bbe4b1cc966db696cd3c7b523c118478/%E6%B7%B7%E6%B7%86%E5%90%8E.txt"))()
         print("皮空脚本已启用")
+    end)
+
+Button(MainTab, "叶脚本", function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/roblox-ye/QQ515966991/refs/heads/main/ROBLOX-CNVIP-XIAOYE.lua"))()
+        print("叶脚本已加载")
     end)
 
     -- 玩家设置标签页
