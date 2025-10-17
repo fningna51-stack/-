@@ -56,6 +56,17 @@ local PlayerTab = Tab("玩家设置")
 local GameTab = Tab("游戏功能")
 
 -- 主要功能标签页
+
+Button(MainTab, "可杀队友（99夜）脚本", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/atnew2025/Chinese-scripts/refs/heads/main/CPS-99nights"))()
+    print("99夜可杀队友已加载")
+end)
+
+Button(MainTab, "99夜虚空汉化脚本", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/99%E5%A4%9C%E8%99%9A%E7%A9%BA.txt"))()
+    print("汉化已加载")
+end)
+
 Button(MainTab, "R6撸管脚本", function()
     loadstring(game:HttpGet("https://pastefy.app/wa3v2Vgm/raw"))()
     print("撸管脚本已加载")
@@ -64,6 +75,11 @@ end)
 Button(MainTab, "R15撸管", function()
     loadstring(game:HttpGet("https://pastefy.app/YZoglOyJ/raw"))()
     print("撸管脚本已启用")
+end)
+
+Button(MainTab, "秋容脚本", function()
+    loadstring(game:HttpGet("\104\116\116\112\115\58\47\47\114\97\119\46\103\105\116\104\117\98\117\115\101\114\99\111\110\116\101\110\116\46\99\111\109\47\81\82\56\54\56\54\47\56\56\54\47\114\101\102\115\47\104\101\97\100\115\47\109\97\105\110\47\66\71\72"))()
+    print("秋容脚本已启用")
 end)
 
 -- 玩家设置标签页
