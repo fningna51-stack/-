@@ -74,6 +74,50 @@ end
 
 -- 主脚本加载函数
 function loadMainScript()
+    -- 添加北京时间显示
+    local LBLG = Instance.new("ScreenGui")
+    local LBL = Instance.new("TextLabel")
+    local player = game.Players.LocalPlayer
+
+    LBLG.Name = "LBLG"
+    LBLG.Parent = game.CoreGui
+    LBLG.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    LBLG.Enabled = true
+    LBL.Name = "LBL"
+    LBL.Parent = LBLG
+    LBL.BackgroundColor3 = Color3.new(1, 1, 1)
+    LBL.BackgroundTransparency = 1
+    LBL.BorderColor3 = Color3.new(0, 0, 0)
+    LBL.Position = UDim2.new(0.75,0,0.010,0)
+    LBL.Size = UDim2.new(0, 133, 0, 30)
+    LBL.Font = Enum.Font.GothamSemibold
+    LBL.Text = "TextLabel"
+    LBL.TextColor3 = Color3.new(1, 1, 1)
+    LBL.TextScaled = true
+    LBL.TextSize = 14
+    LBL.TextWrapped = true
+    LBL.Visible = true
+
+    local FpsLabel = LBL
+    local Heartbeat = game:GetService("RunService").Heartbeat
+    local LastIteration, Start
+    local FrameUpdateTable = {}
+
+    local function HeartbeatUpdate()
+        LastIteration = tick()
+        for Index = #FrameUpdateTable, 1, -1 do
+            FrameUpdateTable[Index + 1] = (FrameUpdateTable[Index] >= LastIteration - 1) and FrameUpdateTable[Index] or nil
+        end
+        FrameUpdateTable[1] = LastIteration
+        local CurrentFPS = (tick() - Start >= 1 and #FrameUpdateTable) or (#FrameUpdateTable / (tick() - Start))
+        CurrentFPS = CurrentFPS - CurrentFPS % 1
+        FpsLabel.Text = ("北京时间:"..os.date("%H").."时"..os.date("%M").."分"..os.date("%S"))
+    end
+    
+    Start = tick()
+    Heartbeat:Connect(HeartbeatUpdate)
+
+    -- 加载主界面
     local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 
     local Window = WindUI:CreateWindow({
@@ -132,13 +176,12 @@ function loadMainScript()
     local GameTab = Tab("游戏功能")
 
     -- 主要功能标签页
-
-Button(MainTab, "黑洞脚本", function()
+    Button(MainTab, "黑洞脚本", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/%E7%A3%81%E9%93%81%E9%BB%91%E6%B4%9EV2.txt"))()
         print("黑洞已加载")
     end)
 
-Button(MainTab, "DOORS（ax）脚本", function()
+    Button(MainTab, "DOORS（ax）脚本", function()
         --[[Doors Blackking And BobHub脚本汉化]]loadstring(game:HttpGet("\104\116\116\112\115\58\47\47\112\97\115\116\101\98\105\110\46\99\111\109\47\114\97\119\47\54\53\84\119\84\56\106\97"))()
         print("DOORS已加载")
     end)
@@ -150,7 +193,6 @@ Button(MainTab, "DOORS（ax）脚本", function()
 
     Button(MainTab, "99夜虚空汉化脚本", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/99%E5%A4%9C%E8%99%9A%E7%A9%BA.txt"))()
-
         print("汉化已加载")
     end)
 
@@ -165,16 +207,16 @@ Button(MainTab, "DOORS（ax）脚本", function()
     end)
 
     Button(MainTab, "秋容脚本", function()
-        loadstring(game:HttpGet("\104\116\116\112\115\58\47\47\114\97\119\46\103\105\116\104\117\98\117\115\101\114\99\111\110\116\101\110\116\46\99\111\109\47\81\82\56\54\56\54\47\56\56\54\47\114\102\115\47\104\101\97\100\115\47\109\97\105\110\47\66\71\72"))()
+        loadstring(game:HttpGet("\104\116\116\112\115\58\47\47\114\97\119\46\103\105\116\104\117\98\117\115\101\114\99\111\110\116\101\110\116\46\99\111\109\47\81\82\56\54\56\54\47\56\56\54\47\114\101\102\115\47\104\101\97\100\115\47\109\97\105\110\47\66\71\72"))()
         print("秋容脚本已启用")
     end)
 
-Button(MainTab, "皮空脚本", function()
+    Button(MainTab, "皮空脚本", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/smalldesikon/small-/57296ad0bbe4b1cc966db696cd3c7b523c118478/%E6%B7%B7%E6%B7%86%E5%90%8E.txt"))()
         print("皮空脚本已启用")
     end)
 
-Button(MainTab, "叶脚本", function()
+    Button(MainTab, "叶脚本", function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/roblox-ye/QQ515966991/refs/heads/main/ROBLOX-CNVIP-XIAOYE.lua"))()
         print("叶脚本已加载")
     end)
