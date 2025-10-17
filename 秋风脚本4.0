@@ -1,0 +1,219 @@
+-- 卡密系统
+local correctPassword = "ks关注XQWANYYDS" -- 设置正确的卡密
+
+-- 创建输入框获取用户输入的卡密
+local function createPasswordPrompt()
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "PasswordPrompt"
+    screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 300, 0, 200)
+    frame.Position = UDim2.new(0.5, -150, 0.5, -100)
+    frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    frame.BorderSizePixel = 0
+    frame.Parent = screenGui
+    
+    local title = Instance.new("TextLabel")
+    title.Text = "秋风脚本重置版 - 卡密验证"
+    title.Size = UDim2.new(1, 0, 0, 40)
+    title.Position = UDim2.new(0, 0, 0, 0)
+    title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.Font = Enum.Font.GothamBold
+    title.TextSize = 16
+    title.Parent = frame
+    
+    local inputBox = Instance.new("TextBox")
+    inputBox.Size = UDim2.new(0.8, 0, 0, 40)
+    inputBox.Position = UDim2.new(0.1, 0, 0.3, 0)
+    inputBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    inputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+    inputBox.PlaceholderText = "请输入卡密"
+    inputBox.Font = Enum.Font.Gotham
+    inputBox.TextSize = 14
+    inputBox.Parent = frame
+    
+    local submitButton = Instance.new("TextButton")
+    submitButton.Text = "验证"
+    submitButton.Size = UDim2.new(0.6, 0, 0, 40)
+    submitButton.Position = UDim2.new(0.2, 0, 0.6, 0)
+    submitButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+    submitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    submitButton.Font = Enum.Font.GothamBold
+    submitButton.TextSize = 14
+    submitButton.Parent = frame
+    
+    local message = Instance.new("TextLabel")
+    message.Text = ""
+    message.Size = UDim2.new(1, 0, 0, 30)
+    message.Position = UDim2.new(0, 0, 0.85, 0)
+    message.BackgroundTransparency = 1
+    message.TextColor3 = Color3.fromRGB(255, 100, 100)
+    message.Font = Enum.Font.Gotham
+    message.TextSize = 12
+    message.Parent = frame
+    
+    submitButton.MouseButton1Click:Connect(function()
+        if inputBox.Text == correctPassword then
+            screenGui:Destroy()
+            loadMainScript() -- 验证通过后加载主脚本
+        else
+            message.Text = "卡密错误，请重新输入！"
+            inputBox.Text = ""
+        end
+    end)
+    
+    -- 按回车键也可以提交
+    inputBox.FocusLost:Connect(function(enterPressed)
+        if enterPressed then
+            submitButton.MouseButton1Click:Fire()
+        end
+    end)
+end
+
+-- 主脚本加载函数
+function loadMainScript()
+    local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+
+    local Window = WindUI:CreateWindow({
+        Title = "秋风脚本重置版",
+        Icon = "door-open",
+        Author = "",
+        Folder = "MyScriptHub",
+        Size = UDim2.fromOffset(560, 360),
+        Transparent = true,
+        Theme = "Dark",
+        User = {
+            Enabled = true,
+            Callback = function() 
+                print("用户信息被点击") 
+            end,
+            Anonymous = true
+        },
+    })
+
+    Window:EditOpenButton({
+        Title = "打开秋风脚本重置版",
+        Icon = "monitor",
+        CornerRadius = UDim.new(0,16),
+        StrokeThickness = 2,
+        Color = ColorSequence.new(
+            Color3.fromHex("FF0F7B"),
+            Color3.fromHex("F89B29")
+        ),
+        Draggable = true,
+    })
+
+    -- 辅助函数定义
+    function Tab(a)
+        return Window:Tab({Title = a, Icon = "eye"})
+    end
+
+    function Button(a, b, c)
+        return a:Button({Title = b, Callback = c})
+    end
+
+    function Toggle(a, b, c, d)
+        return a:Toggle({Title = b, Value = c, Callback = d})
+    end
+
+    function Slider(a, b, c, d, e, f)
+        return a:Slider({Title = b, Step = 1, Value = {Min = c, Max = d, Default = e}, Callback = f})
+    end
+
+    function Dropdown(a, b, c, d, e)
+        return a:Dropdown({Title = b, Values = c, Value = d, Callback = e})
+    end
+
+    -- 创建标签页
+    local MainTab = Tab("主要功能")
+    local PlayerTab = Tab("玩家设置")
+    local GameTab = Tab("游戏功能")
+
+    -- 主要功能标签页
+
+    Button(MainTab, "可杀队友（99夜）脚本", function()
+        loadstring(game:HttpGet("链接4"))()
+        print("99夜可杀队友已加载")
+    end)
+
+    Button(MainTab, "99夜虚空汉化脚本", function()
+        loadstring(game:HttpGet("链接1"))()
+        print("汉化已加载")
+    end)
+
+    Button(MainTab, "R6撸管脚本", function()
+        loadstring(game:HttpGet("链接2"))()
+        print("撸管脚本已加载")
+    end)
+
+    Button(MainTab, "R15撸管", function()
+        loadstring(game:HttpGet("链接3"))()
+        print("撸管脚本已启用")
+    end)
+
+    Button(MainTab, "秋容脚本", function()
+        loadstring(game:HttpGet("\104\116\116\112\115\58\47\47\114\97\119\46\103\105\116\104\117\98\117\115\101\114\99\111\110\116\101\110\116\46\99\111\109\47\81\82\56\54\56\54\47\56\56\54\47\114\102\115\47\104\101\97\100\115\47\109\97\105\110\47\66\71\72"))()
+        print("秋容脚本已启用")
+    end)
+
+    -- 玩家设置标签页
+    Slider(PlayerTab, "移动速度", 16, 200, game.Players.LocalPlayer.Character.Humanoid.WalkSpeed, function(value)
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
+        print("移动速度设置为: " .. value)
+    end)
+
+    Slider(PlayerTab, "跳跃高度", 50, 500, game.Players.LocalPlayer.Character.Humanoid.JumpPower, function(value)
+        game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
+        print("跳跃高度设置为: " .. value)
+    end)
+
+    Toggle(PlayerTab, "夜视模式", false, function(state)
+        if state then
+            game.Lighting.Ambient = Color3.new(1, 1, 1)
+            print("夜视模式已开启")
+        else
+            game.Lighting.Ambient = Color3.new(0, 0, 0)
+            print("夜视模式已关闭")
+        end
+    end)
+
+    -- 游戏功能标签页
+    local games = {
+        "力量传奇",
+        "Brookhaven",
+        "Arsenal",
+        "Piggy"
+    }
+
+    Dropdown(GameTab, "选择游戏", games, "", function(selected)
+        print("已选择游戏: " .. selected)
+
+        if selected == "力量传奇" then
+            Button(GameTab, "加载力量传奇脚本", function()
+                loadstring(game:HttpGet("https://example.com/strengthlegend.lua"))()
+            end)
+        elseif selected == "Brookhaven" then
+            Button(GameTab, "加载Brookhaven脚本", function()
+                loadstring(game:HttpGet("https://example.com/brookhaven.lua"))()
+            end)
+        end
+    end)
+
+    Button(GameTab, "自动农场", function()
+        loadstring(game:HttpGet("https://example.com/autofarm.lua"))()
+        print("自动农场已启动")
+    end)
+
+    -- 重力设置
+    Slider(PlayerTab, "重力设置", -50, 400, workspace.Gravity, function(value)
+        workspace.Gravity = value
+        print("重力设置为: " .. value)
+    end)
+
+    print("脚本界面加载完成！")
+end
+
+-- 启动卡密验证
+createPasswordPrompt()
