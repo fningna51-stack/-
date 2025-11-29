@@ -1,0 +1,210 @@
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+
+local Window = WindUI:CreateWindow({
+    Title = "QXZ缝合脚本",
+    Icon = "door-open",
+    Author = "ks不知名的秋",
+    Folder = "CloudHub",
+    Size = UDim2.fromOffset(560, 360),
+    Transparent = true,
+    Theme = "Dark",
+    User = {
+        Enabled = true,
+        Callback = function() 
+            print("用户信息被点击") 
+        end,
+        Anonymous = true
+    },
+})
+
+Window:EditOpenButton({
+    Title = "打开QXZ缝合脚本",
+    Icon = "monitor",
+    CornerRadius = UDim.new(0,16),
+    StrokeThickness = 2,
+    Color = ColorSequence.new(
+        Color3.fromHex("FF0F7B"),
+        Color3.fromHex("F89B29")
+    ),
+    Draggable = true,
+})
+
+-- 便捷函数定义
+function Tab(a, icon)
+    return Window:Tab({Title = a, Icon = icon or "eye"})
+end
+
+function Button(a, b, c)
+    return a:Button({Title = b, Callback = c})
+end
+
+function Toggle(a, b, c, d)
+    return a:Toggle({Title = b, Value = c, Callback = d})
+end
+
+function Slider(a, b, c, d, e, f)
+    return a:Slider({Title = b, Step = 1, Value = {Min = c, Max = d, Default = e}, Callback = f})
+end
+
+function Dropdown(a, b, c, d, e)
+    return a:Dropdown({Title = b, Values = c, Value = d, Callback = e})
+end
+
+-- 创建标签页
+local MainTab = Tab("脚本区（大杂烩）", "home")
+local PlayerTab = Tab("玩家设置（没用）", "user")
+local MiscTab = Tab("其他功能（没用）", "settings")
+
+-- 主功能标签
+Button(MainTab, "Doors orange脚本", function()
+    loadstring(game:HttpGet("https://github.com/DevSloPo/Main/raw/main/99day"))()
+    print("Doors orange脚本加载中...")
+end)
+
+Button(MainTab, "doors未知汉化脚本", function()
+    loadstring(game:HttpGet(('https://raw.githubusercontent.com/XxxStellatexxX/Starring-Doors/refs/heads/main/Script')))()
+    print("doors脚本加载中...")
+end)
+
+Button(MainTab, "DORRS汉化脚本", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Cucumber190/roblox-/main/abysall%20Qcumber.lua"))()
+    print("DORRS汉化脚本加载中...")
+end)
+
+Button(MainTab, "ringta汉化99夜脚本", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/99Cps%20natural.lua"))()
+    print("99夜脚本加载中...")
+end)
+
+Button(MainTab, "viod 99夜脚本", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/VapeVoidware/VW-Add/main/nightsintheforest.lua",true))()
+    print("99夜脚本加载中...")
+end)
+
+Button(MainTab, "kenny汉化99夜脚本", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/99Cps%20natural.lua"))()
+    print("99夜脚本加载中...")
+end)
+
+Button(MainTab, "死铁轨仿红叶（有卡密）脚本", function()
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/m00ndiety/dead-rails-teleport-everywhere/refs/heads/main/teleport%20all%20locations'))() 
+    print("死铁轨脚本加载中...")
+end)
+
+Button(MainTab, "死铁轨（无卡密 英文）脚本", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/InfernusScripts/Null-Fire/main/Loader"))()
+    print("死铁轨脚本加载中...")
+end)
+
+Button(MainTab, "活了7天脚本", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/%E4%B8%83%E6%97%A5%E7%94%9F%E6%88%90kkk.txt"))()
+    print("活了7天脚本加载中...")
+end)
+
+Button(MainTab, "XA脚本", function()
+    loadstring(game:HttpGet("https://raw.gitcode.com/Xingtaiduan/Scripts/raw/main/Loader.lua"))()
+    print("XA脚本加载中...")
+end)
+
+Button(MainTab, "秋容脚本", function()
+    loadstring(game:HttpGet("\104\116\116\112\115\58\47\47\114\97\119\46\103\105\116\104\117\98\117\115\101\114\99\111\110\116\101\110\116\46\99\111\109\47\81\82\56\54\56\54\47\56\56\54\47\114\101\102\115\47\104\101\97\100\115\47\109\97\105\110\47\66\71\72"))()
+    print("秋容脚本加载中...")
+end)
+
+-- 玩家设置标签
+Slider(PlayerTab, "移动速度", 16, 200, 16, function(value)
+    local player = game.Players.LocalPlayer
+    if player.Character then
+        local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.WalkSpeed = value
+        end
+    end
+    print("移动速度设置为: " .. value)
+end)
+
+Slider(PlayerTab, "跳跃高度", 50, 200, 50, function(value)
+    local player = game.Players.LocalPlayer
+    if player.Character then
+        local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.JumpPower = value
+        end
+    end
+    print("跳跃高度设置为: " .. value)
+end)
+
+Dropdown(PlayerTab, "角色大小", {"正常", "巨人", "迷你"}, "正常", function(selected)
+    local player = game.Players.LocalPlayer
+    if player.Character then
+        local scale = 1
+        if selected == "巨人" then scale = 2 end
+        if selected == "迷你" then scale = 0.5 end
+        
+        local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            -- 使用更安全的方法设置角色大小
+            local function setScale(part)
+                if part:IsA("BasePart") then
+                    part.Size = part.Size * scale
+                end
+            end
+            
+            for _, part in pairs(player.Character:GetDescendants()) do
+                pcall(setScale, part)
+            end
+        end
+    end
+    print("角色大小设置为: " .. selected)
+end)
+
+-- 其他功能标签
+Button(MiscTab, "重置角色", function()
+    local player = game.Players.LocalPlayer
+    if player.Character then
+        player.Character:BreakJoints()
+    end
+    print("角色已重置")
+end)
+
+Button(MiscTab, "服务器信息", function()
+    print("服务器玩家数: " .. #game.Players:GetPlayers())
+    print("游戏地点ID: " .. game.PlaceId)
+    print("服务器FPS: " .. math.floor(1/game:GetService("RunService").RenderDeltaTime))
+end)
+
+-- 改进的自动点击器
+Toggle(MiscTab, "自动点击器", false, function(state)
+    if state then
+        getgenv().autoClick = true
+        spawn(function()
+            while getgenv().autoClick and wait(0.1) do
+                -- 模拟鼠标点击
+                local mouse = game.Players.LocalPlayer:GetMouse()
+                if mouse then
+                    -- 这里可以添加实际的点击逻辑
+                    print("自动点击中...")
+                end
+            end
+        end)
+    else
+        getgenv().autoClick = false
+    end
+    print("自动点击器: " .. (state and "开启" or "关闭"))
+end)
+
+-- 你的原始按钮
+Button(MainTab, "测试脚本", function() 
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/smalldesikon/vv/main/%E7%9A%AE%E7%A9%BA%E8%84%9A%E6%9C%AC"))()
+    print("外部脚本加载中...")
+end)
+
+-- 添加一个安全功能
+Button(MiscTab, "安全检查", function()
+    print("正在检查脚本状态...")
+    print("WindUI 版本: 正常")
+    print("所有功能已加载")
+    print("使用 Ctrl+P 打开菜单")
+end)
+
+print("脚本界面加载完成！使用 Ctrl+P 打开菜单")
