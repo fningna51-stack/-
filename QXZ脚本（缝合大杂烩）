@@ -61,14 +61,15 @@ Button(MainTab, "doors（英文）脚本", function()
     print("脚本加载中...")
 end)
 
-Button(MainTab, "压力脚本", function()
-    loadstring(game:HttpGet('https://raw.githubusercontent.com/ohiojjj/78/main/.github/workflows/Protected_5509067665689579.lua'))()
+Button(MainTab, "刀刃球脚本", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/nodex.lua"))()
+
     print("Doors orange脚本加载中...")
 end)
 
-Button(MainTab, "墨水游戏（op）脚本", function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/ScripterVaz/InkGameAzure/main/Protected_7974105512464815.lua.txt"))()
-    print("doors脚本加载中...")
+Button(MainTab, "蛊脚本", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/sdxs221/-/main/爱别离"))()
+    print("脚本加载中...")
 end)
 
 Button(MainTab, "DORRS汉化脚本", function()
