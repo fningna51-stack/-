@@ -112,6 +112,11 @@ Button(MainTab, "全英文（闪光FPS）脚本", function()
     print("脚本加载中...")
 end)
 
+Button(MainTab, "自然灾害脚本", function()
+    loadstring(game:HttpGet(('https://raw.githubuser...) 
+    print("脚本加载中...")
+end)
+
 Button(MainTab, "XA脚本", function()
     loadstring(game:HttpGet("https://raw.gitcode.com/Xingtaiduan/Scripts/raw/main/Loader.lua"))()
     print("XA脚本加载中...")
