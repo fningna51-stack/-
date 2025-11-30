@@ -107,7 +107,7 @@ Button(MainTab, "活了7天脚本", function()
 end)
 
 Button(MainTab, "全英文（闪光FPS）脚本", function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/bocaj111004/AbysallHub/refs/heads/main/Loader.lua"))()
+    loadstring(game:HttpGet("https://pastebin.com/raw/RZK9XdtH"))()
     print("脚本加载中...")
 end)
 
