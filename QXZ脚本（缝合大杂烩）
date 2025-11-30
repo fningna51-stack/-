@@ -61,13 +61,13 @@ Button(MainTab, "doors（英文）脚本", function()
     print("脚本加载中...")
 end)
 
-Button(MainTab, "Doors orange脚本", function()
-    loadstring(game:HttpGet("https://github.com/DevSloPo/Main/raw/main/99day"))()
+Button(MainTab, "压力脚本", function()
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/ohiojjj/78/main/.github/workflows/Protected_5509067665689579.lua'))()
     print("Doors orange脚本加载中...")
 end)
 
-Button(MainTab, "doors未知汉化脚本", function()
-    loadstring(game:HttpGet(('https://raw.githubusercontent.com/XxxStellatexxX/Starring-Doors/refs/heads/main/Script')))()
+Button(MainTab, "墨水游戏（op）脚本", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ScripterVaz/InkGameAzure/main/Protected_7974105512464815.lua.txt"))()
     print("doors脚本加载中...")
 end)
 
