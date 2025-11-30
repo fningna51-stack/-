@@ -204,9 +204,10 @@ Toggle(MiscTab, "自动点击器", false, function(state)
 end)
 
 -- 你的原始按钮
-Button(MainTab, "测试脚本", function() 
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/smalldesikon/vv/main/%E7%9A%AE%E7%A9%BA%E8%84%9A%E6%9C%AC"))()
-    print("外部脚本加载中...")
+Button(MainTab, "kg（FPS）脚本", function() 
+    KG_SCRIPT = "张硕制作"
+loadstring(game:HttpGet("https://github.com/ZS-NB/KG/raw/main/Zhang-Shuo.lua"))()
+    print("KG脚本加载中...")
 end)
 
 -- 添加一个安全功能
