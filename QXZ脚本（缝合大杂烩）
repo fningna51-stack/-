@@ -56,6 +56,11 @@ local PlayerTab = Tab("玩家设置（没用）", "user")
 local MiscTab = Tab("其他功能（没用）", "settings")
 
 -- 主功能标签
+Button(MainTab, "doors（英文）脚本", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/bocaj111004/AbysallHub/refs/heads/main/Loader.lua"))()
+    print("脚本加载中...")
+end)
+
 Button(MainTab, "Doors orange脚本", function()
     loadstring(game:HttpGet("https://github.com/DevSloPo/Main/raw/main/99day"))()
     print("Doors orange脚本加载中...")
