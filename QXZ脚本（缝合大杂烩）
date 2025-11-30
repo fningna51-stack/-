@@ -112,9 +112,14 @@ Button(MainTab, "全英文（闪光FPS）脚本", function()
     print("脚本加载中...")
 end)
 
-Button(MainTab, "自然灾害脚本", function()
-    loadstring(game:HttpGet(('https://raw.githubuser...) 
-    print("脚本加载中...")
+Button(MainTab, "自然灾害FW脚本", function()
+     loadstring(game:HttpGet('https://raw.githubusercontent.com/9NLK7/93qjoadnlaknwldk/main/main'))()
+    print("自然灾害脚本加载中...")
+end)
+
+Button(MainTab, "自然灾害甩飞脚本", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/0Ben1/fe./main/Fling%20GUI"))()
+    print("自然灾害脚本加载中...")
 end)
 
 Button(MainTab, "XA脚本", function()
