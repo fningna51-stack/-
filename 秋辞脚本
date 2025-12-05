@@ -12,7 +12,7 @@ local MainTab = Window:MakeTab({
 })
 
 local PlayerTab = Window:MakeTab({
-    Title = "玩家设置（没用）",
+    Title = "玩家设置",
     Icon = "user"
 })
 
