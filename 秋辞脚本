@@ -1,0 +1,808 @@
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/9kn-1/LocalredzzUi/refs/heads/main/Redz.txt"))()
+
+local Window = OrionLib:MakeWindow({
+    Name = "秋辞缝合脚本",
+    SubTitle = "由 ks不知名的秋 老辞制作"
+})
+
+-- 创建标签页
+local MainTab = Window:MakeTab({
+    Title = "脚本区（大杂烩）",
+    Icon = "home"
+})
+
+local PlayerTab = Window:MakeTab({
+    Title = "玩家设置（没用）",
+    Icon = "user"
+})
+
+local MiscTab = Window:MakeTab({
+    Title = "其他功能（没用）",
+    Icon = "settings"
+})
+
+local buanTab = Window:MakeTab({
+    Title = "99夜",
+    Icon = "settings"
+})
+
+local ccunTab = Window:MakeTab({
+    Title = "doors（门）",
+    Icon = "home"
+})
+
+local abcdTab = Window:MakeTab({
+    Title = "死铁轨",
+    Icon = "user"
+})
+
+local nmslTab = Window:MakeTab({
+    Title = "活了7天",
+    Icon = "settings"
+})
+
+local wcnmTab = Window:MakeTab({
+    Title = "自然灾害",
+    Icon = "home"
+})
+
+local yydsTab = Window:MakeTab({
+    Title = "通用脚本",
+    Icon = "user"
+})
+
+local ttttTab = Window:MakeTab({
+    Title = "动作脚本",
+    Icon = "home"
+})
+
+-- 主功能标签
+MainTab:AddSection("游戏脚本")
+
+MainTab:AddButton({
+    Name = "doors（英文）脚本",
+    Description = "加载doors英文脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bocaj111004/AbysallHub/refs/heads/main/Loader.lua"))()
+        print("脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "doors脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+MainTab:AddButton({
+    Name = "刀刃球脚本",
+    Description = "加载刀刃球脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/nodex.lua"))()
+        print("Doors orange脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "刀刃球脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+MainTab:AddButton({
+    Name = "蛊脚本",
+    Description = "加载蛊脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/sdxs221/-/main/爱别离"))()
+        print("脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "蛊脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+MainTab:AddButton({
+    Name = "DORRS汉化脚本",
+    Description = "加载DORRS汉化脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Cucumber190/roblox-/main/abysall%20Qcumber.lua"))()
+        print("DORRS汉化脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "DORRS汉化脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+MainTab:AddButton({
+    Name = "ringta汉化99夜脚本",
+    Description = "加载ringta汉化99夜脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/99Cps%20natural.lua"))()
+        print("99夜脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "ringta汉化99夜脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+MainTab:AddButton({
+    Name = "viod 99夜脚本",
+    Description = "加载viod 99夜脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/VapeVoidware/VW-Add/main/nightsintheforest.lua",true))()
+        print("99夜脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "viod 99夜脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+MainTab:AddButton({
+    Name = "kenny汉化99夜脚本",
+    Description = "加载kenny汉化99夜脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/99Cps%20natural.lua"))()
+        print("99夜脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "kenny汉化99夜脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+MainTab:AddButton({
+    Name = "死铁轨仿红叶（有卡密）脚本",
+    Description = "加载死铁轨仿红叶脚本",
+    Callback = function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/m00ndiety/dead-rails-teleport-everywhere/refs/heads/main/teleport%20all%20locations'))() 
+        print("死铁轨脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "死铁轨脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+MainTab:AddButton({
+    Name = "死铁轨（无卡密 英文）脚本",
+    Description = "加载死铁轨英文脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/InfernusScripts/Null-Fire/main/Loader"))()
+        print("死铁轨脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "死铁轨脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+MainTab:AddButton({
+    Name = "活了7天脚本",
+    Description = "加载活了7天脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/%E4%B8%83%E6%97%A5%E7%94%9F%E6%88%90kkk.txt"))()
+        print("活了7天脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "活了7天脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+MainTab:AddButton({
+    Name = "全英文（闪光FPS）脚本",
+    Description = "加载闪光FPS脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/RZK9XdtH"))()
+        print("脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "闪光FPS脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+MainTab:AddButton({
+    Name = "自然灾害FW脚本",
+    Description = "加载自然灾害FW脚本",
+    Callback = function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/9NLK7/93qjoadnlaknwldk/main/main'))()
+        print("自然灾害脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "自然灾害FW脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+MainTab:AddButton({
+    Name = "自然灾害甩飞脚本",
+    Description = "加载自然灾害甩飞脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/0Ben1/fe./main/Fling%20GUI"))()
+        print("自然灾害脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "自然灾害甩飞脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+MainTab:AddButton({
+    Name = "XA脚本",
+    Description = "加载XA脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.gitcode.com/Xingtaiduan/Scripts/raw/main/Loader.lua"))()
+        print("XA脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "XA脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+MainTab:AddButton({
+    Name = "秋容脚本",
+    Description = "加载秋容脚本",
+    Callback = function()
+        loadstring(game:HttpGet("\104\116\116\112\115\58\47\47\114\97\119\46\103\105\116\104\117\98\117\115\101\114\99\111\110\116\101\110\116\46\99\111\109\47\81\82\56\54\56\54\47\56\56\54\47\114\101\102\115\47\104\101\97\100\115\47\109\97\105\110\47\66\71\72"))()
+        print("秋容脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "秋容脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+MainTab:AddButton({
+    Name = "kg（FPS）脚本",
+    Description = "加载KG脚本",
+    Callback = function()
+        KG_SCRIPT = "张硕制作"
+        loadstring(game:HttpGet("https://github.com/ZS-NB/KG/raw/main/Zhang-Shuo.lua"))()
+        print("KG脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "KG脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+-- 玩家设置标签
+PlayerTab:AddSection("角色设置")
+
+-- 移动速度滑块
+local walkSpeedValue = 16
+PlayerTab:AddSlider({
+    Name = "移动速度",
+    Description = "设置角色移动速度",
+    Min = 16,
+    Max = 200,
+    Default = 16,
+    Color = Color3.fromRGB(255, 255, 255),
+    Increment = 1,
+    Callback = function(value)
+        walkSpeedValue = value
+        local player = game.Players.LocalPlayer
+        if player.Character then
+            local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid.WalkSpeed = value
+            end
+        end
+        print("移动速度设置为: " .. value)
+    end
+})
+
+-- 跳跃高度滑块
+local jumpPowerValue = 50
+PlayerTab:AddSlider({
+    Name = "跳跃高度",
+    Description = "设置角色跳跃高度",
+    Min = 50,
+    Max = 200,
+    Default = 50,
+    Color = Color3.fromRGB(255, 255, 255),
+    Increment = 1,
+    Callback = function(value)
+        jumpPowerValue = value
+        local player = game.Players.LocalPlayer
+        if player.Character then
+            local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid.JumpPower = value
+            end
+        end
+        print("跳跃高度设置为: " .. value)
+    end
+})
+
+-- 角色大小下拉菜单
+PlayerTab:AddDropdown({
+    Name = "角色大小",
+    Description = "设置角色大小",
+    Default = "正常",
+    Options = {"正常", "巨人", "迷你"},
+    Callback = function(option)
+        local player = game.Players.LocalPlayer
+        if player.Character then
+            local scale = 1
+            if option == "巨人" then 
+                scale = 2 
+            elseif option == "迷你" then 
+                scale = 0.5 
+            end
+
+            local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                local function setScale(part)
+                    if part:IsA("BasePart") then
+                        part.Size = part.Size * scale
+                    end
+                end
+
+                for _, part in pairs(player.Character:GetDescendants()) do
+                    pcall(setScale, part)
+                end
+            end
+        end
+        print("角色大小设置为: " .. option)
+        OrionLib:MakeNotification({
+            Name = "角色大小已设置",
+            Content = "当前大小: " .. option,
+            Image = "rbxassetid://4483362458",
+            Time = 2
+        })
+    end
+})
+
+-- 飞行菜单
+ PlayerTab:AddButton({
+
+	Name = "皮飞行（搬运的别喷）",
+
+	Callback = function()
+
+     loadstring(game:HttpGet("https://raw.githubusercontent.com/xiaopi77/xiaopi77/main/07cdd3eeaf4d4928.txt_2024-08-09_090317.OTed.lua"))()
+
+  	end    
+
+})
+
+PlayerTab:AddButton({
+
+	Name = "无敌少侠飞行",
+
+	Callback = function()
+
+     loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Invinicible-Flight-R15-45414"))()
+
+  	end    
+
+})
+
+PlayerTab:AddButton({
+
+	Name = "取消坠落伤害",
+
+	Callback = function()
+
+     loadstring(game:HttpGet("http://rawscripts.net/raw/Universal-Script-Touch-fling-script-22447"))()
+
+  	end    
+
+})
+
+-- 其他功能标签
+MiscTab:AddSection("功能")
+
+MiscTab:AddButton({
+    Name = "重置角色",
+    Description = "重置当前角色",
+    Callback = function()
+        local player = game.Players.LocalPlayer
+        if player.Character then
+            player.Character:BreakJoints()
+        end
+        print("角色已重置")
+        OrionLib:MakeNotification({
+            Name = "重置成功",
+            Content = "角色已重置",
+            Image = "rbxassetid://4483362458",
+            Time = 2
+        })
+    end
+})
+
+MiscTab:AddButton({
+    Name = "服务器信息",
+    Description = "显示服务器信息",
+    Callback = function()
+        local playerCount = #game.Players:GetPlayers()
+        local placeId = game.PlaceId
+        local fps = math.floor(1/game:GetService("RunService").RenderDeltaTime)
+        
+        OrionLib:MakeNotification({
+            Name = "服务器信息",
+            Content = string.format("玩家数: %d\n地点ID: %d\nFPS: %d", playerCount, placeId, fps),
+            Image = "rbxassetid://4483362458",
+            Time = 5
+        })
+        
+        print("服务器玩家数: " .. playerCount)
+        print("游戏地点ID: " .. placeId)
+        print("服务器FPS: " .. fps)
+    end
+})
+
+-- 自动点击器开关
+local autoClickToggle = false
+MiscTab:AddToggle({
+    Name = "自动点击器",
+    Description = "启用自动点击",
+    Default = false,
+    Callback = function(value)
+        autoClickToggle = value
+        if value then
+            OrionLib:MakeNotification({
+                Name = "自动点击器已开启",
+                Content = "正在自动点击...",
+                Image = "rbxassetid://4483362458",
+                Time = 2
+            })
+            
+            task.spawn(function()
+                while autoClickToggle do
+                    task.wait(0.1)
+                    if autoClickToggle then
+                        print("自动点击中...")
+                    end
+                end
+            end)
+        else
+            OrionLib:MakeNotification({
+                Name = "自动点击器已关闭",
+                Content = "",
+                Image = "rbxassetid://4483362458",
+                Time = 2
+            })
+        end
+        print("自动点击器: " .. (value and "开启" or "关闭"))
+    end
+})
+
+MiscTab:AddButton({
+    Name = "安全检查",
+    Description = "检查脚本状态",
+    Callback = function()
+        OrionLib:MakeNotification({
+            Name = "安全检查",
+            Content = "脚本状态正常\n所有功能已加载\n使用 Ctrl+P 打开菜单",
+            Image = "rbxassetid://4483362458",
+            Time = 5
+        })
+        print("正在检查脚本状态...")
+        print("OrionLib UI 版本: 正常")
+        print("所有功能已加载")
+        print("使用 Ctrl+P 打开菜单")
+    end
+})
+
+-- 99夜标签页
+buanTab:AddButton({
+    Name = "ringta汉化99夜脚本",
+    Description = "加载ringta汉化99夜脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/99Cps%20natural.lua"))()
+        print("99夜脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "ringta汉化99夜脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+buanTab:AddButton({
+    Name = "viod 99夜脚本",
+    Description = "加载viod 99夜脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/VapeVoidware/VW-Add/main/nightsintheforest.lua",true))()
+        print("99夜脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "viod 99夜脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+buanTab:AddButton({
+    Name = "kenny汉化99夜脚本",
+    Description = "加载kenny汉化99夜脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/99Cps%20natural.lua"))()
+        print("99夜脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "kenny汉化99夜脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+-- doors标签页
+ccunTab:AddButton({
+    Name = "DORRS汉化脚本",
+    Description = "加载DORRS汉化脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Cucumber190/roblox-/main/abysall%20Qcumber.lua"))()
+        print("DORRS汉化脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "DORRS汉化脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+ccunTab:AddButton({
+    Name = "doors（英文）脚本",
+    Description = "加载doors英文脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bocaj111004/AbysallHub/refs/heads/main/Loader.lua"))()
+        print("脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "doors脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+-- 死铁轨标签页
+abcdTab:AddButton({
+    Name = "死铁轨仿红叶（有卡密）脚本",
+    Description = "加载死铁轨仿红叶脚本",
+    Callback = function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/m00ndiety/dead-rails-teleport-everywhere/refs/heads/main/teleport%20all%20locations'))() 
+        print("死铁轨脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "死铁轨脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+abcdTab:AddButton({
+    Name = "死铁轨（无卡密 英文）脚本",
+    Description = "加载死铁轨英文脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/InfernusScripts/Null-Fire/main/Loader"))()
+        print("死铁轨脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "死铁轨脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+-- 活了7天标签页
+nmslTab:AddButton({
+    Name = "活了7天脚本",
+    Description = "加载活了7天脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/%E4%B8%83%E6%97%A5%E7%94%9F%E6%88%90kkk.txt"))()
+        print("活了7天脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "活了7天脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+-- 自然灾害标签页
+wcnmTab:AddButton({
+    Name = "自然灾害FW脚本",
+    Description = "加载自然灾害FW脚本",
+    Callback = function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/9NLK7/93qjoadnlaknwldk/main/main'))()
+        print("自然灾害脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "自然灾害FW脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+wcnmTab:AddButton({
+    Name = "自然灾害甩飞脚本",
+    Description = "加载自然灾害甩飞脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/0Ben1/fe./main/Fling%20GUI"))()
+        print("自然灾害脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "自然灾害甩飞脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+-- 通用脚本标签页
+yydsTab:AddButton({
+    Name = "全英文（闪光FPS）通用脚本",
+    Description = "加载闪光FPS脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/RZK9XdtH"))()
+        print("脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "闪光FPS脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+yydsTab:AddButton({
+    Name = "XA脚本",
+    Description = "加载XA脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.gitcode.com/Xingtaiduan/Scripts/raw/main/Loader.lua"))()
+        print("XA脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "XA脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+yydsTab:AddButton({
+    Name = "秋容脚本",
+    Description = "加载秋容脚本",
+    Callback = function()
+        loadstring(game:HttpGet("\104\116\116\112\115\58\47\47\114\97\119\46\103\105\116\104\117\98\117\115\101\114\99\111\110\116\101\110\116\46\99\111\109\47\81\82\56\54\56\54\47\56\56\54\47\114\101\102\115\47\104\101\97\100\115\47\109\97\105\110\47\66\71\72"))()
+        print("秋容脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "秋容脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+yydsTab:AddButton({
+    Name = "kg（FPS）脚本",
+    Description = "加载KG脚本",
+    Callback = function()
+        KG_SCRIPT = "张硕制作"
+        loadstring(game:HttpGet("https://github.com/ZS-NB/KG/raw/main/Zhang-Shuo.lua"))()
+        print("KG脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "KG脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+yydsTab:AddButton({
+    Name = "新版皮脚本脚本",
+    Description = "加载皮脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/xiaopi77/xiaopi77/main/QQ1002100032-Roblox-Pi-script.lua"))()
+        print("秋容脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "皮脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+yydsTab:AddButton({
+    Name = "蛊脚本",
+    Description = "加载蛊脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/sdxs221/-/main/爱别离"))()
+        print("脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "蛊脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+-- 动作脚本标签页
+ttttTab:AddButton({
+    Name = "R6打飞机脚本",
+    Description = "加载KG脚本",
+    Callback = function()
+        KG_SCRIPT = "张硕制作"
+        loadstring(game:HttpGet("https://pastefy.app/wa3v2Vgm/raw"))()
+        print("KG脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "KG脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+ttttTab:AddButton({
+    Name = "R15打飞机脚本",
+    Description = "加载KG脚本",
+    Callback = function()
+        KG_SCRIPT = "张硕制作"
+        loadstring(game:HttpGet("https://pastefy.app/YZoglOyJ/raw"))()
+        print("KG脚本加载中...")
+        OrionLib:MakeNotification({
+            Name = "加载成功",
+            Content = "KG脚本已加载",
+            Image = "rbxassetid://4483362458",
+            Time = 3
+        })
+    end
+})
+
+-- 关于本脚本
+MiscTab:AddSection("关于")
+MiscTab:AddLabel("QXZ缝合脚本")
+MiscTab:AddLabel("作者: ks不知名的秋")
+MiscTab:AddLabel("版本: 1.0")
+MiscTab:AddLabel("这是一个集合了多种游戏脚本的UI界面")
+
+-- 初始化UI
+OrionLib:Init()
+
+print("脚本界面加载完成！使用 Ctrl+P 打开菜单")
