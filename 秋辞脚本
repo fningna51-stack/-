@@ -56,6 +56,11 @@ local ttttTab = Window:MakeTab({
     Icon = "home"
 })
 
+local aaaaTab = Window:MakeTab({
+    Title = "复制区",
+    Icon = "home"
+})
+
 -- 主功能标签
 MainTab:AddSection("游戏脚本")
 
@@ -793,6 +798,30 @@ ttttTab:AddButton({
             Time = 3
         })
     end
+})
+-- 复制区菜单
+aaaaTab:AddButton({
+
+	Name = "复制作者QQ",
+
+	Callback = function()
+
+     setclipboard("3435286177")
+
+  	end
+
+})
+
+aaaaTab:AddButton({
+
+	Name = "复制作者快手",
+
+	Callback = function()
+
+     setclipboard("KSWCNMBWFL")
+
+  	end
+
 })
 
 -- 关于本脚本
