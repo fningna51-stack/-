@@ -1,2 +1,1 @@
-Error: ERROR at line 1: Unexpected token (1:6)
-> ...local OrionLib = load...
+loadstring(game:HttpGet("https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%A7%8B%E8%BE%9E%E8%84%9A%E6%9C%AC"))()
