@@ -240,6 +240,13 @@ local Translations = {
     ["Set as autoload"]="设置成自动加载",
     ["Reset autoload"]="重置自动加载",
     ["Current autoload config: none"]="当前自动加载配置:无",
+    ["Auto Gonggi（Remote）"]="自动抓石子",
+    ["Troll"]="必输",
+    ["Manual"]="失误",
+    ["Perfect"]="完美",
+    ["Player（NOT FE）"]="玩家设置",
+    ["Biggest Threat"]="确定",
+    ["None"]="无",
 }
 
 local function translateText(text)
