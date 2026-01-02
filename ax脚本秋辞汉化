@@ -1,6 +1,7 @@
-local Translations = {
+do 
+    local Translations={
         Toggle="开关",
-        ["AX-SCRIPTS"]="AX 有芙同享 秋辞汉化",
+        ["AX-SCRIPTS"]="AX <font color='#7FC8F0'>有</font><font color='#74C0EB'>芙</font><font color='#69B8E6'>同</font><font color='#5EB0E1'>享</font><font color='#53A8DC'>秋</font><font color='#48A0D7'>辞</font><font color='#3D98D2'>汉</font><font color='#3290CD'>化</font>", 
         Games="游戏",
         Combat="攻击",
         Miscs="杂项",
@@ -11,17 +12,17 @@ local Translations = {
         ["Disable Injury"]="移除受伤状态",
         ["Finish RLGL"]="传送终点",
         Dalgona="扣糖饼",
-        ["Anti Crack"]="无敌糖饼（有用要动画结束后使用）",
+        ["Anti Crack"]="糖饼不碎（等动画结束后再开）",
         ["Get Lighter"]="免费火机",
         ["Auto Dalgona"]="自动扣糖饼",
-        ["Auto Dalgona V2"]="自动扣糖饼V2(不能用)",
+        ["Auto Dalgona V2"]="自动扣糖饼V2(等动画结束后)",
         ["Lights Out"]="熄灯",
         ["Safe Zone"]="传送到安全点",
         ["Tug of War"]="拔河",
         ["Rope Pull Mode"]="自动拔河力度",
         Normal="正常",
-        ["没找到素材"]="疯狂",
-        ["Pull Rope"]="超级狂暴",
+        ["没找到素材"]="狂暴",
+        ["Pull Rope"]="自动拔河",
         ["Hide N' Seek"]="躲猫猫",
         ["Show Exit Doors (Yellow)"]="透视逃生门(黄)",
         ["Show Doors (Green | Cir/Tri/Sqr)"]="透视门(绿|圆形/三角形/正方形)",
@@ -30,24 +31,24 @@ local Translations = {
         ["Show Spikes (Black)"]="透视尖刺陷阱(黑)",
         ["Pickup Keys"]="自动捡钥匙",
         ["Auto Escape"]="自捡钥匙2",
-        ["Auto Dodge"]="自动格挡",
+        ["Auto Dodge"]="自动闪避",
         ["Infinite Stamina"]="无限耐力",
         ["Fast Sprint"]="解锁快速冲刺",
         ["Spikes Kill"]="尖刺陷阱击杀",
-        ["Disable Spikes"]="禁用尖刺",
-        ["Teleport to Hider"]="传送到蓝色方",
-        ["Teleport to Seeker"]="传送到红色方",
+        ["Disable Spikes"]="禁用尖刺(尖刺击杀时需要打开)",
+        ["Teleport to Hider"]="传送到蓝色",
+        ["Teleport to Seeker"]="传送到红色",
         ["Select Exit Door"]="选择逃生门",
         ["Teleport to Exit Door"]="传送到逃生门",
         Rebel="反叛",
-        ["Auto Shoot Guard"]="自动攻击守卫",
-        ["Wall Check"]="墙壁检测",
-        ["Guard Hitbox+ESP"]="守卫碰撞箱和位置",
-        ["Hitbox Size"]="碰撞箱大小",
-        ["Hitbox Transparency"]="碰撞箱透明度",
+        ["Auto Shoot Guards"]="自动攻击守卫",
+        ["Wall Check"]="墙壁检测（不会击杀在墙后面的守卫）",
+        ["Guards Hitbox + ESP"]="增大守卫和透视",
+        ["Hitbox Size"]="范围大小",
+        ["Hitbox Transparency"]="范围透明度",
         ["Last Dinner"]="最后的晚餐",
-        ["Zone Kill"]="把玩家传送杀死",
-        ["Squid Game"]="1V1对决",
+        ["Zone Kill"]="传送杀人",
+        ["Squid Game"]="螃蟹游戏",
         ["Get Rock"]="自动获得石头",
         Pentathlon="五人六足",
         ["Glass Bridge"]="玻璃桥",
@@ -58,10 +59,9 @@ local Translations = {
         ["Finish Jump Rope"]="传送到终点",
         ["Disable Game"]="禁用游戏",
         ["Simulate Balance"]="一直平衡",
-        ["Auto Jump"]="自动跳(没用)",
+        ["Auto Jump"]="自动跳",
         ["Fix Broken Tracks"]="修复桥梁",
         ["Unlimited Chances"]="无限机会",
-        ["Bypass Rope"]="删除绳子",
         ["Auto Balance"]="自动平衡",
         ["Press Speed"]="点击速度",
         ["Randomize Press Speed"]="随机速度",
@@ -70,7 +70,7 @@ local Translations = {
         ["Get Pole"]="自动得到棍子",
         ["Anti Fall"]="防止摔倒",
         ["Void Kill"]="虚空杀人",
-        ["Auto Ddakji (Remote)"]="自动打纸牌",
+        ["Auto Ddakji (Remote)"]="自动打纸牌(作用不大)",
         ["Auto Flying Stone (Remote)"]="自动打石子",
         ["Auto Gonggi (Remote)"]="自动抓石子",
         ["Auto Spinning Top (Remote)"]="自动陀螺",
@@ -82,9 +82,9 @@ local Translations = {
         ["Spinning Top Auto Balance"]="自动陀螺",
         ["Spinning Top Speed"]="陀螺平衡速度",
         ["Randomize Balance Speed"]="随机陀螺平衡速度",
-        ["Guard Aimlock"]="守卫攻击方向",
-        Closest="离得最近的",
-        LookingAt="看到的位置",
+        ["Guard Aimlock"]="守卫自瞄",
+        Closest="离你最近的",
+        LookingAt="你能看到的位置（墙壁检测）",
         Aimlock="瞄准锁定",
         ["Aimlock Mode"]="瞄准锁定模式",
         ["Auto Shoot"]="自动攻击",
@@ -100,21 +100,21 @@ local Translations = {
         ["Scope FOV"]="范围视野",
         ["Bullets Per Fire"]="每次射击的子弹（应该是增加每次射出的子弹）",
         ["Bullet Size"]="子弹大小（没范围好用）",
-        ["Auto Shoot (Silent Aim)"]="自动攻击（自动打人用时会失效)",
+        ["Auto Shoot (Silent Aim)"]="自动攻击",
         Guns="枪械",
         ["Modded Guns"]="枪械加成",
         Utilities="实用",
         ["Player Info"]="玩家信息",
         ["Select Player"]="选择玩家",
         ["Biggest Threat"]="最高胜场",
-        ["Hitbox"]="碰撞箱",
+        ["Hitbox"]="范围",
         ["Select a player to view info"]="选择玩家查看信息",
-        ["Guard Hitbox+ESP"]="守卫碰撞箱+透视",
+        ["Guard Hitbox+ESP"]="增大守卫范围+透视",
         ["Key System"]="卡密系统",
-        Authentication="卡密认证2（1打不开用2）",
+        Authentication="卡密认证",
         ["Enter Key"]="输入卡密",
         ["Get Key (Linkvertise)"]="得到卡密",
-        ["Get Key (Work Ink)"]="得到卡密",
+        ["Get Key (Work.Ink)"]="得到卡密",
         ["Check Key"]="检查卡密",
         ["Join Discord"]="加入DC频道",
         ["Open Keybind Menu"]="打开菜单自动绑定钥匙",
@@ -142,7 +142,6 @@ local Translations = {
         ["Overwrite theme"]="覆盖文件",
         ["Delete theme"]="删除文件",
         ["Refresh list"]="刷新列表",
-        ["Set as default"]="设置为默认(指的是文件)",
         ["Reset default"]="重置默认",
         Configuration="配置",
         ["Config name"]="配置名字",
@@ -151,7 +150,6 @@ local Translations = {
         ["Load config"]="加载配置",
         ["Overwrite config"]="覆盖配置",
         ["Delete config"]="删除配置",
-        ["Refresh list"]="刷新列表",
         ["Set as autoload"]="设置成自动加载",
         ["Reset autoload"]="重置自动加载",
         ["Current autoload config: none"]="当前自动加载配置:无",
@@ -161,9 +159,9 @@ local Translations = {
         ["Hide Other Nametags"]="隐藏其他标签",
         ["Select Title"]="选择称号",
         ["Equip Title"]="装备称号",
-        ["Select Power"]="选择力量",
+        ["Select Power"]="选择职业",
         ["Custom Titles"]="自定义称号",
-        ["Parkour Artist Mods"]="强化跑酷大师",
+        ["Parkour Artist Mods"]="跑酷大师修改",
         ["Equip Power"]="装备能力",
         ["Disable Dash Cooldown"]="冲刺无冷却",
         Emotes="表情",
@@ -177,7 +175,7 @@ local Translations = {
         ["Ultra Rage"]="超级狂暴模式",
         Boosts="提升",
         ["Damage Boost (NOT FE)"]="伤害调节",
-        ["Faster Sprint (6+ TO UNLOCK DASH)"]="速度调节（速度升两级即可使用）",
+        ["Faster Sprint (6+ TO UNLOCK DASH)"]="速度调节（5级冲刺用了直接死）",
         ["Won Boost (NOT FE)"]="调节胜利次数（没用）",
         Spectate="启用观战模式",
         ["Disable Stun"]="无眩晕",
@@ -208,7 +206,7 @@ local Translations = {
         ["Staff Detector"]="检测管理员",
         ["Auto New Round"]="自动新一轮",
         ["Auto Return Lobby"]="自动返回大厅",
-        ["Auto Unlock Rewards"]="自动解锁奖励",
+        ["Auto Unlock Rewards"]="自动解锁奖励（不知道有啥用）",
         Random="随机",
         ["Teleport to Target"]="传送到目标",
         ["Quick Teleport"]="快速传送",
@@ -216,7 +214,7 @@ local Translations = {
         ["Lowest Health"]="最低血量显示",
         ["Specific Player"]="指定玩家",
         ["人的方向"]="人的方向",
-        ["HNS Mode"]="躲猫猫模式",
+        ["HNS Mode"]="钥匙与刀模式",
         Attach="吸附",
         ["Attach Target"]="吸附目标",
         ["Select Target Player"]="选择玩家",
@@ -232,21 +230,21 @@ local Translations = {
         ["ESP Distance"]="透视距离",
         ["100 studs/5000 studs"]="100米/5000米",
         ["ESP Performance Mode"]="透视性能模式",
-        Search="搜索",
+        ["Search"]="搜索",
         ["Show Only My Team"]="仅显示自己的队伍",
         ["Show Only Enemy Team"]="仅显示敌方队伍",
         Trail="跟踪",
-        ["Ink Game | by AlexScriptX"]="有芙同享汉化（感谢ks秋辞帮助）",
+        ["Ink Game | by AlexScriptX"]="<font color='#7FC8F0'>有</font><font color='#74C0EB'>芙</font><font color='#69B8E6'>同</font><font color='#5EB0E1'>享</font><font color='#53A8DC'>汉</font><font color='#48A0D7'>化</font><font color='#3D98D2'>（</font><font color='#3290CD'>感</font><font color='#2788C8'>谢</font><font color='#2280C3'>k</font><font color='#1D78BE'>s</font><font color='#1870B9'>秋</font><font color='#1368B4'>辞</font><font color='#0E60AF'>帮</font><font color='#0958AA'>助</font><font color='#0450A5'>）</font>",
         Manual="有失误",
         Perfect="零失误",
         ["Keep Playing"]="继续游戏",
         ["Stop Playing"]="反叛",
         ["PARKOUR ARTIST"]="泊车艺术家",
-        ["PHANTOM STEP"]="幽灵步（抽几次奖或升到5级以上即可使用）",
+        ["PHANTOM STEP"]="幽灵步（高等级可使用）",
         ["透视 Elements"]="透视方式",
         Spread="散步范围",
         ["Walk Speed"]="行走速度",
-        Barriers="防掉落",
+        Barriers="防坠落",
         ["Box Fill"]="方块填充",
         ["Box Outline"]="框轮廓",
         Name="名字",
@@ -257,12 +255,11 @@ local Translations = {
         ["From Bottom"]="自己的下面",
         ["From Mouse"]="自己的鼠标",
         ["From Top"]="自己的上面",
-        ["Faster Sprint (DONT USE DASH)"]="加快速度(升几级速度就不会死了)",
+        ["Faster Sprint (DONT USE DASH)"]="加快速度",
         ["LIGHTNING GOD"]="闪光神(✓石只有特效）",
         QUICKSILVER="快银（拉回不好用）",
         ["Tip:Use Rinku.pro for the fastest key"]="Rinku.pro最快",
         ["Get Key (Rinku.pro)"]="得到卡密（7个小时）",
-        ["Get Key (Work.Ink)"]="得到卡密(14个小时推荐)",
         ["Interact Reach: 0"]="互动范围:0",
         ["Enter custom number"]="修改数字(你猜他有啥用)",
         Fantasy="幻想体",
@@ -279,11 +276,11 @@ local Translations = {
         Christmas="圣诞节",
         ["Select an ornament"]="选择一个装饰品",
         ["Teleport to Ornament"]="传送到装饰品位置",
-        ["Perspective Ornament"]="透视圣诞树装饰品",
+        ["Perspective Ornaments"]="透视圣诞树装饰品",
         ["Auto Collect Ornaments"]="自动收集装饰品",
         Unknown="未知",
-        ["Hitbox Expander"]="碰撞箱扩展",
-        ["Rebel Hitbox"]="反叛 碰撞箱",
+        ["Hitbox Expander"]="增大范围",
+        ["Rebel Hitbox"]="反叛范围",
         ["Low Performance"]="低性能",
         Akuma="恶魔",
         AkumaOLD="旧版恶魔",
@@ -300,7 +297,6 @@ local Translations = {
         California="加州",
         Campfire="篝火",
         Campfire_COLLAB="篝火（多人）",
-        Cartwheel="侧手翻",
         ["Auto loaded config"]="自动加载配置",
         ["Ink Game"]="墨水游戏",
         Celebration="庆祝",
@@ -381,7 +377,7 @@ local Translations = {
         Juggling="杂耍",
         ["Kung Fu Kick"]="功夫踢",
         ["Lag Train"]="延迟列车",
-        ["Laser Eyes"]="激光眼",
+        ["Laser Eyes"]="祖国人激光眼",
         Laugh="大笑",
         ["Legendary Power"]="传奇力量",
         Levitation="漂浮",
@@ -488,7 +484,6 @@ local Translations = {
         ["I Am Atomic"]="席德核弹",
         ["IVE PLAYED THESE GAMES BEFO"]="我玩过这些游戏（未完）",
         ["I'm Burning!"]="我着火了！",
-        ["I'm a Mystery"]="我是个谜",
         ["Ice Slide"]="冰滑",
         ["Enter value"]="输入数值",
         ["Amalgamation"]="ks秋辞 有芙同享汉化",
@@ -553,16 +548,15 @@ local Translations = {
         ["Zeus"]="宙斯",
         ["flying fishs banana 93"]="飞鱼香蕉93",
         ["watch out for the road orbs"]="ks秋辞 有芙同享",
-        ["Teleport aim Mode"]="传送目标模式",
-        ["Facing"]="朝向",
-        ["Face aim"]="朝向目标",
+        ["Teleport Target Mode"]="传送目标模式",
+        ["Face Target"]="朝向目标",
         ["ESP Mode"]="透视模式",
         ["ESP Elements"]="透视元素",
         ["Skeleton"]="骨骼",
-        ["Tracer"]="追踪线",
+        ["Tracer"]="跟踪线",
         Guards="守卫",
         ESP="透视",
-        ["Troll"]="巨魔（不知道是啥）",
+        ["Troll"]="全失误",
         ["Teleport"]="传送",
         ["Backflip Height"]="后空翻高度",
         ["Backflip Cooldown:"]="后空翻冷却",
@@ -593,63 +587,92 @@ local Translations = {
         ["Michroma"]="米克罗马体",
         ["Ancient"]="古老体",
         ["Auto Cycle Colors"]="自动切换颜色",
-        ["Auto Cycle Fonts"]="自动切换字体"
+        ["Auto Cycle Fonts"]="自动切换字体",
+        ["Facing"]="朝向",
+        ["ESP Ornaments"]="透视圣诞礼物",
+        ["Bypass Rope"]="跳过跳绳",
+        ["studs"]="米",
+        ["SPARKLE TIME TRAFFIC CONE OWNER"]="闪耀时光交通锥所有者",
+        ["Solid Pattern Rod红色"]="红色纯色花纹杆",
+        ["Star Smaller"]="小星星",
+        ["Solid Rod"]="纯色杆",
+        ["Blue Candy"]="蓝色糖果",
+        ["Blue Candycane"]="蓝色糖果棒",
+        ["Solid Bulb 1"]="纯色灯泡1",
+        ["Snowflake"]="雪花",
+        ["Solid Bulb 1 #2"]="纯色灯泡1#2",
+        ["Solid Bulb 2"]="纯色灯泡2",
+        ["Solid Rod #2"]="纯色杆#2",
+        ["Player"]="玩家",
+        ["Wins"]="胜利次数",
+        ["Level"]="等级",
+        ["Power"]="能力",
+        ["Won"]="获胜奖励",
+        ["Roll(s)"]="滚动次数",
+        ["Robux Donated"]="捐赠罗宝",
+        ["VIP"]="贵宾",
+        ["Lighter"]="打火机",
+        ["2X Vote"]="双倍投票",
+        ["Glass Manufacturer"]="玻璃制造商",
+        ["Upgrades"]="升级项",
+        ["Faster Speed"]="速度提升",
+        ["Strength Boost"]="力量加成",
+        ["Won Boost"]="获胜加成",
+        ["Unlock ed Powers"]="已解锁能力",
+        ["None"]="无",
+        ["Cartwheel"]="侧手翻",
+        ["GOON MODE ENABLED!"]="暴徒模式已启用",
+        ["Rest"]="休息",
+        ["Pick an ornament you want"]="选择一个你想要的装饰品",
+        ["Had"]="有",  
+        ["No"]="没有", 
+        ["Yes"]="有",
+        ["Solid Pattern Orb Red"]="红色纯色花纹球",
+        ["Red Candy"]="红色糖果",
+        ["Solid Swirl"]="纯色漩涡",
+        ["Bypass Rope"] = "跳过绳索",
+        ["Allows passing through the rope without effects"] = "穿过绳索",
+        ["Loader | AX-SCRIPTS"]="<font color='#7FC8F0'>有</font><font color='#74C0EB'>芙</font><font color='#69B8E6'>同</font><font color='#5EB0E1'>享</font><font color='#53A8DC'>汉</font><font color='#48A0D7'>化</font><font color='#3D98D2'>（</font><font color='#3290CD'>感</font><font color='#2788C8'>谢</font><font color='#2280C3'>k</font><font color='#1D78BE'>s</font><font color='#1870B9'>秋</font><font color='#1368B4'>辞</font><font color='#0E60AF'>帮</font><font color='#0958AA'>助</font><font color='#0450A5'>）</font>",
+        ["Auto-load"]="自动加载（建议关掉加载出来不是汉化）",
     }
 
-local function translateText(text)
-    if not text or type(text) ~= "string" then return text end
-    
-    if Translations[text] then
-        return Translations[text]
-    end
-    
-    for en, cn in pairs(Translations) do
-        if text:find(en) then
-            return text:gsub(en, cn)
-        end
-    end
-    
-    return text
-end
-
-local function setupTranslationEngine()
-    local success, err = pcall(function()
-        local oldIndex = getrawmetatable(game).__newindex
-        setreadonly(getrawmetatable(game), false)
+    local function translateText(text)
+        if not text or type(text) ~= "string" then return text end
         
-        getrawmetatable(game).__newindex = newcclosure(function(t, k, v)
-            if (t:IsA("TextLabel") or t:IsA("TextButton") or t:IsA("TextBox")) and k == "Text" then
-                v = translateText(tostring(v))
+        if Translations[text] then
+            return Translations[text]
+        end
+        
+        for en, cn in pairs(Translations) do
+            if text:find(en) then
+                return text:gsub(en, cn)
             end
-            return oldIndex(t, k, v)
+        end
+        
+        return text
+    end
+
+    local function setupTranslationEngine()
+        local success, err = pcall(function()
+            local oldIndex = getrawmetatable(game).__newindex
+            setreadonly(getrawmetatable(game), false)
+            
+            getrawmetatable(game).__newindex = newcclosure(function(t, k, v)
+                if (t:IsA("TextLabel") or t:IsA("TextButton") or t:IsA("TextBox")) and k == "Text" then
+                    v = translateText(tostring(v))
+                end
+                return oldIndex(t, k, v)
+            end)
+            
+            setreadonly(getrawmetatable(game), true)
         end)
         
-        setreadonly(getrawmetatable(game), true)
-    end)
-    
-    if not success then
-        warn("元表劫持失败:", err)
-       
-        local translated = {}
-        local function scanAndTranslate()
-            for _, gui in ipairs(game:GetService("CoreGui"):GetDescendants()) do
-                if (gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox")) and not translated[gui] then
-                    pcall(function()
-                        local text = gui.Text
-                        if text and text ~= "" then
-                            local translatedText = translateText(text)
-                            if translatedText ~= text then
-                                gui.Text = translatedText
-                                translated[gui] = true
-                            end
-                        end
-                    end)
-                end
-            end
-            
-            local player = game:GetService("Players").LocalPlayer
-            if player and player:FindFirstChild("PlayerGui") then
-                for _, gui in ipairs(player.PlayerGui:GetDescendants()) do
+        if not success then
+            warn("元表劫持失败:", err)
+           
+            local translated = {}
+            local function scanAndTranslate()
+                for _, gui in ipairs(game:GetService("CoreGui"):GetDescendants()) do
                     if (gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox")) and not translated[gui] then
                         pcall(function()
                             local text = gui.Text
@@ -663,48 +686,64 @@ local function setupTranslationEngine()
                         end)
                     end
                 end
+                
+                local player = game:GetService("Players").LocalPlayer
+                if player and player:FindFirstChild("PlayerGui") then
+                    for _, gui in ipairs(player.PlayerGui:GetDescendants()) do
+                        if (gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox")) and not translated[gui] then
+                            pcall(function()
+                                local text = gui.Text
+                                if text and text ~= "" then
+                                    local translatedText = translateText(text)
+                                    if translatedText ~= text then
+                                        gui.Text = translatedText
+                                        translated[gui] = true
+                                    end
+                                end
+                            end)
+                        end
+                    end
+                end
+            end
+            
+            local function setupDescendantListener(parent)
+                parent.DescendantAdded:Connect(function(descendant)
+                    if descendant:IsA("TextLabel") or descendant:IsA("TextButton") or descendant:IsA("TextBox") then
+                        task.wait(0.1)
+                        pcall(function()
+                            local text = descendant.Text
+                            if text and text ~= "" then
+                                local translatedText = translateText(text)
+                                if translatedText ~= text then
+                                    descendant.Text = translatedText
+                                end
+                            end
+                        end)
+                    end
+                end)
+            end
+            
+            pcall(setupDescendantListener, game:GetService("CoreGui"))
+            local player = game:GetService("Players").LocalPlayer
+            if player and player:FindFirstChild("PlayerGui") then
+                pcall(setupDescendantListener, player.PlayerGui)
+            end
+            
+            while true do
+                scanAndTranslate()
+                task.wait(3)
             end
         end
-        
-        local function setupDescendantListener(parent)
-            parent.DescendantAdded:Connect(function(descendant)
-                if descendant:IsA("TextLabel") or descendant:IsA("TextButton") or descendant:IsA("TextBox") then
-                    task.wait(0.1)
-                    pcall(function()
-                        local text = descendant.Text
-                        if text and text ~= "" then
-                            local translatedText = translateText(text)
-                            if translatedText ~= text then
-                                descendant.Text = translatedText
-                            end
-                        end
-                    end)
-                end
-            end)
-        end
-        
-        pcall(setupDescendantListener, game:GetService("CoreGui"))
-        local player = game:GetService("Players").LocalPlayer
-        if player and player:FindFirstChild("PlayerGui") then
-            pcall(setupDescendantListener, player.PlayerGui)
-        end
-        
-        while true do
-            scanAndTranslate()
-            task.wait(3)
-        end
     end
-end
 
-task.wait(2)
+    task.wait(2)
+    setupTranslationEngine()
 
-setupTranslationEngine()
+    local success, err = pcall(function()
+        loadstring(game:HttpGet("https://officialaxscripts.vercel.app/scripts/AX-Loader.lua"))()
+    end)
 
-local success, err = pcall(function()
---这下面填加载外部脚本
-loadstring(game:HttpGet("https://officialaxscripts.vercel.app/scripts/AX-Loader.lua"))()
-end)
-
-if not success then
-    warn("加载失败:", err)
+    if not success then
+        warn("加载失败:", err)
+    end
 end
