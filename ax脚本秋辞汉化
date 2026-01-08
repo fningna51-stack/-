@@ -57,7 +57,7 @@ do
         ["Finish Glass Bridge"]="传送到终点",
         ["Jump Rope"]="跳绳",
         ["Finish Jump Rope"]="传送到终点",
-        ["Disable Game"]="禁用游戏",
+        ["Disable Game"]="删除绳子",
         ["Simulate Balance"]="一直平衡",
         ["Auto Jump"]="自动跳",
         ["Fix Broken Tracks"]="修复桥梁",
