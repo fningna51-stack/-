@@ -1,7 +1,7 @@
 do 
     local Translations={
         Toggle="开关",
-        ["AX-SCRIPTS"]="AX <font color='#7FC8F0'>有</font><font color='#74C0EB'>芙</font><font color='#69B8E6'>同</font><font color='#5EB0E1'>享</font><font color='#53A8DC'>秋</font><font color='#48A0D7'>辞</font><font color='#3D98D2'>汉</font><font color='#3290CD'>化</font>", 
+        ["AX-SCRIPTS"]="墨水游戏 <font color='#7FC8F0'>有</font><font color='#74C0EB'>芙</font><font color='#69B8E6'>同</font><font color='#5EB0E1'>享</font><font color='#53A8DC'>秋</font><font color='#48A0D7'>辞</font><font color='#3D98D2'>汉</font><font color='#3290CD'>化</font>", 
         Games="游戏",
         Combat="攻击",
         Miscs="杂项",
