@@ -10,60 +10,47 @@
 ]]--
 
 do
-	local Translations = {Voidware="虚空-有芙同享汉化",["Window Closed"]="脚本已关闭",["Press RightShift to open Voidware again"]="按下右Shift键再次打开",Search="搜索",Information="信息",Fun="有趣",Main="主界面",Auto="自动",["Day Farm"]="自动农场",["Auto Stronghold"]="自动打据点",["Bring Stuff"]="带来物品",["Update Focused"]="活动",Performance="性能",Teleport="传送",["Auto Bandage"]="自动绷带",["MedKit included"]="包含医疗包",["Heal When Below"]="生命值低于此值时治疗",["Hitbox Expansion"]="碰撞箱扩展",["Enable Hitbox Expansion"]="启用碰撞箱",["Hitbox Size Multiplier"]="碰撞箱大小倍率",Security="安全",["Anti AFK"]="防挂机",Other="其他",["Instant Open Chests"]="秒开箱子",["Auto TP to Camp at Night"]="夜间自动传送至篝火",["TP to Camp"]="传送至篝火",["Auto Eat"]="自动进食",["Auto Eat Food"]="食物",["Eat When Hunger Below"]="饥饿值低于此值时进食",["Cooked Morsel"]="熟肉块",["Cooked Steak"]="熟牛排",Chilli="辣椒",Apple="苹果",Cake="蛋糕",["Steak Dinner"]="牛排套餐",Corn="玉米",Mackerel="鲭鱼",Salmon="三文鱼",Swordfish="剑鱼",Ribs="排骨",Stew="炖菜",["Sweet Potato"]="红薯",Stuffing="填料",["Turkey Leg"]="火鸡腿",Carrot="胡萝卜",Pumpkin="南瓜",["Tree Farm"]="树木农场",["Auto Chop Trees"]="自动砍树",["Auto Chop Tree Type"]="自动砍树类型",["Dead Tree"]="枯树",["Big Tree"]="大树",["Snowy Small Tree"]="雪地小树",["Northern Pine"]="北方松树",["Small Webbed Tree"]="小型蛛网树",["Auto Chop Trees Range"]="自动砍树范围",["Auto Plant Saplings"]="自动种树苗",["Chop Status Visualiser"]="树苗血条显示",["Auto TP to Targets"]="自动传送至目标",["Automatically teleports to targets when they are out of range (200 Studs)."]="当目标超出200单位范围时自动传送至目标处",["This is because the 99 Nights devs patched higher range :c"]="因为游戏开发者修复了更远距离的功能",["Small Tree"]="小树",["Ore Aura"]="矿石光环",["Range Circle"]="范围圆圈",["Range Circle Color"]="范围圆圈颜色",RangeCircleColor="范围圆圈颜色",["Killaura Targets"]="杀戮光环目标",["Aura Range"]="杀戮光环范围",["Require Hand Check"]="武器检查",["If disabled, it will let all Auras to work without you holding any tool"]="关闭后可以不拿武器使用杀戮光环",["Alien Elite"]="精英外星人",["Cultist King"]="邪教徒之王",["Meteor Crab"]="陨石蟹",["Polar Bear"]="北极熊",["Arctic Fox"]="北极狐",["Alpha Wolf"]="阿尔法狼",Alien="外星人",Bunny="兔子",Mammoth="猛犸象",Cultist="邪教徒",["Crossbow Cultist"]="弩箭邪教徒",["Juggernaut Cultist"]="主宰邪教徒",Naill="钉子怪",FrogBlue="蓝色青蛙",FrogPurple="紫色青蛙",FrogKing="青蛙之王",Frog="青蛙",Scorpion="蝎子",Hellephant="地狱象",Ram="公羊",Turret="炮塔",["Impostor Santa"]="冒牌圣诞老人",Turkey="火鸡",["Shadow Cultist"]="暗影邪教徒",["Brutal Cultist"]="残暴邪教徒",["Ice Aura"]="冰冻光环",["Kill Aura"]="杀戮光环",["Entity Godmode"]="无敌模式",["Become Invincible"]="开启无敌",["Makes you unhittable by other entities"]="不会生物攻击到",["You also can't die from hunger"]="也不会因饥饿死亡",Enabled="已启用",["Hip Height Changer"]="高度调整器",["Infinite Saplings"]="无限树苗",["Infinite Saplings Exploit!"]="无限树苗漏洞",["Spam Plant"]="快速种植",["Restart Exploit"]="重启漏洞",["This fixes most bugs in case the inf saplings bugs out :D"]="此功能可修复无限树苗出现的大部分漏洞",["Reveal Map"]="全图探索",["Loops you in circle around the map to let everything load"]="绕地图飞行以加载所有区块",["Must upgrade the fire constantly or the map won't load!"]="必须持续升级篝火，否则地图无法加载",["Teleport All Trees"]="传送所有树木",Patched="已修复",["Teleport All BIG Trees"]="传送所有大树",["Teleport All Chests"]="传送所有箱子",["Teleport All Children [BETA]"]="传送到所有儿童【测试版】",["Teleport Entities"]="传送实体",["Teleport The Entities"]="传送选中实体",["Freeze the movement of something :3"]="冻结目标的移动",["Freeze the movement of something"]="冻结目标的移动",["Freeze The Thingys"]="冻结这些物品",["UnFreeze The Thingys"]="解冻这些物品",["Voidware Keybind"]="虚空脚本按键绑定",["Keybind to open ui"]="打开界面的按键",RightShift="右Shift键",["Join Discord Server"]="加入Dc服务器",["Welcome to Voidware!"]="欢迎使用有芙同享汉化！",["Make sure to join our discord server for updates!"]="请加入我们的Dc服务器获取更新！",Unload="关闭脚本",["Language Choice"]="语言",["Library Choice"]="ui界面",Wind="Wind",["This tab is empty"]="此标签页为空",["Pickup All Flowers"]="拾取所有花朵",["Collect All Gold Stacks"]="收集所有金堆",["Crock Pot"]="锅炉",Campfire="营火",Collect="收集",["Open Seed Boxes"]="打开种子箱",["Chest [BETA]"]="箱子【测试版】",["Plant & Build Stuff"]="种植与建造物品",Wolf="狼",Bear="熊",["Select Structure"]="选择建筑",["Selected Structure"]="已选中建筑",["Generator Base"]="发电机基地",Stronghold="据点",["Stronghold Diamond Chest"]="据点钻石箱",Caravan="商队",Fairy="仙子",Anvil="铁砧",["Military Base"]="军事基地",["Snow Clothing Shop"]="雪地服装店",["Testing Facility"]="测试设施",ToolWorkshop="工具工坊",["Fairy House"]="仙子屋",["Thanksgiving Plot"]="感恩节地块",["Workshop Foundations"]="工坊地基",Mothership="母舰",Crash_Active="坠毁点（已激活）",Bank="银行",["Fishing Hut"]="钓鱼小屋",Volcano="火山",["King Statue"]="国王雕像",["Anti Void"]="防虚空",["TP to Warm Place"]="传送至温暖区域",["Chest Dropdown"]="箱子下拉列表",DinoKid="恐龙小孩",KoalaKid="考拉小孩",KrakenKid="海怪小孩",SquidKid="鱿鱼小孩",["Low GFX"]="低画质",["Cleanup Logs"]="清理原木",["This deletes ALL logs from the map PERMANENTLY!"]="会删除砍掉的木头",Taming="驯服",["Equip Zookeeper class"]="装备动物园管理员职业",["Bring Steak"]="携带牛排",["100% Taming Success Rate"]="100%驯服成功率",["Instant Taming Minigame"]="秒驯服",Fishing="钓鱼",["100% Fishing Success Rate"]="100%钓鱼成功率",["Instant Catch Fish"]="秒钓鱼",["Halloween House Choice"]="万圣节房屋选择",["Halloween House"]="万圣节房屋",["Refresh Halloween House List"]="刷新万圣节房屋列表",["Bring Candles"]="携带蜡烛",["Open All Chests via Auto Chest"]="通过自动箱子打开所有宝箱",["By opening all chests you have a bigger chance of bringing a lot of halloween candles"]="打开所有宝箱可提高获得大量万圣节蜡烛的概率",["Halloween House TP"]="万圣节房屋传送",Crossbow="弩",Maze="迷宫",["TP to end"]="传送至终点",Halloween="万圣节",["Equip Vampire Class"]="装备吸血鬼职业",["Bring Fur Tuft"]="携带毛皮",["Candy Farm"]="糖果农场",["The most op candy farm ever"]="最强糖果农场",["Infinite Candy"]="无限糖果",["Server Hop"]="切换服务器",["Use this to get as much candy as possible from different games as fast as possible"]="快速从不同服务器获取大量糖果",["All Food"]="所有食物",["Bring Choice"]="携带选择",["Bring Selected Items"]="携带选中物品",["You can also use the Fishing exploits by searching for the 'Fishing' tab :D"]="你可以通过搜索“钓鱼”标签页使用钓鱼相关功能",["Injured Deer"]="受伤的鹿",["No idea what else to add to this empty update ._."]="这个空更新实在不知道该加什么了",Classes="职业",["Enable Explorer Class"]="启用探险家职业",["This enables the explorer class' functions for FREE!"]="免费启用探险家职业的所有功能！",Thanksgiving="感恩节",Elf="精灵",["Chosen Elf"]="选中的精灵",["Spam Use Shovel"]="自动使用铲子",["Claim All Gold Stacks"]="领取所有金堆",["automatically claims all gold stacks over the map!"]="自动领取地图上的所有金堆！",Christmas="圣诞节",["random christmas present"]="随机圣诞礼物",["Amazing for farming those presents :D"]="非常适合刷取这些礼物",["Presents Farm"]="礼物农场",["Bring All Christmas Lights"]="携带所有圣诞灯",["Perfect for decorating pines :D"]="非常适合用来装饰松树",["Random Tree with Lights"]="带灯的随机树木",["Use this to get Christmas Lights"]="使用此功能获取圣诞灯",["Light Random Christmas Pine"]="点亮随机圣诞松树",["Use this with christmas lights :D"]="配合圣诞灯使用此功能",["Santa's Sack"]="圣诞老人的袋子",["Santa's Workshop"]="圣诞老人的工坊",["Bring Healing"]="携带治疗物品",["Bring Gears"]="携带废料",Gears="废料",Bolt="螺栓",Tyre="轮胎",["Bring Guns & Armor"]="携带武器与护甲",["Guns & Armor"]="武器与护甲",["Gold Shard"]="金碎片",["Raw Obsidiron Ore"]="原始黑曜石矿石",["Gem of the Forest Fragment"]="森林宝石碎片",Diamond="钻石",["Defense Blueprint"]="防御蓝图",Corpse="尸体",["Meteor Shard"]="陨石碎片",Foot="兽足",Pelt="毛皮",["Mammoth Tusk"]="猛犸象牙",["Good Sack"]="优质袋子",["Seed Box"]="种子箱",Chainsaw="电锯",["Old Flashlight"]="旧手电筒",["Strong Flashlight"]="强光手电筒",["Old Rod"]="旧鱼竿",Flower="花朵",["Coin Stack"]="硬币堆",["Infernal Sack"]="地狱袋子",["Giant Sack"]="巨型袋子",Key="钥匙",Feather="羽毛",Wildfire="野火",["Sacrifice Totem"]="献祭图腾",["Christmas Lights"]="圣诞灯",Scythe="镰刀",["Obsidiron Hammer"]="黑曜石锤",["Purple Fur Tuft"]="紫色毛皮",["Halloween Candle"]="万圣节蜡烛",["Thorn Body"]="荆棘护甲",["Riot Shield"]="防暴盾牌",Boots="靴子",["Armour Trim Kit"]="护甲装饰套件",["Obsidiron Boots"]="黑曜石靴",["Leather Body"]="皮革护甲",["Iron Body"]="铁护甲",["Tactical Shotgun"]="战术霰弹枪",["Revolver Ammo"]="左轮手枪弹药",["Rifle Ammo"]="步枪弹药",Armour="护甲",["Axe Trim Kit"]="斧头装饰套件",Spear="长矛",["Good Axe"]="优质斧头",Revolver="左轮手枪",Rifle="步枪",Raygun="射线枪",["Ice Axe"]="冰斧",["Ice Sword"]="冰剑",["Strong Axe"]="强力斧头",["Infernal Sword"]="地狱剑",Morningstar="晨星锤",["Laser Sword"]="激光剑",["UFO Scrap"]="UFO残骸",["UFO Component"]="UFO组件",["UFO Junk"]="UFO废品",Gem="宝石",["Gem of the Forest"]="森林宝石",["Broken Fan"]="破损风扇",["Broken Microwave"]="破损微波炉",["Washing Machine"]="洗衣机",["Old Car Engine"]="旧汽车引擎",["Sheet Metal"]="金属板",["Old Radio"]="旧收音机",MedKit="医疗包",Bandage="绷带",["Bring Logs [BETA]"]="携带原木【测试版】",["Bring Food"]="携带食物",["Bring Meteor Items"]="携带陨石物品",["Bring Fuel [BETA]"]="携带燃料【测试版】",Fuel="燃料",Berry="浆果",Morsel="小块肉",Chair="椅子",Coal="煤炭",["Fuel Canister"]="燃料罐",["Oil Barrel"]="油桶",Biofuel="生物燃料",Log="原木",["Scalding Obsidiron Ingot"]="灼热黑曜石锭",["Bring Cooldown"]="携带冷却时间",["No Bring Amount Limit"]="无携带数量限制",["Bring Height"]="携带高度",["Bring Settings"]="携带设置",["Use Freecam for Bring Items"]="携带物品时使用自由视角",["Untouchable by Others"]="其他玩家无法触碰",["Makes the brought items untouchable by other players"]="使携带的物品无法被其他玩家触碰",["Bring Method"]="携带方式",["Ultra Fast"]="极快",["Bring Location"]="携带位置",Player="玩家",Workbench="工作台",Fire="篝火",Slow="慢速",Fast="快速",["Max Per Item"]="每件物品最大数量",["Stronghold Statistics"]="据点统计",Tracking="追踪状态",Status="状态",Level="等级",["Time till open"]="开启倒计时",["Auto Stronghold Status"]="自动据点状态",Waiting="等待中",["Enable Auto Stronghold"]="启用自动据点",["Stop Auto Stronghold Task"]="停止自动据点任务",["Day Statistics"]="每日统计",Attack="攻击波次",Cycle="周期",Time="时间",Weather="天气",Biome="生物群系",["Day Farm Status"]="自动农场状态",["Skipped Steps"]="跳过步骤数",["Start Day Farm"]="启动自动农场",["Stop Find Task"]="停止寻找任务",["Children Rescue v2"]="救援儿童 v2",["Buy 3 beds"]="购买3张床",["Buy 3 Lightning Rods"]="购买3个避雷针",["Buy Crockpot"]="购买陶罐",["Clean up the Map"]="清理地图",["Map Exploration"]="地图探索",["Children Rescue"]="救援儿童",["Plant/Build Radius"]="种植/建造半径",["Angle Increment"]="角度增量",["Plant Height"]="种植高度",["Plant/Build Limit"]="种植/建造数量上限",["Show Blueprint"]="显示蓝图",["Placement Method"]="放置方式",Circle="圆形",Square="方形",["One Place"]="单个位置",["Plant Saplings"]="种植树苗",["Build Log Walls in Circle"]="建造圆形原木墙",["Auto Collect Coin Stacks"]="自动收集硬币堆",["Auto Open Seed Boxes"]="自动打开种子箱",["Loot Mode"]="拾取模式",Safe="安全模式",Simple="简单模式",["Loot Radius"]="拾取半径",["Chest Delay (sec)"]="箱子延迟（秒）",["Fuel Type"]="燃料类型",["AutoFill 篝火"]="自动填充篝火",["Start Fueling when (Fire HP)"]="篝火生命值低于此值时开始添加燃料",["Auto Scrap Logs"]="自动拆解原木",["Auto Scrap Gears"]="自动拆解废料",["Auto Collect"]="自动收集",["Auto Pickup Flowers"]="自动拾取花朵",["Bring Food To Cook Pot"]="将食物带到烹饪锅",["Auto 篝火"]="自动篝火",["Food Choice"]="食物选择",["Auto Crock Pot"]="自动陶罐",["Auto Campfire"]="自动篝火",Aura="光环",Save="保存",["Saves elements to config"]="将设置保存到配置文件",Load="加载",["Loads elements from config"]="从配置文件加载设置",["Select Theme"]="选择主题",["Toggle Window Transparency"]="切换窗口透明度",["Theme Name"]="主题名称",["Background Color"]="背景颜色",["Outline Color"]="边框颜色",["Text Color"]="文字颜色",["Placeholder Text Color"]="占位符文字颜色",["Update Theme"]="更新主题",Cyberpunk="赛博朋克",Emerald="祖母绿",Amber="琥珀",Lavender="薰衣草紫",Violet="紫罗兰",Red="红色",NeonYellow="霓虹黄",Aqua="水色",Dark="深色",Forest="森林绿",Indigo="靛蓝",Light="浅色",NeonGreen="霓虹绿",Aurora="极光",Midnight="午夜黑",NeonBlue="霓虹蓝",Ocean="海洋蓝",Peach="桃色",NeonPink="霓虹粉",Sunset="日落橙",Night="夜色",Coral="珊瑚红",Coordinates="坐标",["Show Coordinates"]="显示坐标",Credits="致谢",["script dev"]="脚本开发者",["ui library"]="ui",["Please notify me if you need credits (erchodev#0 on discord)"]="如果有翻译错误的地方请加q2482341780",Misc="杂项",["Reset Camera"]="重置视角",["Useful Stuff"]="实用工具",Fullbright="全亮度",["Remove Fog"]="移除雾气",["Remove Sky"]="移除天空",["TP Walk Speed"]="传送行走速度",["TP Walk"]="传送行走",Noclip="穿墙模式",["Infinite Jump"]="无限跳跃",Ambient="环境光",["Rich Shader"]="高清着色器",["Shader Color"]="着色器颜色",["Lighting Theme"]="光照主题",["Enable Lighting Theme"]="启用光照主题",["Aesthetic Lighting"]="唯美光照",NewYork="纽约",Aesthetic3="唯美3",FakeClouds="假云",LunarNight="月夜",PitchDark="漆黑",["discord.gg/void"]="Discord 服务器",en="英文",Stop="停止",["Stop冲刺"]="停止冲刺",["Local玩家"]="本地玩家",Visuals="视觉效果",["Search..."]="搜索...",BetterNight3="优化黑夜3",Orange="橙色",DarkMountains="暗黑山脉",FlamingSunset="烈焰日落",Aesthetic="唯美",Aesthetic2="唯美2",Pastel="马卡龙",PurpleClouds="紫云",BetterSky="优化天空",Space="太空",Galaxy3="银河3",NetherWorld="下界",Nebula="星云",PurpleNight="紫夜",Purple2="紫色2",Galaxy2="银河2",Pink="粉色",Purple3="紫色3",DarkishPink="暗粉",Purple="紫色",Galaxy="银河",BetterNight="优化黑夜",BetterNight2="优化黑夜2",MagentaOrange="品红橙",Self="自身",FOV="视野",Movement="移动",["Walk Speed"]="行走速度",Speed="速度",Fly="飞行",["Fly Speed"]="飞行速度",["Characters ESP"]="角色透视",Characters="角色",CharactersEspColor="角色透视颜色",["Characters Items"]="角色物品",["ESP Settings"]="透视设置",["Enable Highlight"]="启用高亮",["Show Distance"]="显示距离",["Fill Transparency"]="填充透明度",["Outline Transparency"]="边框透明度",["Text Size"]="文字大小",OtherEspColor="其他透视颜色",["Other Items"]="其他物品",["Mammonth Tusk"]="猛犸象牙",Candy="糖果",GunsArmorEspColor="武器与护甲 ESP 颜色",["Food & Healing ESP"]="食物与绷带透视",["Food & Healing"]="食物与绷带",FoodHealingEspColor="食物与绷带透视颜色",["Food & Healing Items"]="食物与治疗物品",["Gears ESP"]="废料透视",GearsEspColor="废料透视颜色",["Gears Items"]="废料物品",["Fuel ESP"]="燃料透视",FuelEspColor="燃料透视颜色",["Fuel Items"]="燃料物品",["Fishing ESP"]="钓鱼透视",FishingEspColor="钓鱼透视颜色",["Fishing Items"]="钓鱼物品",["Children ESP"]="儿童透视",Children="儿童",ChildrenEspColor="儿童透视颜色",["Children Items"]="儿童物品",["Lost Child"]="丢失的儿童",["Lost Child2"]="丢失的儿童2",["Lost Child3"]="丢失的儿童3",["Lost Child4"]="丢失的儿童4",["Water Hole"]="水潭",["Water Hole Big"]="大水潭",["Water Hole1"]="水潭1",["Main ESP"]="主界面透视",PlayerEspColor="玩家透视颜色",["Infernal Crossbow"]="地狱弩",["Structure TP"]="建筑传送",["Teleport To"]="传送至",["Refresh Chest List"]="刷新箱子列表",["Child TP"]="儿童传送",["Select Child"]="选择儿童",["Teleport To Child"]="传送至儿童",["Cleanup Big Trees"]="删除大树",["Bring Carrots"]="带来胡萝卜",["Bring Pumpkins"]="带来南瓜",["Teleport to Thanksgiving Plot"]="传送至感恩节区块",["Teleport to Halloween House"]="传送至万圣节房屋",["No idea what else to add to this empty update :/"]="这个空更新实在不知道该加什么了 ",["Other TP"]="其他传送",["Teleport to Camp"]="传送至营地",["Teleport to Cultist Generator Base"]="传送至邪教徒发电机基地",["Teleport to Stronghold"]="传送至据点",["Teleport to Stronghold Diamond Chest"]="传送至据点钻石箱",["Teleport to Caravan"]="传送至商队",["Teleport to Fairy"]="传送至仙子",["Teleport to Anvil"]="传送至铁砧",["Auto TP to Warm Place"]="自动传送至温暖区域",["Teleport To Chest"]="传送至箱子",["Teleport to Fishing Hut"]="传送至钓鱼小屋",["Teleport All Food"]="传送所有食物",["Elf TP"]="精灵传送",["Teleport To Chosen Elf"]="传送至选中的精灵",["Teleport to Santa's Sack"]="传送至圣诞老人的袋子",["Teleport to Santa's Workshop"]="传送至圣诞老人的工坊",["Teleport to Random Christmas Present"]="传送至随机圣诞礼物",["Teleport to Random Tree with Lights"]="传送至带灯的随机树木",Healing="治疗物品",["Bring Others"]="携带其他物品",["Alien Armor"]="外星人护甲",["Frog Boots"]="青蛙靴",["Leather Armor"]="皮革护甲",["Status: [据点 not found yet :c]"]="状态：[据点尚未找到 :c]",["Level: [据点 not found yet :c]"]="等级：[据点尚未找到 :c]",["Time till open: [据点 not found yet :c]"]="开启倒计时：[据点尚未找到 :c]",["Auto Stronghold Status"]="自动据点状态",["Waiting..."]="等待中...",["Enable Auto Stronghold"]="启用自动据点",["Stop Auto Stronghold Task"]="停止自动据点任务",["Cultist Attack: No"]="邪教徒攻击：无",["Cycle: "]="周期：",["Time: "]="时间：",["Weather: Clear"]="天气：晴朗",["Biome: Snow"]="生物群系：雪地",["Day: "]="天数：",["Auto Farm Status"]="自动农场状态",["Start Auto Farm"]="启动自动农场",["Auto Fill Campfire"]="自动填充篝火",["Auto Chest [BETA]"]="自动箱子【测试版】",["Member Count: 104559"]="成员数：",["Online Count: 7598"]="在线数：",["Update Discord Info"]="更新Dc信息",["Bring Cultists"]="携带邪教徒",["Cultist Attack: "]="邪教徒攻击：",["Time: 20s"]="时间：20秒",["Cycle: Day"]="周期：白天",["Weather: "]="天气：",["Biome: "]="生物群系",["Day: 1"]="天数：1",Start="开始",Choice="选择",["Items Choice"]="物品选择",Food="食物",["No items found to bring! Try exploring the map and try again :D"]="秋辞没有拉出来该物品请探索地图后使用",["erchodev#0"]="有芙同享汉化",Linoria="ks秋辞帮助",Obsidian="烧秋辞🦶88",["mspaint v2"]="希望我加带的私货不会被发现😋",["Inf Yield"]="无收益",All="全部",["Infintie Saplings"]="无限树苗"};
+	local Translations = {Voidware="虚空-<font color='#7FC8F0'>有</font><font color='#74C0EB'>芙</font><font color='#69B8E6'>同</font><font color='#5EB0E1'>享</font><font color='#53A8DC'>秋</font><font color='#48A0D7'>辞</font><font color='#3D98D2'>汉</font><font color='#3290CD'>化</font>",["Window Closed"]="脚本已关闭",["Press RightShift to open Voidware again"]="按下右Shift键再次打开",Search="搜索",Information="信息",Fun="有趣",Main="主界面",Auto="自动",["Day Farm"]="自动农场",["Auto Stronghold"]="自动打据点",["Bring Stuff"]="带来物品",["Update Focused"]="活动",Performance="性能",Teleport="传送",["Auto Bandage"]="自动绷带",["MedKit included"]="包含医疗包",["Heal When Below"]="生命值低于此值时治疗",["Hitbox Expansion"]="碰撞箱扩展",["Enable Hitbox Expansion"]="启用碰撞箱",["Hitbox Size Multiplier"]="碰撞箱大小倍率",Security="安全",["Anti AFK"]="防挂机",Other="其他",["Instant Open Chests"]="秒开箱子",["Auto TP to Camp at Night"]="夜间自动传送至篝火",["TP to Camp"]="传送至篝火",["Auto Eat"]="自动进食",["Auto Eat Food"]="食物",["Eat When Hunger Below"]="饥饿值低于此值时进食",["Cooked Morsel"]="熟肉块",["Cooked Steak"]="熟牛排",Chilli="辣椒",Apple="苹果",Cake="蛋糕",["Steak Dinner"]="牛排套餐",Corn="玉米",Mackerel="鲭鱼",Salmon="三文鱼",Swordfish="剑鱼",Ribs="排骨",Stew="炖菜",["Sweet Potato"]="红薯",Stuffing="填料",["Turkey Leg"]="火鸡腿",Carrot="胡萝卜",Pumpkin="南瓜",["Tree Farm"]="树木农场",["Auto Chop Trees"]="自动砍树",["Auto Chop Tree Type"]="自动砍树类型",["Dead Tree"]="枯树",["Big Tree"]="大树",["Snowy Small Tree"]="雪地小树",["Northern Pine"]="北方松树",["Small Webbed Tree"]="小型蛛网树",["Auto Chop Trees Range"]="自动砍树范围",["Auto Plant Saplings"]="自动种树苗",["Chop Status Visualiser"]="树苗血条显示",["Auto TP to Targets"]="自动传送至目标",["Automatically teleports to targets when they are out of range (200 Studs)."]="当目标超出200单位范围时自动传送至目标处",["This is because the 99 Nights devs patched higher range :c"]="因为游戏开发者修复了更远距离的功能",["Small Tree"]="小树",["Ore Aura"]="矿石光环",["Range Circle"]="范围圆圈",["Range Circle Color"]="范围圆圈颜色",RangeCircleColor="范围圆圈颜色",["Killaura Targets"]="杀戮光环目标",["Aura Range"]="杀戮光环范围",["Require Hand Check"]="武器检查",["If disabled, it will let all Auras to work without you holding any tool"]="关闭后可以不拿武器使用杀戮光环",["Alien Elite"]="精英外星人",["Cultist King"]="邪教徒之王",["Meteor Crab"]="陨石蟹",["Polar Bear"]="北极熊",["Arctic Fox"]="北极狐",["Alpha Wolf"]="阿尔法狼",Alien="外星人",Bunny="兔子",Mammoth="猛犸象",Cultist="邪教徒",["Crossbow Cultist"]="弩箭邪教徒",["Juggernaut Cultist"]="主宰邪教徒",Naill="钉子怪",FrogBlue="蓝色青蛙",FrogPurple="紫色青蛙",FrogKing="青蛙之王",Frog="青蛙",Scorpion="蝎子",Hellephant="地狱象",Ram="公羊",Turret="炮塔",["Impostor Santa"]="冒牌圣诞老人",Turkey="火鸡",["Shadow Cultist"]="暗影邪教徒",["Brutal Cultist"]="残暴邪教徒",["Ice Aura"]="冰冻光环",["Kill Aura"]="杀戮光环",["Entity Godmode"]="无敌模式（有bug用不了）",["Become Invincible"]="开启无敌",["Makes you unhittable by other entities"]="不会生物攻击到",["You also can't die from hunger"]="也不会因饥饿死亡",Enabled="已启用",["Hip Height Changer"]="高度调整",["Infinite Saplings"]="无限树苗",["Infinite Saplings Exploit!"]="无限树苗漏洞",["Spam Plant"]="快速种植",["Restart Exploit"]="重启漏洞",["This fixes most bugs in case the inf saplings bugs out :D"]="此功能可修复无限树苗出现的大部分漏洞",["Reveal Map"]="全图探索",["Loops you in circle around the map to let everything load"]="绕地图飞行以加载所有区块",["Must upgrade the fire constantly or the map won't load!"]="必须持续升级篝火，否则地图无法加载",["Teleport All Trees"]="传送所有树木",Patched="已修复",["Teleport All BIG Trees"]="传送所有大树",["Teleport All Chests"]="传送所有箱子",["Teleport All Children [BETA]"]="传送到所有儿童【测试版】",["Teleport Entities"]="传送实体",["Teleport The Entities"]="传送选中实体",["Freeze the movement of something :3"]="冻结目标的移动",["Freeze the movement of something"]="冻结目标的移动",["Freeze The Thingys"]="冻结这些物品",["UnFreeze The Thingys"]="解冻这些物品",["Voidware Keybind"]="虚空脚本按键绑定",["Keybind to open ui"]="打开界面的按键",RightShift="右Shift键",["Join Discord Server"]="加入Dc服务器",["Welcome to Voidware!"]="欢迎使用<font color='#7FC8F0'>有</font><font color='#74C0EB'>芙</font><font color='#69B8E6'>同</font><font color='#5EB0E1'>享</font><font color='#53A8DC'>汉</font><font color='#48A0D7'>化</font>！",["Make sure to join our discord server for updates!"]="请加入的Dc服务器获取更新！",Unload="关闭脚本",["Language Choice"]="语言",["Library Choice"]="ui界面",Wind="Wind",["This tab is empty"]="此标签页为空",["Pickup All Flowers"]="拾取所有花朵",["Collect All Gold Stacks"]="收集所有金币堆",["Crock Pot"]="锅炉",Campfire="营火",Collect="收集",["Open Seed Boxes"]="打开种子箱",["Chest [BETA]"]="箱子【测试版】",["Plant & Build Stuff"]="种植与建造物品",Wolf="狼",Bear="熊",["Select Structure"]="选择建筑",["Selected Structure"]="已选中建筑",["Generator Base"]="发电机基地",Stronghold="据点",["Stronghold Diamond Chest"]="据点钻石箱",Caravan="商队",Fairy="仙子",Anvil="铁砧",["Military Base"]="军事基地",["Snow Clothing Shop"]="雪地服装店",["Testing Facility"]="测试设施",ToolWorkshop="工具工坊",["Fairy House"]="仙子屋",["Thanksgiving Plot"]="感恩节地块",["Workshop Foundations"]="工坊地基",Mothership="母舰",Crash_Active="坠毁点（已激活）",Bank="银行",["Fishing Hut"]="钓鱼小屋",Volcano="火山",["King Statue"]="国王雕像",["Anti Void"]="防虚空",["TP to Warm Place"]="传送至温暖区域",["Chest Dropdown"]="箱子下拉列表",DinoKid="恐龙小孩",KoalaKid="考拉小孩",KrakenKid="海怪小孩",SquidKid="鱿鱼小孩",["Low GFX"]="低画质",["Cleanup Logs"]="清理原木",["This deletes ALL logs from the map PERMANENTLY!"]="会删除砍掉的木头",Taming="驯服",["Equip Zookeeper class"]="装备动物园管理员职业",["Bring Steak"]="携带牛排",["100% Taming Success Rate"]="100%驯服成功率",["Instant Taming Minigame"]="秒驯服",Fishing="钓鱼",["100% Fishing Success Rate"]="100%钓鱼成功率",["Instant Catch Fish"]="秒钓鱼",["Halloween House Choice"]="万圣节房屋选择",["Halloween House"]="万圣节房屋",["Refresh Halloween House List"]="刷新万圣节房屋列表",["Bring Candles"]="携带蜡烛",["Open All Chests via Auto Chest"]="通过自动箱子打开所有宝箱",["By opening all chests you have a bigger chance of bringing a lot of halloween candles"]="打开所有宝箱可提高获得大量万圣节蜡烛的概率",["Halloween House TP"]="万圣节房屋传送",Crossbow="弩",Maze="迷宫",["TP to end"]="传送至终点",Halloween="万圣节",["Equip Vampire Class"]="装备吸血鬼职业",["Bring Fur Tuft"]="携带毛皮",["Candy Farm"]="糖果农场",["The most op candy farm ever"]="最强糖果农场",["Infinite Candy"]="无限糖果",["Server Hop"]="切换服务器",["Use this to get as much candy as possible from different games as fast as possible"]="快速从不同服务器获取大量糖果",["All Food"]="所有食物",["Bring Choice"]="携带选择",["Bring Selected Items"]="携带选中物品",["You can also use the Fishing exploits by searching for the 'Fishing' tab :D"]="你可以通过搜索“钓鱼”标签页使用钓鱼相关功能",["Injured Deer"]="受伤的鹿",["No idea what else to add to this empty update ._."]="这个空更新实在不知道该加什么了",Classes="职业",["Enable Explorer Class"]="启用探险家职业",["This enables the explorer class' functions for FREE!"]="免费启用探险家职业的所有功能！",Thanksgiving="感恩节",Elf="精灵",["Chosen Elf"]="选中的精灵",["Spam Use Shovel"]="自动使用铲子",["Claim All Gold Stacks"]="领取所有金堆",["automatically claims all gold stacks over the map!"]="自动领取地图上的所有金堆！",Christmas="圣诞节",["random christmas present"]="随机圣诞礼物",["Amazing for farming those presents :D"]="非常适合刷取这些礼物",["Presents Farm"]="礼物农场",["Bring All Christmas Lights"]="携带所有圣诞灯",["Perfect for decorating pines :D"]="非常适合用来装饰松树",["Random Tree with Lights"]="带灯的随机树木",["Use this to get Christmas Lights"]="使用此功能获取圣诞灯",["Light Random Christmas Pine"]="点亮随机圣诞松树",["Use this with christmas lights :D"]="配合圣诞灯使用此功能",["Santa's Sack"]="圣诞老人的袋子",["Santa's Workshop"]="圣诞老人的工坊",["Bring Healing"]="携带治疗物品",["Bring Gears"]="携带废料",Gears="废料",Bolt="螺栓",Tyre="轮胎",["Bring Guns & Armor"]="携带武器与护甲",["Guns & Armor"]="武器与护甲",["Gold Shard"]="金碎片",["Raw Obsidiron Ore"]="原始黑曜石矿石",["Gem of the Forest Fragment"]="森林宝石碎片",Diamond="钻石",["Defense Blueprint"]="防御蓝图",Corpse="尸体",["Meteor Shard"]="陨石碎片",Foot="兽足",Pelt="毛皮",["Mammoth Tusk"]="猛犸象牙",["Good Sack"]="优质袋子",["Seed Box"]="种子箱",Chainsaw="电锯",["Old Flashlight"]="旧手电筒",["Strong Flashlight"]="强光手电筒",["Old Rod"]="旧鱼竿",Flower="花朵",["Coin Stack"]="硬币堆",["Infernal Sack"]="地狱袋子",["Giant Sack"]="巨型袋子",Key="钥匙",Feather="羽毛",Wildfire="野火",["Sacrifice Totem"]="献祭图腾",["Christmas Lights"]="圣诞灯",Scythe="镰刀",["Obsidiron Hammer"]="黑曜石锤",["Purple Fur Tuft"]="紫色毛皮",["Halloween Candle"]="万圣节蜡烛",["Thorn Body"]="荆棘护甲",["Riot Shield"]="防暴盾牌",Boots="靴子",["Armour Trim Kit"]="护甲装饰套件",["Obsidiron Boots"]="黑曜石靴",["Leather Body"]="皮革护甲",["Iron Body"]="铁护甲",["Tactical Shotgun"]="战术霰弹枪",["Revolver Ammo"]="左轮手枪弹药",["Rifle Ammo"]="步枪弹药",Armour="护甲",["Axe Trim Kit"]="斧头装饰套件",Spear="长矛",["Good Axe"]="优质斧头",Revolver="左轮手枪",Rifle="步枪",Raygun="射线枪",["Ice Axe"]="冰斧",["Ice Sword"]="冰剑",["Strong Axe"]="强力斧头",["Infernal Sword"]="地狱剑",Morningstar="晨星锤",["Laser Sword"]="激光剑",["UFO Scrap"]="UFO残骸",["UFO Component"]="UFO组件",["UFO Junk"]="UFO废品",Gem="宝石",["Gem of the Forest"]="森林宝石",["Broken Fan"]="破损风扇",["Broken Microwave"]="破损微波炉",["Washing Machine"]="洗衣机",["Old Car Engine"]="旧汽车引擎",["Sheet Metal"]="金属板",["Old Radio"]="旧收音机",MedKit="医疗包",Bandage="绷带",["Bring Logs [BETA]"]="携带原木【测试版】",["Bring Food"]="携带食物",["Bring Meteor Items"]="携带陨石物品",["Bring Fuel [BETA]"]="携带燃料【测试版】",Fuel="燃料",Berry="浆果",Morsel="小块肉",Chair="椅子",Coal="煤炭",["Fuel Canister"]="燃料罐",["Oil Barrel"]="油桶",Biofuel="生物燃料",Log="原木",["Scalding Obsidiron Ingot"]="灼热黑曜石锭",["Bring Cooldown"]="携带冷却时间",["No Bring Amount Limit"]="无携带数量限制",["Bring Height"]="携带高度",["Bring Settings"]="携带设置",["Use Freecam for Bring Items"]="携带物品时使用自由视角",["Untouchable by Others"]="其他玩家无法触碰",["Makes the brought items untouchable by other players"]="使携带的物品无法被其他玩家触碰",["Bring Method"]="携带方式",["Ultra Fast"]="极快",["Bring Location"]="携带位置",Player="玩家",Workbench="工作台",Fire="篝火",Slow="慢速",Fast="快速",["Max Per Item"]="每件物品最大数量",["Stronghold Statistics"]="据点统计",Tracking="追踪状态",Status="状态",Level="等级",["Time till open"]="开启倒计时",["Auto Stronghold Status"]="自动据点状态",Waiting="等待中",["Enable Auto Stronghold"]="启用自动据点",["Stop Auto Stronghold Task"]="停止自动据点任务",["Day Statistics"]="每日统计",Attack="攻击波次",Cycle="周期",Time="时间",Weather="天气",Biome="生物群系",["Day Farm Status"]="自动农场状态",["Skipped Steps"]="跳过步骤数",["Start Day Farm"]="启动自动农场",["Stop Find Task"]="停止寻找任务",["Children Rescue v2"]="救援儿童 v2",["Buy 3 beds"]="购买3张床",["Buy 3 Lightning Rods"]="购买3个避雷针",["Buy Crockpot"]="购买陶罐",["Clean up the Map"]="清理地图",["Map Exploration"]="地图探索",["Children Rescue"]="救援儿童",["Plant/Build Radius"]="种植/建造半径",["Angle Increment"]="角度增量",["Plant Height"]="种植高度",["Plant/Build Limit"]="种植/建造数量上限",["Show Blueprint"]="显示蓝图",["Placement Method"]="放置方式",Circle="圆形",Square="方形",["One Place"]="单个位置",["Plant Saplings"]="种植树苗",["Build Log Walls in Circle"]="建造圆形原木墙",["Auto Collect Coin Stacks"]="自动收集硬币堆",["Auto Open Seed Boxes"]="自动打开种子箱",["Loot Mode"]="拾取模式",Safe="安全模式",Simple="简单模式",["Loot Radius"]="拾取半径",["Chest Delay (sec)"]="箱子延迟（秒）",["Fuel Type"]="燃料类型",["AutoFill 篝火"]="自动填充篝火",["Start Fueling when (Fire HP)"]="篝火生命值低于此值时开始添加燃料",["Auto Scrap Logs"]="自动拆解原木",["Auto Scrap Gears"]="自动拆解废料",["Auto Collect"]="自动收集",["Auto Pickup Flowers"]="自动拾取花朵",["Bring Food To Cook Pot"]="将食物带到烹饪锅",["Auto 篝火"]="自动篝火",["Food Choice"]="食物选择",["Auto Crock Pot"]="自动陶罐",["Auto Campfire"]="自动篝火",Aura="光环",Save="保存",["Saves elements to config"]="将设置保存到配置文件",Load="加载",["Loads elements from config"]="从配置文件加载设置",["Select Theme"]="选择主题",["Toggle Window Transparency"]="切换窗口透明度",["Theme Name"]="主题名称",["Background Color"]="背景颜色",["Outline Color"]="边框颜色",["Text Color"]="文字颜色",["Placeholder Text Color"]="占位符文字颜色",["Update Theme"]="更新主题",Cyberpunk="赛博朋克",Emerald="祖母绿",Amber="琥珀",Lavender="薰衣草紫",Violet="紫罗兰",Red="红色",NeonYellow="霓虹黄",Aqua="水色",Dark="深色",Forest="森林绿",Indigo="靛蓝",Light="浅色",NeonGreen="霓虹绿",Aurora="极光",Midnight="午夜黑",NeonBlue="霓虹蓝",Ocean="海洋蓝",Peach="桃色",NeonPink="霓虹粉",Sunset="日落橙",Night="夜色",Coral="珊瑚红",Coordinates="坐标",["Show Coordinates"]="显示坐标",Credits="致谢",["script dev"]="脚本开发者",["ui library"]="ui",["Please notify me if you need credits (erchodev#0 on discord)"]="如果有翻译错误的地方请加q2482341780",Misc="杂项",["Reset Camera"]="重置视角",["Useful Stuff"]="实用工具",Fullbright="全亮度",["Remove Fog"]="移除雾气",["Remove Sky"]="移除天空",["TP Walk Speed"]="传送行走速度",["TP Walk"]="传送行走",Noclip="穿墙模式",["Infinite Jump"]="无限跳跃",Ambient="环境光",["Rich Shader"]="高清着色器",["Shader Color"]="着色器颜色",["Lighting Theme"]="光照主题",["Enable Lighting Theme"]="启用光照主题",["Aesthetic Lighting"]="唯美光照",NewYork="纽约",Aesthetic3="唯美3",FakeClouds="假云",LunarNight="月夜",PitchDark="漆黑",["discord.gg/void"]="Discord 服务器",en="英文",Stop="停止",["Stop冲刺"]="停止冲刺",["Local玩家"]="本地玩家",Visuals="视觉效果",["Search..."]="搜索...",BetterNight3="优化黑夜3",Orange="橙色",DarkMountains="暗黑山脉",FlamingSunset="烈焰日落",Aesthetic="唯美",Aesthetic2="唯美2",Pastel="马卡龙",PurpleClouds="紫云",BetterSky="优化天空",Space="太空",Galaxy3="银河3",NetherWorld="下界",Nebula="星云",PurpleNight="紫夜",Purple2="紫色2",Galaxy2="银河2",Pink="粉色",Purple3="紫色3",DarkishPink="暗粉",Purple="紫色",Galaxy="银河",BetterNight="优化黑夜",BetterNight2="优化黑夜2",MagentaOrange="品红橙",Self="自身",FOV="视野",Movement="移动",["Walk Speed"]="行走速度",Speed="速度",Fly="飞行",["Fly Speed"]="飞行速度",["Characters ESP"]="角色透视",Characters="角色",CharactersEspColor="角色透视颜色",["Characters Items"]="角色物品",["ESP Settings"]="透视设置",["Enable Highlight"]="启用高亮",["Show Distance"]="显示距离",["Fill Transparency"]="填充透明度",["Outline Transparency"]="边框透明度",["Text Size"]="文字大小",OtherEspColor="其他透视颜色",["Other Items"]="其他物品",["Mammonth Tusk"]="猛犸象牙",Candy="糖果",GunsArmorEspColor="武器与护甲 ESP 颜色",["Food & Healing ESP"]="食物与绷带透视",["Food & Healing"]="食物与绷带",FoodHealingEspColor="食物与绷带透视颜色",["Food & Healing Items"]="食物与治疗物品",["Gears ESP"]="废料透视",GearsEspColor="废料透视颜色",["Gears Items"]="废料物品",["Fuel ESP"]="燃料透视",FuelEspColor="燃料透视颜色",["Fuel Items"]="燃料物品",["Fishing ESP"]="钓鱼透视",FishingEspColor="钓鱼透视颜色",["Fishing Items"]="钓鱼物品",["Children ESP"]="儿童透视",Children="儿童",ChildrenEspColor="儿童透视颜色",["Children Items"]="儿童物品",["Lost Child"]="丢失的儿童",["Lost Child2"]="丢失的儿童2",["Lost Child3"]="丢失的儿童3",["Lost Child4"]="丢失的儿童4",["Water Hole"]="水潭",["Water Hole Big"]="大水潭",["Water Hole1"]="水潭1",["Main ESP"]="主界面透视",PlayerEspColor="玩家透视颜色",["Infernal Crossbow"]="地狱弩",["Structure TP"]="建筑传送",["Teleport To"]="传送至",["Refresh Chest List"]="刷新箱子列表",["Child TP"]="儿童传送",["Select Child"]="选择儿童",["Teleport To Child"]="传送至儿童",["Cleanup Big Trees"]="删除大树",["Bring Carrots"]="带来胡萝卜",["Bring Pumpkins"]="带来南瓜",["Teleport to Thanksgiving Plot"]="传送至感恩节区块",["Teleport to Halloween House"]="传送至万圣节房屋",["No idea what else to add to this empty update :/"]="这个空更新实在不知道该加什么了 ",["Other TP"]="其他传送",["Teleport to Camp"]="传送至营地",["Teleport to Cultist Generator Base"]="传送至邪教徒发电机基地",["Teleport to Stronghold"]="传送至据点",["Teleport to Stronghold Diamond Chest"]="传送至据点钻石箱",["Teleport to Caravan"]="传送至商队",["Teleport to Fairy"]="传送至仙子",["Teleport to Anvil"]="传送至铁砧",["Auto TP to Warm Place"]="自动传送至温暖区域",["Teleport To Chest"]="传送至箱子",["Teleport to Fishing Hut"]="传送至钓鱼小屋",["Teleport All Food"]="传送所有食物",["Elf TP"]="精灵传送",["Teleport To Chosen Elf"]="传送至选中的精灵",["Teleport to Santa's Sack"]="传送至圣诞老人的袋子",["Teleport to Santa's Workshop"]="传送至圣诞老人的工坊",["Teleport to Random Christmas Present"]="传送至随机圣诞礼物",["Teleport to Random Tree with Lights"]="传送至带灯的随机树木",Healing="治疗物品",["Bring Others"]="携带其他物品",["Alien Armor"]="外星人护甲",["Frog Boots"]="青蛙靴",["Leather Armor"]="皮革护甲",["Status: [据点 not found yet :c]"]="状态：[据点尚未找到 :c]",["Level: [据点 not found yet :c]"]="等级：[据点尚未找到 :c]",["Time till open: [据点 not found yet :c]"]="开启倒计时：[据点尚未找到 :c]",["Auto Stronghold Status"]="自动据点状态",["Waiting..."]="等待中...",["Enable Auto Stronghold"]="启用自动据点",["Stop Auto Stronghold Task"]="停止自动据点任务",["Cultist Attack: No"]="邪教徒攻击：无",["Cycle: "]="周期：",["Time: "]="时间：",["Weather: Clear"]="天气：晴朗",["Biome: Snow"]="生物群系：雪地",["Day: "]="天数：",["Auto Farm Status"]="自动农场状态",["Start Auto Farm"]="启动自动农场",["Auto Fill Campfire"]="自动填充篝火",["Auto Chest [BETA]"]="自动箱子【测试版】",["Member Count: 104559"]="成员数：",["Online Count: 7598"]="在线数：",["Update Discord Info"]="更新Dc信息",["Bring Cultists"]="携带邪教徒",["Cultist Attack: "]="邪教徒攻击：",["Time: 20s"]="时间：20秒",["Cycle: Day"]="周期：白天",["Weather: "]="天气：",["Biome: "]="生物群系",["Day: 1"]="天数：1",Start="开始",Choice="选择",["Items Choice"]="物品选择",Food="食物",["No items found to bring! Try exploring the map and try again :D"]="秋辞没有拉出来该物品请探索地图后使用",["erchodev#0"]="有芙同享汉化",Linoria="ks秋辞帮助",Obsidian="烧秋辞🦶88",["mspaint v2"]="希望我加带的私货不会被发现😋",["Inf Yield"]="无收益",All="全部",["Infintie Saplings"]="无限树苗",["有芙同享"]="<font color='#7FC8F0'>有</font><font color='#74C0EB'>芙</font><font color='#69B8E6'>同</font><font color='#5EB0E1'>享</font>虚空汉化者",["快手人机"]="扫秋辞",Config="配置",Theme="主题",ChristmasPresent1="圣诞礼物1",["[Auto Chest]: Looting"]="[自动箱子]: 拾取中",["[Auto Chest]: Looting  Frog Chest"]="[自动箱子]: 青蛙宝箱",["Makes you unhittable by other entities"]="不会被其他生物攻击到",["Loops you in circle around the map to let everything load"]="绕地图飞行以加载所有区块",["Make sure to join our discord server for updates!"]="加入我们的Dc频道获取更新",["Local Player"]="本地玩家",["胡萝卜"]="秋辞的神秘小玩具",["原木"]="秋辞的二弟"};
 	local function translateText(text)
-		local FlatIdent_8F047 = 0;
-		while true do
-			if (FlatIdent_8F047 == 0) then
-				if (not text or (type(text) ~= "string")) then
-					return text;
-				end
-				if Translations[text] then
-					return Translations[text];
-				end
-				FlatIdent_8F047 = 1;
-			end
-			if (FlatIdent_8F047 == 1) then
-				for en, cn in pairs(Translations) do
-					if text:find(en) then
-						local FlatIdent_95CAC = 0;
-						local result;
-						while true do
-							if (FlatIdent_95CAC == 0) then
-								result = text:gsub(en, cn);
-								return result;
-							end
-						end
+		if (not text or (type(text) ~= "string")) then
+			return text;
+		end
+		if Translations[text] then
+			return Translations[text];
+		end
+		for en, cn in pairs(Translations) do
+			if text:find(en) then
+				local FlatIdent_70355 = 0;
+				local result;
+				while true do
+					if (FlatIdent_70355 == 0) then
+						result = text:gsub(en, cn);
+						return result;
 					end
 				end
-				return text;
 			end
 		end
+		return text;
 	end
 	local function setupTranslationEngine()
 		local success, err = pcall(function()
-			local FlatIdent_52901 = 0;
+			local FlatIdent_69270 = 0;
 			local oldIndex;
 			while true do
-				if (FlatIdent_52901 == 1) then
+				if (FlatIdent_69270 == 1) then
 					getrawmetatable(game).__newindex = newcclosure(function(t, k, v)
-						local FlatIdent_2953F = 0;
-						while true do
-							if (FlatIdent_2953F == 0) then
-								if ((t:IsA("TextLabel") or t:IsA("TextButton") or t:IsA("TextBox")) and (k == "Text")) then
-									v = translateText(tostring(v));
-								end
-								return oldIndex(t, k, v);
-							end
+						if ((t:IsA("TextLabel") or t:IsA("TextButton") or t:IsA("TextBox")) and (k == "Text")) then
+							v = translateText(tostring(v));
 						end
+						return oldIndex(t, k, v);
 					end);
 					setreadonly(getrawmetatable(game), true);
 					break;
 				end
-				if (FlatIdent_52901 == 0) then
+				if (FlatIdent_69270 == 0) then
 					oldIndex = getrawmetatable(game).__newindex;
 					setreadonly(getrawmetatable(game), false);
-					FlatIdent_52901 = 1;
+					FlatIdent_69270 = 1;
 				end
 			end
 		end);
@@ -71,35 +58,28 @@ do
 			warn("元表劫持失败:", err);
 			local translated = {};
 			local function scanAndTranslate()
-				local FlatIdent_6053C = 0;
+				local FlatIdent_12703 = 0;
 				local player;
 				while true do
-					if (FlatIdent_6053C == 0) then
+					if (FlatIdent_12703 == 0) then
 						for _, gui in ipairs(game:GetService("CoreGui"):GetDescendants()) do
 							if ((gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox")) and not translated[gui]) then
 								pcall(function()
-									local FlatIdent_8D83D = 0;
+									local FlatIdent_475BC = 0;
 									local text;
 									while true do
-										if (FlatIdent_8D83D == 0) then
+										if (FlatIdent_475BC == 0) then
 											text = gui.Text;
 											if (text and (text ~= "")) then
-												local FlatIdent_8CEDF = 0;
-												local translatedText;
-												while true do
-													if (FlatIdent_8CEDF == 0) then
-														translatedText = translateText(text);
-														if (translatedText ~= text) then
-															local FlatIdent_33EA4 = 0;
-															while true do
-																if (FlatIdent_33EA4 == 0) then
-																	gui.Text = translatedText;
-																	translated[gui] = true;
-																	break;
-																end
-															end
+												local translatedText = translateText(text);
+												if (translatedText ~= text) then
+													local FlatIdent_60EA1 = 0;
+													while true do
+														if (FlatIdent_60EA1 == 0) then
+															gui.Text = translatedText;
+															translated[gui] = true;
+															break;
 														end
-														break;
 													end
 												end
 											end
@@ -110,32 +90,39 @@ do
 							end
 						end
 						player = game:GetService("Players").LocalPlayer;
-						FlatIdent_6053C = 1;
+						FlatIdent_12703 = 1;
 					end
-					if (FlatIdent_6053C == 1) then
+					if (FlatIdent_12703 == 1) then
 						if (player and player:FindFirstChild("PlayerGui")) then
 							for _, gui in ipairs(player.PlayerGui:GetDescendants()) do
 								if ((gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox")) and not translated[gui]) then
 									pcall(function()
-										local text = gui.Text;
-										if (text and (text ~= "")) then
-											local FlatIdent_1743D = 0;
-											local translatedText;
-											while true do
-												if (FlatIdent_1743D == 0) then
-													translatedText = translateText(text);
-													if (translatedText ~= text) then
-														local FlatIdent_5BA5E = 0;
-														while true do
-															if (FlatIdent_5BA5E == 0) then
-																gui.Text = translatedText;
-																translated[gui] = true;
-																break;
+										local FlatIdent_31A5A = 0;
+										local text;
+										while true do
+											if (FlatIdent_31A5A == 0) then
+												text = gui.Text;
+												if (text and (text ~= "")) then
+													local FlatIdent_5ED46 = 0;
+													local translatedText;
+													while true do
+														if (FlatIdent_5ED46 == 0) then
+															translatedText = translateText(text);
+															if (translatedText ~= text) then
+																local FlatIdent_61585 = 0;
+																while true do
+																	if (0 == FlatIdent_61585) then
+																		gui.Text = translatedText;
+																		translated[gui] = true;
+																		break;
+																	end
+																end
 															end
+															break;
 														end
 													end
-													break;
 												end
+												break;
 											end
 										end
 									end);
@@ -149,23 +136,29 @@ do
 			local function setupDescendantListener(parent)
 				parent.DescendantAdded:Connect(function(descendant)
 					if (descendant:IsA("TextLabel") or descendant:IsA("TextButton") or descendant:IsA("TextBox")) then
-						task.wait(0.1);
-						pcall(function()
-							local FlatIdent_7366E = 0;
-							local text;
-							while true do
-								if (0 == FlatIdent_7366E) then
-									text = descendant.Text;
-									if (text and (text ~= "")) then
-										local translatedText = translateText(text);
-										if (translatedText ~= text) then
-											descendant.Text = translatedText;
+						local FlatIdent_A36C = 0;
+						while true do
+							if (FlatIdent_A36C == 0) then
+								task.wait(0.1);
+								pcall(function()
+									local FlatIdent_7F35E = 0;
+									local text;
+									while true do
+										if (FlatIdent_7F35E == 0) then
+											text = descendant.Text;
+											if (text and (text ~= "")) then
+												local translatedText = translateText(text);
+												if (translatedText ~= text) then
+													descendant.Text = translatedText;
+												end
+											end
+											break;
 										end
 									end
-									break;
-								end
+								end);
+								break;
 							end
-						end);
+						end
 					end
 				end);
 			end
@@ -175,14 +168,8 @@ do
 				pcall(setupDescendantListener, player.PlayerGui);
 			end
 			while true do
-				local FlatIdent_43862 = 0;
-				while true do
-					if (0 == FlatIdent_43862) then
-						scanAndTranslate();
-						task.wait(3);
-						break;
-					end
-				end
+				scanAndTranslate();
+				task.wait(3);
 			end
 		end
 	end
