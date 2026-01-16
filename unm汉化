@@ -1,0 +1,126 @@
+do
+    local Translations={
+        ["Discord Key System"] = "迪斯科尔卡密系统（卡密ink50）",
+        ["Enter your key here.."] = "在此输入你的密钥",
+        ["Get Key"] = "获取卡密",
+        ["Enter your key or wait for auto-check.."] = "输入卡密（自动验证）",
+        ["Unmatched Hub"] = "unm-有芙同享汉化",
+        ["Powers"] = "职业技能",
+        ["RED LIGHT"] = "一二三木头人",
+        ["Auto Collect Bandage"] = "自动拾取绷带",
+        ["Auto Collect Flashbang"] = "自动拾取闪光弹",
+        ["Shoot Marked Players"] = "自动射击被标记的玩家",
+        ["Shoot Marked Players v2"] = "射击被标记的玩家 v2",
+        ["DALGONA & LIGHTS"] = "扣糖饼/熄灯",
+        ["Anti-Crack Cookie"] = "糖饼防碎裂",
+        ["Safe Place on Lights Out"] = "穿送到安全位置",
+        ["HIDE & SEEK"] = "钥匙与刀",
+        ["Auto Kill Hiders"] = "自动击杀蓝队",
+        ["Auto Escape"] = "自动逃脱",
+        ["TP 100 Blocks Up"] = "向上传送100格",
+        ["TP 40 Blocks Down"] = "向下传送40格",
+        ["Remove Spikes"] = "删除尖刺（尖刺无伤害）",
+        ["Spike Kill"] = "尖刺击杀",
+        ["Auto Dodge"] = "自动闪避",
+        ["TUG OF WAR"] = "拔河",
+        ["Auto Pull Rope"] = "自动拉绳",
+        ["Legit Pull"] = "正常拉绳",
+        ["Anti-Mistake"] = "防失误",
+        ["GLASS BRIDGE"] = "玻璃桥",
+        ["Anti-Break"] = "防掉落",
+        ["Glass X-Ray"] = "透视真玻璃",
+        ["Anti-Fall (Glass Bridge)"] = "防坠落（玻璃桥）",
+        ["Player X-Ray"] = "透视玩家",
+        ["Key X-Ray"] = "钥匙透视",
+        ["Exit Door X-Ray"] = "透视出口门",
+        ["GUARDS"] = "守卫",
+        ["Auto Grab Guard"] = "自动抢守卫",
+        ["Multiplier"] = "倍数",
+        ["Money Farm"] = "刷钱",
+        ["Always Headshot"] = "枪枪爆头好运连连",
+        ["Infinite Ammo"] = "无限子弹",
+        ["JUMP ROPE"] = "跳绳",
+        ["Anti-Hit"] = "无视绳子",
+        ["Auto Balance"] = "自动平衡",
+        ["Auto Jump"] = "自动跳跃",
+        ["Remove Rope"] = "删除绳子",
+        ["Freeze Rope"] = "冻结绳子",
+        ["Anti-Fall (Jump Rope)"] = "防坠落（跳绳）",
+        ["REBEL"] = "反叛",
+        ["Rapid Fire"] = "快速射击",
+        ["Guard Aimbot"] = "守卫自瞄",
+        ["Guard X-Ray"] = "守卫透视",
+        ["Bring Guard"] = "传送守卫",
+        ["Rebel Instant Kill Guard"] = "秒击杀守卫",
+        ["Instant Rebel v2"] = "即时反叛 v2",
+        ["Auto Shoot Players"] = "自动射击玩家",
+        ["Pentathlon"] = "五项全能",
+        ["Perfect Rock Throw"] = "完美投石",
+        ["Auto Gonggi"] = "自动玩抓石子",
+        ["Always Perfect Spin"] = "自动旋转陀螺",
+        ["Auto Play Jegi"] = "自动踢毽子",
+        ["Crhismas"] = "圣诞节",
+        ["OTHERS"] = "其他功能",
+        ["Unlock Dash"] = "解锁冲刺",
+        ["Ghost Step"] = "幽灵步",
+        ["FINAL"] = "最终回合",
+        ["Anti-Fall"] = "防坠落",
+        ["Anti-Fall (Wall)"] = "防坠落（墙）",
+        ["Auto Press Start Button"] = "自动按按钮",
+        ["Auto Grab Pipe"] = "自动拿钢管",
+        ["Start"] = "开始",
+        ["Anti-AOE Damage"] = "防出范围伤害",
+        ["Auto Kill"] = "自动击杀",
+        ["Touch Knockback"] = "触碰甩飞",
+        ["Revive"] = "复活",
+        ["Auto QTE V2"] = "自动QTE V2",
+        ["Faster Speed"] = "速度",
+        ["Vision Boost"] = "fov",
+        ["Anti-Lag"] = "防卡顿",
+        ["Instant Interaction"] = "秒交互",
+        ["Visuals"] = "视觉",
+        ["Free VIP"] = "免费会员（客户端）",
+        ["Spectate"] = "观战",
+        ["Custom Win"] = "自定义胜利（客户端）",
+        ["Custom Tag"] = "自定义标签（客户端）",
+        ["Dash"] = "解锁冲刺",
+        ["Bypass Dash Cooldown"] = "无冲刺冷却",
+        ["Parkour Master"] = "跑酷大师",
+        ["Unlock Double Jump"] = "二段跳",
+        ["Unlock Ghost Step"] = "免费幽灵步",
+        ["No Phantom Cooldown"] = "幽灵步无冷却",
+        ["OPEN"]="打开脚本"
+    }
+
+    local function translateText(text)
+        if not text or type(text) ~= "string" then return text end
+        
+        if Translations[text] then
+            return Translations[text]
+        end
+        
+        for en, cn in pairs(Translations) do
+            if text:find(en) then
+                return text:gsub(en, cn)
+            end
+        end
+        
+        return text
+    end
+
+    local function setupTranslationEngine()
+        local success, err = pcall(function()
+            local oldIndex = getrawmetatable(game).__newindex
+            setreadonly(getrawmetatable(game), false)
+            
+            getrawmetatable(game).__newindex = newcclosure(function(t, k, v)
+                if (t:IsA("TextLabel") or t:IsA("TextButton") or t:IsA("TextBox")) and k == "Text" then
+                    v = translateText(v)
+                end
+                oldIndex(t, k, v)
+            end)
+        end)
+    end
+
+    setupTranslationEngine()
+end
