@@ -1,17 +1,17 @@
-do 
-    local Translations={
-        Toggle="开关",
-        ["AX-SCRIPTS"]="墨水游戏 <font color='#7FC8F0'>有</font><font color='#74C0EB'>芙</font><font color='#69B8E6'>同</font><font color='#5EB0E1'>享</font><font color='#53A8DC'>秋</font><font color='#48A0D7'>辞</font><font color='#3D98D2'>汉</font><font color='#3290CD'>化</font>", 
-        Games="游戏",
-        Combat="攻击",
-        Miscs="杂项",
-        Players="玩家",
-        Settings="设置",
+do
+    local Translations = {
+        ["Toggle"]="开关",
+        ["AX-SCRIPTS"]="Ax <font color='#7FC8F0'>有</font><font color='#74C0EB'>芙</font><font color='#69B8E6'>同</font><font color='#5EB0E1'>享</font><font color='#53A8DC'>秋</font><font color='#48A0D7'>辞</font><font color='#3D98D2'>汉</font><font color='#3290CD'>化</font>", 
+        ["Games"]="游戏",
+        ["Combat"]="攻击",
+        ["Miscs"]="杂项",
+        ["Players"]="玩家",
+        ["Settings"]="设置",
         ["Red Light, Green Light"]="一二三木头人",
         ["Auto Stop"]="自动停止",
         ["Disable Injury"]="移除受伤状态",
         ["Finish RLGL"]="传送终点",
-        Dalgona="扣糖饼",
+        ["Dalgona"]="扣糖饼",
         ["Anti Crack"]="糖饼不碎（等动画结束后再开）",
         ["Get Lighter"]="免费火机",
         ["Auto Dalgona"]="自动扣糖饼",
@@ -20,7 +20,7 @@ do
         ["Safe Zone"]="传送到安全点",
         ["Tug of War"]="拔河",
         ["Rope Pull Mode"]="自动拔河力度",
-        Normal="正常",
+        ["Normal"]="正常",
         ["没找到素材"]="狂暴",
         ["Pull Rope"]="自动拔河",
         ["Hide N' Seek"]="躲猫猫",
@@ -35,30 +35,30 @@ do
         ["Infinite Stamina"]="无限耐力",
         ["Fast Sprint"]="解锁快速冲刺",
         ["Spikes Kill"]="尖刺陷阱击杀",
-        ["Disable Spikes"]="禁用尖刺(尖刺击杀时需要打开)",
-        ["Teleport to Hider"]="传送到蓝色",
-        ["Teleport to Seeker"]="传送到红色",
+        ["Disable Spikes"]="禁用尖刺伤害",
+        ["Teleport to Hider"]="传送到蓝队",
+        ["Teleport to Seeker"]="传送到红队",
         ["Select Exit Door"]="选择逃生门",
         ["Teleport to Exit Door"]="传送到逃生门",
-        Rebel="反叛",
+        ["Rebel"]="反叛",
         ["Auto Shoot Guards"]="自动攻击守卫",
-        ["Wall Check"]="墙壁检测（不会击杀在墙后面的守卫）",
-        ["Guards Hitbox + ESP"]="增大守卫和透视",
+        ["Wall Check"]="墙壁检测",
+        ["Guards Hitbox + ESP"]="增大守卫范围和透视",
         ["Hitbox Size"]="范围大小",
         ["Hitbox Transparency"]="范围透明度",
         ["Last Dinner"]="最后的晚餐",
         ["Zone Kill"]="传送杀人",
-        ["Squid Game"]="1V1决斗",
+        ["Squid Game"]="螃蟹游戏",
         ["Get Rock"]="自动获得石头",
-        Pentathlon="五人六足",
+        ["Pentathlon"]="五人六足",
         ["Glass Bridge"]="玻璃桥",
-        ["Reveal Safe & Fake Glass"]="透视玻璃",
+        ["Reveal Safe & Fake Glass"]="真玻璃透视",
         ["Anti Break Glass"]="防坠落",
         ["Finish Glass Bridge"]="传送到终点",
         ["Jump Rope"]="跳绳",
         ["Finish Jump Rope"]="传送到终点",
         ["Disable Game"]="删除绳子",
-        ["Simulate Balance"]="一直平衡",
+        ["Simulate Balance"]="自动平衡",
         ["Auto Jump"]="自动跳",
         ["Fix Broken Tracks"]="修复桥梁",
         ["Unlimited Chances"]="无限机会",
@@ -83,27 +83,27 @@ do
         ["Spinning Top Speed"]="陀螺平衡速度",
         ["Randomize Balance Speed"]="随机陀螺平衡速度",
         ["Guard Aimlock"]="守卫自瞄",
-        Closest="离你最近的",
-        LookingAt="你能看到的位置（墙壁检测）",
-        Aimlock="瞄准锁定",
+        ["Closest"]="离你最近的",
+        ["LookingAt"]="你能看到的位置（墙壁检测）",
+        ["Aimlock"]="瞄准锁定",
         ["Aimlock Mode"]="瞄准锁定模式",
         ["Auto Shoot"]="自动攻击",
         ["Auto Shoot Mode"]="自动攻击模式",
-        Legit="正常",
-        Rage="狂暴",
-        ["Select Guns"]="枪械品种",
+        ["Legit"]="正常",
+        ["Rage"]="狂暴",
+        ["Select Guns"]="枪械种类",
         ["No Recoil"]="没有后座力",
-        Bullets="子弹数量",
+        ["Bullets"]="子弹数量",
         ["Fire Rate CD"]="射速CD",
-        Range="范围",
+        ["Range"]="范围",
         ["Run Speed"]="运行速度",
         ["Scope FOV"]="范围视野",
         ["Bullets Per Fire"]="每次射击的子弹（应该是增加每次射出的子弹）",
         ["Bullet Size"]="子弹大小（没范围好用）",
         ["Auto Shoot (Silent Aim)"]="自动攻击",
-        Guns="枪械",
+        ["Guns"]="枪械",
         ["Modded Guns"]="枪械加成",
-        Utilities="实用",
+        ["Utilities"]="实用",
         ["Player Info"]="玩家信息",
         ["Select Player"]="选择玩家",
         ["Biggest Threat"]="最高胜场",
@@ -111,21 +111,20 @@ do
         ["Select a player to view info"]="选择玩家查看信息",
         ["Guard Hitbox+ESP"]="增大守卫范围+透视",
         ["Key System"]="卡密系统",
-        Authentication="卡密认证",
+        ["Authentication"]="卡密认证",
         ["Enter Key"]="输入卡密",
         ["Get Key (Linkvertise)"]="得到卡密",
-        ["Get Key (Work.Ink)"]="得到卡密",
         ["Check Key"]="检查卡密",
         ["Join Discord"]="加入DC频道",
-        ["Open Keybind Menu"]="打开菜单自动绑定钥匙",
+        ["Open Keybind Menu"]="打开菜单自动绑定卡密",
         ["Enable Crosshair"]="十字瞄准",
         ["Lock Button (Mobile)"]="锁定按钮",
         ["Notification Side"]="十字拖架",
         ["Top-Right"]="右上角",
         ["DPI Scale"]="菜单占比",
         ["Menu bind"]="菜单绑定",
-        Unload="卸载",
-        Themes="主题",
+        ["Unload"]="卸载",
+        ["Themes"]="主题",
         ["Background color"]="背景颜色",
         ["Main color"]="主色调",
         ["Accent color"]="强色调",
@@ -133,7 +132,7 @@ do
         ["Font color"]="字体颜色",
         ["Font Face"]="客户端字体",
         ["Theme list"]="主题列表",
-        Default="默认",
+        ["Default"]="默认",
         ["Set as default"]="设置为默认",
         ["Custom theme name"]="自己给文件名字",
         ["Create theme"]="创建文件",
@@ -143,7 +142,7 @@ do
         ["Delete theme"]="删除文件",
         ["Refresh list"]="刷新列表",
         ["Reset default"]="重置默认",
-        Configuration="配置",
+        ["Configuration"]="配置",
         ["Config name"]="配置名字",
         ["Create config"]="创建配置",
         ["Config list"]="配置列表",
@@ -152,8 +151,8 @@ do
         ["Delete config"]="删除配置",
         ["Set as autoload"]="设置成自动加载",
         ["Reset autoload"]="重置自动加载",
-        ["Current autoload config: none"]="当前自动加载配置:无",
-        Noclip="穿墙",
+        ["Current autoload config:"]="当前自动加载配置:",
+        ["Noclip"]="穿墙",
         ["防不胜防"]="防虚空",
         ["Hide Nametag"]="隐藏称号",
         ["Hide Other Nametags"]="隐藏其他标签",
@@ -164,22 +163,21 @@ do
         ["Parkour Artist Mods"]="跑酷大师修改",
         ["Equip Power"]="装备能力",
         ["Disable Dash Cooldown"]="冲刺无冷却",
-        Emotes="表情",
+        ["Emotes"]="表情",
         ["Select Emote"]="选择表情（最后一个是道观）",
         ["Emote Speed"]="速度",
         ["Play/Pause Emote"]="做/停止做动作",
-        Extras="附加内容",
+        ["Extras"]="附加内容",
         ["Select Vote"]="选择投票选项",
         ["Auto Vote"]="自动投票",
         ["QTE Mode"]="QTE模式",
         ["Ultra Rage"]="超级狂暴模式",
-        Boosts="提升",
-        ["Damage Boost (NOT FE)"]="伤害调节",
+        ["Boosts"]="提升",
+        ["Damage Boost (NOT FE)"]="伤害调节（没用）",
         ["Faster Sprint (6+ TO UNLOCK DASH)"]="速度调节（5级冲刺用了直接死）",
         ["Won Boost (NOT FE)"]="调节胜利次数（没用）",
-        Spectate="启用观战模式",
+        ["Spectate"]="观战模式",
         ["Disable Stun"]="无眩晕",
-        ["Anti Ragdoll"]="移出受伤效果",
         ["Gamepasses (NOT FE)"]="游戏通行证（客户端真正能用的少）",
         ["Enable VIP"]="获得VIP",
         ["Auto QTE"]="自动按QTE",
@@ -187,11 +185,11 @@ do
         ["Auto Next Game"]="自动下一个游戏",
         ["Disable Effects"]="禁用效果",
         ["Low GFX"]="提高帧数",
-        Fullbright="夜视/高亮",
+        ["Fullbright"]="夜视/高亮",
         ["Pickup Bandages"]="自动捡绷带",
         ["FOV Changer"]="视野调节",
         ["Instant Interact"]="即时互动",
-        Lobby="大厅",
+        ["Lobby"]="大厅",
         ["Glass Manufacturer Vision"]="解锁玻璃制造商",
         ["2x Vote Count"]="解锁双倍投票",
         ["Custom Player Tag"]="玩家自定义标签",
@@ -201,13 +199,13 @@ do
         ["Custom Player Tag (NOT FE)"]="自定义玩家标签",
         ["Set a custom tag"]="设置自定义标签",
         ["Enter custom number"]="请输入文本",
-        Security="安全（千万别关）",
+        ["Security"]="安全（千万别关）",
         ["Anti AFK"]="防AFK",
         ["Staff Detector"]="检测管理员",
         ["Auto New Round"]="自动新一轮",
         ["Auto Return Lobby"]="自动返回大厅",
         ["Auto Unlock Rewards"]="自动解锁奖励（不知道有啥用）",
-        Random="随机",
+        ["Random"]="随机",
         ["Teleport to Target"]="传送到目标",
         ["Quick Teleport"]="快速传送",
         ["Auto Attack"]="自动攻击",
@@ -215,15 +213,15 @@ do
         ["Specific Player"]="指定玩家",
         ["人的方向"]="人的方向",
         ["HNS Mode"]="钥匙与刀模式",
-        Attach="吸附",
+        ["Attach"]="吸附",
         ["Attach Target"]="吸附目标",
         ["Select Target Player"]="选择玩家",
         ["Enable ESP"]="透视",
         ["Box Fill, Box Outline,..."]="方框填充，方框轮廓",
         ["Tracer Mode"]="跟踪模式",
         ["Over Head"]="头顶",
-        Target="目标",
-        Whitelist="白名单",
+        ["Target"]="目标",
+        ["Whitelist"]="白名单",
         ["Weapons to auto equip"]="自动装备武器",
         ["Auto Equip Tool"]="自动装备工具",
         ["Show 范围"]="显示范围",
@@ -233,23 +231,23 @@ do
         ["Search"]="搜索",
         ["Show Only My Team"]="仅显示自己的队伍",
         ["Show Only Enemy Team"]="仅显示敌方队伍",
-        Trail="跟踪",
+        ["Trail"]="跟踪",
         ["Ink Game | by AlexScriptX"]="<font color='#7FC8F0'>有</font><font color='#74C0EB'>芙</font><font color='#69B8E6'>同</font><font color='#5EB0E1'>享</font><font color='#53A8DC'>汉</font><font color='#48A0D7'>化</font><font color='#3D98D2'>（</font><font color='#3290CD'>感</font><font color='#2788C8'>谢</font><font color='#2280C3'>k</font><font color='#1D78BE'>s</font><font color='#1870B9'>秋</font><font color='#1368B4'>辞</font><font color='#0E60AF'>帮</font><font color='#0958AA'>助</font><font color='#0450A5'>）</font>",
-        Manual="有失误",
-        Perfect="零失误",
+        ["Manual"]="有失误",
+        ["Perfect"]="零失误",
         ["Keep Playing"]="继续游戏",
         ["Stop Playing"]="反叛",
         ["PARKOUR ARTIST"]="泊车艺术家",
-        ["PHANTOM STEP"]="幽灵步（高等级可使用）",
+        ["PHANTOM STEP"]="幽灵步（五级速度可使用）",
         ["透视 Elements"]="透视方式",
-        Spread="散步范围",
+        ["Spread"]="散步范围",
         ["Walk Speed"]="行走速度",
-        Barriers="防坠落",
+        ["Barriers"]="防坠落",
         ["Box Fill"]="方块填充",
         ["Box Outline"]="框轮廓",
-        Name="名字",
-        Tool="工具",
-        Studs="距离",
+        ["Name"]="名字",
+        ["Tool"]="工具",
+        ["Studs"]="距离",
         ["Health Number"]="标签",
         ["Health Bar"]="血条",
         ["From Bottom"]="自己的下面",
@@ -257,215 +255,215 @@ do
         ["From Top"]="自己的上面",
         ["Faster Sprint (DONT USE DASH)"]="加快速度",
         ["LIGHTNING GOD"]="闪光神(✓石只有特效）",
-        QUICKSILVER="快银（拉回不好用）",
+        ["QUICKSILVER"]="快银（拉回不好用）",
         ["Tip:Use Rinku.pro for the fastest key"]="Rinku.pro最快",
         ["Get Key (Rinku.pro)"]="得到卡密（7个小时）",
         ["Interact Reach: 0"]="互动范围:0",
         ["Enter custom number"]="修改数字(你猜他有啥用)",
-        Fantasy="幻想体",
-        BuilderSans="建造者无衬线体",
-        Code="代码体",
-        Gotham="哥谭体",
-        Jura="朱拉体",
-        Roboto="罗伯托体",
-        RobotoMono="罗伯托等宽体",
-        SourceSans="源无衬线体",
+        ["Fantasy"]="幻想体",
+        ["BuilderSans"]="建造者无衬线体",
+        ["Code"]="代码体",
+        ["Gotham"]="哥谭体",
+        ["Jura"]="朱拉体",
+        ["Roboto"]="罗伯托体",
+        ["RobotoMono"]="罗伯托等宽体",
+        ["SourceSans"]="源无衬线体",
         ["Top-Left"]="左上角",
         ["Bottom-Right"]="右下角",
         ["Bottom-Left"]="左下角",
-        Christmas="圣诞节",
+        ["Christmas"]="圣诞节",
         ["Select an ornament"]="选择一个装饰品",
         ["Teleport to Ornament"]="传送到装饰品位置",
         ["Perspective Ornaments"]="透视圣诞树装饰品",
         ["Auto Collect Ornaments"]="自动收集装饰品",
-        Unknown="未知",
+        ["Unknown"]="未知",
         ["Hitbox Expander"]="增大范围",
         ["Rebel Hitbox"]="反叛范围",
         ["Low Performance"]="低性能",
-        Akuma="恶魔",
-        AkumaOLD="旧版恶魔",
+        ["Akuma"]="恶魔",
+        ["AkumaOLD"]="旧版恶魔",
         ["Arm Wrestle"]="掰手腕",
-        ArmWrestle_FIGHTING="掰手腕-战斗中",
-        ArmWrestle_LOSER="掰手腕-失败者",
-        ArmWrestle_WINNER="掰手腕-胜利者",
+        ["ArmWrestle_FIGHTING"]="掰手腕-战斗中",
+        ["ArmWrestle_LOSER"]="掰手腕-失败者",
+        ["ArmWrestle_WINNER"]="掰手腕-胜利者",
         ["Beach Chair"]="沙滩椅",
-        Beast="野兽",
-        BecomeCar="变汽车",
-        Blog="博客",
+        ["Beast"]="野兽",
+        ["BecomeCar"]="变汽车",
+        ["Blog"]="博客",
         ["Bloom Step"]="绽放步",
         ["Bullet Dodge"]="子弹闪避",
-        California="加州",
-        Campfire="篝火",
-        Campfire_COLLAB="篝火（多人）",
+        ["California"]="加州",
+        ["Campfire"]="篝火",
+        ["Campfire_COLLAB"]="篝火（多人）",
         ["Auto loaded config"]="自动加载配置",
         ["Ink Game"]="墨水游戏",
-        Celebration="庆祝",
-        Celebration_Extra1="庆祝-额外1",
-        Celebration_Extra2="庆祝-额外2",
-        Celebration_Extra3="庆祝-额外3",
-        Celebration_Extra4="庆祝-额外4",
-        Centipede="蜈蚣",
+        ["Celebration"]="庆祝",
+        ["Celebration_Extra1"]="庆祝-额外1",
+        ["Celebration_Extra2"]="庆祝-额外2",
+        ["Celebration_Extra3"]="庆祝-额外3",
+        ["Celebration_Extra4"]="庆祝-额外4",
+        ["Centipede"]="蜈蚣",
         ["Chain of Judgement"]="审判之链",
-        Chant="吟唱",
-        Chant_COLLAB="吟唱（多人）",
+        ["Chant"]="吟唱",
+        ["Chant_COLLAB"]="吟唱（多人）",
         ["Chest Pound"]="捶胸",
-        Coffin="棺材舞",
-        Coin_MainPLR="金币-主玩家",
-        Coin_OtherPLR="金币-其他玩家",
-        Conquest="征服",
+        ["Coffin"]="棺材舞",
+        ["Coin_MainPLR"]="金币-主玩家",
+        ["Coin_OtherPLR"]="金币-其他玩家",
+        ["Conquest"]="征服",
         ["Cruel Sun"]="残酷太阳",
-        Crying="哭泣",
+        ["Crying"]="哭泣",
         ["Cursed Vessel"]="诅咒容器",
-        DDD_INTERNAL="DDD-内部",
-        DDakji="打纸牌",
-        DDakji_AttackerLoseOTHERPLR="打纸牌-攻击者败-其他玩家",
-        DDakji_AttackerWinOTHERPLR="打纸牌-攻击者胜-其他玩家",
-        DDakji_AttackerWinPLR="打纸牌-攻击者胜-本玩家",
-        DDakji_STARTUPOTHERPLR="打纸牌-启动-其他玩家",
-        DDakji_VictimLoseOTHERPLR="打纸牌-受害者败-其他玩家",
-        DDakji_VictimWinPLR="打纸牌-受害者胜-本玩家",
+        ["DDD_INTERNAL"]="DDD-内部",
+        ["DDakji"]="打纸牌",
+        ["DDakji_AttackerLoseOTHERPLR"]="打纸牌-攻击者败-其他玩家",
+        ["DDakji_AttackerWinOTHERPLR"]="打纸牌-攻击者胜-其他玩家",
+        ["DDakji_AttackerWinPLR"]="打纸牌-攻击者胜-本玩家",
+        ["DDakji_STARTUPOTHERPLR"]="打纸牌-启动-其他玩家",
+        ["DDakji_VictimLoseOTHERPLR"]="打纸牌-受害者败-其他玩家",
+        ["DDakji_VictimWinPLR"]="打纸牌-受害者胜-本玩家",
         ["Dance Dance Dance"]="舞舞舞",
         ["Dance of Nights"]="夜之舞",
         ["Dap Me Up"]="击掌",
-        DapMeUp_INTERNAL="击掌-内部",
+        ["DapMeUp_INTERNAL"]="击掌-内部",
         ["Death Note"]="死亡笔记",
-        DeathNoteVar2="死亡笔记-变体2",
+        ["DeathNoteVar2"]="死亡笔记-变体2",
         ["默认 Dance"]="默认舞蹈",
-        Dejected="沮丧",
+        ["Dejected"]="沮丧",
         ["Devil Union"]="恶魔联盟",
         ["Dream Journal"]="梦境日记",
         ["Esper 狂暴"]="超能力者-狂暴",
-        Exorcist="驱邪师",
+        ["Exorcist"]="驱邪师",
         ["Fairy Bottle"]="精灵瓶",
         ["Fake Callout"]="虚假呼喊",
         ["Finger Heart"]="比心",
         ["Player (NOT FE)"]="玩家（非前端）",
-        Fly="飞行",
+        ["Fly"]="飞行",
         ["Anti Void"]="防虚空",
         ["AFK King"]="挂机之王",
-        Flappy="扑翼",
-        Flexing="秀肌肉",
+        ["Flappy"]="扑翼",
+        ["Flexing"]="秀肌肉",
         ["Food or Coin"]="食物或金币",
-        Food_MainPLR="食物-主玩家",
-        Food_OtherPLR="食物-其他玩家",
-        Frolic="嬉闹",
+        ["Food_MainPLR"]="食物-主玩家",
+        ["Food_OtherPLR"]="食物-其他玩家",
+        ["Frolic"]="嬉闹",
         ["Funeral for the Living"]="生者的葬礼",
         ["GET OUT"]="出去",
         ["Gate Release"]="开门",
         ["Gate Release_VAR"]="开门-变体",
         ["Gear 5 Laugh"]="五档大笑",
         ["Ginyu Force"]="基纽特战队",
-        Ginyu_Blue_COLLAB="基纽（多人）",
-        Ginyu_Green_COLLAB="基纽（多人）",
-        Ginyu_Orange_COLLAB="基纽（多人）",
-        Ginyu_White_COLLAB="基纽（多人）",
+        ["Ginyu_Blue_COLLAB"]="基纽（多人）",
+        ["Ginyu_Green_COLLAB"]="基纽（多人）",
+        ["Ginyu_Orange_COLLAB"]="基纽（多人）",
+        ["Ginyu_White_COLLAB"]="基纽（多人）",
         ["Global Control"]="全局控制",
         ["God of Thunder"]="闪光神",
-        Griddy="格里迪舞",
-        Guitar="弹吉他",
+        ["Griddy"]="格里迪舞",
+        ["Guitar"]="弹吉他",
         ["HOW IT FEELS"]="这感觉",
         ["Haki Walk"]="霸气行走",
         ["Handing Out Ls"]="分发失败",
         ["Heel Click"]="踮脚点击",
-        Helicopter="直升机",
+        ["Helicopter"]="直升机",
         ["High Five"]="击掌庆祝",
-        HighFive_INTERNAL="击掌-内部",
-        HighFive_INTERNAL2="击掌-内部2",
+        ["HighFive_INTERNAL"]="击掌-内部",
+        ["HighFive_INTERNAL2"]="击掌-内部2",
         ["Honored One"]="荣耀者",
         ["Hot Pot"]="科目三",
-        HotPot_COLLAB="科目三（多人）",
-        Juggling="杂耍",
+        ["HotPot_COLLAB"]="科目三（多人）",
+        ["Juggling"]="杂耍",
         ["Kung Fu Kick"]="功夫踢",
         ["Lag Train"]="延迟列车",
         ["Laser Eyes"]="祖国人激光眼",
-        Laugh="大笑",
+        ["Laugh"]="大笑",
         ["Legendary Power"]="传奇力量",
-        Levitation="漂浮",
+        ["Levitation"]="漂浮",
         ["Lively Walk"]="活力行走",
-        Marionette="提线木偶",
-        Mathematician="数学家",
-        Menacing="威吓",
+        ["Marionette"]="提线木偶",
+        ["Mathematician"]="数学家",
+        ["Menacing"]="威吓",
         ["Metro Dance"]="地铁舞",
         ["Mingle Dance"]="交际舞",
-        MingleDance_INTERNAL="交际舞-内部",
-        MingleDance_MAINPLR="交际舞-主玩家",
+        ["MingleDance_INTERNAL"]="交际舞-内部",
+        ["MingleDance_MAINPLR"]="交际舞-主玩家",
         ["Monarch of Motion"]="动作君主",
         ["Money 散步范围"]="金钱-散步范围",
         ["Monkey Spin"]="猴子旋转",
-        MonkeySpin_INTERNAL="猴子旋转-内部",
+        ["MonkeySpin_INTERNAL"]="猴子旋转-内部",
         ["Monster Mash Dance"]="怪物舞会",
         ["My 0MistakeVictory"]="我的零失误胜利",
         ["Nerd 狂暴"]="书呆子-狂暴",
-        Neuralyzer="记忆消除器",
-        Objection="反对",
+        ["Neuralyzer"]="记忆消除器",
+        ["Objection"]="反对",
         ["On Your Knees"]="跪下",
         ["Open, Furnace"]="打开熔炉",
         ["Otsukare Summer"]="辛苦了夏天",
-        Performative="表演",
-        Piano="弹钢琴",
-        Popcorn="爆米花",
-        Poppy="波比",
+        ["Performative"]="表演",
+        ["Piano"]="弹钢琴",
+        ["Popcorn"]="爆米花",
+        ["Poppy"]="波比",
         ["Prison Realm"]="监狱领域",
-        PrisonRealm_INTERNAL1="监狱领域-内部1",
-        PrisonRealm_INTERNAL2="监狱领域-内部2",
+        ["PrisonRealm_INTERNAL1"]="监狱领域-内部1",
+        ["PrisonRealm_INTERNAL2"]="监狱领域-内部2",
         ["Pumpkin Carving"]="雕刻南瓜",
         ["RAT SPOTTED"]="发现老鼠",
-        Rally="集结",
-        Rally_MULTI1="集结-多人1",
-        Rally_MULTI2="集结-多人2",
+        ["Rally"]="集结",
+        ["Rally_MULTI1"]="集结-多人1",
+        ["Rally_MULTI2"]="集结-多人2",
         ["随机 Gate"]="随机门",
         ["Red Card"]="红牌",
-        Ritual="仪式",
-        Ritual_Extra1="仪式-额外1",
-        Ritual_Extra2="仪式-额外2",
-        Ritual_Extra3="仪式-额外3",
-        Ritual_Extra4="仪式-额外4",
-        Rockefeller="洛克菲勒",
-        Rockefeller_INTERNAL="洛克菲勒-内部",
+        ["Ritual"]="仪式",
+        ["Ritual_Extra1"]="仪式-额外1",
+        ["Ritual_Extra2"]="仪式-额外2",
+        ["Ritual_Extra3"]="仪式-额外3",
+        ["Ritual_Extra4"]="仪式-额外4",
+        ["Rockefeller"]="洛克菲勒",
+        ["Rockefeller_INTERNAL"]="洛克菲勒-内部",
         ["Ruler Slap"]="尺子拍打",
-        SUII="苏伊",
-        Sadako="贞子",
-        Salute="敬礼",
-        Savior="救世主",
-        Savior_INTERNAL="救世主-内部",
-        Savior_INTERNAL2="救世主-内部2",
-        Scarecrow="稻草人",
+        ["SUII"]="苏伊",
+        ["Sadako"]="贞子",
+        ["Salute"]="敬礼",
+        ["Savior"]="救世主",
+        ["Savior_INTERNAL"]="救世主-内部",
+        ["Savior_INTERNAL2"]="救世主-内部2",
+        ["Scarecrow"]="稻草人",
         ["Secret Handshake"]="秘密握手",
-        SecretHandshake_INTERNAL1="秘密握手-内部1",
-        SecretHandshake_INTERNAL2="秘密握手-内部2",
+        ["SecretHandshake_INTERNAL1"]="秘密握手-内部1",
+        ["SecretHandshake_INTERNAL2"]="秘密握手-内部2",
         ["Section Nightmare"]="区域噩梦",
-        Shatter="破碎",
-        Shuffle="洗牌",
-        Shuffle_COLLAB="洗牌（多人）",
-        Shy="害羞",
+        ["Shatter"]="破碎",
+        ["Shuffle"]="洗牌",
+        ["Shuffle_COLLAB"]="洗牌（多人）",
+        ["Shy"]="害羞",
         ["Smelly Smell"]="臭味",
         ["Soda Pop 1"]="汽水1",
         ["Soda Pop 2"]="汽水2",
-        Sodapop1_COLLAB="汽水1（多人）",
-        Sodapop2_COLLAB="汽水2（多人）",
+        ["Sodapop1_COLLAB"]="汽水1（多人）",
+        ["Sodapop2_COLLAB"]="汽水2（多人）",
         ["Soul Distortion"]="灵魂扭曲",
         ["Soul Resonance"]="灵魂共振",
-        SoulDistortion_INTERNAL1="灵魂扭曲-内部1",
-        SoulDistortion_INTERNAL2="灵魂扭曲-内部2",
-        SoulResonance_INTERNAL1="灵魂共振-内部1",
-        SoulResonance_INTERNAL2="灵魂共振-内部2",
+        ["SoulDistortion_INTERNAL1"]="灵魂扭曲-内部1",
+        ["SoulDistortion_INTERNAL2"]="灵魂扭曲-内部2",
+        ["SoulResonance_INTERNAL1"]="灵魂共振-内部1",
+        ["SoulResonance_INTERNAL2"]="灵魂共振-内部2",
         ["Spare Change"]="零钱",
         ["Spirit Shuffle"]="灵魂洗牌",
-        Spite="怨恨",
-        Srank="斯兰克",
+        ["Spite"]="怨恨",
+        ["Srank"]="斯兰克",
         ["Still Standing"]="依然站立",
         ["Strongest Fight"]="最强之战",
         ["Strongest Walk"]="最强行走",
-        Superman="超人",
+        ["Superman"]="超人",
         ["Sweet Dance"]="甜蜜之舞",
         ["Tactical Espionage"]="战术谍报",
-        Tantrum="发脾气",
+        ["Tantrum"]="发脾气",
         ["Texas Terror"]="德州恐惧",
         ["Thrill Rides"]="惊险游乐",
-        Thriller="惊悚",
+        ["Thriller"]="惊悚",
         ["Thumbs Up"]="点赞",
         ["True Fear"]="真实恐惧",
-        Unlock="解锁",
+        ["Unlock"]="解锁",
         ["Unstoppable Flow"]="势不可挡的节奏",
         ["Walk!"]="走！",
         ["Weirdo Walk"]="怪人行走",
@@ -475,12 +473,12 @@ do
         ["Witches Broom"]="女巫扫帚",
         ["X Buzzer"]="X蜂鸣器",
         ["Yare Yare"]="呀嘞呀嘞",
-        YareYare_COLLAB="呀嘞呀嘞（多人）",
-        Yummers="美味",
-        Yummers_INTERNAL="美味-内部",
-        Yummers_OTHER="美味-其他",
+        ["YareYare_COLLAB"]="呀嘞呀嘞（多人）",
+        ["Yummers"]="美味",
+        ["Yummers_INTERNAL"]="美味-内部",
+        ["Yummers_OTHER"]="美味-其他",
         ["Hug it Out"]="拥抱和解",
-        HugitOut_INTERNAL="拥抱和解-内部",
+        ["HugitOut_INTERNAL"]="拥抱和解-内部",
         ["I Am Atomic"]="席德核弹",
         ["IVE PLAYED THESE GAMES BEFO"]="我玩过这些游戏（未完）",
         ["I'm Burning!"]="我着火了！",
@@ -554,8 +552,8 @@ do
         ["ESP Elements"]="透视元素",
         ["Skeleton"]="骨骼",
         ["Tracer"]="跟踪线",
-        Guards="守卫",
-        ESP="透视",
+        ["Guards"]="守卫",
+        ["ESP"]="透视",
         ["Troll"]="全失误",
         ["Teleport"]="传送",
         ["Backflip Height"]="后空翻高度",
@@ -593,7 +591,7 @@ do
         ["Bypass Rope"]="跳过跳绳",
         ["studs"]="米",
         ["SPARKLE TIME TRAFFIC CONE OWNER"]="闪耀时光交通锥所有者",
-        ["Solid Pattern Rod红色"]="红色纯色花纹杆",
+        ["Solid Pattern Rod"]="红色纯色花纹杆",
         ["Star Smaller"]="小星星",
         ["Solid Rod"]="纯色杆",
         ["Blue Candy"]="蓝色糖果",
@@ -606,7 +604,6 @@ do
         ["Player"]="玩家",
         ["Wins"]="胜利次数",
         ["Level"]="等级",
-        ["Power"]="能力",
         ["Won"]="获胜奖励",
         ["Roll(s)"]="滚动次数",
         ["Robux Donated"]="捐赠罗宝",
@@ -633,23 +630,37 @@ do
         ["Bypass Rope"] = "跳过绳索",
         ["Allows passing through the rope without effects"] = "穿过绳索",
         ["Loader | AX-SCRIPTS"]="<font color='#7FC8F0'>有</font><font color='#74C0EB'>芙</font><font color='#69B8E6'>同</font><font color='#5EB0E1'>享</font><font color='#53A8DC'>汉</font><font color='#48A0D7'>化</font><font color='#3D98D2'>（</font><font color='#3290CD'>感</font><font color='#2788C8'>谢</font><font color='#2280C3'>k</font><font color='#1D78BE'>s</font><font color='#1870B9'>秋</font><font color='#1368B4'>辞</font><font color='#0E60AF'>帮</font><font color='#0958AA'>助</font><font color='#0450A5'>）</font>",
-        ["Auto-load"]="自动加载（建议关掉加载出来不是汉化）",
+        ["Auto-load"]="自动加载（加载出来不是汉化）"
     }
 
+    local sortedKeys = {}
+    for k in pairs(Translations) do
+        table.insert(sortedKeys, k)
+    end
+    table.sort(sortedKeys, function(a, b)
+        return #a > #b
+    end)
+
     local function translateText(text)
-        if not text or type(text) ~= "string" then return text end
+        if not text or type(text) ~= "string" or text == "" then
+            return text
+        end
 
         if Translations[text] then
             return Translations[text]
         end
 
-        for en, cn in pairs(Translations) do
-            if text:find(en) then
-                return text:gsub(en, cn)
+        local result = text
+        for _, en in ipairs(sortedKeys) do
+            if result:find(en, 1, true) then 
+                result = result:gsub(en, Translations[en], 1)
             end
         end
+        return result
+    end
 
-        return text
+    local function isUITextObject(obj)
+        return obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox")
     end
 
     local function setupTranslationEngine()
@@ -658,7 +669,7 @@ do
             setreadonly(getrawmetatable(game), false)
 
             getrawmetatable(game).__newindex = newcclosure(function(t, k, v)
-                if (t:IsA("TextLabel") or t:IsA("TextButton") or t:IsA("TextBox")) and k == "Text" then
+                if isUITextObject(t) and k == "Text" then
                     v = translateText(tostring(v))
                 end
                 return oldIndex(t, k, v)
@@ -670,55 +681,49 @@ do
         if not success then
             warn("元表劫持失败:", err)
 
-            local translated = {}
+            local translatedCache = {} 
+
+            local function translateSingleObject(gui)
+                if not isUITextObject(gui) then
+                    return
+                end
+                local currentText = gui.Text
+                if not currentText or currentText == "" then
+                    return
+                end
+                local translatedText = translateText(currentText)
+
+                if translatedText ~= currentText then
+                    gui.Text = translatedText
+                    translatedCache[gui] = translatedText
+                end
+            end
+
             local function scanAndTranslate()
-                for _, gui in ipairs(game:GetService("CoreGui"):GetDescendants()) do
-                    if (gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox")) and not translated[gui] then
-                        pcall(function()
-                            local text = gui.Text
-                            if text and text ~= "" then
-                                local translatedText = translateText(text)
-                                if translatedText ~= text then
-                                    gui.Text = translatedText
-                                    translated[gui] = true
-                                end
+                local function scanGui(parent)
+                    for _, gui in ipairs(parent:GetDescendants()) do
+                        if isUITextObject(gui) then
+                            local currentText = gui.Text
+                            local cachedText = translatedCache[gui]
+
+                            if not cachedText or cachedText ~= currentText then
+                                translateSingleObject(gui)
                             end
-                        end)
+                        end
                     end
                 end
 
+                pcall(scanGui, game:GetService("CoreGui"))
                 local player = game:GetService("Players").LocalPlayer
                 if player and player:FindFirstChild("PlayerGui") then
-                    for _, gui in ipairs(player.PlayerGui:GetDescendants()) do
-                        if (gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox")) and not translated[gui] then
-                            pcall(function()
-                                local text = gui.Text
-                                if text and text ~= "" then
-                                    local translatedText = translateText(text)
-                                    if translatedText ~= text then
-                                        gui.Text = translatedText
-                                        translated[gui] = true
-                                    end
-                                end
-                            end)
-                        end
-                    end
+                    pcall(scanGui, player.PlayerGui)
                 end
             end
 
             local function setupDescendantListener(parent)
                 parent.DescendantAdded:Connect(function(descendant)
-                    if descendant:IsA("TextLabel") or descendant:IsA("TextButton") or descendant:IsA("TextBox") then
-                        task.wait(0.1)
-                        pcall(function()
-                            local text = descendant.Text
-                            if text and text ~= "" then
-                                local translatedText = translateText(text)
-                                if translatedText ~= text then
-                                    descendant.Text = translatedText
-                                end
-                            end
-                        end)
+                    if isUITextObject(descendant) then
+                        task.spawn(translateSingleObject, descendant)
                     end
                 end)
             end
@@ -729,21 +734,30 @@ do
                 pcall(setupDescendantListener, player.PlayerGui)
             end
 
-            while true do
+            while task.wait(10) do
                 scanAndTranslate()
-                task.wait(3)
             end
         end
     end
 
+    local function loadExternalScript(url, maxRetries)
+        local retries = 0
+        while retries < maxRetries do
+            local success, err = pcall(function()
+                loadstring(game:HttpGet(url))()
+            end)
+            if success then
+                return true
+            end
+            retries = retries + 1
+            warn("加载失败，重试中(" .. retries .. "/" .. maxRetries .. "):", err)
+            task.wait(2)
+        end
+        warn("达到最大重试次数，加载失败")
+        return false
+    end
+
     task.wait(2)
     setupTranslationEngine()
-
-    local success, err = pcall(function()
-        loadstring(game:HttpGet("https://officialaxscripts.vercel.app/scripts/AX-Loader.lua"))()
-    end)
-
-    if not success then
-        warn("加载失败:", err)
-    end
+    loadExternalScript("https://officialaxscripts.vercel.app/scripts/AX-Loader.lua", 3)
 end
