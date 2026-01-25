@@ -1,5 +1,3 @@
-local v0="https://raw.githubusercontent.com/ATLASTEAM01/Obsidian/main/";local v1=loadstring(game:HttpGet(v0   .. "Library.lua" ))();local v2=loadstring(game:HttpGet(v0   .. "addons/ThemeManager.lua" ))();local v3=loadstring(game:HttpGet(v0   .. "addons/SaveManager.lua" ))();local v4=v1.Options;local v5=v1.Toggles;local v6=v1:CreateWindow({Title="秋辞通缉脚本（虽然功能全是盗的）",Footer="1.3",Center=true,AutoShow=true});local v7={Main=v6:AddTab("主页","user"),["UI Settings"]=v6:AddTab("UI设置","settings"),MoneyFarm=v6:AddTab("金钱农场","dollar-sign"),AutoPickup=v6:AddTab("自动拾取","box"),Teleport=v6:AddTab("地点传送","map-pin"),PlayerTeleport=v6:AddTab("玩家传送","user")};local v8=v7.Main:AddLeftGroupbox("主设置");v8:AddToggle("EnabledToggle",{Text="（举例）",Default=false}):AddKeyPicker("EnabledKeybind",{Default="RightAlt",SyncToggleState=true,Mode="Toggle"});v5.EnabledToggle:OnChanged(function(v53) end);local v9=v7.Main:AddLeftGroupbox("人物功能");local v10=false;local v11=false;local v12=1584 -(709 + 825) ;local v13=4 + 1 ;local v14,v15,v16;local v17;local v18={F=0,B=0,L=872 -(826 + 46) ,R=947 -(245 + 702) ,Q=0 -0 ,E=0 + 0 };local v19={F=1898 -(260 + 1638) ,B=440 -(382 + 58) ,L=0,R=0 -0 ,Q=93 -(4 + 89) ,E=0 + 0 };local function v20() local v54=0 -0 ;local v55;local v56;local v57;while true do if ((3 -2)==v54) then v57=nil;while true do if (v55==(0 -0)) then v56=game:GetService("Players").LocalPlayer;v57=v56:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule");v55=1206 -(902 + 303) ;end if (v55==(1 -0)) then return require(v57:WaitForChild("ControlModule"));end end break;end if (v54==(0 -0)) then v55=0 + 0 ;v56=nil;v54=1454 -(28 + 1425) ;end end end local function v21(v58) local v59=1690 -(1121 + 569) ;local v60;local v61;local v62;local v63;local v64;local v65;while true do if (v59==1) then v63=Instance.new("Attachment",v60);v63.Name="FlightAttachment";v64=Instance.new("AlignOrientation");v59=216 -(22 + 192) ;end if (v59==(1517 -(822 + 692))) then v64.CFrame=v60.CFrame;v64.Attachment0=v63;v64.Parent=v62;v59=687 -(483 + 200) ;end if (v59==(1467 -(1404 + 59))) then v65=Instance.new("LinearVelocity");v65.VectorVelocity=Vector3.new(0 + 0 ,297 -(45 + 252) ,0);v65.MaxForce=9000000485 -(655 + 342) ;v59=13 -8 ;end if (v59==(6 -1)) then v65.Attachment0=v63;v65.Parent=v62;return v64,v65,v61,v63;end if ((767 -(468 + 297))==v59) then v64.Mode=Enum.OrientationAlignmentMode.OneAttachment;v64.RigidityEnabled=true;v64.MaxTorque=Vector3.new(9000000050 -(334 + 228) ,8999999488,8999999921 -(114 + 319) );v59=3 -0 ;end if (v59==(0 -0)) then v60=v58:WaitForChild("HumanoidRootPart");v61=v58:WaitForChild("Humanoid");v62=workspace:FindFirstChildOfClass("Terrain") or workspace ;v59=2 -1 ;end end end local function v22(v66) local v67=v66:GetMoveVector();local v68=workspace.CurrentCamera;v18.F= -v67.Z;v18.B=v67.Z;v18.L= -v67.X;v18.R=v67.X;v18.Q=v67.Y;v18.E= -v67.Y;local v78=game:GetService("UserInputService");if v78:IsKeyDown(Enum.KeyCode.W) then v18.F=1 -0 ;end if v78:IsKeyDown(Enum.KeyCode.S) then v18.B=1 + 0 ;end if v78:IsKeyDown(Enum.KeyCode.A) then v18.L=237 -(141 + 95) ;end if v78:IsKeyDown(Enum.KeyCode.D) then v18.R=1 + 0 ;end if v78:IsKeyDown(Enum.KeyCode.Space) then v18.Q=1;end if v78:IsKeyDown(Enum.KeyCode.LeftControl) then v18.E=2 -1 ;end local v79=(v68.CFrame.LookVector * (v18.F-v18.B)) + (v68.CFrame.RightVector * (v18.R-v18.L)) + (Vector3.new(0 -0 ,1 + 0 ,0 -0 ) * (v18.Q-v18.E)) ;return ((v79.Magnitude>(0 + 0)) and v79.Unit) or v79 ;end local function v23() if v10 then return;end local v80=game:GetService("Players").LocalPlayer;local v81=v80.Character or v80.CharacterAdded:Wait() ;if  not v81 then local v141=0 + 0 ;local v142;while true do if (v141==0) then v142=465 -(170 + 295) ;while true do if ((0 -0)==v142) then v1:Notify({Title="飞行失败",Content="无法获取角色",Duration=2,Icon="x"});return;end end break;end end end v10=true;v11=false;if v14 then v14:Destroy();end if v15 then v15:Destroy();end if v16 then v16:Destroy();end v14,v15,humanoid,v16=v21(v81);v1:Notify({Title="飞行开启",Content="速度: "   .. v12 ,Duration=2 + 0 ,Icon="check"});local v82=v20();v17=game:GetService("RunService").Heartbeat:Connect(function() local v131=163 -(92 + 71) ;local v132;while true do if (v131==1) then if (v132.Magnitude>(0 -0)) then local v295=0 + 0 ;while true do if (v295==(0 + 0)) then v15.VelocityConstraintMode=Enum.VelocityConstraintMode.Vector;v15.VectorVelocity=v132 * v12 ;break;end end else v15.VectorVelocity=Vector3.new(0 + 0 ,0 -0 ,765 -(574 + 191) );end if v11 then local v297=0 + 0 ;local v298;local v299;local v300;while true do if (v297==(0 -0)) then v298=0 + 0 ;v299=nil;v297=850 -(254 + 595) ;end if ((127 -(55 + 71))==v297) then v300=nil;while true do if (v298==(1 -0)) then v14.CFrame=v300;break;end if (v298==(1790 -(573 + 1217))) then v299=v81.Humanoid.SeatPart or v81.HumanoidRootPart ;v300=v299.CFrame * CFrame.Angles(0 -0 ,math.rad(v13),0 + 0 ) ;v298=1 -0 ;end end break;end end else v14.CFrame=workspace.CurrentCamera.CFrame;end v131=941 -(714 + 225) ;end if (v131==2) then if v81.HumanoidRootPart then v81.Humanoid.PlatformStand=true;end break;end if (v131==(0 -0)) then if ( not v10 or  not v15 or  not v14) then local v304=0 + 0 ;while true do if (v304==(0 -0)) then if v17 then local v419=0 -0 ;local v420;while true do if (v419==(0 + 0)) then v420=0;while true do if (v420==(0 -0)) then v17:Disconnect();v17=nil;break;end end break;end end end return;end end end v132=v22(v82);v131=807 -(118 + 688) ;end end end);v81.AncestryChanged:Connect(function(v133,v134) if ( not v134 and v10) then stopFlying();end end);end local function v24() if  not v10 then return;end v10=false;v11=false;v18={F=48 -(25 + 23) ,B=0 + 0 ,L=1886 -(927 + 959) ,R=0 -0 ,Q=1212 -(1090 + 122) ,E=0 + 0 };v19={F=0 -0 ,B=732 -(16 + 716) ,L=0 -0 ,R=0 + 0 ,Q=0,E=1118 -(628 + 490) };if v17 then v17:Disconnect();v17=nil;end local v83=game:GetService("Players").LocalPlayer;local v84=v83.Character;if (v84 and v84:FindFirstChild("Humanoid")) then v84.Humanoid.PlatformStand=false;end if v14 then local v144=97 -(11 + 86) ;while true do if (v144==(0 -0)) then v14:Destroy();v14=nil;break;end end end if v15 then local v145=0 -0 ;while true do if (v145==(285 -(175 + 110))) then v15:Destroy();v15=nil;break;end end end if v16 then local v146=0 -0 ;local v147;while true do if (v146==(0 -0)) then v147=1796 -(503 + 1293) ;while true do if (v147==(0 -0)) then v16:Destroy();v16=nil;break;end end break;end end end v1:Notify({Title="飞行关闭",Content="飞行功能已禁用",Duration=2 + 0 ,Icon="x"});end local function v25() local v85=1695 -(556 + 1139) ;while true do if (v85==(1062 -(810 + 251))) then if v11 then v1:Notify({Title="旋转开启",Content="旋转速度: "   .. v13 ,Duration=2 + 0 ,Icon="refresh-cw"});else v1:Notify({Title="旋转关闭",Content="旋转功能已禁用",Duration=1 + 1 ,Icon="x"});end break;end if ((0 + 0)==v85) then if  not v10 then local v268=169 -(28 + 141) ;local v269;while true do if (v268==(0 + 0)) then v269=533 -(43 + 490) ;while true do if ((733 -(711 + 22))==v269) then v1:Notify({Title="提示",Content="请先开启飞行功能",Duration=7 -5 ,Icon="info"});return;end end break;end end end v11= not v11;v85=860 -(240 + 619) ;end end end v9:AddToggle("飞行模式",{Text="飞行模式",Default=false,Callback=function(v86) if v86 then v23();else v24();end end});v9:AddToggle("旋转模式",{Text="旋转模式",Default=false,Callback=function(v87) if v87 then v11=true;else v11=false;end end});v9:AddSlider("飞行速度",{Text="飞行速度",Min=1 + 0 ,Max=318 -118 ,Default=4 + 46 ,Rounding=1744 -(1344 + 400) ,Callback=function(v88) v12=v88;if v10 then v1:Notify({Title="速度已更新",Content="飞行速度: "   .. v88 ,Duration=406 -(255 + 150) ,Icon="zap"});end end});v9:AddSlider("旋转速度",{Text="旋转速度",Min=1 + 0 ,Max=27 + 23 ,Default=21 -16 ,Rounding=0,Callback=function(v89) local v90=0 -0 ;while true do if (v90==(0 + 0)) then v13=v89;if v11 then v1:Notify({Title="旋转速度已更新",Content="旋转速度: "   .. v89 ,Duration=1740 -(404 + 1335) ,Icon="refresh-cw"});end break;end end end});local v26=false;local v27=422 -(183 + 223) ;local v28;v9:AddToggle("速度增加",{Text="速度增加",Default=false,Callback=function(v91) local v92=0 -0 ;while true do if (v92==(0 -0)) then v26=v91;if v91 then local v270=0 + 0 ;local v271;while true do if (v270==(0 + 0)) then v271=337 -(10 + 327) ;while true do if (v271==(0 + 0)) then if v28 then v28:Disconnect();end v28=game:GetService("RunService").Heartbeat:Connect(function() if (game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")) then local v450=game.Players.LocalPlayer.Character.Humanoid;if (v450.MoveDirection.Magnitude>(338 -(118 + 220))) then game.Players.LocalPlayer.Character:TranslateBy((v450.MoveDirection * v27)/(128 -(88 + 30)) );end end end);break;end end break;end end elseif v28 then local v334=0 + 0 ;while true do if (v334==(449 -(108 + 341))) then v28:Disconnect();v28=nil;break;end end end break;end end end});v9:AddSlider("速度设置",{Text="速度设置",Min=2 -1 ,Max=1926 -(421 + 1355) ,Default=8 + 8 ,Rounding=0,Callback=function(v93) v27=v93;end});local v29;v9:AddToggle("扩大视野",{Text="扩大视野",Default=false,Callback=function(v94) if v94 then local v148=0 -0 ;while true do if (v148==(1083 -(286 + 797))) then if v29 then v29:Disconnect();end v29=game:GetService("RunService").Heartbeat:Connect(function() workspace.CurrentCamera.FieldOfView=1613 -(711 + 782) ;end);break;end end elseif v29 then local v230=0 -0 ;while true do if (v230==(439 -(397 + 42))) then v29:Disconnect();v29=nil;break;end end end end});local v30;v9:AddToggle("无限跳",{Text="无限跳",Default=false,Callback=function(v95) if v95 then local v149=469 -(270 + 199) ;local v150;while true do if (v149==(0 + 0)) then v150=1819 -(580 + 1239) ;while true do if (v150==(785 -(222 + 563))) then if v30 then v30:Disconnect();end v30=game:GetService("UserInputService").JumpRequest:Connect(function() local v385=0;local v386;while true do if (v385==(0 -0)) then v386=game:GetService("Players").LocalPlayer.Character and game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid") ;if v386 then v386:ChangeState(Enum.HumanoidStateType.Jumping);end break;end end end);break;end end break;end end elseif v30 then v30:Disconnect();v30=nil;end end});local v31=game:GetService("Players");local v32=v31.LocalPlayer;v32.CharacterAdded:Connect(function() if v10 then local v151=0 + 0 ;while true do if (v151==(190 -(23 + 167))) then task.wait(0.5 + 0 );v24();v151=1 + 0 ;end if (v151==(1 + 0)) then task.wait(0.1 -0 );v23();break;end end end end);local v33=v7.Main:AddRightGroupbox("战斗功能");local v34=false;v33:AddToggle("强制加载所有数据",{Text="强制加载所有数据",Default=false,Callback=function(v96) v34=v96;if v96 then task.spawn(function() local v189=848 -(40 + 808) ;local v190;local v191;local v192;local v193;local v194;local v195;local v196;local v197;while true do if (v189==(2 + 0)) then function v196() local v335=1167 -(645 + 522) ;local v336;while true do if ((1790 -(1010 + 780))==v335) then v336=workspace:FindFirstChild("Local") and workspace.Local:FindFirstChild("Gizmos") and workspace.Local.Gizmos:FindFirstChild("White") ;if v336 then for v434,v435 in ipairs(v336:GetChildren()) do if v435.PrimaryPart then v195(v435.PrimaryPart.Position,50 + 0 );task.wait(0.1 + 0 );end end end break;end end end v197=nil;function v197() for v354,v355 in ipairs(v192:GetPlayers()) do if (v355.Character and v355.Character:FindFirstChild("HumanoidRootPart")) then local v408=0 -0 ;local v409;while true do if (v408==(0 -0)) then v409=1836 -(1045 + 791) ;while true do if (v409==(0 -0)) then v195(v355.Character.HumanoidRootPart.Position,76 -26 );task.wait(0.1 -0 );break;end end break;end end end end end while v34 do v196();v197();v195(Vector3.new(1726 -(1165 + 561) ,0 + 0 ,0 -0 ),1505 -(351 + 154) );v195(Vector3.new(2574 -(1281 + 293) ,0,1000),1266 -(28 + 238) );v195(Vector3.new( -(2234 -1234),1559 -(1381 + 178) , -(938 + 62)),807 + 193 );v195(Vector3.new(427 + 573 ,0, -(3447 -2447)),519 + 481 );v195(Vector3.new( -(1470 -(381 + 89)),0 + 0 ,677 + 323 ),2375 -1375 );task.wait(8 -3 );end break;end if (v189==(1157 -(1074 + 82))) then v194=v192.LocalPlayer;v195=nil;function v195(v337,v338) if v193:IsClient() then local v387=0;while true do if (v387==(0 -0)) then pcall(function() v191.InvokeServer("requestStreamAround",v337,v338);end);pcall(function() v191.FireServer("setReplicationFocus",v337);end);break;end end end end v196=nil;v189=1 + 1 ;end if (v189==(1784 -(214 + 1570))) then v190=require(game:GetService("ReplicatedStorage").Devv);v191=v190.load("Network");v192=game:GetService("Players");v193=game:GetService("RunService");v189=1456 -(990 + 465) ;end end end);else print("强制加载：关闭");end end});local v35=false;local v36=nil;local v37=nil;v33:AddToggle("愤怒机器人[全枪]",{Text="愤怒机器人[全枪]",Default=false,Callback=function(v97) v35=v97;if v97 then task.spawn(function() v37=require(game:GetService("ReplicatedStorage").Client.Wanted.Objects.ClientTool.Components.Guns.Shooter);v36=v37._shoot;local function v199(v231,v232,v233,v234) return ((((1 + 0) -v234)^(1 + 1)) * v231) + ((2 + 0) * ((3 -2) -v234) * v234 * v232) + ((v234^(1728 -(1668 + 58))) * v233) ;end local function v200(v235,v236) local v237=Instance.new("Folder");v237.Name="MagicTrail";v237.Parent=workspace;local v240=(v235 + v236)/(4 -2) ;local v241=(v236-v235).Unit;local v242=Vector3.new( -v241.Z,v241.Y,v241.X) * (629 -(512 + 114)) ;local v243=v240 + v242 + Vector3.new(0,math.random( -(7 -4),3),0 -0 ) ;local v244={};local v245=69 -49 ;for v272=0 + 0 ,v245 do local v273=69 -(10 + 59) ;local v274;local v275;while true do if ((0 + 0)==v273) then local v356=0 + 0 ;while true do if (v356==(0 + 0)) then v274=v272/v245 ;v275=v199(v235,v243,v236,v274);v356=1 + 0 ;end if (v356==(4 -3)) then v273=1164 -(671 + 492) ;break;end end end if ((3 -2)==v273) then table.insert(v244,v275);break;end end end for v276=1995 -(109 + 1885) , #v244-(1470 -(1269 + 200))  do local v277=0 + 0 ;local v278;local v279;local v280;local v281;local v282;local v283;while true do if (v277==(3 -1)) then v281.Transparency=0.3 + 0 ;v281.CFrame=CFrame.new(v278,v279) * CFrame.new(815 -(98 + 717) ,826 -(802 + 24) , -v280/2 ) ;v281.Parent=v237;v282=Instance.new("PointLight");v277=5 -2 ;end if (v277==(4 -0)) then v283=Instance.new("ParticleEmitter");v283.Size=NumberSequence.new(0.1 + 0 ,0.3 + 0 );v283.Transparency=NumberSequence.new(0.3 + 0 ,0.8 + 0 );v283.Lifetime=NumberRange.new(0.5 -0 ,3 -2 );v277=2 + 3 ;end if (v277==(3 + 2)) then v283.Rate=110 -60 ;v283.Speed=NumberRange.new(1 + 0 ,2 + 0 );v283.VelocitySpread=85 + 95 ;v283.Parent=v281;break;end if (v277==(1 + 0)) then v281.Size=Vector3.new(1413.15 -(1233 + 180) ,1433.15 -(797 + 636) ,v280);v281.Anchored=true;v281.CanCollide=false;v281.Material=Enum.Material.Neon;v277=2;end if (v277==(0 -0)) then local v372=1619 -(1427 + 192) ;while true do if (v372==(1 + 1)) then v277=2 -1 ;break;end if ((0 + 0)==v372) then v278=v244[v276];v279=v244[v276 + (3 -2) ];v372=1 + 0 ;end if (v372==(327 -(192 + 134))) then v280=(v279-v278).Magnitude;v281=Instance.new("Part");v372=1912 -(716 + 1194) ;end end end if (v277==(1279 -(316 + 960))) then v282.Brightness=1 + 4 ;v282.Range=2 + 1 ;v282.Color=Color3.fromRGB(0 + 0 ,673 -(74 + 429) ,236 + 19 );v282.Parent=v281;v277=2 + 2 ;end end end task.spawn(function() local v284=0 -0 ;while true do if (v284==0) then task.wait(3.5 -2 );if (v237 and v237.Parent) then v237:Destroy();end break;end end end);return v237;end local function v201(v246,v247) local v248=551 -(83 + 468) ;local v249;local v250;local v251;local v252;while true do local v285=1806 -(1202 + 604) ;while true do if (v285==(435 -(279 + 154))) then if ((4 -3)==v248) then v249.FilterDescendantsInstances={game.Players.LocalPlayer.Character};v249.IgnoreWater=true;v248=5 -3 ;end break;end if (v285==(325 -(45 + 280))) then if (v248==(4 + 0)) then return true;end if (v248==(0 + 0)) then local v412=0;while true do if ((1 + 0)==v412) then v248=2 -1 ;break;end if (v412==(0 + 0)) then v249=RaycastParams.new();v249.FilterType=Enum.RaycastFilterType.Blacklist;v412=1 + 0 ;end end end v285=1 -0 ;end if (v285==(1912 -(340 + 1571))) then if ((1 + 1)==v248) then local v413=0;while true do if (v413==(1183 -(1058 + 125))) then v250=(v247-v246).Unit;v251=(v247-v246).Magnitude;v413=1 + 0 ;end if (v413==(1773 -(1733 + 39))) then v248=8 -5 ;break;end end end if (v248==(1037 -(125 + 909))) then local v414=0;while true do if (v414==0) then v252=workspace:Raycast(v246,v250 * v251 ,v249);if v252 then local v458=v252.Instance;if v458 then local v474=1948 -(1096 + 852) ;local v475;while true do if (v474==(0 + 0)) then v475=v458:FindFirstAncestorOfClass("Model");if (v475 and v475:FindFirstChild("Humanoid")) then return true;else return false;end break;end end end end v414=1 -0 ;end if (v414==(1894 -(1222 + 671))) then v248=4 + 0 ;break;end end end v285=514 -(409 + 103) ;end end end end v37._shoot=function(v253) if ( not v253 or  not v253.tool) then return v36(v253);end local v254=game:GetService("Players");local v255=game.Players.LocalPlayer;local v256=v255.Character;if  not v256 then return v36(v253);end local v257=(v256.HumanoidRootPart and v256.HumanoidRootPart.Position) or v256.PrimaryPart.Position ;local v258=nil;local v259=math.huge;for v286,v287 in ipairs(v254:GetPlayers()) do if ((v287~=v255) and v287.Character and v287.Character:FindFirstChild("HumanoidRootPart")) then local v339=236 -(46 + 190) ;local v340;local v341;local v342;while true do if (v339==(1182 -(229 + 953))) then v340=95 -(51 + 44) ;v341=nil;v339=1 + 0 ;end if (v339==(1318 -(1114 + 203))) then v342=nil;while true do if (v340==(727 -(228 + 498))) then if (v201(v257,v341) and (v342<v259)) then local v459=0 + 0 ;local v460;while true do if (v459==(0 + 0)) then v460=0 + 0 ;while true do if (v460==(679 -(642 + 37))) then v259=v342;v258=v287;break;end end break;end end end break;end if (v340==(663 -(174 + 489))) then local v440=0 -0 ;while true do if (v440==(1905 -(830 + 1075))) then v341=v287.Character.HumanoidRootPart.Position;v342=(v257-v341).Magnitude;v440=525 -(303 + 221) ;end if (v440==(1270 -(231 + 1038))) then v340=1 + 0 ;break;end end end end break;end end end end if (v258 and v258.Character and v258.Character:FindFirstChild("HumanoidRootPart")) then local v307=v258.Character.HumanoidRootPart.Position;v253.aimpoint=v307;v253.aimpoint2=v307;if (v253.tool.model and v253.tool.model.PrimaryPart) then local v377=1162 -(171 + 991) ;local v378;while true do if (v377==(0 + 0)) then v378=v253.tool.model.PrimaryPart.Position;v200(v378,v307);break;end end else v200(v257,v307);end if v253.tool then local v379=0 -0 ;local v380;while true do if (v379==(0 -0)) then v380=0 -0 ;while true do if (v380==(0 + 0)) then v253.tool.shooting=true;v253.tool.fireDebounce=0 -0 ;v380=1;end if (v380==(2 -1)) then v253.tool.fireMode="auto";break;end end break;end end end elseif v253.tool then v253.tool.shooting=false;end return v36(v253);end;while v35 do local v260=0 -0 ;while true do if (v260==(0 -0)) then if (v37 and v37._shoot) then local v388=0 + 0 ;local v389;while true do if (v388==(0 + 0)) then v389=game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Tool") ;if v389 then local v454=v389:FindFirstChild("Shooter");if  not v454 then v454={tool=v389};end pcall(function() v37._shoot(v454);end);end break;end end end task.wait(1015.2 -(657 + 358) );break;end end end if v36 then v37._shoot=v36;end end);else print("自动射击：关闭");if (v37 and v36) then v37._shoot=v36;end end end});local v38=v7.MoneyFarm;local v39=v38:AddLeftGroupbox("自动收集");local v40=false;v39:AddToggle("自动ATM",{Text="自动ATM",Default=v40,Callback=function(v98) v40=v98;if v98 then local v152=1248 -(111 + 1137) ;local v153=79 -49 ;local v154=(game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()):WaitForChild("HumanoidRootPart");local v155=workspace.Local.Gizmos.White;local v156={Vector3.new( -(2590 -1453),232 -154 , -1953),Vector3.new( -(567 -(423 + 100)),1 + 62 , -(5766 -3683)),Vector3.new(194,60, -(1504 + 1380)),Vector3.new( -(1183 -(326 + 445)),462 -356 , -(2898 -1597)),Vector3.new( -(879 -502),1121 -(530 + 181) , -(1622 -(614 + 267))),Vector3.new( -(1602 -617),1664 -1284 , -(2667 -1522)),Vector3.new( -854,106 + 300 , -(2646 -1141))};local function v157(v202) if v202:IsA("BasePart") then return v202;end for v262,v263 in ipairs(v202:GetDescendants()) do if v263:IsA("BasePart") then return v263;end end end local function v158(v203) local v204=0;local v205;while true do if (v204==(0 -0)) then v205=v203:GetAttribute("gizmoType");return v205=="ATM" ;end end end local function v159() local v206=math.huge;local v207=nil;for v264,v265 in ipairs(v155:GetChildren()) do if v158(v265) then local v310=0 -0 ;local v311;while true do if ((1812 -(1293 + 519))==v310) then v311=v157(v265);if v311 then local v425=0 -0 ;local v426;while true do if (v425==(0 + 0)) then v426=(v154.Position-v311.Position).Magnitude;if (v426<v206) then local v464=0 -0 ;while true do if (v464==(0 -0)) then v207=v311;v206=v426;break;end end end break;end end end break;end end end end return v207;end local function v160(v208) if (typeof(v208)~="Instance") then if (typeof(v208)=="Vector3") then v154.CFrame=CFrame.new(v208);end else v154.CFrame=v208.CFrame * CFrame.new(0 -0 ,2 + 3 ,0 -0 ) ;end end local function v161(v209) local v210=0 -0 ;local v211;while true do if (v210==(0 + 0)) then v211=tick();while (tick() -v211)<v209  do local v344=0;while true do if (v344==(1 + 0)) then task.wait(0.05);break;end if (v344==(0 -0)) then game:GetService("VirtualInputManager"):SendKeyEvent(true,Enum.KeyCode.E,false,game);game:GetService("VirtualInputManager"):SendKeyEvent(false,Enum.KeyCode.E,false,game);v344=1 + 0 ;end end end break;end end end local function v162(v212) local v213=0 + 0 ;local v214;local v215;while true do if (v213==(0 -0)) then local v312=0 + 0 ;while true do if (v312==(1096 -(709 + 387))) then v214=tick();v215=3;v312=1;end if (v312==(1859 -(673 + 1185))) then v213=1 + 0 ;break;end end end if (v213==(2 -1)) then while ((tick() -v214)<v215) and v212.Parent and  not v212:GetAttribute("Collected")  do task.wait(0.1);end v161(1.5);break;end end end task.spawn(function() while v40 do local v266=0;local v267;while true do if (v266==(3 -2)) then task.wait(0.7 -0 );break;end if (v266==(0 + 0)) then v267=v159();if v267 then local v390=520 -(150 + 370) ;while true do if ((1282 -(74 + 1208))==v390) then v160(v267);task.wait(0.3 + 0 );v390=1 -0 ;end if (v390==(1 + 0)) then v161(1.5 -0 );v162(v267);v390=3 -1 ;end if (v390==(1882 -(446 + 1434))) then v152=1283 -(1040 + 243) ;break;end end else local v391=0 + 0 ;local v392;while true do if (v391==(0 -0)) then v392=1847 -(559 + 1288) ;while true do if ((1931 -(609 + 1322))==v392) then v152=v152 + (454.7 -(13 + 441)) ;v160(v156[math.random(3 -2 , #v156)]);v392=2 -1 ;end if (v392==(4 -3)) then if (v153<=v152) then v152=0;end break;end end break;end end end v266=1 + 0 ;end end end end);end end});local v41=false;v39:AddToggle("自动收银机",{Text="自动收银机",Default=v41,Callback=function(v99) v41=v99;if v99 then local v163=0 -0 ;local v164;local v165;local v166;local v167;local v168;local v169;local v170;local v171;local v172;local v173;local v174;while true do if (v163==(1 + 1)) then local v290=0 + 0 ;while true do if (v290==(0 + 0)) then function v169(v393) local v394=0;local v395;while true do if (v394==(0 -0)) then v395=0 + 0 ;while true do if (0==v395) then if v393:IsA("BasePart") then return v393;end for v465,v466 in ipairs(v393:GetDescendants()) do if v466:IsA("BasePart") then return v466;end end break;end end break;end end end v170=nil;v290=1 -0 ;end if (v290==(1 + 0)) then function v170(v396) local v397=1868 -(708 + 1160) ;local v398;while true do if ((0 + 0)==v397) then v398=v396:GetAttribute("gizmoType");return v398=="Register" ;end end end v163=3 + 0 ;break;end end end if (4==v163) then local v291=27 -(10 + 17) ;while true do if (v291==(1 + 0)) then function v173(v399) local v400=0 + 0 ;local v401;while true do if ((0 -0)==v400) then v401=tick();while (tick() -v401)<v399  do local v441=433 -(153 + 280) ;while true do if ((2 -1)==v441) then task.wait(0.05 + 0 );break;end if (v441==(0 + 0)) then game:GetService("VirtualInputManager"):SendKeyEvent(true,Enum.KeyCode.E,false,game);game:GetService("VirtualInputManager"):SendKeyEvent(false,Enum.KeyCode.E,false,game);v441=1 + 0 ;end end end break;end end end v163=5 + 0 ;break;end if (v291==(0 + 0)) then function v172(v402) if (typeof(v402)~="Instance") then if (typeof(v402)=="Vector3") then v166.CFrame=CFrame.new(v402);end else v166.CFrame=v402.CFrame * CFrame.new(0 + 0 ,1395 -(360 + 1030) ,0 + 0 ) ;end end v173=nil;v291=1 + 0 ;end end end if (v163==3) then v171=nil;function v171() local v313=math.huge;local v314=nil;for v345,v346 in ipairs(v167:GetChildren()) do if v170(v346) then local v403=v169(v346);if v403 then local v428=0 -0 ;local v429;while true do if (v428==(0 + 0)) then v429=(v166.Position-v403.Position).Magnitude;if (v429<v313) then local v467=667 -(89 + 578) ;while true do if (v467==(1661 -(909 + 752))) then v314=v403;v313=v429;break;end end end break;end end end end end return v314;end v172=nil;v163=4;end if (v163==(0 + 0)) then local v292=0 -0 ;while true do if (v292==(1049 -(572 + 477))) then v164=242 -(6 + 236) ;v165=5 + 25 ;v292=1 + 0 ;end if (v292==(1 + 0)) then v166=(game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()):WaitForChild("HumanoidRootPart");v163=1 + 0 ;break;end end end if (v163==(87 -(84 + 2))) then v167=workspace.Local.Gizmos.White;v168={Vector3.new( -(1648 -648),73 + 27 , -(2842 -(497 + 345))),Vector3.new( -500,100, -(372 + 1828)),Vector3.new(89 + 11 ,72 + 28 , -(2907 -(174 + 233)))};v169=nil;v163=5 -3 ;end if (v163==(8 -3)) then v174=nil;function v174(v315) local v316=0 -0 ;local v317;local v318;local v319;while true do if (v316==(1 + 0)) then v319=nil;while true do if (v317==(0 -0)) then local v431=1174 -(663 + 511) ;while true do if (v431==(0 + 0)) then v318=tick();v319=2 + 0 ;v431=2 -1 ;end if (v431==(1 + 0)) then v317=1;break;end end end if (v317==(1 + 0)) then while ((tick() -v318)<v319) and v315.Parent and  not v315:GetAttribute("Collected")  do task.wait(489.1 -(457 + 32) );end v173(1.2);break;end end break;end if (v316==(0 + 0)) then v317=1402 -(832 + 570) ;v318=nil;v316=1 + 0 ;end end end task.spawn(function() while v41 do local v347=v171();if v347 then local v404=0 + 0 ;while true do if (v404==(0 + 0)) then v172(v347);task.wait(0.3 + 0 );v404=3 -2 ;end if (v404==(1 + 1)) then v164=796 -(588 + 208) ;break;end if (v404==(2 -1)) then v173(1801.2 -(884 + 916) );v174(v347);v404=3 -1 ;end end else local v405=0 + 0 ;while true do if (v405==1) then if (v165<=v164) then v164=1556 -(655 + 901) ;end break;end if (v405==(653 -(232 + 421))) then v164=v164 + 0.7 + 0 ;v172(v168[math.random(1890 -(1569 + 320) , #v168)]);v405=1 + 0 ;end end end task.wait(0.7 + 0 );end end);break;end end end end});local v42=v7.AutoPickup;local v43=v42:AddLeftGroupbox("自动拾取物品");local v44=false;v43:AddToggle("自动拾取金条",{Text="自动拾取金条",Default=v44,Callback=function(v100) v44=v100;if v100 then task.spawn(function() local v216=0 -0 ;local v217;while true do if (v216==(1446 -(695 + 750))) then while v44 do local v348=0;local v349;local v350;local v351;while true do if (v348==(3 -2)) then v351=nil;while true do if (v349==(606 -(316 + 289))) then if (v351 and v350) then for v468,v469 in ipairs(v351:GetChildren()) do if ((v469.Name=="Gold Bar") and v44) then local v476=v469.PrimaryPart or v469:FindFirstChildWhichIsA("BasePart",true) ;if v476 then local v481=0;local v482;while true do if (v481==(0 -0)) then v482=0 + 0 ;while true do if (v482==(2 -0)) then game:GetService("VirtualInputManager"):SendKeyEvent(false,Enum.KeyCode.E,false,game);repeat task.wait(0.1 -0 );until  not v469.Parent or  not v44  break;end if (v482==(1454 -(666 + 787))) then game:GetService("VirtualInputManager"):SendKeyEvent(true,Enum.KeyCode.E,false,game);task.wait(351.05 -(285 + 66) );v482=2;end if (v482==(425 -(360 + 65))) then v350.CFrame=v476.CFrame * CFrame.new(0,0, -(2.5 + 0)) ;task.wait(254.2 -(79 + 175) );v482=1 -0 ;end end break;end end end end if  not v44 then break;end end end task.wait(0.5 + 0 );break;end if (v349==(0 -0)) then v350=v217();v351=workspace:FindFirstChild("Local") and workspace.Local:FindFirstChild("Gizmos") and workspace.Local.Gizmos:FindFirstChild("White") ;v349=1 -0 ;end end break;end if (0==v348) then v349=299 -(176 + 123) ;v350=nil;v348=1;end end end break;end if (v216==(0 + 0)) then v217=nil;function v217() local v352=0 + 0 ;local v353;while true do if (v352==(899 -(503 + 396))) then v353=game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait() ;return v353:WaitForChild("HumanoidRootPart",5);end end end v216=182 -(92 + 89) ;end end end);end end});local v45=false;v43:AddToggle("自动拾取礼物盒",{Text="自动拾取礼物盒",Default=v45,Callback=function(v101) local v102=0;while true do if (v102==(0 -0)) then v45=v101;if v101 then task.spawn(function() local v320=0 + 0 ;local v321;while true do if (v320==(0 + 0)) then local v406=0 -0 ;while true do if (v406==(1 + 0)) then v320=2 -1 ;break;end if ((0 -0)==v406) then v321=nil;function v321() local v443=0 + 0 ;local v444;while true do if (v443==(315 -(306 + 9))) then v444=game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait() ;return v444:WaitForChild("HumanoidRootPart",17 -12 );end end end v406=1 + 0 ;end end end if (v320==(1 + 0)) then while v45 do local v415=0 + 0 ;local v416;local v417;local v418;while true do if (v415==(2 -1)) then v418=nil;while true do if (v416==(1375 -(1140 + 235))) then local v470=0 + 0 ;while true do if (v470==(0 -0)) then v417=v321();v418=workspace:FindFirstChild("Local") and workspace.Local:FindFirstChild("Gizmos") and workspace.Local.Gizmos:FindFirstChild("White") ;v470=1 + 0 ;end if (1==v470) then v416=1 + 0 ;break;end end end if (v416==(53 -(33 + 19))) then if (v418 and v417) then for v479,v480 in ipairs(v418:GetChildren()) do if ((v480.Name=="WorldItem") and v45) then local v485=0 + 0 ;local v486;while true do if (v485==(0 -0)) then v486=v480.PrimaryPart or v480:FindFirstChildWhichIsA("BasePart",true) ;if v486 then local v491=1244 -(485 + 759) ;while true do if (v491==(0 -0)) then v417.CFrame=v486.CFrame * CFrame.new(1189 -(442 + 747) ,1135 -(832 + 303) , -(948.5 -(88 + 858))) ;task.wait(0.2 + 0 );v491=1 + 0 ;end if (v491==(1 + 1)) then game:GetService("VirtualInputManager"):SendKeyEvent(false,Enum.KeyCode.E,false,game);repeat task.wait(789.1 -(766 + 23) );until  not v480.Parent or  not v45  break;end if (v491==(4 -3)) then game:GetService("VirtualInputManager"):SendKeyEvent(true,Enum.KeyCode.E,false,game);task.wait(0.05 -0 );v491=4 -2 ;end end end break;end end end if  not v45 then break;end end end task.wait(0.5 -0 );break;end end break;end if ((1073 -(1036 + 37))==v415) then v416=0 + 0 ;v417=nil;v415=1 -0 ;end end end break;end end end);else print("礼物盒：关闭");end break;end end end});local v46=v7.Teleport;local v47=v46:AddLeftGroupbox("地点传送");v47:AddButton("奥菲的价值兑换",function() local v103=0 -0 ;local v104;local v105;local v106;while true do if (v103==(1 + 0)) then v106=v105:WaitForChild("HumanoidRootPart");v106.CFrame=CFrame.new( -(4387.68848 -(641 + 839)),950.1002731 -(910 + 3) ,3067.74817 -1623 ,0.848566413 -0 ,1684.0000000393804 -(1466 + 218) , -(0.529088855 -0), -(1962.000000017741 -(1300 + 662)),1,4.5977092e-8 -0 ,0.529088855 + 0 , -(1148.0000000296282 -(556 + 592)),0.848566413 + 0 );v103=2;end if (v103==(5 -3)) then v1:Notify({Title="传送成功",Content="已传送到奥菲的价值兑换",Duration=1407 -(851 + 554) ,Icon="check"});break;end if (v103==0) then v104=game.Players.LocalPlayer;v105=v104.Character or v104.CharacterAdded:Wait() ;v103=1 + 0 ;end end end);v47:AddButton("绿洲银行",function() local v107=0;local v108;local v109;local v110;while true do if (v107==(809 -(329 + 479))) then v110=v109:WaitForChild("HumanoidRootPart");v110.CFrame=CFrame.new( -(1285.537354 -(174 + 680)),133.6113892 -94 , -(2901.08313 -1501), -(0.901108384 + 0), -1.61008e-8, -(739.433593899 -(396 + 343)), -5.2681104e-9,1 + 0 , -(1477.0000000261848 -(29 + 1448)),0.433593899 + 0 , -(1389.0000000213113 -(135 + 1254)), -(0.901108384 + 0));v107=7 -5 ;end if (v107==(0 -0)) then v108=game.Players.LocalPlayer;v109=v108.Character or v108.CharacterAdded:Wait() ;v107=1 + 0 ;end if (v107==(2 + 0)) then v1:Notify({Title="传送成功",Content="已传送到绿洲银行",Duration=1529 -(389 + 1138) ,Icon="check"});break;end end end);v47:AddButton("绿洲城警察",function() local v111=358 -(237 + 121) ;local v112;local v113;local v114;while true do if (v111==(575 -(102 + 472))) then local v222=0 + 0 ;while true do if (v222==(1 + 0)) then v111=6 -4 ;break;end if (v222==(142 -(96 + 46))) then v114=v113:WaitForChild("HumanoidRootPart");v114.CFrame=CFrame.new(2404.02393 + 174 ,43.169289000000006 + 76 , -(2263.579773 -(320 + 1225)), -(0.395326763 -0), -(5.9598324e-8 -0), -0.918540537, -(9.65633e-9 + 0),1, -(1464.0000000523244 -(157 + 1307)),0.918540537,1859.0000000794766 -(821 + 1038) , -(0.395326763 -0));v222=2 -1 ;end end end if (v111==(1 + 1)) then v1:Notify({Title="传送成功",Content="已传送到绿洲城警察",Duration=3 -1 ,Icon="check"});break;end if (v111==(0 + 0)) then local v223=0;while true do if (v223==(0 -0)) then v112=game.Players.LocalPlayer;v113=v112.Character or v112.CharacterAdded:Wait() ;v223=1027 -(834 + 192) ;end if (v223==(1 + 0)) then v111=1 + 0 ;break;end end end end end);v47:AddButton("金库",function() local v115=0 + 0 ;local v116;local v117;local v118;while true do if (v115==(1 + 0)) then local v224=0 -0 ;while true do if (v224==(305 -(300 + 4))) then v115=1 + 1 ;break;end if ((0 -0)==v224) then v118=v117:WaitForChild("HumanoidRootPart");v118.CFrame=CFrame.new( -(762.492279 -(112 + 250)),65.15173300000001 + 98 , -(3111.7263199999998 -1869), -(0.912052214 + 0), -(1.09039995e-8 + 0), -(0.410074085 -0),1.4650267e-8 + 0 ,1 + 0 , -5.9174205e-8,0.410074085 + 0 , -(1973.0000000599778 -(1656 + 317)), -(1414.912052214 -(1001 + 413)));v224=1;end end end if ((4 -2)==v115) then v1:Notify({Title="传送成功",Content="已传送到金库",Duration=884 -(244 + 638) ,Icon="check"});break;end if (v115==(693 -(627 + 66))) then local v225=0 -0 ;while true do if ((603 -(512 + 90))==v225) then v115=1907 -(1665 + 241) ;break;end if ((1271 -(266 + 1005))==v225) then v116=game.Players.LocalPlayer;v117=v116.Character or v116.CharacterAdded:Wait() ;v225=718 -(373 + 344) ;end end end end end);v47:AddButton("犯罪基地",function() local v119=0 -0 ;local v120;local v121;local v122;while true do if ((2 -0)==v119) then v1:Notify({Title="传送成功",Content="已传送到犯罪基地",Duration=2,Icon="check"});break;end if ((1 + 0)==v119) then local v226=0 + 0 ;while true do if (v226==1) then v119=5 -3 ;break;end if (v226==(0 -0)) then v122=v121:WaitForChild("HumanoidRootPart");v122.CFrame=CFrame.new( -(7080.50586 -(35 + 1064)),27.2680244 + 10 ,3850.22046 -2605 , -(388.733384013 -(212 + 176)), -(3.6538985e-8 -0), -0.679814577, -(1.7351333e-8 + 0),1237 -(298 + 938) , -(1259.0000000350299 -(233 + 1026)),1666.679814577 -(636 + 1030) , -(1.38946366e-8 + 0), -0.733384013);v226=1 + 0 ;end end end if (v119==(1901 -(484 + 1417))) then v120=game.Players.LocalPlayer;v121=v120.Character or v120.CharacterAdded:Wait() ;v119=1 + 0 ;end end end);v47:AddButton("烈焰要塞",function() local v123=0 -0 ;local v124;local v125;local v126;while true do if ((0 + 0)==v123) then local v228=221 -(55 + 166) ;while true do if (0==v228) then v124=game.Players.LocalPlayer;v125=v124.Character or v124.CharacterAdded:Wait() ;v228=1 + 0 ;end if (1==v228) then v123=1 + 0 ;break;end end end if (v123==(7 -5)) then v1:Notify({Title="传送成功",Content="已传送到烈焰要塞",Duration=2,Icon="check"});break;end if ((298 -(36 + 261))==v123) then v126=v125:WaitForChild("HumanoidRootPart");v126.CFrame=CFrame.new( -(3992.58496 -2498),12.164810000000003 + 29 ,5882.56055 -2518 ,1368.961387396 -(34 + 1334) ,1.07588015e-7,0.275198698 + 0 , -(9.5233396e-8 + 0),1, -(1283.0000000582554 -(1035 + 248)), -(21.275198698 -(20 + 1)),2.97983e-8 + 0 ,0.961387396 -0 );v123=2;end end end);local v48=v7.PlayerTeleport;local v49=v48:AddLeftGroupbox("玩家传送");local v50="";local v51="前方";v49:AddInput("输入玩家用户名",{Text="玩家名称",Default="",Placeholder="输入玩家名称",Callback=function(v127) v50=v127;end});v49:AddDropdown("传送部位",{Values={"前方","后方","头顶","左侧","右侧"},Default=867 -(39 + 827) ,Multi=false,Callback=function(v128) v51=v128;end});v49:AddButton("传送一次",function() if (v50 and (v50~="") and v51) then local v175=game.Players:FindFirstChild(v50);if (v175 and (v175~=game.Players.LocalPlayer)) then if (v175.Character and v175.Character:FindFirstChild("HumanoidRootPart")) then local v328=0 -0 ;local v329;local v330;local v331;local v332;local v333;while true do if (0==v328) then v329=0;v330=nil;v328=969 -(478 + 490) ;end if (v328==(2 + 0)) then v333=nil;while true do if (v329==(1 -0)) then v332=v331:WaitForChild("HumanoidRootPart");v333=v175.Character.HumanoidRootPart.CFrame;v329=1174 -(786 + 386) ;end if (v329==(6 -4)) then if (v51=="前方") then v332.CFrame=v333 * CFrame.new(1379 -(1055 + 324) ,1340 -(1093 + 247) , -5) ;elseif (v51=="后方") then v332.CFrame=v333 * CFrame.new(0 + 0 ,0 + 0 ,19 -14 ) ;elseif (v51=="头顶") then v332.CFrame=v333 * CFrame.new(0 -0 ,559 -(475 + 79) ,0 -0 ) ;elseif (v51=="左侧") then v332.CFrame=v333 * CFrame.new( -(12 -7),0 + 0 ,0) ;elseif (v51=="右侧") then v332.CFrame=v333 * CFrame.new(19 -14 ,0 -0 ,0 + 0 ) ;end v1:Notify({Title="传送成功",Content="已传送到玩家 "   .. v50   .. " 的"   .. v51 ,Duration=2,Icon="check"});break;end if (v329==(0 + 0)) then local v433=0 -0 ;while true do if ((689 -(364 + 324))==v433) then v329=2 -1 ;break;end if (v433==(0 -0)) then v330=game.Players.LocalPlayer;v331=v330.Character or v330.CharacterAdded:Wait() ;v433=320 -(27 + 292) ;end end end end break;end if (v328==(1 + 0)) then v331=nil;v332=nil;v328=8 -6 ;end end else v1:Notify({Title="传送失败",Content="目标玩家没有角色或缺少HumanoidRootPart",Duration=2,Icon="x"});end else v1:Notify({Title="传送失败",Content="未找到玩家或玩家无效",Duration=2 -0 ,Icon="x"});end else v1:Notify({Title="传送失败",Content="请输入玩家名称并选择传送位置",Duration=5 -3 ,Icon="x"});end end);local v52=false;v49:AddToggle("固定传送",{Text="固定传送",Default=false,Callback=function(v129) local v130=0 -0 ;while true do if (v130==(1268 -(1249 + 19))) then v52=v129;if v129 then task.spawn(function() while v52 do if (v50 and (v50~="") and v51) then local v407=game.Players:FindFirstChild(v50);if (v407 and (v407~=game.Players.LocalPlayer)) then if (v407.Character and v407.Character:FindFirstChild("HumanoidRootPart")) then local v445=0 + 0 ;local v446;local v447;local v448;local v449;while true do if (v445==(3 -2)) then v448=v447:WaitForChild("HumanoidRootPart");v449=v407.Character.HumanoidRootPart.CFrame;v445=1088 -(686 + 400) ;end if (v445==(0 + 0)) then v446=game.Players.LocalPlayer;v447=v446.Character or v446.CharacterAdded:Wait() ;v445=230 -(73 + 156) ;end if (v445==2) then if (v51=="前方") then v448.CFrame=v449 * CFrame.new(0 + 0 ,811 -(721 + 90) , -(1 + 4)) ;elseif (v51=="后方") then v448.CFrame=v449 * CFrame.new(0 -0 ,470 -(224 + 246) ,8 -3 ) ;elseif (v51=="头顶") then v448.CFrame=v449 * CFrame.new(0 -0 ,1 + 4 ,0 + 0 ) ;elseif (v51=="左侧") then v448.CFrame=v449 * CFrame.new( -(4 + 1),0 -0 ,0 -0 ) ;elseif (v51=="右侧") then v448.CFrame=v449 * CFrame.new(16 -11 ,513 -(203 + 310) ,1993 -(1238 + 755) ) ;end break;end end end end end task.wait(0.1);end end);end break;end end end});v2:SetLibrary(v1);v3:SetLibrary(v1);v3:IgnoreThemeSettings();v3:SetIgnoreIndexes({"MenuKeybind"});v3:SetFolder("UniversalSilentAim/Configs");v3:BuildConfigSection(v7["UI Settings"]);v2:ApplyToTab(v7["UI Settings"]);v3:LoadAutoloadConfig();
--- ⚠️ WARNING: integrity protected!
 --[[
  .____                  ________ ___.    _____                           __                
  |    |    __ _______   \_____  \\_ |___/ ____\_ __  ______ ____ _____ _/  |_  ___________ 
@@ -10,3 +8,1937 @@ local v0="https://raw.githubusercontent.com/ATLASTEAM01/Obsidian/main/";local v1
           \_Welcome to LuaObfuscator.com   (Alpha 0.10.9) ~  Much Love, Ferib 
 
 ]]--
+
+local repo = "https://raw.githubusercontent.com/ATLASTEAM01/Obsidian/main/";
+local Library = loadstring(game:HttpGet(repo .. "Library.lua"))();
+local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))();
+local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))();
+local Options = Library.Options;
+local Toggles = Library.Toggles;
+local Window = Library:CreateWindow({Title="秋辞通缉脚本（虽然功能全是盗的）",Footer="1.3",Center=true,AutoShow=true});
+local Tabs = {Main=Window:AddTab("主页", "user"),["UI Settings"]=Window:AddTab("UI设置", "settings")};
+local MainSettingsBox = Tabs.Main:AddLeftGroupbox("主设置");
+MainSettingsBox:AddToggle("EnabledToggle", {Text="（举例）",Default=false}):AddKeyPicker("EnabledKeybind", {Default="RightAlt",SyncToggleState=true,Mode="Toggle"});
+Toggles.EnabledToggle:OnChanged(function(Value)
+end);
+local FlightControl = Tabs.Main:AddLeftGroupbox("人物功能");
+local FlyingEnabled = false;
+local SpinningEnabled = false;
+local FlightSpeed = 50;
+local SpinSpeed = 5;
+local CurrentAO, CurrentLV, CurrentMoverAttachment;
+local FlightConnection;
+local Control = {F=0,B=0,L=0,R=0,Q=0,E=0};
+local LastControl = {F=0,B=0,L=0,R=0,Q=0,E=0};
+local function getControlModule()
+	local FlatIdent_8D327 = 0;
+	local LocalPlayer;
+	local PlayerModule;
+	while true do
+		if (FlatIdent_8D327 == 0) then
+			LocalPlayer = game:GetService("Players").LocalPlayer;
+			PlayerModule = LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule");
+			FlatIdent_8D327 = 1;
+		end
+		if (FlatIdent_8D327 == 1) then
+			return require(PlayerModule:WaitForChild("ControlModule"));
+		end
+	end
+end
+local function setupBodyMovers(character)
+	local FlatIdent_67C40 = 0;
+	local hrp;
+	local humanoid;
+	local moverParent;
+	local moverAttachment;
+	local alignOrientation;
+	local linearVelocity;
+	while true do
+		if (FlatIdent_67C40 == 3) then
+			linearVelocity = Instance.new("LinearVelocity");
+			linearVelocity.VectorVelocity = Vector3.new(0, 0, 0);
+			linearVelocity.MaxForce = 8999999488;
+			linearVelocity.Attachment0 = moverAttachment;
+			FlatIdent_67C40 = 4;
+		end
+		if (FlatIdent_67C40 == 4) then
+			linearVelocity.Parent = moverParent;
+			return alignOrientation, linearVelocity, humanoid, moverAttachment;
+		end
+		if (FlatIdent_67C40 == 1) then
+			moverAttachment.Name = "FlightAttachment";
+			alignOrientation = Instance.new("AlignOrientation");
+			alignOrientation.Mode = Enum.OrientationAlignmentMode.OneAttachment;
+			alignOrientation.RigidityEnabled = true;
+			FlatIdent_67C40 = 2;
+		end
+		if (FlatIdent_67C40 == 0) then
+			hrp = character:WaitForChild("HumanoidRootPart");
+			humanoid = character:WaitForChild("Humanoid");
+			moverParent = workspace:FindFirstChildOfClass("Terrain") or workspace;
+			moverAttachment = Instance.new("Attachment", hrp);
+			FlatIdent_67C40 = 1;
+		end
+		if (FlatIdent_67C40 == 2) then
+			alignOrientation.MaxTorque = Vector3.new(8999999488, 8999999488, 8999999488);
+			alignOrientation.CFrame = hrp.CFrame;
+			alignOrientation.Attachment0 = moverAttachment;
+			alignOrientation.Parent = moverParent;
+			FlatIdent_67C40 = 3;
+		end
+	end
+end
+local function getFlightVector(controlModule)
+	local moveVector = controlModule:GetMoveVector();
+	local camera = workspace.CurrentCamera;
+	Control.F = -moveVector.Z;
+	Control.B = moveVector.Z;
+	Control.L = -moveVector.X;
+	Control.R = moveVector.X;
+	Control.Q = moveVector.Y;
+	Control.E = -moveVector.Y;
+	local UserInputService = game:GetService("UserInputService");
+	if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+		Control.F = 1;
+	end
+	if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+		Control.B = 1;
+	end
+	if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+		Control.L = 1;
+	end
+	if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+		Control.R = 1;
+	end
+	if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+		Control.Q = 1;
+	end
+	if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+		Control.E = 1;
+	end
+	local flightVector = (camera.CFrame.LookVector * (Control.F - Control.B)) + (camera.CFrame.RightVector * (Control.R - Control.L)) + (Vector3.new(0, 1, 0) * (Control.Q - Control.E));
+	return ((flightVector.Magnitude > 0) and flightVector.Unit) or flightVector;
+end
+local function startFlying()
+	local FlatIdent_8199B = 0;
+	local LocalPlayer;
+	local character;
+	local controlModule;
+	while true do
+		if (FlatIdent_8199B == 2) then
+			if CurrentAO then
+				CurrentAO:Destroy();
+			end
+			if CurrentLV then
+				CurrentLV:Destroy();
+			end
+			if CurrentMoverAttachment then
+				CurrentMoverAttachment:Destroy();
+			end
+			FlatIdent_8199B = 3;
+		end
+		if (FlatIdent_8199B == 3) then
+			CurrentAO, CurrentLV, humanoid, CurrentMoverAttachment = setupBodyMovers(character);
+			Library:Notify({Title="飞行开启",Content=("速度: " .. FlightSpeed),Duration=2,Icon="check"});
+			controlModule = getControlModule();
+			FlatIdent_8199B = 4;
+		end
+		if (FlatIdent_8199B == 1) then
+			if not character then
+				Library:Notify({Title="飞行失败",Content="无法获取角色",Duration=2,Icon="x"});
+				return;
+			end
+			FlyingEnabled = true;
+			SpinningEnabled = false;
+			FlatIdent_8199B = 2;
+		end
+		if (FlatIdent_8199B == 4) then
+			FlightConnection = game:GetService("RunService").Heartbeat:Connect(function()
+				if (not FlyingEnabled or not CurrentLV or not CurrentAO) then
+					local FlatIdent_61B23 = 0;
+					while true do
+						if (FlatIdent_61B23 == 0) then
+							if FlightConnection then
+								FlightConnection:Disconnect();
+								FlightConnection = nil;
+							end
+							return;
+						end
+					end
+				end
+				local flightVector = getFlightVector(controlModule);
+				if (flightVector.Magnitude > 0) then
+					local FlatIdent_E652 = 0;
+					while true do
+						if (0 == FlatIdent_E652) then
+							CurrentLV.VelocityConstraintMode = Enum.VelocityConstraintMode.Vector;
+							CurrentLV.VectorVelocity = flightVector * FlightSpeed;
+							break;
+						end
+					end
+				else
+					CurrentLV.VectorVelocity = Vector3.new(0, 0, 0);
+				end
+				if SpinningEnabled then
+					local targetPart = character.Humanoid.SeatPart or character.HumanoidRootPart;
+					local spinCFrame = targetPart.CFrame * CFrame.Angles(0, math.rad(SpinSpeed), 0);
+					CurrentAO.CFrame = spinCFrame;
+				else
+					CurrentAO.CFrame = workspace.CurrentCamera.CFrame;
+				end
+				if character.HumanoidRootPart then
+					character.Humanoid.PlatformStand = true;
+				end
+			end);
+			character.AncestryChanged:Connect(function(_, parent)
+				if (not parent and FlyingEnabled) then
+					stopFlying();
+				end
+			end);
+			break;
+		end
+		if (FlatIdent_8199B == 0) then
+			if FlyingEnabled then
+				return;
+			end
+			LocalPlayer = game:GetService("Players").LocalPlayer;
+			character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait();
+			FlatIdent_8199B = 1;
+		end
+	end
+end
+local function stopFlying()
+	local FlatIdent_27957 = 0;
+	local LocalPlayer;
+	local character;
+	while true do
+		if (FlatIdent_27957 == 1) then
+			Control = {F=0,B=0,L=0,R=0,Q=0,E=0};
+			LastControl = {F=0,B=0,L=0,R=0,Q=0,E=0};
+			if FlightConnection then
+				local FlatIdent_7A75F = 0;
+				while true do
+					if (FlatIdent_7A75F == 0) then
+						FlightConnection:Disconnect();
+						FlightConnection = nil;
+						break;
+					end
+				end
+			end
+			FlatIdent_27957 = 2;
+		end
+		if (FlatIdent_27957 == 0) then
+			if not FlyingEnabled then
+				return;
+			end
+			FlyingEnabled = false;
+			SpinningEnabled = false;
+			FlatIdent_27957 = 1;
+		end
+		if (FlatIdent_27957 == 3) then
+			if CurrentAO then
+				local FlatIdent_1B1BA = 0;
+				while true do
+					if (FlatIdent_1B1BA == 0) then
+						CurrentAO:Destroy();
+						CurrentAO = nil;
+						break;
+					end
+				end
+			end
+			if CurrentLV then
+				local FlatIdent_380E8 = 0;
+				while true do
+					if (FlatIdent_380E8 == 0) then
+						CurrentLV:Destroy();
+						CurrentLV = nil;
+						break;
+					end
+				end
+			end
+			if CurrentMoverAttachment then
+				local FlatIdent_66799 = 0;
+				while true do
+					if (FlatIdent_66799 == 0) then
+						CurrentMoverAttachment:Destroy();
+						CurrentMoverAttachment = nil;
+						break;
+					end
+				end
+			end
+			FlatIdent_27957 = 4;
+		end
+		if (FlatIdent_27957 == 2) then
+			LocalPlayer = game:GetService("Players").LocalPlayer;
+			character = LocalPlayer.Character;
+			if (character and character:FindFirstChild("Humanoid")) then
+				character.Humanoid.PlatformStand = false;
+			end
+			FlatIdent_27957 = 3;
+		end
+		if (FlatIdent_27957 == 4) then
+			Library:Notify({Title="飞行关闭",Content="飞行功能已禁用",Duration=2,Icon="x"});
+			break;
+		end
+	end
+end
+FlightControl:AddToggle("飞行模式", {Text="飞行模式",Default=false,Callback=function(Value)
+	if Value then
+		startFlying();
+	else
+		stopFlying();
+	end
+end});
+FlightControl:AddToggle("旋转模式", {Text="旋转模式",Default=false,Callback=function(Value)
+	if Value then
+		SpinningEnabled = true;
+	else
+		SpinningEnabled = false;
+	end
+end});
+FlightControl:AddSlider("飞行速度", {Text="飞行速度",Min=1,Max=200,Default=50,Rounding=0,Callback=function(Value)
+	local FlatIdent_295EB = 0;
+	while true do
+		if (FlatIdent_295EB == 0) then
+			FlightSpeed = Value;
+			if FlyingEnabled then
+				Library:Notify({Title="速度已更新",Content=("飞行速度: " .. Value),Duration=1,Icon="zap"});
+			end
+			break;
+		end
+	end
+end});
+FlightControl:AddSlider("旋转速度", {Text="旋转速度",Min=1,Max=50,Default=5,Rounding=0,Callback=function(Value)
+	local FlatIdent_981A3 = 0;
+	while true do
+		if (FlatIdent_981A3 == 0) then
+			SpinSpeed = Value;
+			if SpinningEnabled then
+				Library:Notify({Title="旋转速度已更新",Content=("旋转速度: " .. Value),Duration=1,Icon="refresh-cw"});
+			end
+			break;
+		end
+	end
+end});
+local SpeedHack = false;
+local SpeedValue = 16;
+local SpeedConnection;
+FlightControl:AddToggle("速度增加", {Text="速度增加",Default=false,Callback=function(Value)
+	local FlatIdent_6B983 = 0;
+	while true do
+		if (FlatIdent_6B983 == 0) then
+			SpeedHack = Value;
+			if Value then
+				local FlatIdent_7909D = 0;
+				while true do
+					if (FlatIdent_7909D == 0) then
+						if SpeedConnection then
+							SpeedConnection:Disconnect();
+						end
+						SpeedConnection = game:GetService("RunService").Heartbeat:Connect(function()
+							if (game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")) then
+								local FlatIdent_64E40 = 0;
+								local hum;
+								while true do
+									if (FlatIdent_64E40 == 0) then
+										hum = game.Players.LocalPlayer.Character.Humanoid;
+										if (hum.MoveDirection.Magnitude > 0) then
+											game.Players.LocalPlayer.Character:TranslateBy((hum.MoveDirection * SpeedValue) / 10);
+										end
+										break;
+									end
+								end
+							end
+						end);
+						break;
+					end
+				end
+			elseif SpeedConnection then
+				local FlatIdent_8D1A5 = 0;
+				while true do
+					if (0 == FlatIdent_8D1A5) then
+						SpeedConnection:Disconnect();
+						SpeedConnection = nil;
+						break;
+					end
+				end
+			end
+			break;
+		end
+	end
+end});
+FlightControl:AddSlider("速度设置", {Text="速度设置",Min=1,Max=150,Default=16,Rounding=0,Callback=function(Value)
+	SpeedValue = Value;
+end});
+local fovConnection;
+FlightControl:AddToggle("扩大视野", {Text="扩大视野",Default=false,Callback=function(Value)
+	if Value then
+		if fovConnection then
+			fovConnection:Disconnect();
+		end
+		fovConnection = game:GetService("RunService").Heartbeat:Connect(function()
+			workspace.CurrentCamera.FieldOfView = 120;
+		end);
+	elseif fovConnection then
+		local FlatIdent_8B523 = 0;
+		while true do
+			if (FlatIdent_8B523 == 0) then
+				fovConnection:Disconnect();
+				fovConnection = nil;
+				break;
+			end
+		end
+	end
+end});
+local jumpConn;
+FlightControl:AddToggle("无限跳", {Text="无限跳",Default=false,Callback=function(Value)
+	if Value then
+		if jumpConn then
+			jumpConn:Disconnect();
+		end
+		jumpConn = game:GetService("UserInputService").JumpRequest:Connect(function()
+			local FlatIdent_20FB0 = 0;
+			local humanoid;
+			while true do
+				if (0 == FlatIdent_20FB0) then
+					humanoid = game:GetService("Players").LocalPlayer.Character and game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid");
+					if humanoid then
+						humanoid:ChangeState(Enum.HumanoidStateType.Jumping);
+					end
+					break;
+				end
+			end
+		end);
+	elseif jumpConn then
+		local FlatIdent_5B4A8 = 0;
+		while true do
+			if (FlatIdent_5B4A8 == 0) then
+				jumpConn:Disconnect();
+				jumpConn = nil;
+				break;
+			end
+		end
+	end
+end});
+local Players = game:GetService("Players");
+local LocalPlayer = Players.LocalPlayer;
+LocalPlayer.CharacterAdded:Connect(function()
+	if FlyingEnabled then
+		local FlatIdent_5477B = 0;
+		while true do
+			if (1 == FlatIdent_5477B) then
+				task.wait(0.1);
+				startFlying();
+				break;
+			end
+			if (FlatIdent_5477B == 0) then
+				task.wait(0.5);
+				stopFlying();
+				FlatIdent_5477B = 1;
+			end
+		end
+	end
+end);
+local CombatControl = Tabs.Main:AddRightGroupbox("战斗功能");
+local ForceLoadAll = false;
+CombatControl:AddToggle("强制加载所有数据", {Text="强制加载所有数据",Default=false,Callback=function(Value)
+	ForceLoadAll = Value;
+	if Value then
+		task.spawn(function()
+			local FlatIdent_5998C = 0;
+			local devv;
+			local Network;
+			local Players;
+			local RunService;
+			local LocalPlayer;
+			local loadArea;
+			local loadAllGizmos;
+			local loadAllPlayers;
+			while true do
+				if (FlatIdent_5998C == 3) then
+					loadAllPlayers = nil;
+					function loadAllPlayers()
+						for _, player in ipairs(Players:GetPlayers()) do
+							if (player.Character and player.Character:FindFirstChild("HumanoidRootPart")) then
+								local FlatIdent_3CF01 = 0;
+								while true do
+									if (FlatIdent_3CF01 == 0) then
+										loadArea(player.Character.HumanoidRootPart.Position, 50);
+										task.wait(0.1);
+										break;
+									end
+								end
+							end
+						end
+					end
+					while ForceLoadAll do
+						loadAllGizmos();
+						loadAllPlayers();
+						loadArea(Vector3.new(0, 0, 0), 1000);
+						loadArea(Vector3.new(1000, 0, 1000), 1000);
+						loadArea(Vector3.new(-1000, 0, -1000), 1000);
+						loadArea(Vector3.new(1000, 0, -1000), 1000);
+						loadArea(Vector3.new(-1000, 0, 1000), 1000);
+						task.wait(5);
+					end
+					break;
+				end
+				if (FlatIdent_5998C == 0) then
+					devv = require(game:GetService("ReplicatedStorage").Devv);
+					Network = devv.load("Network");
+					Players = game:GetService("Players");
+					FlatIdent_5998C = 1;
+				end
+				if (FlatIdent_5998C == 2) then
+					function loadArea(position, radius)
+						if RunService:IsClient() then
+							local FlatIdent_45D37 = 0;
+							while true do
+								if (FlatIdent_45D37 == 0) then
+									pcall(function()
+										Network.InvokeServer("requestStreamAround", position, radius);
+									end);
+									pcall(function()
+										Network.FireServer("setReplicationFocus", position);
+									end);
+									break;
+								end
+							end
+						end
+					end
+					loadAllGizmos = nil;
+					function loadAllGizmos()
+						local FlatIdent_6A091 = 0;
+						local White;
+						while true do
+							if (FlatIdent_6A091 == 0) then
+								White = workspace:FindFirstChild("Local") and workspace.Local:FindFirstChild("Gizmos") and workspace.Local.Gizmos:FindFirstChild("White");
+								if White then
+									for _, gizmo in ipairs(White:GetChildren()) do
+										if gizmo.PrimaryPart then
+											local FlatIdent_882F4 = 0;
+											while true do
+												if (FlatIdent_882F4 == 0) then
+													loadArea(gizmo.PrimaryPart.Position, 50);
+													task.wait(0.1);
+													break;
+												end
+											end
+										end
+									end
+								end
+								break;
+							end
+						end
+					end
+					FlatIdent_5998C = 3;
+				end
+				if (FlatIdent_5998C == 1) then
+					RunService = game:GetService("RunService");
+					LocalPlayer = Players.LocalPlayer;
+					loadArea = nil;
+					FlatIdent_5998C = 2;
+				end
+			end
+		end);
+	else
+		print("强制加载：关闭");
+	end
+end});
+local AutoShoot = false;
+local OriginalShoot = nil;
+local ShooterModule = nil;
+CombatControl:AddToggle("愤怒机器人[全枪]", {Text="愤怒机器人[全枪]",Default=false,Callback=function(Value)
+	AutoShoot = Value;
+	if Value then
+		task.spawn(function()
+			ShooterModule = require(game:GetService("ReplicatedStorage").Client.Wanted.Objects.ClientTool.Components.Guns.Shooter);
+			OriginalShoot = ShooterModule._shoot;
+			local function createBezierCurve(p0, p1, p2, t)
+				return (((1 - t) ^ 2) * p0) + (2 * (1 - t) * t * p1) + ((t ^ 2) * p2);
+			end
+			local function createBeautifulTrail(origin, targetPos)
+				local trailContainer = Instance.new("Folder");
+				trailContainer.Name = "MagicTrail";
+				trailContainer.Parent = workspace;
+				local midPoint = (origin + targetPos) / 2;
+				local direction = (targetPos - origin).Unit;
+				local perpendicular = Vector3.new(-direction.Z, direction.Y, direction.X) * 3;
+				local controlPoint = midPoint + perpendicular + Vector3.new(0, math.random(-3, 3), 0);
+				local curvePoints = {};
+				local numSegments = 20;
+				for i = 0, numSegments do
+					local FlatIdent_72421 = 0;
+					local t;
+					local point;
+					while true do
+						if (FlatIdent_72421 == 1) then
+							table.insert(curvePoints, point);
+							break;
+						end
+						if (FlatIdent_72421 == 0) then
+							t = i / numSegments;
+							point = createBezierCurve(origin, controlPoint, targetPos, t);
+							FlatIdent_72421 = 1;
+						end
+					end
+				end
+				for i = 1, #curvePoints - 1 do
+					local startPoint = curvePoints[i];
+					local endPoint = curvePoints[i + 1];
+					local distance = (endPoint - startPoint).Magnitude;
+					local beamPart = Instance.new("Part");
+					beamPart.Size = Vector3.new(0.15, 0.15, distance);
+					beamPart.Anchored = true;
+					beamPart.CanCollide = false;
+					beamPart.Material = Enum.Material.Neon;
+					beamPart.Transparency = 0.3;
+					beamPart.CFrame = CFrame.new(startPoint, endPoint) * CFrame.new(0, 0, -distance / 2);
+					beamPart.Parent = trailContainer;
+					local pointLight = Instance.new("PointLight");
+					pointLight.Brightness = 5;
+					pointLight.Range = 3;
+					pointLight.Color = Color3.fromRGB(0, 170, 255);
+					pointLight.Parent = beamPart;
+					local particles = Instance.new("ParticleEmitter");
+					particles.Size = NumberSequence.new(0.1, 0.3);
+					particles.Transparency = NumberSequence.new(0.3, 0.8);
+					particles.Lifetime = NumberRange.new(0.5, 1);
+					particles.Rate = 50;
+					particles.Speed = NumberRange.new(1, 2);
+					particles.VelocitySpread = 180;
+					particles.Parent = beamPart;
+				end
+				task.spawn(function()
+					local FlatIdent_3B7E2 = 0;
+					while true do
+						if (FlatIdent_3B7E2 == 0) then
+							task.wait(1.5);
+							if (trailContainer and trailContainer.Parent) then
+								trailContainer:Destroy();
+							end
+							break;
+						end
+					end
+				end);
+				return trailContainer;
+			end
+			local function hasLineOfSight(shooterPos, targetPos)
+				local raycastParams = RaycastParams.new();
+				raycastParams.FilterType = Enum.RaycastFilterType.Blacklist;
+				raycastParams.FilterDescendantsInstances = {game.Players.LocalPlayer.Character};
+				raycastParams.IgnoreWater = true;
+				local direction = (targetPos - shooterPos).Unit;
+				local distance = (targetPos - shooterPos).Magnitude;
+				local raycastResult = workspace:Raycast(shooterPos, direction * distance, raycastParams);
+				if raycastResult then
+					local FlatIdent_1013A = 0;
+					local hitPart;
+					while true do
+						if (0 == FlatIdent_1013A) then
+							hitPart = raycastResult.Instance;
+							if hitPart then
+								local FlatIdent_77172 = 0;
+								local hitCharacter;
+								while true do
+									if (FlatIdent_77172 == 0) then
+										hitCharacter = hitPart:FindFirstAncestorOfClass("Model");
+										if (hitCharacter and hitCharacter:FindFirstChild("Humanoid")) then
+											return true;
+										else
+											return false;
+										end
+										break;
+									end
+								end
+							end
+							break;
+						end
+					end
+				end
+				return true;
+			end
+			ShooterModule._shoot = function(self)
+				if (not self or not self.tool) then
+					return OriginalShoot(self);
+				end
+				local Players = game:GetService("Players");
+				local LocalPlayer = game.Players.LocalPlayer;
+				local LocalCharacter = LocalPlayer.Character;
+				if not LocalCharacter then
+					return OriginalShoot(self);
+				end
+				local shooterPos = (LocalCharacter.HumanoidRootPart and LocalCharacter.HumanoidRootPart.Position) or LocalCharacter.PrimaryPart.Position;
+				local nearestPlayer = nil;
+				local nearestDistance = math.huge;
+				for _, player in ipairs(Players:GetPlayers()) do
+					if ((player ~= LocalPlayer) and player.Character and player.Character:FindFirstChild("HumanoidRootPart")) then
+						local targetPos = player.Character.HumanoidRootPart.Position;
+						local distance = (shooterPos - targetPos).Magnitude;
+						if (hasLineOfSight(shooterPos, targetPos) and (distance < nearestDistance)) then
+							local FlatIdent_4223E = 0;
+							while true do
+								if (FlatIdent_4223E == 0) then
+									nearestDistance = distance;
+									nearestPlayer = player;
+									break;
+								end
+							end
+						end
+					end
+				end
+				if (nearestPlayer and nearestPlayer.Character and nearestPlayer.Character:FindFirstChild("HumanoidRootPart")) then
+					local FlatIdent_6AEED = 0;
+					local targetPos;
+					while true do
+						if (FlatIdent_6AEED == 2) then
+							if self.tool then
+								local FlatIdent_53124 = 0;
+								while true do
+									if (FlatIdent_53124 == 0) then
+										self.tool.shooting = true;
+										self.tool.fireDebounce = 0;
+										FlatIdent_53124 = 1;
+									end
+									if (FlatIdent_53124 == 1) then
+										self.tool.fireMode = "auto";
+										break;
+									end
+								end
+							end
+							break;
+						end
+						if (FlatIdent_6AEED == 0) then
+							targetPos = nearestPlayer.Character.HumanoidRootPart.Position;
+							self.aimpoint = targetPos;
+							FlatIdent_6AEED = 1;
+						end
+						if (FlatIdent_6AEED == 1) then
+							self.aimpoint2 = targetPos;
+							if (self.tool.model and self.tool.model.PrimaryPart) then
+								local FlatIdent_331F0 = 0;
+								local muzzlePos;
+								while true do
+									if (FlatIdent_331F0 == 0) then
+										muzzlePos = self.tool.model.PrimaryPart.Position;
+										createBeautifulTrail(muzzlePos, targetPos);
+										break;
+									end
+								end
+							else
+								createBeautifulTrail(shooterPos, targetPos);
+							end
+							FlatIdent_6AEED = 2;
+						end
+					end
+				elseif self.tool then
+					self.tool.shooting = false;
+				end
+				return OriginalShoot(self);
+			end;
+			while AutoShoot do
+				if (ShooterModule and ShooterModule._shoot) then
+					local tool = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Tool");
+					if tool then
+						local FlatIdent_4A248 = 0;
+						local shooter;
+						while true do
+							if (0 == FlatIdent_4A248) then
+								shooter = tool:FindFirstChild("Shooter");
+								if not shooter then
+									shooter = {tool=tool};
+								end
+								FlatIdent_4A248 = 1;
+							end
+							if (1 == FlatIdent_4A248) then
+								pcall(function()
+									ShooterModule._shoot(shooter);
+								end);
+								break;
+							end
+						end
+					end
+				end
+				task.wait(0.2);
+			end
+			if OriginalShoot then
+				ShooterModule._shoot = OriginalShoot;
+			end
+		end);
+	else
+		local FlatIdent_5D802 = 0;
+		while true do
+			if (FlatIdent_5D802 == 0) then
+				print("自动射击：关闭");
+				if (ShooterModule and OriginalShoot) then
+					ShooterModule._shoot = OriginalShoot;
+				end
+				break;
+			end
+		end
+	end
+end});
+local MoneyFarmBox = Tabs.Main:AddRightGroupbox("金钱农场");
+local AutoATM = false;
+MoneyFarmBox:AddToggle("自动ATM", {Text="自动ATM",Default=AutoATM,Callback=function(Value)
+	AutoATM = Value;
+	if Value then
+		local TimeElapsedATM = 0;
+		local TimeoutThresholdATM = 30;
+		local RootPart = (game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()):WaitForChild("HumanoidRootPart");
+		local GizmoFolder = workspace.Local.Gizmos.White;
+		local ATMPatrolPoints = {Vector3.new(-1137, 78, -1953),Vector3.new(-44, 63, -2083),Vector3.new(194, 60, -2884),Vector3.new(-412, 106, -1301),Vector3.new(-377, 410, -741),Vector3.new(-985, 380, -1145),Vector3.new(-854, 406, -1505)};
+		local function GetBasePart(instance)
+			local FlatIdent_8638E = 0;
+			while true do
+				if (FlatIdent_8638E == 0) then
+					if instance:IsA("BasePart") then
+						return instance;
+					end
+					for _, descendant in ipairs(instance:GetDescendants()) do
+						if descendant:IsA("BasePart") then
+							return descendant;
+						end
+					end
+					break;
+				end
+			end
+		end
+		local function IsValidATMTarget(instance)
+			local typeAttr = instance:GetAttribute("gizmoType");
+			return typeAttr == "ATM";
+		end
+		local function FindClosestATMTarget()
+			local minDistance = math.huge;
+			local closestPart = nil;
+			for _, item in ipairs(GizmoFolder:GetChildren()) do
+				if IsValidATMTarget(item) then
+					local FlatIdent_957A4 = 0;
+					local part;
+					while true do
+						if (FlatIdent_957A4 == 0) then
+							part = GetBasePart(item);
+							if part then
+								local FlatIdent_71EE8 = 0;
+								local dist;
+								while true do
+									if (FlatIdent_71EE8 == 0) then
+										dist = (RootPart.Position - part.Position).Magnitude;
+										if (dist < minDistance) then
+											local FlatIdent_89917 = 0;
+											while true do
+												if (FlatIdent_89917 == 0) then
+													closestPart = part;
+													minDistance = dist;
+													break;
+												end
+											end
+										end
+										break;
+									end
+								end
+							end
+							break;
+						end
+					end
+				end
+			end
+			return closestPart;
+		end
+		local function TeleportTo(target)
+			if (typeof(target) ~= "Instance") then
+				if (typeof(target) == "Vector3") then
+					RootPart.CFrame = CFrame.new(target);
+				end
+			else
+				RootPart.CFrame = target.CFrame * CFrame.new(0, 5, 0);
+			end
+		end
+		local function SpamInteract(duration)
+			local FlatIdent_985A2 = 0;
+			local start;
+			while true do
+				if (FlatIdent_985A2 == 0) then
+					start = tick();
+					while (tick() - start) < duration do
+						local FlatIdent_512FF = 0;
+						while true do
+							if (FlatIdent_512FF == 0) then
+								game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.E, false, game);
+								game:GetService("VirtualInputManager"):SendKeyEvent(false, Enum.KeyCode.E, false, game);
+								FlatIdent_512FF = 1;
+							end
+							if (1 == FlatIdent_512FF) then
+								task.wait(0.05);
+								break;
+							end
+						end
+					end
+					break;
+				end
+			end
+		end
+		local function ProcessATMCollection(targetPart)
+			local start = tick();
+			local maxWait = 3;
+			while ((tick() - start) < maxWait) and targetPart.Parent and not targetPart:GetAttribute("Collected") do
+				task.wait(0.1);
+			end
+			SpamInteract(1.5);
+		end
+		task.spawn(function()
+			while AutoATM do
+				local FlatIdent_F26C = 0;
+				local target;
+				while true do
+					if (FlatIdent_F26C == 1) then
+						task.wait(0.7);
+						break;
+					end
+					if (FlatIdent_F26C == 0) then
+						target = FindClosestATMTarget();
+						if target then
+							local FlatIdent_31077 = 0;
+							while true do
+								if (1 == FlatIdent_31077) then
+									SpamInteract(1.5);
+									ProcessATMCollection(target);
+									FlatIdent_31077 = 2;
+								end
+								if (FlatIdent_31077 == 0) then
+									TeleportTo(target);
+									task.wait(0.3);
+									FlatIdent_31077 = 1;
+								end
+								if (2 == FlatIdent_31077) then
+									TimeElapsedATM = 0;
+									break;
+								end
+							end
+						else
+							local FlatIdent_527C6 = 0;
+							while true do
+								if (FlatIdent_527C6 == 0) then
+									TimeElapsedATM = TimeElapsedATM + 0.7;
+									TeleportTo(ATMPatrolPoints[math.random(1, #ATMPatrolPoints)]);
+									FlatIdent_527C6 = 1;
+								end
+								if (1 == FlatIdent_527C6) then
+									if (TimeoutThresholdATM <= TimeElapsedATM) then
+										TimeElapsedATM = 0;
+									end
+									break;
+								end
+							end
+						end
+						FlatIdent_F26C = 1;
+					end
+				end
+			end
+		end);
+	end
+end});
+local AutoRegister = false;
+MoneyFarmBox:AddToggle("自动收银机", {Text="自动收银机",Default=AutoRegister,Callback=function(Value)
+	AutoRegister = Value;
+	if Value then
+		local TimeElapsedRegister = 0;
+		local TimeoutThresholdRegister = 30;
+		local RootPart = (game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()):WaitForChild("HumanoidRootPart");
+		local GizmoFolder = workspace.Local.Gizmos.White;
+		local RegisterPatrolPoints = {Vector3.new(-1000, 100, -2000),Vector3.new(-500, 100, -2200),Vector3.new(100, 100, -2500)};
+		local function GetBasePart(instance)
+			local FlatIdent_65194 = 0;
+			while true do
+				if (FlatIdent_65194 == 0) then
+					if instance:IsA("BasePart") then
+						return instance;
+					end
+					for _, descendant in ipairs(instance:GetDescendants()) do
+						if descendant:IsA("BasePart") then
+							return descendant;
+						end
+					end
+					break;
+				end
+			end
+		end
+		local function IsValidRegisterTarget(instance)
+			local FlatIdent_86E18 = 0;
+			local typeAttr;
+			while true do
+				if (FlatIdent_86E18 == 0) then
+					typeAttr = instance:GetAttribute("gizmoType");
+					return typeAttr == "Register";
+				end
+			end
+		end
+		local function FindClosestRegisterTarget()
+			local minDistance = math.huge;
+			local closestPart = nil;
+			for _, item in ipairs(GizmoFolder:GetChildren()) do
+				if IsValidRegisterTarget(item) then
+					local FlatIdent_C595 = 0;
+					local part;
+					while true do
+						if (FlatIdent_C595 == 0) then
+							part = GetBasePart(item);
+							if part then
+								local FlatIdent_6147E = 0;
+								local dist;
+								while true do
+									if (FlatIdent_6147E == 0) then
+										dist = (RootPart.Position - part.Position).Magnitude;
+										if (dist < minDistance) then
+											local FlatIdent_1E5DB = 0;
+											while true do
+												if (FlatIdent_1E5DB == 0) then
+													closestPart = part;
+													minDistance = dist;
+													break;
+												end
+											end
+										end
+										break;
+									end
+								end
+							end
+							break;
+						end
+					end
+				end
+			end
+			return closestPart;
+		end
+		local function TeleportTo(target)
+			if (typeof(target) ~= "Instance") then
+				if (typeof(target) == "Vector3") then
+					RootPart.CFrame = CFrame.new(target);
+				end
+			else
+				RootPart.CFrame = target.CFrame * CFrame.new(0, 5, 0);
+			end
+		end
+		local function SpamInteract(duration)
+			local FlatIdent_1E4CB = 0;
+			local start;
+			while true do
+				if (FlatIdent_1E4CB == 0) then
+					start = tick();
+					while (tick() - start) < duration do
+						local FlatIdent_1D701 = 0;
+						while true do
+							if (FlatIdent_1D701 == 0) then
+								game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.E, false, game);
+								game:GetService("VirtualInputManager"):SendKeyEvent(false, Enum.KeyCode.E, false, game);
+								FlatIdent_1D701 = 1;
+							end
+							if (1 == FlatIdent_1D701) then
+								task.wait(0.05);
+								break;
+							end
+						end
+					end
+					break;
+				end
+			end
+		end
+		local function ProcessRegisterCollection(targetPart)
+			local start = tick();
+			local maxWait = 2;
+			while ((tick() - start) < maxWait) and targetPart.Parent and not targetPart:GetAttribute("Collected") do
+				task.wait(0.1);
+			end
+			SpamInteract(1.2);
+		end
+		task.spawn(function()
+			while AutoRegister do
+				local FlatIdent_6066D = 0;
+				local target;
+				while true do
+					if (FlatIdent_6066D == 0) then
+						target = FindClosestRegisterTarget();
+						if target then
+							local FlatIdent_77529 = 0;
+							while true do
+								if (FlatIdent_77529 == 2) then
+									TimeElapsedRegister = 0;
+									break;
+								end
+								if (0 == FlatIdent_77529) then
+									TeleportTo(target);
+									task.wait(0.3);
+									FlatIdent_77529 = 1;
+								end
+								if (1 == FlatIdent_77529) then
+									SpamInteract(1.2);
+									ProcessRegisterCollection(target);
+									FlatIdent_77529 = 2;
+								end
+							end
+						else
+							TimeElapsedRegister = TimeElapsedRegister + 0.7;
+							TeleportTo(RegisterPatrolPoints[math.random(1, #RegisterPatrolPoints)]);
+							if (TimeoutThresholdRegister <= TimeElapsedRegister) then
+								TimeElapsedRegister = 0;
+							end
+						end
+						FlatIdent_6066D = 1;
+					end
+					if (FlatIdent_6066D == 1) then
+						task.wait(0.7);
+						break;
+					end
+				end
+			end
+		end);
+	end
+end});
+local AutoPickupBox = Tabs.Main:AddLeftGroupbox("自动拾取");
+local AutoGold = false;
+AutoPickupBox:AddToggle("自动拾取金条", {Text="自动拾取金条",Default=AutoGold,Callback=function(Value)
+	AutoGold = Value;
+	if Value then
+		task.spawn(function()
+			local FlatIdent_A446 = 0;
+			local GetRootPart;
+			while true do
+				if (FlatIdent_A446 == 1) then
+					while AutoGold do
+						local RootPart = GetRootPart();
+						local White = workspace:FindFirstChild("Local") and workspace.Local:FindFirstChild("Gizmos") and workspace.Local.Gizmos:FindFirstChild("White");
+						if (White and RootPart) then
+							for _, Item in ipairs(White:GetChildren()) do
+								if ((Item.Name == "Gold Bar") and AutoGold) then
+									local Target = Item.PrimaryPart or Item:FindFirstChildWhichIsA("BasePart", true);
+									if Target then
+										RootPart.CFrame = Target.CFrame * CFrame.new(0, 0, -2.5);
+										task.wait(0.2);
+										game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.E, false, game);
+										task.wait(0.05);
+										game:GetService("VirtualInputManager"):SendKeyEvent(false, Enum.KeyCode.E, false, game);
+										repeat
+											task.wait(0.1);
+										until not Item.Parent or not AutoGold 
+									end
+								end
+								if not AutoGold then
+									break;
+								end
+							end
+						end
+						task.wait(0.5);
+					end
+					break;
+				end
+				if (FlatIdent_A446 == 0) then
+					GetRootPart = nil;
+					function GetRootPart()
+						local FlatIdent_14454 = 0;
+						local Character;
+						while true do
+							if (FlatIdent_14454 == 0) then
+								Character = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait();
+								return Character:WaitForChild("HumanoidRootPart", 5);
+							end
+						end
+					end
+					FlatIdent_A446 = 1;
+				end
+			end
+		end);
+	end
+end});
+local AutoWorldItem = false;
+AutoPickupBox:AddToggle("自动拾取礼物盒", {Text="自动拾取礼物盒",Default=AutoWorldItem,Callback=function(Value)
+	local FlatIdent_3831 = 0;
+	while true do
+		if (FlatIdent_3831 == 0) then
+			AutoWorldItem = Value;
+			if Value then
+				task.spawn(function()
+					local FlatIdent_21E03 = 0;
+					local GetRootPart;
+					while true do
+						if (FlatIdent_21E03 == 1) then
+							while AutoWorldItem do
+								local FlatIdent_8239F = 0;
+								local RootPart;
+								local White;
+								while true do
+									if (FlatIdent_8239F == 1) then
+										if (White and RootPart) then
+											for _, Item in ipairs(White:GetChildren()) do
+												if ((Item.Name == "WorldItem") and AutoWorldItem) then
+													local Target = Item.PrimaryPart or Item:FindFirstChildWhichIsA("BasePart", true);
+													if Target then
+														local FlatIdent_8A8EC = 0;
+														while true do
+															if (0 == FlatIdent_8A8EC) then
+																RootPart.CFrame = Target.CFrame * CFrame.new(0, 0, -2.5);
+																task.wait(0.2);
+																FlatIdent_8A8EC = 1;
+															end
+															if (2 == FlatIdent_8A8EC) then
+																game:GetService("VirtualInputManager"):SendKeyEvent(false, Enum.KeyCode.E, false, game);
+																repeat
+																	task.wait(0.1);
+																until not Item.Parent or not AutoWorldItem 
+																break;
+															end
+															if (FlatIdent_8A8EC == 1) then
+																game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.E, false, game);
+																task.wait(0.05);
+																FlatIdent_8A8EC = 2;
+															end
+														end
+													end
+												end
+												if not AutoWorldItem then
+													break;
+												end
+											end
+										end
+										task.wait(0.5);
+										break;
+									end
+									if (0 == FlatIdent_8239F) then
+										RootPart = GetRootPart();
+										White = workspace:FindFirstChild("Local") and workspace.Local:FindFirstChild("Gizmos") and workspace.Local.Gizmos:FindFirstChild("White");
+										FlatIdent_8239F = 1;
+									end
+								end
+							end
+							break;
+						end
+						if (FlatIdent_21E03 == 0) then
+							GetRootPart = nil;
+							function GetRootPart()
+								local FlatIdent_2C7C4 = 0;
+								local Character;
+								while true do
+									if (FlatIdent_2C7C4 == 0) then
+										Character = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait();
+										return Character:WaitForChild("HumanoidRootPart", 5);
+									end
+								end
+							end
+							FlatIdent_21E03 = 1;
+						end
+					end
+				end);
+			else
+				print("礼物盒：关闭");
+			end
+			break;
+		end
+	end
+end});
+local LocationTeleportBox = Tabs.Main:AddRightGroupbox("地点传送");
+LocationTeleportBox:AddButton("奥菲的价值兑换", function()
+	local FlatIdent_40FD3 = 0;
+	local p;
+	local c;
+	local h;
+	while true do
+		if (FlatIdent_40FD3 == 1) then
+			h = c:WaitForChild("HumanoidRootPart");
+			h.CFrame = CFrame.new(-2907.68848, 37.1002731, 1444.74817, 0.848566413, 3.9380446e-8, -0.529088855, -1.774107e-8, 1, 4.5977092e-8, 0.529088855, -2.962804e-8, 0.848566413);
+			FlatIdent_40FD3 = 2;
+		end
+		if (FlatIdent_40FD3 == 2) then
+			Library:Notify({Title="传送成功",Content="已传送到奥菲的价值兑换",Duration=2,Icon="check"});
+			break;
+		end
+		if (FlatIdent_40FD3 == 0) then
+			p = game.Players.LocalPlayer;
+			c = p.Character or p.CharacterAdded:Wait();
+			FlatIdent_40FD3 = 1;
+		end
+	end
+end);
+LocationTeleportBox:AddButton("绿洲银行", function()
+	local p = game.Players.LocalPlayer;
+	local c = p.Character or p.CharacterAdded:Wait();
+	local h = c:WaitForChild("HumanoidRootPart");
+	h.CFrame = CFrame.new(-431.537354, 39.6113892, -1400.08313, -0.901108384, -1.61008e-8, -0.433593899, -5.2681104e-9, 1, -2.618487e-8, 0.433593899, -2.1311186e-8, -0.901108384);
+	Library:Notify({Title="传送成功",Content="已传送到绿洲银行",Duration=2,Icon="check"});
+end);
+LocationTeleportBox:AddButton("绿洲城警察", function()
+	local FlatIdent_74B46 = 0;
+	local p;
+	local c;
+	local h;
+	while true do
+		if (FlatIdent_74B46 == 0) then
+			p = game.Players.LocalPlayer;
+			c = p.Character or p.CharacterAdded:Wait();
+			FlatIdent_74B46 = 1;
+		end
+		if (FlatIdent_74B46 == 2) then
+			Library:Notify({Title="传送成功",Content="已传送到绿洲城警察",Duration=2,Icon="check"});
+			break;
+		end
+		if (FlatIdent_74B46 == 1) then
+			h = c:WaitForChild("HumanoidRootPart");
+			h.CFrame = CFrame.new(2578.02393, 119.169289, -718.579773, -0.395326763, -5.9598324e-8, -0.918540537, -9.65633e-9, 1, -5.232432e-8, 0.918540537, 7.947669e-8, -0.395326763);
+			FlatIdent_74B46 = 2;
+		end
+	end
+end);
+LocationTeleportBox:AddButton("金库", function()
+	local FlatIdent_559FF = 0;
+	local p;
+	local c;
+	local h;
+	while true do
+		if (FlatIdent_559FF == 1) then
+			h = c:WaitForChild("HumanoidRootPart");
+			h.CFrame = CFrame.new(-400.492279, 163.151733, -1242.72632, -0.912052214, -1.09039995e-8, -0.410074085, 1.4650267e-8, 1, -5.9174205e-8, 0.410074085, -5.997766e-8, -0.912052214);
+			FlatIdent_559FF = 2;
+		end
+		if (FlatIdent_559FF == 2) then
+			Library:Notify({Title="传送成功",Content="已传送到金库",Duration=2,Icon="check"});
+			break;
+		end
+		if (FlatIdent_559FF == 0) then
+			p = game.Players.LocalPlayer;
+			c = p.Character or p.CharacterAdded:Wait();
+			FlatIdent_559FF = 1;
+		end
+	end
+end);
+LocationTeleportBox:AddButton("犯罪基地", function()
+	local FlatIdent_340E5 = 0;
+	local p;
+	local c;
+	local h;
+	while true do
+		if (FlatIdent_340E5 == 2) then
+			Library:Notify({Title="传送成功",Content="已传送到犯罪基地",Duration=2,Icon="check"});
+			break;
+		end
+		if (FlatIdent_340E5 == 1) then
+			h = c:WaitForChild("HumanoidRootPart");
+			h.CFrame = CFrame.new(-5981.50586, 37.2680244, 1245.22046, -0.733384013, -3.6538985e-8, -0.679814577, -1.7351333e-8, 1, -3.502984e-8, 0.679814577, -1.38946366e-8, -0.733384013);
+			FlatIdent_340E5 = 2;
+		end
+		if (FlatIdent_340E5 == 0) then
+			p = game.Players.LocalPlayer;
+			c = p.Character or p.CharacterAdded:Wait();
+			FlatIdent_340E5 = 1;
+		end
+	end
+end);
+LocationTeleportBox:AddButton("烈焰要塞", function()
+	local FlatIdent_73F66 = 0;
+	local p;
+	local c;
+	local h;
+	while true do
+		if (FlatIdent_73F66 == 1) then
+			h = c:WaitForChild("HumanoidRootPart");
+			h.CFrame = CFrame.new(-1494.58496, 41.16481, 3364.56055, 0.961387396, 1.07588015e-7, 0.275198698, -9.5233396e-8, 1, -5.8255473e-8, -0.275198698, 2.97983e-8, 0.961387396);
+			FlatIdent_73F66 = 2;
+		end
+		if (FlatIdent_73F66 == 2) then
+			Library:Notify({Title="传送成功",Content="已传送到烈焰要塞",Duration=2,Icon="check"});
+			break;
+		end
+		if (FlatIdent_73F66 == 0) then
+			p = game.Players.LocalPlayer;
+			c = p.Character or p.CharacterAdded:Wait();
+			FlatIdent_73F66 = 1;
+		end
+	end
+end);
+local PlayerTeleportBox = Tabs.Main:AddLeftGroupbox("玩家传送");
+local TargetPlayerName = "";
+local TeleportPosition = "前方";
+PlayerTeleportBox:AddInput("输入玩家用户名", {Text="玩家名称",Default="",Placeholder="输入玩家名称",Callback=function(Value)
+	TargetPlayerName = Value;
+end});
+PlayerTeleportBox:AddDropdown("传送部位", {Values={"前方","后方","头顶","左侧","右侧"},Default=1,Multi=false,Callback=function(Value)
+	TeleportPosition = Value;
+end});
+PlayerTeleportBox:AddButton("传送一次", function()
+	if (TargetPlayerName and (TargetPlayerName ~= "") and TeleportPosition) then
+		local targetPlayer = game.Players:FindFirstChild(TargetPlayerName);
+		if (targetPlayer and (targetPlayer ~= game.Players.LocalPlayer)) then
+			if (targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart")) then
+				local p = game.Players.LocalPlayer;
+				local c = p.Character or p.CharacterAdded:Wait();
+				local h = c:WaitForChild("HumanoidRootPart");
+				local targetCFrame = targetPlayer.Character.HumanoidRootPart.CFrame;
+				if (TeleportPosition == "前方") then
+					h.CFrame = targetCFrame * CFrame.new(0, 0, -5);
+				elseif (TeleportPosition == "后方") then
+					h.CFrame = targetCFrame * CFrame.new(0, 0, 5);
+				elseif (TeleportPosition == "头顶") then
+					h.CFrame = targetCFrame * CFrame.new(0, 5, 0);
+				elseif (TeleportPosition == "左侧") then
+					h.CFrame = targetCFrame * CFrame.new(-5, 0, 0);
+				elseif (TeleportPosition == "右侧") then
+					h.CFrame = targetCFrame * CFrame.new(5, 0, 0);
+				end
+				Library:Notify({Title="传送成功",Content=("已传送到玩家 " .. TargetPlayerName .. " 的" .. TeleportPosition),Duration=2,Icon="check"});
+			else
+				Library:Notify({Title="传送失败",Content="目标玩家没有角色或缺少HumanoidRootPart",Duration=2,Icon="x"});
+			end
+		else
+			Library:Notify({Title="传送失败",Content="未找到玩家或玩家无效",Duration=2,Icon="x"});
+		end
+	else
+		Library:Notify({Title="传送失败",Content="请输入玩家名称并选择传送位置",Duration=2,Icon="x"});
+	end
+end);
+local FixedTeleport = false;
+PlayerTeleportBox:AddToggle("固定传送", {Text="固定传送",Default=false,Callback=function(Value)
+	FixedTeleport = Value;
+	if Value then
+		task.spawn(function()
+			while FixedTeleport do
+				local FlatIdent_5C0FA = 0;
+				while true do
+					if (FlatIdent_5C0FA == 0) then
+						if (TargetPlayerName and (TargetPlayerName ~= "") and TeleportPosition) then
+							local targetPlayer = game.Players:FindFirstChild(TargetPlayerName);
+							if (targetPlayer and (targetPlayer ~= game.Players.LocalPlayer)) then
+								if (targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart")) then
+									local FlatIdent_2C453 = 0;
+									local p;
+									local c;
+									local h;
+									local targetCFrame;
+									while true do
+										if (FlatIdent_2C453 == 0) then
+											p = game.Players.LocalPlayer;
+											c = p.Character or p.CharacterAdded:Wait();
+											FlatIdent_2C453 = 1;
+										end
+										if (FlatIdent_2C453 == 1) then
+											h = c:WaitForChild("HumanoidRootPart");
+											targetCFrame = targetPlayer.Character.HumanoidRootPart.CFrame;
+											FlatIdent_2C453 = 2;
+										end
+										if (FlatIdent_2C453 == 2) then
+											if (TeleportPosition == "前方") then
+												h.CFrame = targetCFrame * CFrame.new(0, 0, -5);
+											elseif (TeleportPosition == "后方") then
+												h.CFrame = targetCFrame * CFrame.new(0, 0, 5);
+											elseif (TeleportPosition == "头顶") then
+												h.CFrame = targetCFrame * CFrame.new(0, 5, 0);
+											elseif (TeleportPosition == "左侧") then
+												h.CFrame = targetCFrame * CFrame.new(-5, 0, 0);
+											elseif (TeleportPosition == "右侧") then
+												h.CFrame = targetCFrame * CFrame.new(5, 0, 0);
+											end
+											break;
+										end
+									end
+								end
+							end
+						end
+						task.wait(0.1);
+						break;
+					end
+				end
+			end
+		end);
+	end
+end});
+local BypassGroup = Tabs.Main:AddLeftGroupbox("绕过类");
+local WeaponModGroup = Tabs.Main:AddLeftGroupbox("武器修改");
+local AimBotGroup = Tabs.Main:AddRightGroupbox("自瞄功能");
+local ESPGroup = Tabs.Main:AddRightGroupbox("透视功能");
+local ImmuneTurret = false;
+BypassGroup:AddToggle("绕过炮塔伤害", {Text="绕过炮塔伤害",Default=ImmuneTurret,Callback=function(v)
+	local FlatIdent_2C195 = 0;
+	while true do
+		if (FlatIdent_2C195 == 0) then
+			ImmuneTurret = v;
+			if v then
+				local oldFireServer = game:GetService("ReplicatedStorage").Shared.Core.Network.FireServer;
+				game:GetService("ReplicatedStorage").Shared.Core.Network.FireServer = function(self, event, ...)
+					local FlatIdent_8770C = 0;
+					while true do
+						if (FlatIdent_8770C == 0) then
+							if ((event == "registerLocalHit") and (... == "Turret")) then
+								return nil;
+							end
+							return oldFireServer(self, event, ...);
+						end
+					end
+				end;
+			else
+			end
+			break;
+		end
+	end
+end});
+WeaponModGroup:AddButton("无限子弹", function()
+	local Shooter = require(game:GetService("ReplicatedStorage").Client.Wanted.Objects.ClientTool.Components.Guns.Shooter);
+	local originalShoot = Shooter._shoot;
+	Shooter._shoot = function(self)
+		local FlatIdent_6F3E4 = 0;
+		while true do
+			if (FlatIdent_6F3E4 == 0) then
+				self.ammo = 9999;
+				self.totalAmmo = 9999;
+				FlatIdent_6F3E4 = 1;
+			end
+			if (FlatIdent_6F3E4 == 1) then
+				return originalShoot(self);
+			end
+		end
+	end;
+	Library:Notify({Title="成功",Content="无限子弹已启用",Duration=2,Icon="check"});
+end);
+WeaponModGroup:AddButton("无后坐力", function()
+	local FlatIdent_C342 = 0;
+	local Shooter;
+	local originalShoot;
+	while true do
+		if (1 == FlatIdent_C342) then
+			Shooter._shoot = function(self)
+				local FlatIdent_480B4 = 0;
+				while true do
+					if (FlatIdent_480B4 == 0) then
+						self.recoil = {firstShotKick=0,climb=0,spread=0};
+						return originalShoot(self);
+					end
+				end
+			end;
+			Library:Notify({Title="成功",Content="无后坐力已启用",Duration=2,Icon="check"});
+			break;
+		end
+		if (FlatIdent_C342 == 0) then
+			Shooter = require(game:GetService("ReplicatedStorage").Client.Wanted.Objects.ClientTool.Components.Guns.Shooter);
+			originalShoot = Shooter._shoot;
+			FlatIdent_C342 = 1;
+		end
+	end
+end);
+WeaponModGroup:AddButton("无扩散", function()
+	local FlatIdent_851CE = 0;
+	local Shooter;
+	local originalShoot;
+	while true do
+		if (FlatIdent_851CE == 0) then
+			Shooter = require(game:GetService("ReplicatedStorage").Client.Wanted.Objects.ClientTool.Components.Guns.Shooter);
+			originalShoot = Shooter._shoot;
+			FlatIdent_851CE = 1;
+		end
+		if (FlatIdent_851CE == 1) then
+			Shooter._shoot = function(self)
+				local FlatIdent_82AB4 = 0;
+				while true do
+					if (FlatIdent_82AB4 == 0) then
+						self.aim = {spreadAngle=0,zeroing=1000};
+						return originalShoot(self);
+					end
+				end
+			end;
+			Library:Notify({Title="成功",Content="无扩散已启用",Duration=2,Icon="check"});
+			break;
+		end
+	end
+end);
+WeaponModGroup:AddButton("快速射击", function()
+	local Shooter = require(game:GetService("ReplicatedStorage").Client.Wanted.Objects.ClientTool.Components.Guns.Shooter);
+	local originalShoot = Shooter._shoot;
+	Shooter._shoot = function(self)
+		local FlatIdent_97E60 = 0;
+		while true do
+			if (0 == FlatIdent_97E60) then
+				self.tool.fireDebounce = 0;
+				self.tool.fireMode = "auto";
+				FlatIdent_97E60 = 1;
+			end
+			if (FlatIdent_97E60 == 1) then
+				return originalShoot(self);
+			end
+		end
+	end;
+	Library:Notify({Title="成功",Content="快速射击已启用",Duration=2,Icon="check"});
+end);
+WeaponModGroup:AddButton("无装弹", function()
+	local Shooter = require(game:GetService("ReplicatedStorage").Client.Wanted.Objects.ClientTool.Components.Guns.Shooter);
+	local originalShoot = Shooter._shoot;
+	Shooter._shoot = function(self)
+		local FlatIdent_8CF9A = 0;
+		while true do
+			if (0 == FlatIdent_8CF9A) then
+				self.ammoData = {reloadTime=0,magSize=9999};
+				return originalShoot(self);
+			end
+		end
+	end;
+	Library:Notify({Title="成功",Content="无装弹已启用",Duration=2,Icon="check"});
+end);
+local isAiming = false;
+local isPredicting = false;
+local fov = 50;
+local plr = game:GetService("Players").LocalPlayer;
+local RunService = game:GetService("RunService");
+local Cam = workspace.CurrentCamera;
+local targetPart = "Head";
+local teamCheck = false;
+local aliveCheck = false;
+local smoothness = 0.5;
+local aimStyle = "平滑";
+local isSilentAim = false;
+local silentFov = 30;
+local isAutoShootOnAim = false;
+local shootDelay = 0.1;
+local lastShotTime = 0;
+local FOVring = Drawing.new("Circle");
+FOVring.Visible = false;
+FOVring.Thickness = 2;
+FOVring.Color = Color3.fromRGB(255, 0, 0);
+FOVring.Filled = false;
+FOVring.Radius = fov;
+FOVring.Position = Vector2.new(Cam.ViewportSize.X / 2, Cam.ViewportSize.Y / 2);
+local aimConnection = nil;
+local ShooterModule = nil;
+local OriginalShoot = nil;
+local autoShootConnection = nil;
+local isAutoShootingActive = false;
+local function getClosestPlayerInFOV()
+	local nearest = nil;
+	local lastDistance = math.huge;
+	local playerMousePos = Vector2.new(Cam.ViewportSize.X / 2, Cam.ViewportSize.Y / 2);
+	local fovToUse = fov;
+	for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+		if (player ~= plr) then
+			local FlatIdent_2458 = 0;
+			local character;
+			while true do
+				if (FlatIdent_2458 == 1) then
+					if (character and character:FindFirstChild(targetPart)) then
+						if (aliveCheck and (not character:FindFirstChildOfClass("Humanoid") or (character:FindFirstChildOfClass("Humanoid").Health <= 0))) then
+							continue;
+						end
+						local part = character[targetPart];
+						local ePos, isVisible = Cam:WorldToViewportPoint(part.Position);
+						local screenDistance = (Vector2.new(ePos.x, ePos.y) - playerMousePos).Magnitude;
+						if ((screenDistance < fovToUse) and isVisible) then
+							if (screenDistance < lastDistance) then
+								local FlatIdent_38BA4 = 0;
+								while true do
+									if (FlatIdent_38BA4 == 0) then
+										lastDistance = screenDistance;
+										nearest = player;
+										break;
+									end
+								end
+							end
+						end
+					end
+					break;
+				end
+				if (FlatIdent_2458 == 0) then
+					if (teamCheck and (player.Team == plr.Team)) then
+						continue;
+					end
+					character = player.Character;
+					FlatIdent_2458 = 1;
+				end
+			end
+		end
+	end
+	return nearest;
+end
+local function smartAimAt(targetPosition)
+	local FlatIdent_8EF6C = 0;
+	local currentCFrame;
+	local targetDirection;
+	while true do
+		if (1 == FlatIdent_8EF6C) then
+			if (aimStyle == "平滑") then
+				local FlatIdent_1BD19 = 0;
+				local smoothFactor;
+				local lookVector;
+				while true do
+					if (FlatIdent_1BD19 == 0) then
+						smoothFactor = smoothness;
+						lookVector = currentCFrame.LookVector:Lerp(targetDirection, smoothFactor);
+						FlatIdent_1BD19 = 1;
+					end
+					if (FlatIdent_1BD19 == 1) then
+						Cam.CFrame = CFrame.new(currentCFrame.Position, currentCFrame.Position + lookVector);
+						break;
+					end
+				end
+			else
+				Cam.CFrame = CFrame.new(currentCFrame.Position, currentCFrame.Position + targetDirection);
+			end
+			break;
+		end
+		if (0 == FlatIdent_8EF6C) then
+			currentCFrame = Cam.CFrame;
+			targetDirection = (targetPosition - currentCFrame.Position).Unit;
+			FlatIdent_8EF6C = 1;
+		end
+	end
+end
+local function aimLoop()
+	local FlatIdent_4CEEC = 0;
+	local target;
+	while true do
+		if (FlatIdent_4CEEC == 1) then
+			target = getClosestPlayerInFOV();
+			if (target and target.Character and target.Character:FindFirstChild(targetPart)) then
+				local FlatIdent_1F33B = 0;
+				local part;
+				while true do
+					if (FlatIdent_1F33B == 1) then
+						if (isAutoShootOnAim and ((tick() - lastShotTime) > shootDelay)) then
+							local tool = plr.Character and plr.Character:FindFirstChildWhichIsA("Tool");
+							if tool then
+								lastShotTime = tick();
+							end
+						end
+						break;
+					end
+					if (FlatIdent_1F33B == 0) then
+						part = target.Character[targetPart];
+						smartAimAt(part.Position);
+						FlatIdent_1F33B = 1;
+					end
+				end
+			end
+			break;
+		end
+		if (FlatIdent_4CEEC == 0) then
+			if not isAiming then
+				return;
+			end
+			FOVring.Position = Vector2.new(Cam.ViewportSize.X / 2, Cam.ViewportSize.Y / 2);
+			FlatIdent_4CEEC = 1;
+		end
+	end
+end
+AimBotGroup:AddToggle("开启自瞄", {Text="开启自瞄",Default=false,Callback=function(v)
+	local FlatIdent_53252 = 0;
+	while true do
+		if (FlatIdent_53252 == 0) then
+			isAiming = v;
+			FOVring.Visible = v;
+			FlatIdent_53252 = 1;
+		end
+		if (FlatIdent_53252 == 1) then
+			if v then
+				local FlatIdent_25061 = 0;
+				while true do
+					if (FlatIdent_25061 == 0) then
+						if aimConnection then
+							aimConnection:Disconnect();
+						end
+						aimConnection = RunService.RenderStepped:Connect(aimLoop);
+						break;
+					end
+				end
+			elseif aimConnection then
+				aimConnection:Disconnect();
+				aimConnection = nil;
+			end
+			break;
+		end
+	end
+end});
+AimBotGroup:AddToggle("瞄准时自动射击", {Text="瞄准时自动射击",Default=false,Callback=function(v)
+	isAutoShootOnAim = v;
+end});
+AimBotGroup:AddDropdown("瞄准身体部位", {Values={"头","胸","左手","右手","左腿","右腿"},Default=1,Callback=function(v)
+	local FlatIdent_79884 = 0;
+	local partMap;
+	while true do
+		if (FlatIdent_79884 == 0) then
+			partMap = {["头"]="Head",["胸"]="UpperTorso",["左手"]="LeftHand",["右手"]="RightHand",["左腿"]="LeftFoot",["右腿"]="RightFoot"};
+			targetPart = partMap[v];
+			break;
+		end
+	end
+end});
+AimBotGroup:AddSlider("FOV范围", {Text="FOV范围",Min=1,Max=500,Default=50,Rounding=0,Callback=function(v)
+	local FlatIdent_5D0DC = 0;
+	while true do
+		if (FlatIdent_5D0DC == 0) then
+			fov = v;
+			FOVring.Radius = v;
+			break;
+		end
+	end
+end});
+AimBotGroup:AddSlider("平滑度", {Text="平滑度",Min=0.01,Max=1,Default=0.5,Rounding=2,Callback=function(v)
+	smoothness = v;
+end});
+AimBotGroup:AddToggle("团队检查", {Text="团队检查",Default=false,Callback=function(v)
+	teamCheck = v;
+end});
+AimBotGroup:AddToggle("活体检测", {Text="活体检测",Default=false,Callback=function(v)
+	aliveCheck = v;
+end});
+local ESPEnabled = false;
+local ShowBox = false;
+local ShowHealth = false;
+local ShowName = false;
+local ShowDistance = false;
+local ShowTracer = false;
+local ShowSkeleton = false;
+local ShowRadar = false;
+local ShowPlayerCount = false;
+local ShowWeapon = false;
+local ShowFOV = false;
+local OutOfViewArrows = false;
+local Chams = false;
+local TeamCheckESP = false;
+local ESPComponents = {};
+local espConnection = nil;
+local function updateESP()
+	local FlatIdent_54124 = 0;
+	while true do
+		if (FlatIdent_54124 == 0) then
+			if not ESPEnabled then
+				return;
+			end
+			for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+				if (player == plr) then
+					continue;
+				end
+				if (TeamCheckESP and (player.Team == plr.Team)) then
+					continue;
+				end
+				local character = player.Character;
+				if not character then
+					continue;
+				end
+				local humanoid = character:FindFirstChildOfClass("Humanoid");
+				if (not humanoid or (humanoid.Health <= 0)) then
+					continue;
+				end
+				local hrp = character:FindFirstChild("HumanoidRootPart");
+				if not hrp then
+					continue;
+				end
+				local position, onScreen = Cam:WorldToViewportPoint(hrp.Position);
+				if onScreen then
+				end
+			end
+			break;
+		end
+	end
+end
+ESPGroup:AddToggle("启用ESP", {Text="启用ESP",Default=false,Callback=function(v)
+	ESPEnabled = v;
+	if v then
+		local FlatIdent_68E5B = 0;
+		while true do
+			if (FlatIdent_68E5B == 0) then
+				if espConnection then
+					espConnection:Disconnect();
+				end
+				espConnection = RunService.RenderStepped:Connect(updateESP);
+				break;
+			end
+		end
+	elseif espConnection then
+		local FlatIdent_70C30 = 0;
+		while true do
+			if (FlatIdent_70C30 == 0) then
+				espConnection:Disconnect();
+				espConnection = nil;
+				break;
+			end
+		end
+	end
+end});
+ESPGroup:AddToggle("显示方框", {Text="显示方框",Default=false,Callback=function(v)
+	ShowBox = v;
+end});
+ESPGroup:AddToggle("显示血量", {Text="显示血量",Default=false,Callback=function(v)
+	ShowHealth = v;
+end});
+ESPGroup:AddToggle("显示名称", {Text="显示名称",Default=false,Callback=function(v)
+	ShowName = v;
+end});
+ESPGroup:AddToggle("显示距离", {Text="显示距离",Default=false,Callback=function(v)
+	ShowDistance = v;
+end});
+ESPGroup:AddToggle("显示骨骼", {Text="显示骨骼",Default=false,Callback=function(v)
+	ShowSkeleton = v;
+end});
+ESPGroup:AddToggle("团队检查", {Text="团队检查",Default=false,Callback=function(v)
+	TeamCheckESP = v;
+end});
+local function cleanup()
+	local FlatIdent_6719E = 0;
+	while true do
+		if (FlatIdent_6719E == 1) then
+			if espConnection then
+				local FlatIdent_2C1E9 = 0;
+				while true do
+					if (FlatIdent_2C1E9 == 0) then
+						espConnection:Disconnect();
+						espConnection = nil;
+						break;
+					end
+				end
+			end
+			break;
+		end
+		if (FlatIdent_6719E == 0) then
+			if aimConnection then
+				local FlatIdent_14A42 = 0;
+				while true do
+					if (FlatIdent_14A42 == 0) then
+						aimConnection:Disconnect();
+						aimConnection = nil;
+						break;
+					end
+				end
+			end
+			if FOVring then
+				FOVring:Remove();
+			end
+			FlatIdent_6719E = 1;
+		end
+	end
+end
+game:GetService("Players").LocalPlayer.CharacterAdded:Connect(function()
+	local FlatIdent_259C6 = 0;
+	while true do
+		if (FlatIdent_259C6 == 0) then
+			if isAiming then
+				local FlatIdent_3E76B = 0;
+				while true do
+					if (0 == FlatIdent_3E76B) then
+						task.wait(1);
+						if not aimConnection then
+							aimConnection = RunService.RenderStepped:Connect(aimLoop);
+						end
+						break;
+					end
+				end
+			end
+			if (ESPEnabled and not espConnection) then
+				espConnection = RunService.RenderStepped:Connect(updateESP);
+			end
+			break;
+		end
+	end
+end);
+game:GetService("CoreGui").ChildRemoved:Connect(function(child)
+	if ((child.Name == "CloudHub") or child.Name:find("Obsidian")) then
+		cleanup();
+	end
+end);
+ThemeManager:SetLibrary(Library);
+SaveManager:SetLibrary(Library);
+SaveManager:IgnoreThemeSettings();
+SaveManager:SetIgnoreIndexes({"MenuKeybind"});
+SaveManager:SetFolder("UniversalSilentAim/Configs");
+SaveManager:BuildConfigSection(Tabs["UI Settings"]);
+ThemeManager:ApplyToTab(Tabs["UI Settings"]);
+SaveManager:LoadAutoloadConfig();
