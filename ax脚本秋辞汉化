@@ -1,6 +1,5 @@
-do
-    local Translations = {
-        ["Toggle"]="开关",
+local Translations = {
+    ["Toggle"]="开关",
         ["AX-SCRIPTS"]="Ax <font color='#7FC8F0'>有</font><font color='#74C0EB'>芙</font><font color='#69B8E6'>同</font><font color='#5EB0E1'>享</font><font color='#53A8DC'>秋</font><font color='#48A0D7'>辞</font><font color='#3D98D2'>汉</font><font color='#3290CD'>化</font>", 
         ["Games"]="游戏",
         ["Combat"]="攻击",
@@ -633,131 +632,117 @@ do
         ["Auto-load"]="自动加载（加载出来不是汉化）"
     }
 
-    local sortedKeys = {}
-    for k in pairs(Translations) do
-        table.insert(sortedKeys, k)
+local function translateText(text)
+    if not text or type(text) ~= "string" then return text end
+    
+    if Translations[text] then
+        return Translations[text]
     end
-    table.sort(sortedKeys, function(a, b)
-        return #a > #b
-    end)
-
-    local function translateText(text)
-        if not text or type(text) ~= "string" or text == "" then
-            return text
+    
+    for en, cn in pairs(Translations) do
+        if text:find(en) then
+            return text:gsub(en, cn)
         end
+    end
+    
+    return text
+end
 
-        if Translations[text] then
-            return Translations[text]
-        end
-
-        local result = text
-        for _, en in ipairs(sortedKeys) do
-            if result:find(en, 1, true) then 
-                result = result:gsub(en, Translations[en], 1)
+local function setupTranslationEngine()
+    local success, err = pcall(function()
+        local oldIndex = getrawmetatable(game).__newindex
+        setreadonly(getrawmetatable(game), false)
+        
+        getrawmetatable(game).__newindex = newcclosure(function(t, k, v)
+            if (t:IsA("TextLabel") or t:IsA("TextButton") or t:IsA("TextBox")) and k == "Text" then
+                v = translateText(tostring(v))
             end
-        end
-        return result
-    end
-
-    local function isUITextObject(obj)
-        return obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox")
-    end
-
-    local function setupTranslationEngine()
-        local success, err = pcall(function()
-            local oldIndex = getrawmetatable(game).__newindex
-            setreadonly(getrawmetatable(game), false)
-
-            getrawmetatable(game).__newindex = newcclosure(function(t, k, v)
-                if isUITextObject(t) and k == "Text" then
-                    v = translateText(tostring(v))
-                end
-                return oldIndex(t, k, v)
-            end)
-
-            setreadonly(getrawmetatable(game), true)
+            return oldIndex(t, k, v)
         end)
-
-        if not success then
-            warn("元表劫持失败:", err)
-
-            local translatedCache = {} 
-
-            local function translateSingleObject(gui)
-                if not isUITextObject(gui) then
-                    return
-                end
-                local currentText = gui.Text
-                if not currentText or currentText == "" then
-                    return
-                end
-                local translatedText = translateText(currentText)
-
-                if translatedText ~= currentText then
-                    gui.Text = translatedText
-                    translatedCache[gui] = translatedText
-                end
-            end
-
-            local function scanAndTranslate()
-                local function scanGui(parent)
-                    for _, gui in ipairs(parent:GetDescendants()) do
-                        if isUITextObject(gui) then
-                            local currentText = gui.Text
-                            local cachedText = translatedCache[gui]
-
-                            if not cachedText or cachedText ~= currentText then
-                                translateSingleObject(gui)
+        
+        setreadonly(getrawmetatable(game), true)
+    end)
+    
+    if not success then
+        warn("元表劫持失败:", err)
+       
+        local translated = {}
+        local function scanAndTranslate()
+            for _, gui in ipairs(game:GetService("CoreGui"):GetDescendants()) do
+                if (gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox")) and not translated[gui] then
+                    pcall(function()
+                        local text = gui.Text
+                        if text and text ~= "" then
+                            local translatedText = translateText(text)
+                            if translatedText ~= text then
+                                gui.Text = translatedText
+                                translated[gui] = true
                             end
                         end
-                    end
-                end
-
-                pcall(scanGui, game:GetService("CoreGui"))
-                local player = game:GetService("Players").LocalPlayer
-                if player and player:FindFirstChild("PlayerGui") then
-                    pcall(scanGui, player.PlayerGui)
+                    end)
                 end
             end
-
-            local function setupDescendantListener(parent)
-                parent.DescendantAdded:Connect(function(descendant)
-                    if isUITextObject(descendant) then
-                        task.spawn(translateSingleObject, descendant)
-                    end
-                end)
-            end
-
-            pcall(setupDescendantListener, game:GetService("CoreGui"))
+            
             local player = game:GetService("Players").LocalPlayer
             if player and player:FindFirstChild("PlayerGui") then
-                pcall(setupDescendantListener, player.PlayerGui)
-            end
-
-            while task.wait(10) do
-                scanAndTranslate()
+                for _, gui in ipairs(player.PlayerGui:GetDescendants()) do
+                    if (gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox")) and not translated[gui] then
+                        pcall(function()
+                            local text = gui.Text
+                            if text and text ~= "" then
+                                local translatedText = translateText(text)
+                                if translatedText ~= text then
+                                    gui.Text = translatedText
+                                    translated[gui] = true
+                                end
+                            end
+                        end)
+                    end
+                end
             end
         end
-    end
-
-    local function loadExternalScript(url, maxRetries)
-        local retries = 0
-        while retries < maxRetries do
-            local success, err = pcall(function()
-                loadstring(game:HttpGet(url))()
+        
+        local function setupDescendantListener(parent)
+            parent.DescendantAdded:Connect(function(descendant)
+                if descendant:IsA("TextLabel") or descendant:IsA("TextButton") or descendant:IsA("TextBox") then
+                    task.wait(0.1)
+                    pcall(function()
+                        local text = descendant.Text
+                        if text and text ~= "" then
+                            local translatedText = translateText(text)
+                            if translatedText ~= text then
+                                descendant.Text = translatedText
+                            end
+                        end
+                    end)
+                end
             end)
-            if success then
-                return true
-            end
-            retries = retries + 1
-            warn("加载失败，重试中(" .. retries .. "/" .. maxRetries .. "):", err)
-            task.wait(2)
         end
-        warn("达到最大重试次数，加载失败")
-        return false
+        
+        pcall(setupDescendantListener, game:GetService("CoreGui"))
+        local player = game:GetService("Players").LocalPlayer
+        if player and player:FindFirstChild("PlayerGui") then
+            pcall(setupDescendantListener, player.PlayerGui)
+        end
+        
+        while true do
+            scanAndTranslate()
+            task.wait(3)
+        end
     end
+end
 
-    task.wait(2)
-    setupTranslationEngine()
-    loadExternalScript("https://officialaxscripts.vercel.app/scripts/AX-Loader.lua", 3)
+task.wait(2)
+
+setupTranslationEngine()
+
+local success, err = pcall(function()
+--这下面填加载外部脚本
+loadstring(game:HttpGet("https://rawscripts.net/raw/Ink-Game-AX-89692"))()
+
+
+end)
+
+if not success then
+    warn("加载失败:", err)
 end
