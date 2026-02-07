@@ -1,0 +1,219 @@
+do
+    local Translations = {
+        ["Ultimate Trolling Gui V5"] = "通用脚本 V5",
+        ["Main"] = "主界面",
+        ["Morphs"] = "变身",
+        ["GUI"] = "界面",
+        ["Tools"] = "工具",
+        ["Misc"] = "杂项",
+        ["Vehicles"] = "载具",
+        ["Weapons"] = "武器",
+        ["Made By Fancykid"] = "汉化-有芙同享",
+        ["Some Scripts By St1gma dud/Nicolasbarbosa323/EXPTR"] = "秋辞qq群938714427",
+        ["Template By 16VisionZX"] = "扫秋辞🦶八八",
+        ["Loaded"] = "已加载",
+        ["Ultimate Trolling Gui loaded successfully!"] = "脚本加载成功",
+        ["Follow me on tiktok (Not_Fancykid)"] = "关注秋辞（roblox）",
+        ["Ultimate Trolling Gui"] = "通用脚本里",
+        ["By FancyKid"] = "扫秋辞快叫88",
+        ["Rayfield UI"] = "Rayfield 界面",
+        ["Show Rayfield"] = "显示 Rayfield",
+        ["Krystal Dance"] = "水晶舞",
+        ["Neko"] = "猫娘",
+        ["Bomb Vest V1"] = "炸弹背心 V1",
+        ["Good cop bad cop"] = "警察",
+        ["Ban Hammer"] = "封禁锤",
+        ["MLG Gun"] = "炫酷枪械",
+        ["Nebula Star Glitcher"] = "星云星特效器",
+        ["Spectrum Star Glitcher"] = "光谱星特效器",
+        ["Grab Knife V4"] = "抓取刀 V4",
+        ["Grab Knife V3"] = "抓取刀 V3",
+        ["Ranenger Claws"] = "游侠利爪",
+        ["Dual Pink Guns"] = "双持粉枪",
+        ["Ronald McDonald"] = "麦当劳叔叔",
+        ["Pipe Bomb Launcher"] = "管道炸弹发射器",
+        ["Plasma Cutters"] = "等离子切割器",
+        ["Kitchen Gun"] = "厨房搞怪枪",
+        ["Bomb Vest V2"] = "炸弹背心 V2",
+        ["Galaxy Titan"] = "银河泰坦",
+        ["Steve"] = "史蒂夫",
+        ["Master Hand"] = "大师之手",
+        ["Xester"] = "西斯塔",
+        ["Vereus"] = "维鲁斯",
+        ["Goner"] = "消逝者",
+        ["Server Admin"] = "服务器管理员",
+        ["Thomas The Dank Engine"] = "搞怪托马斯引擎",
+        ["Robot"] = "机器人",
+        ["FPS Shotgun"] = "霰弹枪",
+        ["Big Smoke"] = "大烟哥",
+        ["Atlas"] = "阿特拉斯",
+        ["Dark Titan"] = "暗黑泰坦",
+        ["Explosive Robot"] = "爆炸机器人",
+        ["Sin Unleashed"] = "原罪释放",
+        ["Noob Bat"] = "新手棒球棒",
+        ["Bird Wings"] = "天使之翼",
+        ["Sin Dragon"] = "原罪之龙",
+        ["John Doe (Remake)"] = "无名氏（重制版）",
+        ["John Doe"] = "无名氏",
+        ["Project 2044033514 (Kinda Broken)"] = "项目 2044033514（有bug）",
+        ["9/11 Plane"] ="911飞机",
+        ["Guitar"] = "吉他",
+        ["Time Blast"] = "时间爆炸",
+        ["TF2 Spy"] = "军团要塞二 间谍",
+        ["Lightsaber (With Vest)"] = "光剑（带背心）",
+        ["Book Of Wisdom"] = "智慧之书",
+        ["button"] = "按钮",
+        ["COOlgui"] = "酷小孩",
+        ["TOPK3K V3"] = "TOPK3K V3",
+        ["TOPK3K V4"] = "TOPK3K V4",
+        ["Jumpscare GUI"] = "吓人",
+        ["Sheldoni"] = "谢尔登",
+        ["Dick GUI"] = "恶搞界面",
+        ["Forcefield GUI"] = "力场界面",
+        ["Suicide Gun"] = "自杀枪",
+        ["Meme Tools V1"] = "梗图  V1",
+        ["Meme Tools V2"] = "梗图 V2",
+        ["Meme Tools V3"] = "梗图 V3",
+        ["Gamepasses Tool"] = "解锁游戏通行证工具（速度线圈等）",
+        ["F3X"] = "F3X工具",
+        ["Scp 096 Tools"] = "SCP-096",
+        ["Portal Gun"] = "传送枪",
+        ["Pee"] = "尿尿",
+        ["R15 To R6"] = "R15变R6",
+        ["RC7 Cloud"] = "RC7 云",
+        ["MLG Particles"] = "MLG 粒子特效",
+        ["Keyboard"] = "键盘",
+        ["Tank"] = "坦克",
+        ["AK-74"] = "AK-74",
+        ["Abyssal Sword"] = "深渊剑",
+        ["M4A1-S"] = "M4A1-S",
+        ["Revolver (Press Q to use & R to Reload)"] = "左轮",
+        ["AWP"] = "AWP",
+        ["Lightsaber (Press Q to use)"] = "光剑",
+        ["Laser Gun"] = "激光枪",
+        ["Dick Gun"] = "恶搞枪",
+        ["L96A1 Magnum"] = "L96A1狙击枪",
+        ["M4A1"] = "M4A1",
+        ["Take Off Clothes"] = "脱下衣服",
+        ["LOL this game has filtering enabled so it literally wont work here"] = "这个服务器用不了这个功能😡",
+        ["Customize V4"] = "自定义 V4",
+        ["Blood Color:"] = "血液颜色:",
+        ["R"] = "红",
+        ["G"] = "绿",
+        ["B"] = "蓝",
+        ["Input"] = "输入",
+        ["do this math to disable child lock"] = "完成此数学题以解锁",
+        ["3.2(6.2r - 7.5) = 59.9"] = "3.2(6.2r - 7.5) = 59.9",
+        ["Answer (rounded to nearest tenth)"] = "四舍五入到十分位",
+        ["Rayfield"] = "Rayfield",
+        ["R15 Not Supported !"] = "不支持 R15 角色！",
+        ["[Client Sided MCDonalds Script]"] = "[客户端麦当劳脚本]",
+        ["HEY!"] = "嘿！",
+        ["Made By Kokjindesu Display Name: Bunb0yBun Channel: The Good Thing"] = "汉化作者：有芙同享 显示名：Bunb0yBun 频道：The Good Thing",
+        ["Ronaldo sui"] = "罗纳尔多 碎",
+        ["one eyes"] = "独眼",
+        ["mr.bean"] = "憨豆先生",
+        ["scary"] = "吓人",
+        ["Show Rayfield"] = "打开"
+    }
+
+    local function translateText(text)
+        if not text or type(text) ~= "string" then return text end
+        return Translations[text] or text
+    end
+
+    local function setupTranslationEngine()
+        local success, err = pcall(function()
+            local oldIndex = getrawmetatable(game).__newindex
+            setreadonly(getrawmetatable(game), false)
+            
+            getrawmetatable(game).__newindex = newcclosure(function(t, k, v)
+                if (t:IsA("TextLabel") or t:IsA("TextButton") or t:IsA("TextBox")) and k == "Text" then
+                    v = translateText(tostring(v))
+                end
+                return oldIndex(t, k, v)
+            end)
+            
+            setreadonly(getrawmetatable(game), true)
+        end)
+        
+        if not success then
+            warn("元表劫持失败:", err)
+           
+            local translated = {}
+            local function scanAndTranslate()
+                for _, gui in ipairs(game:GetService("CoreGui"):GetDescendants()) do
+                    if (gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox")) and not translated[gui] then
+                        pcall(function()
+                            local text = gui.Text
+                            if text and text ~= "" then
+                                local translatedText = translateText(text)
+                                if translatedText ~= text then
+                                    gui.Text = translatedText
+                                    translated[gui] = true
+                                end
+                            end
+                        end)
+                    end
+                end
+                
+                local player = game:GetService("Players").LocalPlayer
+                if player and player:FindFirstChild("PlayerGui") then
+                    for _, gui in ipairs(player.PlayerGui:GetDescendants()) do
+                        if (gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox")) and not translated[gui] then
+                            pcall(function()
+                                local text = gui.Text
+                                if text and text ~= "" then
+                                    local translatedText = translateText(text)
+                                    if translatedText ~= text then
+                                        gui.Text = translatedText
+                                        translated[gui] = true
+                                    end
+                                end
+                            end)
+                        end
+                    end
+                end
+            end
+            
+            local function setupDescendantListener(parent)
+                parent.DescendantAdded:Connect(function(descendant)
+                    if descendant:IsA("TextLabel") or descendant:IsA("TextButton") or descendant:IsA("TextBox") then
+                        task.wait(0.1)
+                        pcall(function()
+                            local text = descendant.Text
+                            if text and text ~= "" then
+                                local translatedText = translateText(text)
+                                if translatedText ~= text then
+                                    descendant.Text = translatedText
+                                end
+                            end
+                        end)
+                    end
+                end)
+            end
+            
+            pcall(setupDescendantListener, game:GetService("CoreGui"))
+            local player = game:GetService("Players").LocalPlayer
+            if player and player:FindFirstChild("PlayerGui") then
+                pcall(setupDescendantListener, player.PlayerGui)
+            end
+            
+            while true do
+                scanAndTranslate()
+                task.wait(3)
+            end
+        end
+    end
+
+    task.wait(2)
+    setupTranslationEngine()
+
+    local success, err = pcall(function()
+loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-ULTIMATE-TROLLING-GUI-V5-39695"))()
+    end)
+
+    if not success then
+        warn("加载失败:", err)
+    end
+end
