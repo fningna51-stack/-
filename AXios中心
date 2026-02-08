@@ -1,0 +1,277 @@
+do
+    local Translations = {
+     ["AXIOS HUB - Natural Disaster"] = "axios中心 - 自然灾害",
+    ["Natural Disaster Survival"] = "自然灾害生存",
+    ["AxiosHub"] = "Axios中心",
+    ["Axios Hub - Detecting game..."] = "Axios中心-正在检测服务器",
+    ["Detected: Natural Disaster"] = "检测到服务器-自然灾害",
+    ["Checking for existing key..."] = "正在检查卡密...",
+    ["No existing key found"] = "未找到一使用卡密",
+    ["Verifying key..."] = "正在验证卡密...",
+    ["Enter your key to continue"] = "请输入你卡密",
+    ["Enter key here"] = "输入卡密",
+    ["GET KEY"] = "复制解卡链接",
+    ["LOAD"] = "验证卡密",
+    ["LOADING..."] = "加载中...",
+    ["Enter key first"] = "请先输入卡密",
+    ["Toggle"] = "开关",
+    ["Lock"] = "锁定",
+    ["AxiosHub"] = "Axios中心",
+    ["Main"] = "主界面",
+    ["Player Target"] = "玩家传送",
+    ["UI Settings"] = "ui设置",
+    ["Search"] = "搜索",
+    ["Shape Controls"] = "黑洞形状控制",
+    ["Enable Shape"] = "开启黑洞",
+    ["Enable Rotation"] = "黑洞旋转",
+    ["Shape Type"] = "形状类型",
+    ["Fibonacci Sphere"] = "斐波那契球",
+    ["Star"] = "星形",
+    ["DNA Helix"] = "DNA双螺旋",
+    ["Torus"] = "圆环",
+    ["Cube Grid"] = "立方体网格",
+    ["Swastika"] = "万字纹",
+    ["Stack"] = "堆叠",
+    ["Wave Interference"] = "波干涉",
+    ["Speed Mode"] = "速度",
+    ["Normal"] = "正常",
+    ["Hyper"] = "快速",
+    ["Size"] = "大小",
+    ["Rotation Speed"] = "旋转速度",
+    ["Distance from Player"] = "与玩家距离",
+    ["No Clip Parts"] = "穿墙",
+    ["Part Collection Range"] = "黑洞范围",
+    ["Limit Collection Range"] = "限制收集范围",
+    ["Show Range Circle"] = "显示范围圈",
+    ["Collection Range"] = "收集范围",
+    ["Other Scripts"] = "其他脚本",
+    ["Infinite Yield"] = "IY指令",
+    ["Hop Server"] = "换服",
+    ["Rejoin"] = "重新加入服务器",
+    ["Fly Enable"] = "飞行",
+    ["Jerk Enable"] = "撸管",
+    ["Target Player"] = "目标玩家",
+    ["Follow Target"] = "跟随目标",
+    ["Select Player"] = "选择玩家",
+    ["Teleport to Target"] = "传送至目标",
+    ["version: 2.1"] = " <font color='#7FC8F0'>有</font><font color='#74C0EB'>芙</font><font color='#69B8E6'>同</font><font color='#5EB0E1'>享</font><font color='#53A8DC'>汉</font><font color='#48A0D7'>化</font>",
+    ["Rotation Control"] = "黑洞控制",
+    ["Rotation paused!"] = "黑洞旋转已关闭",
+    ["Rotation enabled!"] = "黑洞黑洞旋转已开启",
+    ["Shape Changed"] = "黑洞形状已更改",
+    ["Now using: Fibonacci Sphere"] = "当前使用：斐波那契球",
+    ["Now using: Star"] = "当前使用：星形",
+    ["Now using: DNA Helix"] = "当前使用：DNA双螺旋",
+    ["Now using: Torus"] = "当前使用：圆环面",
+    ["Now using: Cube Grid"] = "当前使用：立方体网格",
+    ["Now using: Swastika"] = "当前使用：万字纹",
+    ["Now using: Stack"] = "当前使用：堆叠",
+    ["Now using: Wave Interference"] = "当前使用：波干涉",
+    ["Normal mode activated!"] = "正常模式已启用",
+    ["Hyper mode activated!"] = "快速模式已启用",
+    ["Collision Mode"] = "穿墙",
+    ["Parts Noclip Disabled"] = "穿墙已关闭",
+    ["No Clip Mode"] = "穿墙模式",
+    ["Parts Noclip Enabled"] = "穿墙已开启",
+    ["Range Collection"] = "范围收集",
+    ["Parts limited to 100 studs"] = "部件限制在100格范围内",
+    ["Collecting all parts in map"] = "正在收集地图内所有部件",
+    ["Range Circle"] = "黑洞范围",
+    ["Circle visible"] = "黑洞范围已显示",
+    ["Circle hidden"] = "范围圈已隐藏",
+    ["Script Loader"] = "IY指令",
+    ["Infinite Yield loaded!"] = "IY指令已加载！",
+    ["Valid key found! Loading..."] = "Axioshub-找到卡密正在加载",
+    ["Shape Master"] = "黑洞开关",
+    ["Shape deactivated!"] = "黑洞已关闭",
+    ["Shape activated!"] = "黑洞已开启",
+    ["Target Mode"] = "目标模式",
+    ["Open Keybind Menu"]="打开菜单自动绑定卡密", 
+    ["Enable Crosshair"]="十字瞄准",
+    ["Lock Button (Mobile)"]="锁定按钮",
+    ["Notification Side"]="十字拖架",
+    ["Top-Right"]="右上角",
+    ["DPI Scale"]="菜单占比",
+    ["Menu bind"]="菜单绑定",
+    ["Unload"]="卸载",
+    ["Themes"]="主题",
+    ["Background color"]="背景颜色",
+    ["Main color"]="主色调",
+    ["Accent color"]="强色调",
+    ["Outline color"]="轮廓颜色",
+    ["Font color"]="字体颜色",
+    ["Font Face"]="客户端字体",
+    ["Theme list"]="主题列表",
+    ["Default"]="默认",
+    ["Set as default"]="设置为默认",
+    ["Custom theme name"]="自己给文件名字",
+    ["Create theme"]="创建文件",
+    ["Custom themes"]="自定义文件",
+    ["Load theme"]="加载文件",
+    ["Overwrite theme"]="覆盖文件",
+    ["Delete theme"]="删除文件",
+    ["Refresh list"]="刷新列表",
+    ["Reset default"]="重置默认",
+    ["Configuration"]="配置",
+    ["Config name"]="配置名字",
+    ["Create config"]="创建配置",
+    ["Config list"]="配置列表",
+    ["Load config"]="加载配置",
+    ["Overwrite config"]="覆盖配置",
+    ["Delete config"]="删除配置",
+    ["Set as autoload"]="设置成自动加载",
+    ["Reset autoload"]="重置自动加载",
+    ["Current autoload config:"]="当前自动加载配置:",
+    ["Following:"] = "正在跟随：",
+    ["Teleport"] = "传送",
+    ["Teleported to "] = "已传送到", 
+    ["Fantasy"]="幻想体",
+    ["BuilderSans"]="建造者无衬线体",
+    ["Code"]="代码体",
+    ["Gotham"]="哥谭体",
+    ["Jura"]="朱拉体",
+    ["Roboto"]="罗伯托体",
+    ["RobotoMono"]="罗伯托等宽体",
+    ["SourceSans"]="源无衬线体",
+    ["Menu"] = "菜单",
+    ["Custom Cursor"] = "自定义光标",
+    ["Menu Keybind"] = "菜单快捷键",
+    ["RightShift"] = "Shift",
+    ["Mint"] = "薄荷绿",
+    ["BBot"] = "BBOT",
+    ["Fatality"] = "致命",
+    ["Jester"] = "小丑",
+    ["Tokyo Night"] = "东京之夜",
+    ["Ubuntu"] = "Ubuntu",
+    ["Quartz"] = "石英",
+    ["Nord"] = "北欧",
+    ["Dracula"] = "德古拉",
+    ["Monokai"] = "Monokai",
+    ["Gruvbox"] = "Gruvbox",
+    ["Solarized"] = "Solarized",
+    ["Catppuccin"] = "卡布奇诺",
+    ["One Dark"] = "One Dark",
+    ["Cyberpunk"] = "赛博朋克",
+    ["Oceanic Next"] = "海洋下一个",
+    ["Unlock"] = "解锁",
+    ["Script loaded successfully!"] = "Axioshub加载成功！",
+    ["Fly"] = "飞行",
+    ["Fly disabled!"] = "飞行已关闭",
+    ["Fly enabled!"] = "飞行已开启",
+    ["Jerk"] = "撸管",
+    ["Jerk enabled!"] = "撸管已开启",
+    ["Jerk disabled!"] = "撸管已关闭"     
+    }
+
+    local function translateText(text)
+        if not text or type(text) ~= "string" then return text end
+        
+        if Translations[text] then
+            return Translations[text]
+        end
+        
+        for en, cn in pairs(Translations) do
+            if text:find(en) then
+                return text:gsub(en, cn)
+            end
+        end
+        
+        return text
+    end
+
+    local function setupTranslationEngine()
+        local success, err = pcall(function()
+            local oldIndex = getrawmetatable(game).__newindex
+            setreadonly(getrawmetatable(game), false)
+            
+            getrawmetatable(game).__newindex = newcclosure(function(t, k, v)
+                if (t:IsA("TextLabel") or t:IsA("TextButton") or t:IsA("TextBox")) and k == "Text" then
+                    v = translateText(tostring(v))
+                end
+                return oldIndex(t, k, v)
+            end)
+            
+            setreadonly(getrawmetatable(game), true)
+        end)
+        
+        if not success then
+            warn("元表劫持失败:", err)
+           
+            local translated = {}
+            local function scanAndTranslate()
+                for _, gui in ipairs(game:GetService("CoreGui"):GetDescendants()) do
+                    if (gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox")) and not translated[gui] then
+                        pcall(function()
+                            local text = gui.Text
+                            if text and text ~= "" then
+                                local translatedText = translateText(text)
+                                if translatedText ~= text then
+                                    gui.Text = translatedText
+                                    translated[gui] = true
+                                end
+                            end
+                        end)
+                    end
+                end
+                
+                local player = game:GetService("Players").LocalPlayer
+                if player and player:FindFirstChild("PlayerGui") then
+                    for _, gui in ipairs(player.PlayerGui:GetDescendants()) do
+                        if (gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox")) and not translated[gui] then
+                            pcall(function()
+                                local text = gui.Text
+                                if text and text ~= "" then
+                                    local translatedText = translateText(text)
+                                    if translatedText ~= text then
+                                        gui.Text = translatedText
+                                        translated[gui] = true
+                                    end
+                                end
+                            end)
+                        end
+                    end
+                end
+            end
+            
+            local function setupDescendantListener(parent)
+                parent.DescendantAdded:Connect(function(descendant)
+                    if descendant:IsA("TextLabel") or descendant:IsA("TextButton") or descendant:IsA("TextBox") then
+                        task.wait(0.1)
+                        pcall(function()
+                            local text = descendant.Text
+                            if text and text ~= "" then
+                                local translatedText = translateText(text)
+                                if translatedText ~= text then
+                                    descendant.Text = translatedText
+                                end
+                            end
+                        end)
+                    end
+                end)
+            end
+            
+            pcall(setupDescendantListener, game:GetService("CoreGui"))
+            local player = game:GetService("Players").LocalPlayer
+            if player and player:FindFirstChild("PlayerGui") then
+                pcall(setupDescendantListener, player.PlayerGui)
+            end
+            
+            while true do
+                scanAndTranslate()
+                task.wait(3)
+            end
+        end
+    end
+
+    task.wait(2)
+    setupTranslationEngine()
+
+    local success, err = pcall(function()
+loadstring(game:HttpGet('https://axioshub.store/loaderapi'))()
+
+    end)
+
+    if not success then
+        warn("加载失败:", err)
+    end
+end
