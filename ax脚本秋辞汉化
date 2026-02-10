@@ -23,7 +23,7 @@ do
         ["Normal"]="正常",
         ["没找到素材"]="狂暴",
         ["Pull Rope"]="自动拔河",
-        ["Hide N' Seek"]="躲猫猫",
+        ["Hide N' Seek"]="捉迷藏",
         ["Show Exit Doors (Yellow)"]="透视逃生门(黄)",
         ["Show Doors (Green | Cir/Tri/Sqr)"]="透视门(绿|圆形/三角形/正方形)",
         ["Show Dropped Keys (Purple)"]="透视钥匙(紫)",
