@@ -1,1 +1,1855 @@
-do local A1=game:GetService("Players");local A2=A1.LocalPlayer;local A3=game:GetService("RunService");local A4=game:GetService("Lighting");local A5=game:GetService("CoreGui");local A6=game:GetService("UserInputService");local A7=game:GetService("TeleportService");local A8=game:GetService("Workspace");local A9="https://raw.githubusercontent.com/ATLASTEAM01/Obsidian/main/";local A10=loadstring(game:HttpGet(A9   .. "Library.lua" ))();local A11=loadstring(game:HttpGet(A9   .. "addons/ThemeManager.lua" ))();local A12=loadstring(game:HttpGet(A9   .. "addons/SaveManager.lua" ))();local A13=A10.Options;local A14=A10.Toggles;local A15=A10:CreateWindow({Title="绉嬭緸鏈夎姍鍚屼韩鑴氭湰",SubTitle="浣滆€咃細蹇墜绉嬭緸 鍓綔鑰咃細鏈夎姍鍚屼韩",Center=true,AutoShow=true});local A16={Universal=A15:AddTab("閫氱敤","user"),Announcement=A15:AddTab("鍏憡","info-circle"),ScriptCenter=A15:AddTab("鑴氭湰涓績","script"),UISettings=A15:AddTab("UI璁剧疆","settings")};local AnnouncementGroup=A16.Announcement:AddLeftGroupbox("鑴氭湰鍏憡");AnnouncementGroup:AddLabel("绉嬭緸鏈夎姍鍚屼韩鑴氭湰鍏憡");AnnouncementGroup:AddLabel("鐗堟湰: 1.0.2");AnnouncementGroup:AddLabel("馃槨馃槨鍙埜鐖�");AnnouncementGroup:AddLabel("鏂版坊鍔犲姛鑳藉涓�");AnnouncementGroup:AddLabel("缇よ亰鎼滀笉鍒板揩鎵嬫悳KSWCNMBWFL缃《瑙嗛鍔犵兢");AnnouncementGroup:AddLabel("鍚勫ぇ鑴氭湰锛屽叕鍛�");AnnouncementGroup:AddLabel("寮€婧愭鏃犳剰涔夝煠擆煠撳洜涓烘簮鐮侀兘鏄嬁鐨�");AnnouncementGroup:AddLabel("鎰熻阿浣跨敤!");local A17=nil;local A18=false;local A19=false;local A20=false;local A21=false;local A22=nil;local A23=nil;local A24=nil;local A25=nil;local A26=nil;local A27={};local A28=false;local A29=true;local A30=A16.Universal:AddLeftGroupbox("鍚勭鍔熻兘");local A31=A16.Universal:AddRightGroupbox("淇℃伅涓庣炕璇�");A30:AddSlider("WalkSpeedSlider",{Text="绉诲姩閫熷害",Default=16,Min=16,Max=200,Rounding=0,Compact=false}):OnChanged(function(A32) if (A2 and A2.Character) then local A33=A2.Character:FindFirstChild("Humanoid");if A33 then A33.WalkSpeed=A32;end end end);A30:AddSlider("JumpPowerSlider",{Text="璺宠穬楂樺害",Default=50,Min=50,Max=200,Rounding=0,Compact=false}):OnChanged(function(A34) if (A2 and A2.Character) then local A35=A2.Character:FindFirstChild("Humanoid");if A35 then A35.JumpPower=A34;end end end);A30:AddInput("JumpPowerInput",{Text="璺宠穬楂樺害璁剧疆",Default="",Placeholder="杈撳叆璺宠穬楂樺害鍊�",Numeric=true,Finished=false,Callback=function(A36) local A37=tonumber(A36);if (A37 and A2 and A2.Character) then local A38=A2.Character:FindFirstChild("Humanoid");if A38 then A38.JumpPower=A37;end end end});A30:AddInput("WalkSpeedInput",{Text="绉诲姩閫熷害璁剧疆",Default="",Placeholder="杈撳叆绉诲姩閫熷害鍊�",Numeric=true,Finished=false,Callback=function(A39) local A40=tonumber(A39);if (A40 and A2 and A2.Character) then local A41=A2.Character:FindFirstChild("Humanoid");if A41 then A41.WalkSpeed=A40;end end end});A30:AddInput("GravityInput",{Text="閲嶅姏璁剧疆",Default="",Placeholder="杈撳叆閲嶅姏鍊�",Numeric=true,Finished=false,Callback=function(A42) local A43=tonumber(A42);if A43 then A8.Gravity=A43;end end});A30:AddToggle("NightVisionToggle",{Text="澶滆",Default=false}):OnChanged(function(A44) A28=A44;if A44 then A4.Ambient=Color3.new(1,1,1);A4.Brightness=1;A4.OutdoorAmbient=Color3.new(1,1,1);A4.FogEnd=100000;A4.FogStart=0;A4.GlobalShadows=false;else A4.Ambient=Color3.new(0,0,0);A4.Brightness=1;A4.OutdoorAmbient=Color3.new(0.5,0.5,0.5);A4.FogEnd=100000;A4.FogStart=0;A4.GlobalShadows=true;end end);A30:AddToggle("ESPToggle",{Text="閫忚",Default=false}):OnChanged(function(A45) if A45 then if  not A26 then A26=Instance.new("Folder");A26.Name="Highlight_Storage";A26.Parent=A5;end local A46=Color3.fromRGB(175,25,255);local A47=Color3.fromRGB(255,255,255);for _,A48 in pairs(A1:GetPlayers()) do if (A48~=A2) then local A49=Instance.new("Highlight");A49.Name=A48.Name;A49.FillColor=A46;A49.DepthMode=Enum.HighlightDepthMode.AlwaysOnTop;A49.FillTransparency=0.5;A49.OutlineColor=A47;A49.OutlineTransparency=0;A49.Parent=A26;local function A50(A51) if A51 then A49.Adornee=A51;end end if A48.Character then A50(A48.Character);end local A52=A48.CharacterAdded:Connect(A50);A27[A48]=A52;end end local A53=A1.PlayerAdded:Connect(function(A54) local A55=Instance.new("Highlight");A55.Name=A54.Name;A55.FillColor=A46;A55.DepthMode=Enum.HighlightDepthMode.AlwaysOnTop;A55.FillTransparency=0.5;A55.OutlineColor=A47;A55.OutlineTransparency=0;A55.Parent=A26;local function A56(A57) if A57 then A55.Adornee=A57;end end if A54.Character then A56(A54.Character);end local A58=A54.CharacterAdded:Connect(A56);A27[A54]=A58;end);local A59=A1.PlayerRemoving:Connect(function(A60) if A27[A60] then A27[A60]:Disconnect();A27[A60]=nil;end if A26 then local A61=A26:FindFirstChild(A60.Name);if A61 then A61:Destroy();end end end);A27['PlayerAdded']=A53;A27['PlayerRemoving']=A59;else for _,A62 in pairs(A27) do if A62 then pcall(function() A62:Disconnect();end);end end A27={};if A26 then A26:Destroy();A26=nil;end end end);A30:AddButton("澧ㄦ按椋炶",function() local A63={};A63.Config={MoveSpeed=10,FreezeEnabled=false,FreezeY=nil};A63.State={UI=nil,Connections={},Initialized=false};A63.Init=function() if A63.State.Initialized then return;end A63.Services={Players=game:GetService("Players"),UserInputService=game:GetService("UserInputService"),RunService=game:GetService("RunService"),CoreGui=game:GetService("CoreGui")};A63.Player=A63.Services.Players.LocalPlayer;A63.Character=nil;A63.Humanoid=nil;A63.HRP=nil;A63.State.Initialized=true;end;A63.CreateUI=function() if A63.State.UI then A63.State.UI:Destroy();A63.State.UI=nil;end local A64=Instance.new("ScreenGui");A64.Name="QC_FlyUI";A64.Parent=A63.Services.CoreGui;A64.DisplayOrder=2000;A64.ResetOnSpawn=false;local A65=Instance.new("TextBox");A65.Name="SpeedInput";A65.Parent=A64;A65.Size=UDim2.new(0,120,0,30);A65.Position=UDim2.new(0.95, -120,0.05,38);A65.Text=tostring(A63.Config.MoveSpeed);A65.TextSize=18;A65.PlaceholderText="绉诲姩閫熷害";A65.BackgroundColor3=Color3.fromRGB(255,255,255);A65.BackgroundTransparency=0.2;A65.TextColor3=Color3.fromRGB(0,0,0);Instance.new("UICorner").Parent=A65;A65.FocusLost:Connect(function() local A66=tonumber(A65.Text);if (A66 and (A66>0)) then A63.Config.MoveSpeed=A66;else A65.Text=tostring(A63.Config.MoveSpeed);end end);local A67=Instance.new("TextButton");A67.Name="FreezeBtn";A67.Parent=A64;A67.Size=UDim2.new(0,120,0,38);A67.Position=UDim2.new(0.95, -120,0.05,0);A67.Text="寮€鍚┖涓偓鎸�";A67.TextSize=20;A67.BackgroundColor3=Color3.fromRGB(210,240,255);A67.BackgroundTransparency=0.2;A67.TextColor3=Color3.fromRGB(0,0,0);Instance.new("UICorner").Parent=A67;A67.MouseButton1Click:Connect(function() A63.Config.FreezeEnabled= not A63.Config.FreezeEnabled;A67.Text=(A63.Config.FreezeEnabled and "鎮寕鈭�") or "寮€鍚┖涓偓鎸�" ;A67.BackgroundColor3=(A63.Config.FreezeEnabled and Color3.fromRGB(255,200,200)) or Color3.fromRGB(210,240,255) ;if  not A63.Config.FreezeEnabled then A63.Config.FreezeY=nil;end end);A63.State.UI=A64;return A64;end;A63.SetupCharacter=function(A68) A63.Character=A68;A63.Humanoid=A68:WaitForChild("Humanoid",10);A63.HRP=A68:WaitForChild("HumanoidRootPart",10);A63.Humanoid.Died:Connect(function() A63.Config.FreezeEnabled=false;A63.Config.FreezeY=nil;if A63.State.UI then local A69=A63.State.UI:FindFirstChild("FreezeBtn");if A69 then A69.Text="寮€鍚┖涓偓鎸�";A69.BackgroundColor3=Color3.fromRGB(210,240,255);end end end);end;A63.SetupInfiniteJump=function() table.insert(A63.State.Connections,A63.Services.UserInputService.JumpRequest:Connect(function() if (A63.Humanoid and (A63.Humanoid:GetState()~=Enum.HumanoidStateType.Dead)) then A63.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping);end end));end;A63.SetupMainLoop=function() table.insert(A63.State.Connections,A63.Services.RunService.Heartbeat:Connect(function(A70) if (A63.Humanoid and A63.HRP and (A63.Humanoid:GetState()~=Enum.HumanoidStateType.Dead)) then local A71=A63.Humanoid.MoveDirection;if A63.Config.FreezeEnabled then local A72=A63.Humanoid:GetState();if ((A72==Enum.HumanoidStateType.Freefall) and (A63.Humanoid:GetState()~=Enum.HumanoidStateType.Jumping)) then if (A71.Magnitude>0) then if  not A63.Config.FreezeY then A63.Config.FreezeY=A63.HRP.Position.Y;end local A73=Vector3.new(A71.X,0,A71.Z) * A63.Config.MoveSpeed * A70 ;local A74=A63.HRP.Position;local A75=Vector3.new(A74.X,A63.Config.FreezeY,A74.Z) + A73 ;A63.HRP.CFrame=CFrame.new(A75,A75 + A63.HRP.CFrame.LookVector );A63.HRP.Velocity=Vector3.new(0,0,0);else A63.Config.FreezeY=nil;end return;else A63.Config.FreezeY=nil;end end if (A71.Magnitude>0) then A63.HRP.CFrame=A63.HRP.CFrame + (A71.Unit * A63.Config.MoveSpeed * A70) ;end end end));end;A63.SetupCharacterListeners=function() if A63.Player.Character then A63.SetupCharacter(A63.Player.Character);end table.insert(A63.State.Connections,A63.Player.CharacterAdded:Connect(function(A76) A63.SetupCharacter(A76);end));table.insert(A63.State.Connections,A63.Player.CharacterRemoving:Connect(function() A63.Character=nil;A63.Humanoid=nil;A63.HRP=nil;A63.Config.FreezeEnabled=false;A63.Config.FreezeY=nil;end));end;A63.Start=function() A63.Init();A63.CreateUI();A63.SetupInfiniteJump();A63.SetupMainLoop();A63.SetupCharacterListeners();end;A63.Stop=function() for _,A77 in pairs(A63.State.Connections) do A77:Disconnect();end A63.State.Connections={};if A63.State.UI then A63.State.UI:Destroy();A63.State.UI=nil;end A63.Config.FreezeEnabled=false;A63.Config.FreezeY=nil;A63.Character=nil;A63.Humanoid=nil;A63.HRP=nil;end;A63.GetInfo=function() return {Name="椋炶鎮寕妯″潡",Version="1.0",Author="QC Script",Description="鎻愪緵椋炶銆佹偓鎸傘€佹棤闄愯烦璺冨姛鑳�"};end;A63.Start();end);A30:AddButton("鏃犻檺璺�",function() A20= not A20;if A25 then A25:Disconnect();A25=nil;end if A20 then A25=A6.JumpRequest:Connect(function() if A2.Character then local A78=A2.Character:FindFirstChildOfClass("Humanoid");if A78 then A78:ChangeState("Jumping");end end end);end end);A30:AddButton("鐖",function() A18= not A18;if A24 then A24:Disconnect();A24=nil;end if A18 then A24=A3.Heartbeat:Connect(function() if A2.Character then local A79=A2.Character:FindFirstChildOfClass("Humanoid");local A80=A2.Character:FindFirstChild("HumanoidRootPart");if (A79 and A80) then local A81=Ray.new(A80.Position,A80.CFrame.LookVector * 5 );local A82,A83=A8:FindPartOnRay(A81,A2.Character);if A82 then A79:ChangeState(Enum.HumanoidStateType.Climbing);A80.CFrame=CFrame.new(A83) * CFrame.new(0,3,0) ;end end end end);end end);A30:AddButton("椋炶",function() A21= not A21;if A21 then local A84=Instance.new("ScreenGui");local A85=Instance.new("Frame");local A86=Instance.new("TextButton");local A87=Instance.new("TextButton");local A88=Instance.new("TextButton");local A89=Instance.new("TextLabel");local A90=Instance.new("TextButton");local A91=Instance.new("TextLabel");local A92=Instance.new("TextButton");local A93=Instance.new("TextButton");local A94=Instance.new("TextButton");local A95=Instance.new("TextButton");A84.Name="main";A84.Parent=game.Players.LocalPlayer:WaitForChild("PlayerGui");A84.ZIndexBehavior=Enum.ZIndexBehavior.Sibling;A84.ResetOnSpawn=false;A85.Parent=A84;A85.BackgroundColor3=Color3.fromRGB(163,255,137);A85.BorderColor3=Color3.fromRGB(103,221,213);A85.Position=UDim2.new(0.100320168,0,0.379746825,0);A85.Size=UDim2.new(0,190,0,57);A86.Name="up";A86.Parent=A85;A86.BackgroundColor3=Color3.fromRGB(79,255,152);A86.Size=UDim2.new(0,44,0,28);A86.Font=Enum.Font.SourceSans;A86.Text="涓婂崌";A86.TextColor3=Color3.fromRGB(0,0,0);A86.TextSize=14;A87.Name="down";A87.Parent=A85;A87.BackgroundColor3=Color3.fromRGB(215,255,121);A87.Position=UDim2.new(0,0,0.491228074,0);A87.Size=UDim2.new(0,44,0,28);A87.Font=Enum.Font.SourceSans;A87.Text="涓嬮檷";A87.TextColor3=Color3.fromRGB(0,0,0);A87.TextSize=14;A88.Name="onof";A88.Parent=A85;A88.BackgroundColor3=Color3.fromRGB(255,249,74);A88.Position=UDim2.new(0.702823281,0,0.491228074,0);A88.Size=UDim2.new(0,56,0,28);A88.Font=Enum.Font.SourceSans;A88.Text="璧烽";A88.TextColor3=Color3.fromRGB(0,0,0);A88.TextSize=14;A89.Parent=A85;A89.BackgroundColor3=Color3.fromRGB(242,60,255);A89.Position=UDim2.new(0.469327301,0,0,0);A89.Size=UDim2.new(0,100,0,28);A89.Font=Enum.Font.SourceSans;A89.Text=" 绉嬭緸椋炶";A89.TextColor3=Color3.fromRGB(0,0,0);A89.TextScaled=true;A89.TextSize=14;A89.TextWrapped=true;A90.Name="plus";A90.Parent=A85;A90.BackgroundColor3=Color3.fromRGB(133,145,255);A90.Position=UDim2.new(0.231578946,0,0,0);A90.Size=UDim2.new(0,45,0,28);A90.Font=Enum.Font.SourceSans;A90.Text="+";A90.TextColor3=Color3.fromRGB(0,0,0);A90.TextScaled=true;A90.TextSize=14;A90.TextWrapped=true;A91.Name="speed";A91.Parent=A85;A91.BackgroundColor3=Color3.fromRGB(255,85,0);A91.Position=UDim2.new(0.468421042,0,0.491228074,0);A91.Size=UDim2.new(0,44,0,28);A91.Font=Enum.Font.SourceSans;A91.Text="1";A91.TextColor3=Color3.fromRGB(0,0,0);A91.TextScaled=true;A91.TextSize=14;A91.TextWrapped=true;A92.Name="mine";A92.Parent=A85;A92.BackgroundColor3=Color3.fromRGB(123,255,247);A92.Position=UDim2.new(0.231578946,0,0.491228074,0);A92.Size=UDim2.new(0,45,0,29);A92.Font=Enum.Font.SourceSans;A92.Text="-";A92.TextColor3=Color3.fromRGB(0,0,0);A92.TextScaled=true;A92.TextSize=14;A92.TextWrapped=true;A93.Name="Close";A93.Parent=A84.Frame;A93.BackgroundColor3=Color3.fromRGB(225,25,0);A93.Font="SourceSans";A93.Size=UDim2.new(0,45,0,28);A93.Text="X";A93.TextSize=30;A93.Position=UDim2.new(0,0, -1,27);A94.Name="minimize";A94.Parent=A84.Frame;A94.BackgroundColor3=Color3.fromRGB(192,150,230);A94.Font="SourceSans";A94.Size=UDim2.new(0,45,0,28);A94.Text="-";A94.TextSize=40;A94.Position=UDim2.new(0,44, -1,27);A95.Name="minimize2";A95.Parent=A84.Frame;A95.BackgroundColor3=Color3.fromRGB(192,150,230);A95.Font="SourceSans";A95.Size=UDim2.new(0,45,0,28);A95.Text="+";A95.TextSize=40;A95.Position=UDim2.new(0,44, -1,57);A95.Visible=false;speeds=1;local A96=game:GetService("Players").LocalPlayer;local A97=game.Players.LocalPlayer.Character;local A98=A97 and A97:FindFirstChildWhichIsA("Humanoid") ;nowe=false;A85.Active=true;A85.Draggable=true;A88.MouseButton1Down:connect(function() if (nowe==true) then nowe=false;A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing,true);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown,true);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Flying,true);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall,true);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp,true);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping,true);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Landed,true);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics,true);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.PlatformStanding,true);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll,true);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Running,true);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics,true);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated,true);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics,true);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming,true);A96.Character.Humanoid:ChangeState(Enum.HumanoidStateType.RunningNoPhysics);else nowe=true;for i=1,speeds do spawn(function() local A99=game:GetService("RunService").Heartbeat;tpwalking=true;local A100=game.Players.LocalPlayer.Character;local A101=A100 and A100:FindFirstChildWhichIsA("Humanoid") ;while tpwalking and A99:Wait() and A100 and A101 and A101.Parent  do if (A101.MoveDirection.Magnitude>0) then A100:TranslateBy(A101.MoveDirection);end end end);end game.Players.LocalPlayer.Character.Animate.Disabled=true;local A102=game.Players.LocalPlayer.Character;local A103=A102:FindFirstChildOfClass("Humanoid") or A102:FindFirstChildOfClass("AnimationController") ;for i,v in next,A103:GetPlayingAnimationTracks() do v:AdjustSpeed(0);end A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing,false);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown,false);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Flying,false);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall,false);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp,false);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping,false);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Landed,false);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics,false);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.PlatformStanding,false);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll,false);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Running,false);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics,false);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated,false);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics,false);A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming,false);A96.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Swimming);end if (game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid").RigType==Enum.HumanoidRigType.R6) then local A104=game.Players.LocalPlayer;local A105=A104.Character.Torso;local A106=true;local A107=true;local A108={f=0,b=0,l=0,r=0};local A109={f=0,b=0,l=0,r=0};local A110=50;local A111=0;local A112=Instance.new("BodyGyro",A105);A112.P=90000;A112.maxTorque=Vector3.new(8999999488,8999999488,8999999488);A112.cframe=A105.CFrame;local A113=Instance.new("BodyVelocity",A105);A113.velocity=Vector3.new(0,0.1,0);A113.maxForce=Vector3.new(8999999488,8999999488,8999999488);if (nowe==true) then A104.Character.Humanoid.PlatformStand=true;end while (nowe==true) or (game:GetService("Players").LocalPlayer.Character.Humanoid.Health==0)  do game:GetService("RunService").RenderStepped:Wait();if (((A108.l + A108.r)~=0) or ((A108.f + A108.b)~=0)) then A111=A111 + 0.5 + (A111/A110) ;if (A111>A110) then A111=A110;end elseif ( not (((A108.l + A108.r)~=0) or ((A108.f + A108.b)~=0)) and (A111~=0)) then A111=A111-1 ;if (A111<0) then A111=0;end end if (((A108.l + A108.r)~=0) or ((A108.f + A108.b)~=0)) then A113.velocity=((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (A108.f + A108.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(A108.l + A108.r ,(A108.f + A108.b) * 0.2 ,0).p) -game.Workspace.CurrentCamera.CoordinateFrame.p)) * A111 ;A109={f=A108.f,b=A108.b,l=A108.l,r=A108.r};elseif (((A108.l + A108.r)==0) and ((A108.f + A108.b)==0) and (A111~=0)) then A113.velocity=((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (A109.f + A109.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(A109.l + A109.r ,(A109.f + A109.b) * 0.2 ,0).p) -game.Workspace.CurrentCamera.CoordinateFrame.p)) * A111 ;else A113.velocity=Vector3.new(0,0,0);end A112.cframe=game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles( -math.rad(((A108.f + A108.b) * 50 * A111)/A110 ),0,0) ;end A108={f=0,b=0,l=0,r=0};A109={f=0,b=0,l=0,r=0};A111=0;A112:Destroy();A113:Destroy();A104.Character.Humanoid.PlatformStand=false;game.Players.LocalPlayer.Character.Animate.Disabled=false;tpwalking=false;else local A114=game.Players.LocalPlayer;local A115=A114.Character.UpperTorso;local A116=true;local A117=true;local A118={f=0,b=0,l=0,r=0};local A119={f=0,b=0,l=0,r=0};local A120=50;local A121=0;local A122=Instance.new("BodyGyro",A115);A122.P=90000;A122.maxTorque=Vector3.new(8999999488,8999999488,8999999488);A122.cframe=A115.CFrame;local A123=Instance.new("BodyVelocity",A115);A123.velocity=Vector3.new(0,0.1,0);A123.maxForce=Vector3.new(8999999488,8999999488,8999999488);if (nowe==true) then A114.Character.Humanoid.PlatformStand=true;end while (nowe==true) or (game:GetService("Players").LocalPlayer.Character.Humanoid.Health==0)  do wait();if (((A118.l + A118.r)~=0) or ((A118.f + A118.b)~=0)) then A121=A121 + 0.5 + (A121/A120) ;if (A121>A120) then A121=A120;end elseif ( not (((A118.l + A118.r)~=0) or ((A118.f + A118.b)~=0)) and (A121~=0)) then A121=A121-1 ;if (A121<0) then A121=0;end end if (((A118.l + A118.r)~=0) or ((A118.f + A118.b)~=0)) then A123.velocity=((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (A118.f + A118.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(A118.l + A118.r ,(A118.f + A118.b) * 0.2 ,0).p) -game.Workspace.CurrentCamera.CoordinateFrame.p)) * A121 ;A119={f=A118.f,b=A118.b,l=A118.l,r=A118.r};elseif (((A118.l + A118.r)==0) and ((A118.f + A118.b)==0) and (A121~=0)) then A123.velocity=((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (A119.f + A119.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(A119.l + A119.r ,(A119.f + A119.b) * 0.2 ,0).p) -game.Workspace.CurrentCamera.CoordinateFrame.p)) * A121 ;else A123.velocity=Vector3.new(0,0,0);end A122.cframe=game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles( -math.rad(((A118.f + A118.b) * 50 * A121)/A120 ),0,0) ;end A118={f=0,b=0,l=0,r=0};A119={f=0,b=0,l=0,r=0};A121=0;A122:Destroy();A123:Destroy();A114.Character.Humanoid.PlatformStand=false;game.Players.LocalPlayer.Character.Animate.Disabled=false;tpwalking=false;end end);local A124;A86.MouseButton1Down:connect(function() A124=A86.MouseEnter:connect(function() while A124 do wait();game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame=game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0,1,0) ;end end);end);A86.MouseLeave:connect(function() if A124 then A124:Disconnect();A124=nil;end end);local A125;A87.MouseButton1Down:connect(function() A125=A87.MouseEnter:connect(function() while A125 do wait();game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame=game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, -1,0) ;end end);end);A87.MouseLeave:connect(function() if A125 then A125:Disconnect();A125=nil;end end);game:GetService("Players").LocalPlayer.CharacterAdded:Connect(function(A126) wait(0.7);game.Players.LocalPlayer.Character.Humanoid.PlatformStand=false;game.Players.LocalPlayer.Character.Animate.Disabled=false;end);A90.MouseButton1Down:connect(function() speeds=speeds + 1 ;A91.Text=speeds;if (nowe==true) then tpwalking=false;for i=1,speeds do spawn(function() local A127=game:GetService("RunService").Heartbeat;tpwalking=true;local A128=game.Players.LocalPlayer.Character;local A129=A128 and A128:FindFirstChildWhichIsA("Humanoid") ;while tpwalking and A127:Wait() and A128 and A129 and A129.Parent  do if (A129.MoveDirection.Magnitude>0) then A128:TranslateBy(A129.MoveDirection);end end end);end end end);A92.MouseButton1Down:connect(function() if (speeds==1) then A91.Text="cannot be less than 1";wait(1);A91.Text=speeds;else speeds=speeds-1 ;A91.Text=speeds;if (nowe==true) then tpwalking=false;for i=1,speeds do spawn(function() local A130=game:GetService("RunService").Heartbeat;tpwalking=true;local A131=game.Players.LocalPlayer.Character;local A132=A131 and A131:FindFirstChildWhichIsA("Humanoid") ;while tpwalking and A130:Wait() and A131 and A132 and A132.Parent  do if (A132.MoveDirection.Magnitude>0) then A131:TranslateBy(A132.MoveDirection);end end end);end end end end);A93.MouseButton1Click:Connect(function() A84:Destroy();end);A94.MouseButton1Click:Connect(function() A86.Visible=false;A87.Visible=false;A88.Visible=false;A90.Visible=false;A91.Visible=false;A92.Visible=false;A94.Visible=false;A95.Visible=true;A84.Frame.BackgroundTransparency=1;A93.Position=UDim2.new(0,0, -1,57);end);A95.MouseButton1Click:Connect(function() A86.Visible=true;A87.Visible=true;A88.Visible=true;A90.Visible=true;A91.Visible=true;A92.Visible=true;A94.Visible=true;A95.Visible=false;A84.Frame.BackgroundTransparency=0;A93.Position=UDim2.new(0,0, -1,27);end);end end);A30:AddButton("閲嶆柊鍔犺浇瑙掕壊",function() if A2.Character then A2.Character:BreakJoints();end end);A30:AddButton("閫氱敤鐢╅",function() local A135=game:HttpGet("https://raw.githubusercontent.com/0Ben1/fe./main/Fling%20GUI");local A136=loadstring(A135);if A136 then A136();end end);A30:AddButton("韪忕┖琛岃蛋",function() if A2.Character then local A137=A2.Character:FindFirstChild("HumanoidRootPart");if A137 then local A138=loadstring(game:HttpGet("https://raw.githubusercontent.com/GhostPlayer352/Test4/main/Float"))();A138.Velocity=Vector3.new(0,0,0);A138.MaxForce=Vector3.new(0,math.huge,0);A138.Parent=A137;A6.InputBegan:Connect(function(A139) if (A139.KeyCode==Enum.KeyCode.Space) then A138.Velocity=Vector3.new(0,50,0);wait(0.1);A138.Velocity=Vector3.new(0,0,0);end end);end end end);A30:AddButton("绌垮妯″紡",function() A19= not A19;if A22 then A22:Disconnect();A22=nil;end if A19 then A22=A3.Stepped:Connect(function() if A2.Character then for _,A140 in pairs(A2.Character:GetDescendants()) do if A140:IsA("BasePart") then A140.CanCollide=false;end end end end);end end);A30:AddToggle("SafeModeToggle",{Text="瀹夊叏妯″紡",Default=true}):OnChanged(function(A141) A29=A141;if A141 then if A17 then A17:Destroy();A17=nil;end if (A23 and (type(A23)=="table") and A23.Destroy) then pcall(function() A23:Destroy();end);A23=nil;end end end);A30:AddSlider("SpinSpeedSlider",{Text="鏃嬭浆閫熷害",Default=0,Min=0,Max=500,Rounding=0,Compact=false}):OnChanged(function(A142) if (A2 and A2.Character) then local A143=A2.Character:FindFirstChild("HumanoidRootPart");if A143 then if (A142>0) then if A17 then A17:Destroy();end A17=Instance.new("BodyAngularVelocity");A17.Parent=A143;A17.Name="CustomSpin";A17.MaxTorque=Vector3.new(0,400000,0);A17.AngularVelocity=Vector3.new(0,A142,0);elseif A17 then A17:Destroy();A17=nil;end end end end);local A144=A16.Universal:AddRightGroupbox("鏃嬭浆鎺у埗");A144:AddButton("鏃嬭浆 10",function() if (A2 and A2.Character) then local A145=A2.Character:FindFirstChild("HumanoidRootPart");if A145 then if A17 then A17:Destroy();end A17=Instance.new("BodyAngularVelocity");A17.Parent=A145;A17.Name="CustomSpin";A17.MaxTorque=Vector3.new(0,400000,0);A17.AngularVelocity=Vector3.new(0,10,0);end end end);A144:AddButton("鏃嬭浆 20",function() if (A2 and A2.Character) then local A146=A2.Character:FindFirstChild("HumanoidRootPart");if A146 then if A17 then A17:Destroy();end A17=Instance.new("BodyAngularVelocity");A17.Parent=A146;A17.Name="CustomSpin";A17.MaxTorque=Vector3.new(0,400000,0);A17.AngularVelocity=Vector3.new(0,20,0);end end end);A144:AddButton("鏃嬭浆 30",function() if (A2 and A2.Character) then local A147=A2.Character:FindFirstChild("HumanoidRootPart");if A147 then if A17 then A17:Destroy();end A17=Instance.new("BodyAngularVelocity");A17.Parent=A147;A17.Name="CustomSpin";A17.MaxTorque=Vector3.new(0,400000,0);A17.AngularVelocity=Vector3.new(0,30,0);end end end);A144:AddButton("鏃嬭浆 50",function() if (A2 and A2.Character) then local A148=A2.Character:FindFirstChild("HumanoidRootPart");if A148 then if A17 then A17:Destroy();end A17=Instance.new("BodyAngularVelocity");A17.Parent=A148;A17.Name="CustomSpin";A17.MaxTorque=Vector3.new(0,400000,0);A17.AngularVelocity=Vector3.new(0,50,0);end end end);A144:AddButton("鏃嬭浆 100",function() if (A2 and A2.Character) then local A149=A2.Character:FindFirstChild("HumanoidRootPart");if A149 then if A17 then A17:Destroy();end A17=Instance.new("BodyAngularVelocity");A17.Parent=A149;A17.Name="CustomSpin";A17.MaxTorque=Vector3.new(0,400000,0);A17.AngularVelocity=Vector3.new(0,100,0);end end end);A144:AddButton("鏃嬭浆 200",function() if (A2 and A2.Character) then local A150=A2.Character:FindFirstChild("HumanoidRootPart");if A150 then if A17 then A17:Destroy();end A17=Instance.new("BodyAngularVelocity");A17.Parent=A150;A17.Name="CustomSpin";A17.MaxTorque=Vector3.new(0,400000,0);A17.AngularVelocity=Vector3.new(0,200,0);end end end);A144:AddButton("鏃嬭浆 500",function() if (A2 and A2.Character) then local A151=A2.Character:FindFirstChild("HumanoidRootPart");if A151 then if A17 then A17:Destroy();end A17=Instance.new("BodyAngularVelocity");A17.Parent=A151;A17.Name="CustomSpin";A17.MaxTorque=Vector3.new(0,400000,0);A17.AngularVelocity=Vector3.new(0,500,0);end end end);A144:AddButton("鍋滄鏃嬭浆",function() if A17 then A17:Destroy();A17=nil;end end);A30:AddButton("鍒锋柊娓告垙",function() A7:Teleport(game.PlaceId,A2);end);A31:AddLabel("QQ缇�");A31:AddButton("QQ缇�: 938714427",function() setclipboard("938714427");end);A31:AddLabel("TX鍏ㄨ嚜鍔ㄧ炕璇�");A31:AddButton("TX鍏ㄨ嚜鍔ㄧ炕璇�",function() local A152=game:HttpGet("https://raw.githubusercontent.com/JsYb666/Item/refs/heads/main/Auto-language");local A153=loadstring(A152);if A153 then A153();end end);local scriptCategories={{GroupName="鍚勫ぇ鑴氭湰",List={{Name="绉嬪鑴氭湰",Url="\104\116\116\112\115\58\47\47\114\97\119\46\103\105\116\104\117\98\117\115\101\114\99\111\110\116\101\110\116\46\99\111\109\47\81\82\56\54\56\54\47\56\56\54\47\114\101\102\115\47\104\101\97\100\115\47\119\97\105\110\47\66\71\72"},{Name="鍙惰剼鏈�",Url="https://raw.githubusercontent.com/roblox-ye/QQ515966991/refs/heads/main/ROBLOX-CNVIP-XIAOYE.lua"},{Name="xk鑴氭湰",Url="https://github.com/devslopo/DVES/raw/main/XK%20Hub"},{Name="鏂扮増XA鑴氭湰",Url="https://github.com/YunLua/Lua/raw/main/XA_Hub.lua"}}},{GroupName="99澶�",List={{Name="铏氱┖99澶滆剼鏈眽鍖�",Url="https://raw.githubusercontent.com/fningna51-stack/-/main/99%E5%A4%9C%E6%B1%89%E5%8C%96"},{Name="99澶滆剼鏈彲鏉€闃熷弸",Url="https://raw.githubusercontent.com/358545698555/roblox-/refs/heads/main/%E5%8F%AF%E6%9D%80%E9%98%9F%E5%8F%8B99%E5%A4%9C"}}},{GroupName="姝婚搧杞�",List={{Name="浠跨孩鍙惰剼鏈眽鍖�",Url="https://raw.githubusercontent.com/fningna51-stack/-/main/%E4%BB%BF%E7%BA%A2%E5%8F%B6%E8%84%9A%E6%9C%AC%E6%B1%89%E5%8C%96"},{Name="绾㈠彾鑴氭湰",Url="https://getnative.cc/script/loader"},{Name="閫熼€氳剼鏈眽鍖�",Url="https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%AD%BB%E9%93%81%E8%BD%A8%E6%B1%89%E5%8C%96%E8%84%9A%E6%9C%AC"}}},{GroupName="澧ㄦ按娓告垙",List={{Name="AX澧ㄦ按鑴氭湰姹夊寲",Url="https://raw.githubusercontent.com/fningna51-stack/-/main/ax%E8%84%9A%E6%9C%AC%E7%A7%8B%E8%BE%9E%E6%B1%89%E5%8C%96"},{Name="澧ㄦ按Ringta姹夊寲",Url="https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/Ringta"},{Name="鍗氫鸡澧ㄦ按鑴氭湰",Url="https://pastebin.com/raw/Q64rPkwu"}}},{GroupName="doors",List={{Name="Doors鑴氭湰",Url="https://raw.githubusercontent.com/atnew2025/Chinese-scripts/refs/heads/main/mshax(prohax).txt"},{Name="doors鏈€鏂拌剼鏈�",Url="https://raw.githubusercontent.com/TheHunterSolo1/Scripts/refs/heads/main/Protected_2809220311826785.lua.txt"}}},{GroupName="鐩戠嫳鐢熸椿",List={{Name="鐩戠嫳鐢熸椿姹夊寲",Url="https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%9B%91%E7%8B%B1%E7%94%9F%E6%B4%BB%E8%84%9A%E6%9C%AC"}}},{GroupName="鎴樹簤澶т酣",List={{Name="鎴樹簤澶т酣鏈€寮鸿剼鏈�",Url="https://raw.githubusercontent.com/MaxPikaa/PureLove/refs/heads/main/520"}}},{GroupName="琚仐寮�",List={{Name="琚仐寮冩棤鍗″瘑瓒呭ソ鐢�",Url="https://rawscripts.net/raw/G666-Forsaken-Keyless-auto-gen-reach-autoblock-+-more-63283"}}},{GroupName="绔炰簤瀵规墜",List={{Name="绔炰簤瀵规墜鑴氭湰姹夊寲",Url="https://raw.githubusercontent.com/fningna51-stack/-/main/绔炰簤瀵规墜姹夊寲鑴氭湰"}}}};local ScriptCenterGroupLeft=A16.ScriptCenter:AddLeftGroupbox("鑴氭湰涓績");local ScriptCenterGroupRight=A16.ScriptCenter:AddRightGroupbox("鑴氭湰涓績");local leftIndex=0;local rightIndex=0;for _,category in ipairs(scriptCategories) do local targetGroup=((leftIndex<=rightIndex) and ScriptCenterGroupLeft) or ScriptCenterGroupRight ;local index=((targetGroup==ScriptCenterGroupLeft) and leftIndex) or rightIndex ;if (index>0) then targetGroup:AddLabel("----------------------------------------");end targetGroup:AddLabel(category.GroupName);for __,btn in ipairs(category.List) do targetGroup:AddButton(btn.Name,function() local success,err=pcall(function() local scriptContent=game:HttpGet(btn.Url);local func=loadstring(scriptContent);if func then func();end end);end);end if (targetGroup==ScriptCenterGroupLeft) then leftIndex=leftIndex + 1 ;else rightIndex=rightIndex + 1 ;end end local SettingsGroup=A16.UISettings:AddLeftGroupbox("绯荤粺璁剧疆");SettingsGroup:AddButton("鏌ョ湅鍏憡",function() CreateAnnouncementUI();end);SettingsGroup:AddButton("閲嶆柊鍔犺浇鍏憡",function() local gui=A5:FindFirstChild("AnnouncementGui");if gui then gui:Destroy();end wait(0.1);CreateAnnouncementUI();end);A11:SetLibrary(A10);A12:SetLibrary(A10);A12:IgnoreThemeSettings();A12:SetIgnoreIndexes({"MenuKeybind"});A12:SetFolder("Obsidian/绉嬭緸鑴氭湰");A11:ApplyToTab(A16.UISettings);A12:BuildConfigSection(A16.UISettings);A10.KeybindFrame.Visible=true;A10:OnKeyPress(function(A197) if (A197==Enum.KeyCode.LeftControl) then A10:ToggleUI();end end);A12:LoadAutoloadConfig();game:GetService("Players").PlayerRemoving:Connect(function(A198) if (A198==A2) then if A22 then A22:Disconnect();end if A24 then A24:Disconnect();end if A25 then A25:Disconnect();end if (A23 and (type(A23)=="table") and A23.Destroy) then pcall(function() A23:Destroy();end);A23=nil;end for _,A199 in pairs(A27) do if A199 then pcall(function() A199:Disconnect();end);end end if A26 then A26:Destroy();end if A17 then A17:Destroy();end end end); end
+--[[
+ .____                  ________ ___.    _____                           __                
+ |    |    __ _______   \_____  \\_ |___/ ____\_ __  ______ ____ _____ _/  |_  ___________ 
+ |    |   |  |  \__  \   /   |   \| __ \   __\  |  \/  ___// ___\\__  \\   __\/  _ \_  __ \
+ |    |___|  |  // __ \_/    |    \ \_\ \  | |  |  /\___ \\  \___ / __ \|  | (  <_> )  | \/
+ |_______ \____/(____  /\_______  /___  /__| |____//____  >\___  >____  /__|  \____/|__|   
+         \/          \/         \/    \/                \/     \/     \/                   
+          \_Welcome to LuaObfuscator.com   (Alpha 0.10.9) ~  Much Love, Ferib 
+
+]]--
+
+local A1 = game:GetService("Players");
+local A2 = A1.LocalPlayer;
+local A3 = game:GetService("RunService");
+local A4 = game:GetService("Lighting");
+local A5 = game:GetService("CoreGui");
+local A6 = game:GetService("UserInputService");
+local A7 = game:GetService("TeleportService");
+local A8 = game:GetService("Workspace");
+local A9 = "https://raw.githubusercontent.com/ATLASTEAM01/Obsidian/main/";
+local A10 = loadstring(game:HttpGet(A9 .. "Library.lua"))();
+local A11 = loadstring(game:HttpGet(A9 .. "addons/ThemeManager.lua"))();
+local A12 = loadstring(game:HttpGet(A9 .. "addons/SaveManager.lua"))();
+local A13 = A10.Options;
+local A14 = A10.Toggles;
+local A15 = A10:CreateWindow({Title="秋辞有芙同享脚本",SubTitle="作者：快手秋辞 副作者：有芙同享",Center=true,AutoShow=true});
+local A16 = {Universal=A15:AddTab("通用", "user"),Announcement=A15:AddTab("公告", "info-circle"),ScriptCenter=A15:AddTab("脚本中心", "script"),UISettings=A15:AddTab("UI设置", "settings")};
+local AnnouncementGroup = A16.Announcement:AddLeftGroupbox("脚本公告");
+AnnouncementGroup:AddLabel("秋辞有芙同享脚本公告");
+AnnouncementGroup:AddLabel("版本: 1.0.2");
+AnnouncementGroup:AddLabel("😡😡叫爸爸");
+AnnouncementGroup:AddLabel("新添加功能如下");
+AnnouncementGroup:AddLabel("群聊搜不到快手搜KSWCNMBWFL置顶视频加群");
+AnnouncementGroup:AddLabel("各大脚本，公告");
+AnnouncementGroup:AddLabel("开源毫无意义🤓🤓因为源码都是拿的");
+AnnouncementGroup:AddLabel("感谢使用!");
+local A17 = nil;
+local A18 = false;
+local A19 = false;
+local A20 = false;
+local A21 = false;
+local A22 = nil;
+local A23 = nil;
+local A24 = nil;
+local A25 = nil;
+local A26 = nil;
+local A27 = {};
+local A28 = false;
+local A29 = true;
+local A30 = A16.Universal:AddLeftGroupbox("各种功能");
+local A31 = A16.Universal:AddRightGroupbox("信息与翻译");
+A30:AddSlider("WalkSpeedSlider", {Text="移动速度",Default=16,Min=16,Max=200,Rounding=0,Compact=false}):OnChanged(function(A32)
+	if (A2 and A2.Character) then
+		local FlatIdent_7126A = 0;
+		local A33;
+		while true do
+			if (FlatIdent_7126A == 0) then
+				A33 = A2.Character:FindFirstChild("Humanoid");
+				if A33 then
+					A33.WalkSpeed = A32;
+				end
+				break;
+			end
+		end
+	end
+end);
+A30:AddSlider("JumpPowerSlider", {Text="跳跃高度",Default=50,Min=50,Max=200,Rounding=0,Compact=false}):OnChanged(function(A34)
+	if (A2 and A2.Character) then
+		local FlatIdent_12703 = 0;
+		local A35;
+		while true do
+			if (FlatIdent_12703 == 0) then
+				A35 = A2.Character:FindFirstChild("Humanoid");
+				if A35 then
+					A35.JumpPower = A34;
+				end
+				break;
+			end
+		end
+	end
+end);
+A30:AddInput("JumpPowerInput", {Text="跳跃高度设置",Default="",Placeholder="输入跳跃高度值",Numeric=true,Finished=false,Callback=function(A36)
+	local FlatIdent_2BD95 = 0;
+	local A37;
+	while true do
+		if (FlatIdent_2BD95 == 0) then
+			A37 = tonumber(A36);
+			if (A37 and A2 and A2.Character) then
+				local A38 = A2.Character:FindFirstChild("Humanoid");
+				if A38 then
+					A38.JumpPower = A37;
+				end
+			end
+			break;
+		end
+	end
+end});
+A30:AddInput("WalkSpeedInput", {Text="移动速度设置",Default="",Placeholder="输入移动速度值",Numeric=true,Finished=false,Callback=function(A39)
+	local FlatIdent_23BE8 = 0;
+	local A40;
+	while true do
+		if (FlatIdent_23BE8 == 0) then
+			A40 = tonumber(A39);
+			if (A40 and A2 and A2.Character) then
+				local FlatIdent_8199B = 0;
+				local A41;
+				while true do
+					if (FlatIdent_8199B == 0) then
+						A41 = A2.Character:FindFirstChild("Humanoid");
+						if A41 then
+							A41.WalkSpeed = A40;
+						end
+						break;
+					end
+				end
+			end
+			break;
+		end
+	end
+end});
+A30:AddInput("GravityInput", {Text="重力设置",Default="",Placeholder="输入重力值",Numeric=true,Finished=false,Callback=function(A42)
+	local FlatIdent_39B0 = 0;
+	local A43;
+	while true do
+		if (FlatIdent_39B0 == 0) then
+			A43 = tonumber(A42);
+			if A43 then
+				A8.Gravity = A43;
+			end
+			break;
+		end
+	end
+end});
+A30:AddToggle("NightVisionToggle", {Text="夜视",Default=false}):OnChanged(function(A44)
+	local FlatIdent_1076E = 0;
+	while true do
+		if (FlatIdent_1076E == 0) then
+			A28 = A44;
+			if A44 then
+				local FlatIdent_C460 = 0;
+				while true do
+					if (FlatIdent_C460 == 0) then
+						A4.Ambient = Color3.new(1, 1, 1);
+						A4.Brightness = 1;
+						FlatIdent_C460 = 1;
+					end
+					if (FlatIdent_C460 == 1) then
+						A4.OutdoorAmbient = Color3.new(1, 1, 1);
+						A4.FogEnd = 100000;
+						FlatIdent_C460 = 2;
+					end
+					if (FlatIdent_C460 == 2) then
+						A4.FogStart = 0;
+						A4.GlobalShadows = false;
+						break;
+					end
+				end
+			else
+				A4.Ambient = Color3.new(0, 0, 0);
+				A4.Brightness = 1;
+				A4.OutdoorAmbient = Color3.new(0.5, 0.5, 0.5);
+				A4.FogEnd = 100000;
+				A4.FogStart = 0;
+				A4.GlobalShadows = true;
+			end
+			break;
+		end
+	end
+end);
+A30:AddToggle("ESPToggle", {Text="透视",Default=false}):OnChanged(function(A45)
+	if A45 then
+		if not A26 then
+			A26 = Instance.new("Folder");
+			A26.Name = "Highlight_Storage";
+			A26.Parent = A5;
+		end
+		local A46 = Color3.fromRGB(175, 25, 255);
+		local A47 = Color3.fromRGB(255, 255, 255);
+		for _, A48 in pairs(A1:GetPlayers()) do
+			if (A48 ~= A2) then
+				local FlatIdent_6053C = 0;
+				local A49;
+				local A50;
+				local A52;
+				while true do
+					if (FlatIdent_6053C == 1) then
+						A49.FillTransparency = 0.5;
+						A49.OutlineColor = A47;
+						A49.OutlineTransparency = 0;
+						A49.Parent = A26;
+						FlatIdent_6053C = 2;
+					end
+					if (FlatIdent_6053C == 0) then
+						A49 = Instance.new("Highlight");
+						A49.Name = A48.Name;
+						A49.FillColor = A46;
+						A49.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop;
+						FlatIdent_6053C = 1;
+					end
+					if (FlatIdent_6053C == 3) then
+						A27[A48] = A52;
+						break;
+					end
+					if (FlatIdent_6053C == 2) then
+						A50 = nil;
+						function A50(A51)
+							if A51 then
+								A49.Adornee = A51;
+							end
+						end
+						if A48.Character then
+							A50(A48.Character);
+						end
+						A52 = A48.CharacterAdded:Connect(A50);
+						FlatIdent_6053C = 3;
+					end
+				end
+			end
+		end
+		local A53 = A1.PlayerAdded:Connect(function(A54)
+			local FlatIdent_7A75F = 0;
+			local A55;
+			local A56;
+			local A58;
+			while true do
+				if (FlatIdent_7A75F == 2) then
+					A55.OutlineTransparency = 0;
+					A55.Parent = A26;
+					A56 = nil;
+					FlatIdent_7A75F = 3;
+				end
+				if (FlatIdent_7A75F == 0) then
+					A55 = Instance.new("Highlight");
+					A55.Name = A54.Name;
+					A55.FillColor = A46;
+					FlatIdent_7A75F = 1;
+				end
+				if (FlatIdent_7A75F == 1) then
+					A55.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop;
+					A55.FillTransparency = 0.5;
+					A55.OutlineColor = A47;
+					FlatIdent_7A75F = 2;
+				end
+				if (FlatIdent_7A75F == 4) then
+					A27[A54] = A58;
+					break;
+				end
+				if (FlatIdent_7A75F == 3) then
+					function A56(A57)
+						if A57 then
+							A55.Adornee = A57;
+						end
+					end
+					if A54.Character then
+						A56(A54.Character);
+					end
+					A58 = A54.CharacterAdded:Connect(A56);
+					FlatIdent_7A75F = 4;
+				end
+			end
+		end);
+		local A59 = A1.PlayerRemoving:Connect(function(A60)
+			local FlatIdent_759F1 = 0;
+			while true do
+				if (0 == FlatIdent_759F1) then
+					if A27[A60] then
+						A27[A60]:Disconnect();
+						A27[A60] = nil;
+					end
+					if A26 then
+						local FlatIdent_324DE = 0;
+						local A61;
+						while true do
+							if (0 == FlatIdent_324DE) then
+								A61 = A26:FindFirstChild(A60.Name);
+								if A61 then
+									A61:Destroy();
+								end
+								break;
+							end
+						end
+					end
+					break;
+				end
+			end
+		end);
+		A27['PlayerAdded'] = A53;
+		A27['PlayerRemoving'] = A59;
+	else
+		local FlatIdent_35A31 = 0;
+		while true do
+			if (FlatIdent_35A31 == 0) then
+				for _, A62 in pairs(A27) do
+					if A62 then
+						pcall(function()
+							A62:Disconnect();
+						end);
+					end
+				end
+				A27 = {};
+				FlatIdent_35A31 = 1;
+			end
+			if (FlatIdent_35A31 == 1) then
+				if A26 then
+					local FlatIdent_64E40 = 0;
+					while true do
+						if (FlatIdent_64E40 == 0) then
+							A26:Destroy();
+							A26 = nil;
+							break;
+						end
+					end
+				end
+				break;
+			end
+		end
+	end
+end);
+A30:AddButton("墨水飞行", function()
+	local A63 = {};
+	A63.Config = {MoveSpeed=10,FreezeEnabled=false,FreezeY=nil};
+	A63.State = {UI=nil,Connections={},Initialized=false};
+	A63.Init = function()
+		local FlatIdent_5346B = 0;
+		while true do
+			if (FlatIdent_5346B == 0) then
+				if A63.State.Initialized then
+					return;
+				end
+				A63.Services = {Players=game:GetService("Players"),UserInputService=game:GetService("UserInputService"),RunService=game:GetService("RunService"),CoreGui=game:GetService("CoreGui")};
+				FlatIdent_5346B = 1;
+			end
+			if (1 == FlatIdent_5346B) then
+				A63.Player = A63.Services.Players.LocalPlayer;
+				A63.Character = nil;
+				FlatIdent_5346B = 2;
+			end
+			if (3 == FlatIdent_5346B) then
+				A63.State.Initialized = true;
+				break;
+			end
+			if (2 == FlatIdent_5346B) then
+				A63.Humanoid = nil;
+				A63.HRP = nil;
+				FlatIdent_5346B = 3;
+			end
+		end
+	end;
+	A63.CreateUI = function()
+		if A63.State.UI then
+			local FlatIdent_6C033 = 0;
+			while true do
+				if (0 == FlatIdent_6C033) then
+					A63.State.UI:Destroy();
+					A63.State.UI = nil;
+					break;
+				end
+			end
+		end
+		local A64 = Instance.new("ScreenGui");
+		A64.Name = "QC_FlyUI";
+		A64.Parent = A63.Services.CoreGui;
+		A64.DisplayOrder = 2000;
+		A64.ResetOnSpawn = false;
+		local A65 = Instance.new("TextBox");
+		A65.Name = "SpeedInput";
+		A65.Parent = A64;
+		A65.Size = UDim2.new(0, 120, 0, 30);
+		A65.Position = UDim2.new(0.95, -120, 0.05, 38);
+		A65.Text = tostring(A63.Config.MoveSpeed);
+		A65.TextSize = 18;
+		A65.PlaceholderText = "移动速度";
+		A65.BackgroundColor3 = Color3.fromRGB(255, 255, 255);
+		A65.BackgroundTransparency = 0.2;
+		A65.TextColor3 = Color3.fromRGB(0, 0, 0);
+		Instance.new("UICorner").Parent = A65;
+		A65.FocusLost:Connect(function()
+			local FlatIdent_5B2CE = 0;
+			local A66;
+			while true do
+				if (FlatIdent_5B2CE == 0) then
+					A66 = tonumber(A65.Text);
+					if (A66 and (A66 > 0)) then
+						A63.Config.MoveSpeed = A66;
+					else
+						A65.Text = tostring(A63.Config.MoveSpeed);
+					end
+					break;
+				end
+			end
+		end);
+		local A67 = Instance.new("TextButton");
+		A67.Name = "FreezeBtn";
+		A67.Parent = A64;
+		A67.Size = UDim2.new(0, 120, 0, 38);
+		A67.Position = UDim2.new(0.95, -120, 0.05, 0);
+		A67.Text = "开启空中悬挂";
+		A67.TextSize = 20;
+		A67.BackgroundColor3 = Color3.fromRGB(210, 240, 255);
+		A67.BackgroundTransparency = 0.2;
+		A67.TextColor3 = Color3.fromRGB(0, 0, 0);
+		Instance.new("UICorner").Parent = A67;
+		A67.MouseButton1Click:Connect(function()
+			local FlatIdent_2E9CB = 0;
+			while true do
+				if (FlatIdent_2E9CB == 1) then
+					A67.BackgroundColor3 = (A63.Config.FreezeEnabled and Color3.fromRGB(255, 200, 200)) or Color3.fromRGB(210, 240, 255);
+					if not A63.Config.FreezeEnabled then
+						A63.Config.FreezeY = nil;
+					end
+					break;
+				end
+				if (FlatIdent_2E9CB == 0) then
+					A63.Config.FreezeEnabled = not A63.Config.FreezeEnabled;
+					A67.Text = (A63.Config.FreezeEnabled and "悬挂√") or "开启空中悬挂";
+					FlatIdent_2E9CB = 1;
+				end
+			end
+		end);
+		A63.State.UI = A64;
+		return A64;
+	end;
+	A63.SetupCharacter = function(A68)
+		A63.Character = A68;
+		A63.Humanoid = A68:WaitForChild("Humanoid", 10);
+		A63.HRP = A68:WaitForChild("HumanoidRootPart", 10);
+		A63.Humanoid.Died:Connect(function()
+			local FlatIdent_8BC55 = 0;
+			while true do
+				if (FlatIdent_8BC55 == 1) then
+					if A63.State.UI then
+						local FlatIdent_8B336 = 0;
+						local A69;
+						while true do
+							if (FlatIdent_8B336 == 0) then
+								A69 = A63.State.UI:FindFirstChild("FreezeBtn");
+								if A69 then
+									local FlatIdent_2BE02 = 0;
+									while true do
+										if (FlatIdent_2BE02 == 0) then
+											A69.Text = "开启空中悬挂";
+											A69.BackgroundColor3 = Color3.fromRGB(210, 240, 255);
+											break;
+										end
+									end
+								end
+								break;
+							end
+						end
+					end
+					break;
+				end
+				if (FlatIdent_8BC55 == 0) then
+					A63.Config.FreezeEnabled = false;
+					A63.Config.FreezeY = nil;
+					FlatIdent_8BC55 = 1;
+				end
+			end
+		end);
+	end;
+	A63.SetupInfiniteJump = function()
+		table.insert(A63.State.Connections, A63.Services.UserInputService.JumpRequest:Connect(function()
+			if (A63.Humanoid and (A63.Humanoid:GetState() ~= Enum.HumanoidStateType.Dead)) then
+				A63.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping);
+			end
+		end));
+	end;
+	A63.SetupMainLoop = function()
+		table.insert(A63.State.Connections, A63.Services.RunService.Heartbeat:Connect(function(A70)
+			if (A63.Humanoid and A63.HRP and (A63.Humanoid:GetState() ~= Enum.HumanoidStateType.Dead)) then
+				local A71 = A63.Humanoid.MoveDirection;
+				if A63.Config.FreezeEnabled then
+					local FlatIdent_6D9D2 = 0;
+					local A72;
+					while true do
+						if (FlatIdent_6D9D2 == 0) then
+							A72 = A63.Humanoid:GetState();
+							if ((A72 == Enum.HumanoidStateType.Freefall) and (A63.Humanoid:GetState() ~= Enum.HumanoidStateType.Jumping)) then
+								local FlatIdent_6225E = 0;
+								while true do
+									if (FlatIdent_6225E == 0) then
+										if (A71.Magnitude > 0) then
+											if not A63.Config.FreezeY then
+												A63.Config.FreezeY = A63.HRP.Position.Y;
+											end
+											local A73 = Vector3.new(A71.X, 0, A71.Z) * A63.Config.MoveSpeed * A70;
+											local A74 = A63.HRP.Position;
+											local A75 = Vector3.new(A74.X, A63.Config.FreezeY, A74.Z) + A73;
+											A63.HRP.CFrame = CFrame.new(A75, A75 + A63.HRP.CFrame.LookVector);
+											A63.HRP.Velocity = Vector3.new(0, 0, 0);
+										else
+											A63.Config.FreezeY = nil;
+										end
+										return;
+									end
+								end
+							else
+								A63.Config.FreezeY = nil;
+							end
+							break;
+						end
+					end
+				end
+				if (A71.Magnitude > 0) then
+					A63.HRP.CFrame = A63.HRP.CFrame + (A71.Unit * A63.Config.MoveSpeed * A70);
+				end
+			end
+		end));
+	end;
+	A63.SetupCharacterListeners = function()
+		local FlatIdent_21DDC = 0;
+		while true do
+			if (FlatIdent_21DDC == 1) then
+				table.insert(A63.State.Connections, A63.Player.CharacterRemoving:Connect(function()
+					local FlatIdent_67691 = 0;
+					while true do
+						if (FlatIdent_67691 == 1) then
+							A63.HRP = nil;
+							A63.Config.FreezeEnabled = false;
+							FlatIdent_67691 = 2;
+						end
+						if (FlatIdent_67691 == 2) then
+							A63.Config.FreezeY = nil;
+							break;
+						end
+						if (FlatIdent_67691 == 0) then
+							A63.Character = nil;
+							A63.Humanoid = nil;
+							FlatIdent_67691 = 1;
+						end
+					end
+				end));
+				break;
+			end
+			if (FlatIdent_21DDC == 0) then
+				if A63.Player.Character then
+					A63.SetupCharacter(A63.Player.Character);
+				end
+				table.insert(A63.State.Connections, A63.Player.CharacterAdded:Connect(function(A76)
+					A63.SetupCharacter(A76);
+				end));
+				FlatIdent_21DDC = 1;
+			end
+		end
+	end;
+	A63.Start = function()
+		local FlatIdent_1013A = 0;
+		while true do
+			if (0 == FlatIdent_1013A) then
+				A63.Init();
+				A63.CreateUI();
+				FlatIdent_1013A = 1;
+			end
+			if (FlatIdent_1013A == 1) then
+				A63.SetupInfiniteJump();
+				A63.SetupMainLoop();
+				FlatIdent_1013A = 2;
+			end
+			if (FlatIdent_1013A == 2) then
+				A63.SetupCharacterListeners();
+				break;
+			end
+		end
+	end;
+	A63.Stop = function()
+		local FlatIdent_86900 = 0;
+		while true do
+			if (FlatIdent_86900 == 3) then
+				A63.Humanoid = nil;
+				A63.HRP = nil;
+				break;
+			end
+			if (1 == FlatIdent_86900) then
+				if A63.State.UI then
+					A63.State.UI:Destroy();
+					A63.State.UI = nil;
+				end
+				A63.Config.FreezeEnabled = false;
+				FlatIdent_86900 = 2;
+			end
+			if (FlatIdent_86900 == 2) then
+				A63.Config.FreezeY = nil;
+				A63.Character = nil;
+				FlatIdent_86900 = 3;
+			end
+			if (FlatIdent_86900 == 0) then
+				for _, A77 in pairs(A63.State.Connections) do
+					A77:Disconnect();
+				end
+				A63.State.Connections = {};
+				FlatIdent_86900 = 1;
+			end
+		end
+	end;
+	A63.GetInfo = function()
+		return {Name="飞行悬挂模块",Version="1.0",Author="QC Script",Description="提供飞行、悬挂、无限跳跃功能"};
+	end;
+	A63.Start();
+end);
+A30:AddButton("无限跳", function()
+	local FlatIdent_91608 = 0;
+	while true do
+		if (FlatIdent_91608 == 1) then
+			if A20 then
+				A25 = A6.JumpRequest:Connect(function()
+					if A2.Character then
+						local FlatIdent_53124 = 0;
+						local A78;
+						while true do
+							if (FlatIdent_53124 == 0) then
+								A78 = A2.Character:FindFirstChildOfClass("Humanoid");
+								if A78 then
+									A78:ChangeState("Jumping");
+								end
+								break;
+							end
+						end
+					end
+				end);
+			end
+			break;
+		end
+		if (FlatIdent_91608 == 0) then
+			A20 = not A20;
+			if A25 then
+				local FlatIdent_331F0 = 0;
+				while true do
+					if (FlatIdent_331F0 == 0) then
+						A25:Disconnect();
+						A25 = nil;
+						break;
+					end
+				end
+			end
+			FlatIdent_91608 = 1;
+		end
+	end
+end);
+A30:AddButton("爬墙", function()
+	A18 = not A18;
+	if A24 then
+		local FlatIdent_44603 = 0;
+		while true do
+			if (FlatIdent_44603 == 0) then
+				A24:Disconnect();
+				A24 = nil;
+				break;
+			end
+		end
+	end
+	if A18 then
+		A24 = A3.Heartbeat:Connect(function()
+			if A2.Character then
+				local FlatIdent_5724B = 0;
+				local A79;
+				local A80;
+				while true do
+					if (FlatIdent_5724B == 1) then
+						if (A79 and A80) then
+							local FlatIdent_83844 = 0;
+							local A81;
+							local A82;
+							local A83;
+							while true do
+								if (FlatIdent_83844 == 0) then
+									A81 = Ray.new(A80.Position, A80.CFrame.LookVector * 5);
+									A82, A83 = A8:FindPartOnRay(A81, A2.Character);
+									FlatIdent_83844 = 1;
+								end
+								if (1 == FlatIdent_83844) then
+									if A82 then
+										local FlatIdent_2593F = 0;
+										while true do
+											if (FlatIdent_2593F == 0) then
+												A79:ChangeState(Enum.HumanoidStateType.Climbing);
+												A80.CFrame = CFrame.new(A83) * CFrame.new(0, 3, 0);
+												break;
+											end
+										end
+									end
+									break;
+								end
+							end
+						end
+						break;
+					end
+					if (0 == FlatIdent_5724B) then
+						A79 = A2.Character:FindFirstChildOfClass("Humanoid");
+						A80 = A2.Character:FindFirstChild("HumanoidRootPart");
+						FlatIdent_5724B = 1;
+					end
+				end
+			end
+		end);
+	end
+end);
+A30:AddButton("飞行", function()
+	A21 = not A21;
+	if A21 then
+		local A84 = Instance.new("ScreenGui");
+		local A85 = Instance.new("Frame");
+		local A86 = Instance.new("TextButton");
+		local A87 = Instance.new("TextButton");
+		local A88 = Instance.new("TextButton");
+		local A89 = Instance.new("TextLabel");
+		local A90 = Instance.new("TextButton");
+		local A91 = Instance.new("TextLabel");
+		local A92 = Instance.new("TextButton");
+		local A93 = Instance.new("TextButton");
+		local A94 = Instance.new("TextButton");
+		local A95 = Instance.new("TextButton");
+		A84.Name = "main";
+		A84.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui");
+		A84.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
+		A84.ResetOnSpawn = false;
+		A85.Parent = A84;
+		A85.BackgroundColor3 = Color3.fromRGB(163, 255, 137);
+		A85.BorderColor3 = Color3.fromRGB(103, 221, 213);
+		A85.Position = UDim2.new(0.100320168, 0, 0.379746825, 0);
+		A85.Size = UDim2.new(0, 190, 0, 57);
+		A86.Name = "up";
+		A86.Parent = A85;
+		A86.BackgroundColor3 = Color3.fromRGB(79, 255, 152);
+		A86.Size = UDim2.new(0, 44, 0, 28);
+		A86.Font = Enum.Font.SourceSans;
+		A86.Text = "上升";
+		A86.TextColor3 = Color3.fromRGB(0, 0, 0);
+		A86.TextSize = 14;
+		A87.Name = "down";
+		A87.Parent = A85;
+		A87.BackgroundColor3 = Color3.fromRGB(215, 255, 121);
+		A87.Position = UDim2.new(0, 0, 0.491228074, 0);
+		A87.Size = UDim2.new(0, 44, 0, 28);
+		A87.Font = Enum.Font.SourceSans;
+		A87.Text = "下降";
+		A87.TextColor3 = Color3.fromRGB(0, 0, 0);
+		A87.TextSize = 14;
+		A88.Name = "onof";
+		A88.Parent = A85;
+		A88.BackgroundColor3 = Color3.fromRGB(255, 249, 74);
+		A88.Position = UDim2.new(0.702823281, 0, 0.491228074, 0);
+		A88.Size = UDim2.new(0, 56, 0, 28);
+		A88.Font = Enum.Font.SourceSans;
+		A88.Text = "起飞";
+		A88.TextColor3 = Color3.fromRGB(0, 0, 0);
+		A88.TextSize = 14;
+		A89.Parent = A85;
+		A89.BackgroundColor3 = Color3.fromRGB(242, 60, 255);
+		A89.Position = UDim2.new(0.469327301, 0, 0, 0);
+		A89.Size = UDim2.new(0, 100, 0, 28);
+		A89.Font = Enum.Font.SourceSans;
+		A89.Text = " 秋辞飞行";
+		A89.TextColor3 = Color3.fromRGB(0, 0, 0);
+		A89.TextScaled = true;
+		A89.TextSize = 14;
+		A89.TextWrapped = true;
+		A90.Name = "plus";
+		A90.Parent = A85;
+		A90.BackgroundColor3 = Color3.fromRGB(133, 145, 255);
+		A90.Position = UDim2.new(0.231578946, 0, 0, 0);
+		A90.Size = UDim2.new(0, 45, 0, 28);
+		A90.Font = Enum.Font.SourceSans;
+		A90.Text = "+";
+		A90.TextColor3 = Color3.fromRGB(0, 0, 0);
+		A90.TextScaled = true;
+		A90.TextSize = 14;
+		A90.TextWrapped = true;
+		A91.Name = "speed";
+		A91.Parent = A85;
+		A91.BackgroundColor3 = Color3.fromRGB(255, 85, 0);
+		A91.Position = UDim2.new(0.468421042, 0, 0.491228074, 0);
+		A91.Size = UDim2.new(0, 44, 0, 28);
+		A91.Font = Enum.Font.SourceSans;
+		A91.Text = "1";
+		A91.TextColor3 = Color3.fromRGB(0, 0, 0);
+		A91.TextScaled = true;
+		A91.TextSize = 14;
+		A91.TextWrapped = true;
+		A92.Name = "mine";
+		A92.Parent = A85;
+		A92.BackgroundColor3 = Color3.fromRGB(123, 255, 247);
+		A92.Position = UDim2.new(0.231578946, 0, 0.491228074, 0);
+		A92.Size = UDim2.new(0, 45, 0, 29);
+		A92.Font = Enum.Font.SourceSans;
+		A92.Text = "-";
+		A92.TextColor3 = Color3.fromRGB(0, 0, 0);
+		A92.TextScaled = true;
+		A92.TextSize = 14;
+		A92.TextWrapped = true;
+		A93.Name = "Close";
+		A93.Parent = A84.Frame;
+		A93.BackgroundColor3 = Color3.fromRGB(225, 25, 0);
+		A93.Font = "SourceSans";
+		A93.Size = UDim2.new(0, 45, 0, 28);
+		A93.Text = "X";
+		A93.TextSize = 30;
+		A93.Position = UDim2.new(0, 0, -1, 27);
+		A94.Name = "minimize";
+		A94.Parent = A84.Frame;
+		A94.BackgroundColor3 = Color3.fromRGB(192, 150, 230);
+		A94.Font = "SourceSans";
+		A94.Size = UDim2.new(0, 45, 0, 28);
+		A94.Text = "-";
+		A94.TextSize = 40;
+		A94.Position = UDim2.new(0, 44, -1, 27);
+		A95.Name = "minimize2";
+		A95.Parent = A84.Frame;
+		A95.BackgroundColor3 = Color3.fromRGB(192, 150, 230);
+		A95.Font = "SourceSans";
+		A95.Size = UDim2.new(0, 45, 0, 28);
+		A95.Text = "+";
+		A95.TextSize = 40;
+		A95.Position = UDim2.new(0, 44, -1, 57);
+		A95.Visible = false;
+		speeds = 1;
+		local A96 = game:GetService("Players").LocalPlayer;
+		local A97 = game.Players.LocalPlayer.Character;
+		local A98 = A97 and A97:FindFirstChildWhichIsA("Humanoid");
+		nowe = false;
+		A85.Active = true;
+		A85.Draggable = true;
+		A88.MouseButton1Down:connect(function()
+			if (nowe == true) then
+				local FlatIdent_30F75 = 0;
+				while true do
+					if (0 == FlatIdent_30F75) then
+						nowe = false;
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing, true);
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, true);
+						FlatIdent_30F75 = 1;
+					end
+					if (FlatIdent_30F75 == 4) then
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics, true);
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true);
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics, true);
+						FlatIdent_30F75 = 5;
+					end
+					if (FlatIdent_30F75 == 1) then
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Flying, true);
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall, true);
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp, true);
+						FlatIdent_30F75 = 2;
+					end
+					if (FlatIdent_30F75 == 2) then
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, true);
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Landed, true);
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics, true);
+						FlatIdent_30F75 = 3;
+					end
+					if (FlatIdent_30F75 == 5) then
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming, true);
+						A96.Character.Humanoid:ChangeState(Enum.HumanoidStateType.RunningNoPhysics);
+						break;
+					end
+					if (FlatIdent_30F75 == 3) then
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.PlatformStanding, true);
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, true);
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Running, true);
+						FlatIdent_30F75 = 4;
+					end
+				end
+			else
+				local FlatIdent_1BA2F = 0;
+				local A102;
+				local A103;
+				while true do
+					if (FlatIdent_1BA2F == 7) then
+						A96.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Swimming);
+						break;
+					end
+					if (FlatIdent_1BA2F == 6) then
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false);
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics, false);
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming, false);
+						FlatIdent_1BA2F = 7;
+					end
+					if (3 == FlatIdent_1BA2F) then
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall, false);
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp, false);
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, false);
+						FlatIdent_1BA2F = 4;
+					end
+					if (FlatIdent_1BA2F == 0) then
+						nowe = true;
+						for i = 1, speeds do
+							spawn(function()
+								local FlatIdent_5077 = 0;
+								local A99;
+								local A100;
+								local A101;
+								while true do
+									if (FlatIdent_5077 == 0) then
+										A99 = game:GetService("RunService").Heartbeat;
+										tpwalking = true;
+										FlatIdent_5077 = 1;
+									end
+									if (FlatIdent_5077 == 2) then
+										while tpwalking and A99:Wait() and A100 and A101 and A101.Parent do
+											if (A101.MoveDirection.Magnitude > 0) then
+												A100:TranslateBy(A101.MoveDirection);
+											end
+										end
+										break;
+									end
+									if (FlatIdent_5077 == 1) then
+										A100 = game.Players.LocalPlayer.Character;
+										A101 = A100 and A100:FindFirstChildWhichIsA("Humanoid");
+										FlatIdent_5077 = 2;
+									end
+								end
+							end);
+						end
+						game.Players.LocalPlayer.Character.Animate.Disabled = true;
+						FlatIdent_1BA2F = 1;
+					end
+					if (FlatIdent_1BA2F == 2) then
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing, false);
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false);
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Flying, false);
+						FlatIdent_1BA2F = 3;
+					end
+					if (FlatIdent_1BA2F == 5) then
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false);
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Running, false);
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics, false);
+						FlatIdent_1BA2F = 6;
+					end
+					if (FlatIdent_1BA2F == 4) then
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Landed, false);
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics, false);
+						A96.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.PlatformStanding, false);
+						FlatIdent_1BA2F = 5;
+					end
+					if (FlatIdent_1BA2F == 1) then
+						A102 = game.Players.LocalPlayer.Character;
+						A103 = A102:FindFirstChildOfClass("Humanoid") or A102:FindFirstChildOfClass("AnimationController");
+						for i, v in next, A103:GetPlayingAnimationTracks() do
+							v:AdjustSpeed(0);
+						end
+						FlatIdent_1BA2F = 2;
+					end
+				end
+			end
+			if (game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid").RigType == Enum.HumanoidRigType.R6) then
+				local A104 = game.Players.LocalPlayer;
+				local A105 = A104.Character.Torso;
+				local A106 = true;
+				local A107 = true;
+				local A108 = {f=0,b=0,l=0,r=0};
+				local A109 = {f=0,b=0,l=0,r=0};
+				local A110 = 50;
+				local A111 = 0;
+				local A112 = Instance.new("BodyGyro", A105);
+				A112.P = 90000;
+				A112.maxTorque = Vector3.new(8999999488, 8999999488, 8999999488);
+				A112.cframe = A105.CFrame;
+				local A113 = Instance.new("BodyVelocity", A105);
+				A113.velocity = Vector3.new(0, 0.1, 0);
+				A113.maxForce = Vector3.new(8999999488, 8999999488, 8999999488);
+				if (nowe == true) then
+					A104.Character.Humanoid.PlatformStand = true;
+				end
+				while (nowe == true) or (game:GetService("Players").LocalPlayer.Character.Humanoid.Health == 0) do
+					local FlatIdent_77529 = 0;
+					while true do
+						if (0 == FlatIdent_77529) then
+							game:GetService("RunService").RenderStepped:Wait();
+							if (((A108.l + A108.r) ~= 0) or ((A108.f + A108.b) ~= 0)) then
+								local FlatIdent_506A5 = 0;
+								while true do
+									if (FlatIdent_506A5 == 0) then
+										A111 = A111 + 0.5 + (A111 / A110);
+										if (A111 > A110) then
+											A111 = A110;
+										end
+										break;
+									end
+								end
+							elseif (not (((A108.l + A108.r) ~= 0) or ((A108.f + A108.b) ~= 0)) and (A111 ~= 0)) then
+								local FlatIdent_14124 = 0;
+								while true do
+									if (0 == FlatIdent_14124) then
+										A111 = A111 - 1;
+										if (A111 < 0) then
+											A111 = 0;
+										end
+										break;
+									end
+								end
+							end
+							FlatIdent_77529 = 1;
+						end
+						if (1 == FlatIdent_77529) then
+							if (((A108.l + A108.r) ~= 0) or ((A108.f + A108.b) ~= 0)) then
+								A113.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (A108.f + A108.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(A108.l + A108.r, (A108.f + A108.b) * 0.2, 0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p)) * A111;
+								A109 = {f=A108.f,b=A108.b,l=A108.l,r=A108.r};
+							elseif (((A108.l + A108.r) == 0) and ((A108.f + A108.b) == 0) and (A111 ~= 0)) then
+								A113.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (A109.f + A109.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(A109.l + A109.r, (A109.f + A109.b) * 0.2, 0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p)) * A111;
+							else
+								A113.velocity = Vector3.new(0, 0, 0);
+							end
+							A112.cframe = game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad(((A108.f + A108.b) * 50 * A111) / A110), 0, 0);
+							break;
+						end
+					end
+				end
+				A108 = {f=0,b=0,l=0,r=0};
+				A109 = {f=0,b=0,l=0,r=0};
+				A111 = 0;
+				A112:Destroy();
+				A113:Destroy();
+				A104.Character.Humanoid.PlatformStand = false;
+				game.Players.LocalPlayer.Character.Animate.Disabled = false;
+				tpwalking = false;
+			else
+				local A114 = game.Players.LocalPlayer;
+				local A115 = A114.Character.UpperTorso;
+				local A116 = true;
+				local A117 = true;
+				local A118 = {f=0,b=0,l=0,r=0};
+				local A119 = {f=0,b=0,l=0,r=0};
+				local A120 = 50;
+				local A121 = 0;
+				local A122 = Instance.new("BodyGyro", A115);
+				A122.P = 90000;
+				A122.maxTorque = Vector3.new(8999999488, 8999999488, 8999999488);
+				A122.cframe = A115.CFrame;
+				local A123 = Instance.new("BodyVelocity", A115);
+				A123.velocity = Vector3.new(0, 0.1, 0);
+				A123.maxForce = Vector3.new(8999999488, 8999999488, 8999999488);
+				if (nowe == true) then
+					A114.Character.Humanoid.PlatformStand = true;
+				end
+				while (nowe == true) or (game:GetService("Players").LocalPlayer.Character.Humanoid.Health == 0) do
+					local FlatIdent_2DB3E = 0;
+					while true do
+						if (FlatIdent_2DB3E == 1) then
+							if (((A118.l + A118.r) ~= 0) or ((A118.f + A118.b) ~= 0)) then
+								local FlatIdent_270C = 0;
+								while true do
+									if (FlatIdent_270C == 0) then
+										A123.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (A118.f + A118.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(A118.l + A118.r, (A118.f + A118.b) * 0.2, 0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p)) * A121;
+										A119 = {f=A118.f,b=A118.b,l=A118.l,r=A118.r};
+										break;
+									end
+								end
+							elseif (((A118.l + A118.r) == 0) and ((A118.f + A118.b) == 0) and (A121 ~= 0)) then
+								A123.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (A119.f + A119.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(A119.l + A119.r, (A119.f + A119.b) * 0.2, 0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p)) * A121;
+							else
+								A123.velocity = Vector3.new(0, 0, 0);
+							end
+							A122.cframe = game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad(((A118.f + A118.b) * 50 * A121) / A120), 0, 0);
+							break;
+						end
+						if (FlatIdent_2DB3E == 0) then
+							wait();
+							if (((A118.l + A118.r) ~= 0) or ((A118.f + A118.b) ~= 0)) then
+								A121 = A121 + 0.5 + (A121 / A120);
+								if (A121 > A120) then
+									A121 = A120;
+								end
+							elseif (not (((A118.l + A118.r) ~= 0) or ((A118.f + A118.b) ~= 0)) and (A121 ~= 0)) then
+								local FlatIdent_7D3C9 = 0;
+								while true do
+									if (0 == FlatIdent_7D3C9) then
+										A121 = A121 - 1;
+										if (A121 < 0) then
+											A121 = 0;
+										end
+										break;
+									end
+								end
+							end
+							FlatIdent_2DB3E = 1;
+						end
+					end
+				end
+				A118 = {f=0,b=0,l=0,r=0};
+				A119 = {f=0,b=0,l=0,r=0};
+				A121 = 0;
+				A122:Destroy();
+				A123:Destroy();
+				A114.Character.Humanoid.PlatformStand = false;
+				game.Players.LocalPlayer.Character.Animate.Disabled = false;
+				tpwalking = false;
+			end
+		end);
+		local A124;
+		A86.MouseButton1Down:connect(function()
+			A124 = A86.MouseEnter:connect(function()
+				while A124 do
+					local FlatIdent_5CC3B = 0;
+					while true do
+						if (0 == FlatIdent_5CC3B) then
+							wait();
+							game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 1, 0);
+							break;
+						end
+					end
+				end
+			end);
+		end);
+		A86.MouseLeave:connect(function()
+			if A124 then
+				local FlatIdent_B322 = 0;
+				while true do
+					if (FlatIdent_B322 == 0) then
+						A124:Disconnect();
+						A124 = nil;
+						break;
+					end
+				end
+			end
+		end);
+		local A125;
+		A87.MouseButton1Down:connect(function()
+			A125 = A87.MouseEnter:connect(function()
+				while A125 do
+					local FlatIdent_84ED3 = 0;
+					while true do
+						if (0 == FlatIdent_84ED3) then
+							wait();
+							game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, -1, 0);
+							break;
+						end
+					end
+				end
+			end);
+		end);
+		A87.MouseLeave:connect(function()
+			if A125 then
+				local FlatIdent_40FD3 = 0;
+				while true do
+					if (FlatIdent_40FD3 == 0) then
+						A125:Disconnect();
+						A125 = nil;
+						break;
+					end
+				end
+			end
+		end);
+		game:GetService("Players").LocalPlayer.CharacterAdded:Connect(function(A126)
+			local FlatIdent_740DC = 0;
+			while true do
+				if (FlatIdent_740DC == 1) then
+					game.Players.LocalPlayer.Character.Animate.Disabled = false;
+					break;
+				end
+				if (FlatIdent_740DC == 0) then
+					wait(0.7);
+					game.Players.LocalPlayer.Character.Humanoid.PlatformStand = false;
+					FlatIdent_740DC = 1;
+				end
+			end
+		end);
+		A90.MouseButton1Down:connect(function()
+			local FlatIdent_78A9D = 0;
+			while true do
+				if (FlatIdent_78A9D == 1) then
+					if (nowe == true) then
+						local FlatIdent_8CB90 = 0;
+						while true do
+							if (FlatIdent_8CB90 == 0) then
+								tpwalking = false;
+								for i = 1, speeds do
+									spawn(function()
+										local FlatIdent_4058F = 0;
+										local A127;
+										local A128;
+										local A129;
+										while true do
+											if (FlatIdent_4058F == 1) then
+												A128 = game.Players.LocalPlayer.Character;
+												A129 = A128 and A128:FindFirstChildWhichIsA("Humanoid");
+												FlatIdent_4058F = 2;
+											end
+											if (2 == FlatIdent_4058F) then
+												while tpwalking and A127:Wait() and A128 and A129 and A129.Parent do
+													if (A129.MoveDirection.Magnitude > 0) then
+														A128:TranslateBy(A129.MoveDirection);
+													end
+												end
+												break;
+											end
+											if (FlatIdent_4058F == 0) then
+												A127 = game:GetService("RunService").Heartbeat;
+												tpwalking = true;
+												FlatIdent_4058F = 1;
+											end
+										end
+									end);
+								end
+								break;
+							end
+						end
+					end
+					break;
+				end
+				if (FlatIdent_78A9D == 0) then
+					speeds = speeds + 1;
+					A91.Text = speeds;
+					FlatIdent_78A9D = 1;
+				end
+			end
+		end);
+		A92.MouseButton1Down:connect(function()
+			if (speeds == 1) then
+				local FlatIdent_4D907 = 0;
+				while true do
+					if (FlatIdent_4D907 == 1) then
+						A91.Text = speeds;
+						break;
+					end
+					if (FlatIdent_4D907 == 0) then
+						A91.Text = "cannot be less than 1";
+						wait(1);
+						FlatIdent_4D907 = 1;
+					end
+				end
+			else
+				local FlatIdent_2C0A2 = 0;
+				while true do
+					if (FlatIdent_2C0A2 == 0) then
+						speeds = speeds - 1;
+						A91.Text = speeds;
+						FlatIdent_2C0A2 = 1;
+					end
+					if (FlatIdent_2C0A2 == 1) then
+						if (nowe == true) then
+							local FlatIdent_77CC3 = 0;
+							while true do
+								if (FlatIdent_77CC3 == 0) then
+									tpwalking = false;
+									for i = 1, speeds do
+										spawn(function()
+											local FlatIdent_3416F = 0;
+											local A130;
+											local A131;
+											local A132;
+											while true do
+												if (FlatIdent_3416F == 1) then
+													A131 = game.Players.LocalPlayer.Character;
+													A132 = A131 and A131:FindFirstChildWhichIsA("Humanoid");
+													FlatIdent_3416F = 2;
+												end
+												if (FlatIdent_3416F == 0) then
+													A130 = game:GetService("RunService").Heartbeat;
+													tpwalking = true;
+													FlatIdent_3416F = 1;
+												end
+												if (FlatIdent_3416F == 2) then
+													while tpwalking and A130:Wait() and A131 and A132 and A132.Parent do
+														if (A132.MoveDirection.Magnitude > 0) then
+															A131:TranslateBy(A132.MoveDirection);
+														end
+													end
+													break;
+												end
+											end
+										end);
+									end
+									break;
+								end
+							end
+						end
+						break;
+					end
+				end
+			end
+		end);
+		A93.MouseButton1Click:Connect(function()
+			A84:Destroy();
+		end);
+		A94.MouseButton1Click:Connect(function()
+			local FlatIdent_59521 = 0;
+			while true do
+				if (FlatIdent_59521 == 0) then
+					A86.Visible = false;
+					A87.Visible = false;
+					FlatIdent_59521 = 1;
+				end
+				if (FlatIdent_59521 == 2) then
+					A91.Visible = false;
+					A92.Visible = false;
+					FlatIdent_59521 = 3;
+				end
+				if (FlatIdent_59521 == 3) then
+					A94.Visible = false;
+					A95.Visible = true;
+					FlatIdent_59521 = 4;
+				end
+				if (4 == FlatIdent_59521) then
+					A84.Frame.BackgroundTransparency = 1;
+					A93.Position = UDim2.new(0, 0, -1, 57);
+					break;
+				end
+				if (FlatIdent_59521 == 1) then
+					A88.Visible = false;
+					A90.Visible = false;
+					FlatIdent_59521 = 2;
+				end
+			end
+		end);
+		A95.MouseButton1Click:Connect(function()
+			local FlatIdent_2B4B0 = 0;
+			while true do
+				if (2 == FlatIdent_2B4B0) then
+					A91.Visible = true;
+					A92.Visible = true;
+					FlatIdent_2B4B0 = 3;
+				end
+				if (3 == FlatIdent_2B4B0) then
+					A94.Visible = true;
+					A95.Visible = false;
+					FlatIdent_2B4B0 = 4;
+				end
+				if (FlatIdent_2B4B0 == 4) then
+					A84.Frame.BackgroundTransparency = 0;
+					A93.Position = UDim2.new(0, 0, -1, 27);
+					break;
+				end
+				if (FlatIdent_2B4B0 == 1) then
+					A88.Visible = true;
+					A90.Visible = true;
+					FlatIdent_2B4B0 = 2;
+				end
+				if (FlatIdent_2B4B0 == 0) then
+					A86.Visible = true;
+					A87.Visible = true;
+					FlatIdent_2B4B0 = 1;
+				end
+			end
+		end);
+	end
+end);
+A30:AddButton("重新加载角色", function()
+	if A2.Character then
+		A2.Character:BreakJoints();
+	end
+end);
+A30:AddButton("通用甩飞", function()
+	local FlatIdent_851CE = 0;
+	local A135;
+	local A136;
+	while true do
+		if (FlatIdent_851CE == 0) then
+			A135 = game:HttpGet("https://raw.githubusercontent.com/0Ben1/fe./main/Fling%20GUI");
+			A136 = loadstring(A135);
+			FlatIdent_851CE = 1;
+		end
+		if (FlatIdent_851CE == 1) then
+			if A136 then
+				A136();
+			end
+			break;
+		end
+	end
+end);
+A30:AddButton("踏空行走", function()
+	if A2.Character then
+		local A137 = A2.Character:FindFirstChild("HumanoidRootPart");
+		if A137 then
+			local FlatIdent_82AB4 = 0;
+			local A138;
+			while true do
+				if (2 == FlatIdent_82AB4) then
+					A6.InputBegan:Connect(function(A139)
+						if (A139.KeyCode == Enum.KeyCode.Space) then
+							local FlatIdent_37E3 = 0;
+							while true do
+								if (FlatIdent_37E3 == 0) then
+									A138.Velocity = Vector3.new(0, 50, 0);
+									wait(0.1);
+									FlatIdent_37E3 = 1;
+								end
+								if (FlatIdent_37E3 == 1) then
+									A138.Velocity = Vector3.new(0, 0, 0);
+									break;
+								end
+							end
+						end
+					end);
+					break;
+				end
+				if (FlatIdent_82AB4 == 1) then
+					A138.MaxForce = Vector3.new(0, math.huge, 0);
+					A138.Parent = A137;
+					FlatIdent_82AB4 = 2;
+				end
+				if (FlatIdent_82AB4 == 0) then
+					A138 = loadstring(game:HttpGet("https://raw.githubusercontent.com/GhostPlayer352/Test4/main/Float"))();
+					A138.Velocity = Vector3.new(0, 0, 0);
+					FlatIdent_82AB4 = 1;
+				end
+			end
+		end
+	end
+end);
+A30:AddButton("穿墙模式", function()
+	A19 = not A19;
+	if A22 then
+		A22:Disconnect();
+		A22 = nil;
+	end
+	if A19 then
+		A22 = A3.Stepped:Connect(function()
+			if A2.Character then
+				for _, A140 in pairs(A2.Character:GetDescendants()) do
+					if A140:IsA("BasePart") then
+						A140.CanCollide = false;
+					end
+				end
+			end
+		end);
+	end
+end);
+A30:AddToggle("SafeModeToggle", {Text="安全模式",Default=true}):OnChanged(function(A141)
+	local FlatIdent_511F5 = 0;
+	while true do
+		if (0 == FlatIdent_511F5) then
+			A29 = A141;
+			if A141 then
+				local FlatIdent_7735C = 0;
+				while true do
+					if (FlatIdent_7735C == 0) then
+						if A17 then
+							A17:Destroy();
+							A17 = nil;
+						end
+						if (A23 and (type(A23) == "table") and A23.Destroy) then
+							local FlatIdent_38BA4 = 0;
+							while true do
+								if (FlatIdent_38BA4 == 0) then
+									pcall(function()
+										A23:Destroy();
+									end);
+									A23 = nil;
+									break;
+								end
+							end
+						end
+						break;
+					end
+				end
+			end
+			break;
+		end
+	end
+end);
+A30:AddSlider("SpinSpeedSlider", {Text="旋转速度",Default=0,Min=0,Max=500,Rounding=0,Compact=false}):OnChanged(function(A142)
+	if (A2 and A2.Character) then
+		local FlatIdent_8EF6C = 0;
+		local A143;
+		while true do
+			if (0 == FlatIdent_8EF6C) then
+				A143 = A2.Character:FindFirstChild("HumanoidRootPart");
+				if A143 then
+					if (A142 > 0) then
+						local FlatIdent_81DE9 = 0;
+						while true do
+							if (FlatIdent_81DE9 == 0) then
+								if A17 then
+									A17:Destroy();
+								end
+								A17 = Instance.new("BodyAngularVelocity");
+								FlatIdent_81DE9 = 1;
+							end
+							if (FlatIdent_81DE9 == 1) then
+								A17.Parent = A143;
+								A17.Name = "CustomSpin";
+								FlatIdent_81DE9 = 2;
+							end
+							if (FlatIdent_81DE9 == 2) then
+								A17.MaxTorque = Vector3.new(0, 400000, 0);
+								A17.AngularVelocity = Vector3.new(0, A142, 0);
+								break;
+							end
+						end
+					elseif A17 then
+						local FlatIdent_4CEEC = 0;
+						while true do
+							if (FlatIdent_4CEEC == 0) then
+								A17:Destroy();
+								A17 = nil;
+								break;
+							end
+						end
+					end
+				end
+				break;
+			end
+		end
+	end
+end);
+local A144 = A16.Universal:AddRightGroupbox("旋转控制");
+A144:AddButton("旋转 10", function()
+	if (A2 and A2.Character) then
+		local FlatIdent_67408 = 0;
+		local A145;
+		while true do
+			if (FlatIdent_67408 == 0) then
+				A145 = A2.Character:FindFirstChild("HumanoidRootPart");
+				if A145 then
+					local FlatIdent_79F35 = 0;
+					while true do
+						if (FlatIdent_79F35 == 0) then
+							if A17 then
+								A17:Destroy();
+							end
+							A17 = Instance.new("BodyAngularVelocity");
+							FlatIdent_79F35 = 1;
+						end
+						if (FlatIdent_79F35 == 2) then
+							A17.MaxTorque = Vector3.new(0, 400000, 0);
+							A17.AngularVelocity = Vector3.new(0, 10, 0);
+							break;
+						end
+						if (1 == FlatIdent_79F35) then
+							A17.Parent = A145;
+							A17.Name = "CustomSpin";
+							FlatIdent_79F35 = 2;
+						end
+					end
+				end
+				break;
+			end
+		end
+	end
+end);
+A144:AddButton("旋转 20", function()
+	if (A2 and A2.Character) then
+		local A146 = A2.Character:FindFirstChild("HumanoidRootPart");
+		if A146 then
+			local FlatIdent_6A15B = 0;
+			while true do
+				if (0 == FlatIdent_6A15B) then
+					if A17 then
+						A17:Destroy();
+					end
+					A17 = Instance.new("BodyAngularVelocity");
+					FlatIdent_6A15B = 1;
+				end
+				if (FlatIdent_6A15B == 1) then
+					A17.Parent = A146;
+					A17.Name = "CustomSpin";
+					FlatIdent_6A15B = 2;
+				end
+				if (FlatIdent_6A15B == 2) then
+					A17.MaxTorque = Vector3.new(0, 400000, 0);
+					A17.AngularVelocity = Vector3.new(0, 20, 0);
+					break;
+				end
+			end
+		end
+	end
+end);
+A144:AddButton("旋转 30", function()
+	if (A2 and A2.Character) then
+		local FlatIdent_1FA0 = 0;
+		local A147;
+		while true do
+			if (0 == FlatIdent_1FA0) then
+				A147 = A2.Character:FindFirstChild("HumanoidRootPart");
+				if A147 then
+					if A17 then
+						A17:Destroy();
+					end
+					A17 = Instance.new("BodyAngularVelocity");
+					A17.Parent = A147;
+					A17.Name = "CustomSpin";
+					A17.MaxTorque = Vector3.new(0, 400000, 0);
+					A17.AngularVelocity = Vector3.new(0, 30, 0);
+				end
+				break;
+			end
+		end
+	end
+end);
+A144:AddButton("旋转 50", function()
+	if (A2 and A2.Character) then
+		local FlatIdent_2B407 = 0;
+		local A148;
+		while true do
+			if (FlatIdent_2B407 == 0) then
+				A148 = A2.Character:FindFirstChild("HumanoidRootPart");
+				if A148 then
+					local FlatIdent_7EE98 = 0;
+					while true do
+						if (FlatIdent_7EE98 == 2) then
+							A17.MaxTorque = Vector3.new(0, 400000, 0);
+							A17.AngularVelocity = Vector3.new(0, 50, 0);
+							break;
+						end
+						if (FlatIdent_7EE98 == 0) then
+							if A17 then
+								A17:Destroy();
+							end
+							A17 = Instance.new("BodyAngularVelocity");
+							FlatIdent_7EE98 = 1;
+						end
+						if (1 == FlatIdent_7EE98) then
+							A17.Parent = A148;
+							A17.Name = "CustomSpin";
+							FlatIdent_7EE98 = 2;
+						end
+					end
+				end
+				break;
+			end
+		end
+	end
+end);
+A144:AddButton("旋转 100", function()
+	if (A2 and A2.Character) then
+		local FlatIdent_81F9 = 0;
+		local A149;
+		while true do
+			if (FlatIdent_81F9 == 0) then
+				A149 = A2.Character:FindFirstChild("HumanoidRootPart");
+				if A149 then
+					if A17 then
+						A17:Destroy();
+					end
+					A17 = Instance.new("BodyAngularVelocity");
+					A17.Parent = A149;
+					A17.Name = "CustomSpin";
+					A17.MaxTorque = Vector3.new(0, 400000, 0);
+					A17.AngularVelocity = Vector3.new(0, 100, 0);
+				end
+				break;
+			end
+		end
+	end
+end);
+A144:AddButton("旋转 200", function()
+	if (A2 and A2.Character) then
+		local A150 = A2.Character:FindFirstChild("HumanoidRootPart");
+		if A150 then
+			local FlatIdent_2E7F5 = 0;
+			while true do
+				if (FlatIdent_2E7F5 == 1) then
+					A17.Parent = A150;
+					A17.Name = "CustomSpin";
+					FlatIdent_2E7F5 = 2;
+				end
+				if (FlatIdent_2E7F5 == 0) then
+					if A17 then
+						A17:Destroy();
+					end
+					A17 = Instance.new("BodyAngularVelocity");
+					FlatIdent_2E7F5 = 1;
+				end
+				if (FlatIdent_2E7F5 == 2) then
+					A17.MaxTorque = Vector3.new(0, 400000, 0);
+					A17.AngularVelocity = Vector3.new(0, 200, 0);
+					break;
+				end
+			end
+		end
+	end
+end);
+A144:AddButton("旋转 500", function()
+	if (A2 and A2.Character) then
+		local A151 = A2.Character:FindFirstChild("HumanoidRootPart");
+		if A151 then
+			local FlatIdent_259C6 = 0;
+			while true do
+				if (2 == FlatIdent_259C6) then
+					A17.MaxTorque = Vector3.new(0, 400000, 0);
+					A17.AngularVelocity = Vector3.new(0, 500, 0);
+					break;
+				end
+				if (FlatIdent_259C6 == 0) then
+					if A17 then
+						A17:Destroy();
+					end
+					A17 = Instance.new("BodyAngularVelocity");
+					FlatIdent_259C6 = 1;
+				end
+				if (FlatIdent_259C6 == 1) then
+					A17.Parent = A151;
+					A17.Name = "CustomSpin";
+					FlatIdent_259C6 = 2;
+				end
+			end
+		end
+	end
+end);
+A144:AddButton("停止旋转", function()
+	if A17 then
+		local FlatIdent_542D1 = 0;
+		while true do
+			if (0 == FlatIdent_542D1) then
+				A17:Destroy();
+				A17 = nil;
+				break;
+			end
+		end
+	end
+end);
+A30:AddButton("刷新游戏", function()
+	A7:Teleport(game.PlaceId, A2);
+end);
+A31:AddLabel("QQ群");
+A31:AddButton("QQ群: 938714427", function()
+	setclipboard("938714427");
+end);
+A31:AddLabel("TX全自动翻译");
+A31:AddButton("TX全自动翻译", function()
+	local FlatIdent_6A0CF = 0;
+	local A152;
+	local A153;
+	while true do
+		if (FlatIdent_6A0CF == 0) then
+			A152 = game:HttpGet("https://raw.githubusercontent.com/JsYb666/Item/refs/heads/main/Auto-language");
+			A153 = loadstring(A152);
+			FlatIdent_6A0CF = 1;
+		end
+		if (FlatIdent_6A0CF == 1) then
+			if A153 then
+				A153();
+			end
+			break;
+		end
+	end
+end);
+local scriptCategories = {{GroupName="各大脚本",List={{Name="秋容脚本",Url="\104\116\116\112\115\58\47\47\114\97\119\46\103\105\116\104\117\98\117\115\101\114\99\111\110\116\101\110\116\46\99\111\109\47\81\82\56\54\56\54\47\56\56\54\47\114\101\102\115\47\104\101\97\100\115\47\119\97\105\110\47\66\71\72"},{Name="叶脚本",Url="https://raw.githubusercontent.com/roblox-ye/QQ515966991/refs/heads/main/ROBLOX-CNVIP-XIAOYE.lua"},{Name="xk脚本",Url="https://github.com/devslopo/DVES/raw/main/XK%20Hub"},{Name="新版XA脚本",Url="https://github.com/YunLua/Lua/raw/main/XA_Hub.lua"}}},{GroupName="99夜",List={{Name="虚空99夜脚本汉化",Url="https://raw.githubusercontent.com/fningna51-stack/-/main/99%E5%A4%9C%E6%B1%89%E5%8C%96"},{Name="99夜脚本可杀队友",Url="https://raw.githubusercontent.com/358545698555/roblox-/refs/heads/main/%E5%8F%AF%E6%9D%80%E9%98%9F%E5%8F%8B99%E5%A4%9C"}}},{GroupName="死铁轨",List={{Name="仿红叶脚本汉化",Url="https://raw.githubusercontent.com/fningna51-stack/-/main/%E4%BB%BF%E7%BA%A2%E5%8F%B6%E8%84%9A%E6%9C%AC%E6%B1%89%E5%8C%96"},{Name="红叶脚本",Url="https://getnative.cc/script/loader"},{Name="速通脚本汉化",Url="https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%AD%BB%E9%93%81%E8%BD%A8%E6%B1%89%E5%8C%96%E8%84%9A%E6%9C%AC"}}},{GroupName="墨水游戏",List={{Name="AX墨水脚本汉化",Url="https://raw.githubusercontent.com/fningna51-stack/-/main/ax%E8%84%9A%E6%9C%AC%E7%A7%8B%E8%BE%9E%E6%B1%89%E5%8C%96"},{Name="墨水Ringta汉化",Url="https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/Ringta"},{Name="博伦墨水脚本",Url="https://pastebin.com/raw/Q64rPkwu"}}},{GroupName="doors",List={{Name="Doors脚本",Url="https://raw.githubusercontent.com/atnew2025/Chinese-scripts/refs/heads/main/mshax(prohax).txt"},{Name="doors最新脚本",Url="https://raw.githubusercontent.com/TheHunterSolo1/Scripts/refs/heads/main/Protected_2809220311826785.lua.txt"}}},{GroupName="监狱生活",List={{Name="监狱生活汉化",Url="https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%9B%91%E7%8B%B1%E7%94%9F%E6%B4%BB%E8%84%9A%E6%9C%AC"}}},{GroupName="战争大亨",List={{Name="战争大亨最强脚本",Url="https://raw.githubusercontent.com/MaxPikaa/PureLove/refs/heads/main/520"}}},{GroupName="被遗弃",List={{Name="被遗弃无卡密超好用",Url="https://rawscripts.net/raw/G666-Forsaken-Keyless-auto-gen-reach-autoblock-+-more-63283"}}},{GroupName="竞争对手",List={{Name="竞争对手脚本汉化",Url="https://raw.githubusercontent.com/fningna51-stack/-/main/竞争对手汉化脚本"}}}};
+local ScriptCenterGroupLeft = A16.ScriptCenter:AddLeftGroupbox("脚本中心");
+local ScriptCenterGroupRight = A16.ScriptCenter:AddRightGroupbox("脚本中心");
+local leftIndex = 0;
+local rightIndex = 0;
+for _, category in ipairs(scriptCategories) do
+	local targetGroup = ((leftIndex <= rightIndex) and ScriptCenterGroupLeft) or ScriptCenterGroupRight;
+	local index = ((targetGroup == ScriptCenterGroupLeft) and leftIndex) or rightIndex;
+	if (index > 0) then
+		targetGroup:AddLabel("----------------------------------------");
+	end
+	targetGroup:AddLabel(category.GroupName);
+	for __, btn in ipairs(category.List) do
+		targetGroup:AddButton(btn.Name, function()
+			local success, err = pcall(function()
+				local FlatIdent_96598 = 0;
+				local scriptContent;
+				local func;
+				while true do
+					if (FlatIdent_96598 == 1) then
+						if func then
+							func();
+						end
+						break;
+					end
+					if (0 == FlatIdent_96598) then
+						scriptContent = game:HttpGet(btn.Url);
+						func = loadstring(scriptContent);
+						FlatIdent_96598 = 1;
+					end
+				end
+			end);
+		end);
+	end
+	if (targetGroup == ScriptCenterGroupLeft) then
+		leftIndex = leftIndex + 1;
+	else
+		rightIndex = rightIndex + 1;
+	end
+end
+local SettingsGroup = A16.UISettings:AddLeftGroupbox("系统设置");
+SettingsGroup:AddButton("查看公告", function()
+	CreateAnnouncementUI();
+end);
+SettingsGroup:AddButton("重新加载公告", function()
+	local FlatIdent_35F25 = 0;
+	local gui;
+	while true do
+		if (FlatIdent_35F25 == 0) then
+			gui = A5:FindFirstChild("AnnouncementGui");
+			if gui then
+				gui:Destroy();
+			end
+			FlatIdent_35F25 = 1;
+		end
+		if (FlatIdent_35F25 == 1) then
+			wait(0.1);
+			CreateAnnouncementUI();
+			break;
+		end
+	end
+end);
+A11:SetLibrary(A10);
+A12:SetLibrary(A10);
+A12:IgnoreThemeSettings();
+A12:SetIgnoreIndexes({"MenuKeybind"});
+A12:SetFolder("Obsidian/秋辞脚本");
+A11:ApplyToTab(A16.UISettings);
+A12:BuildConfigSection(A16.UISettings);
+A10.KeybindFrame.Visible = true;
+A10:OnKeyPress(function(A197)
+	if (A197 == Enum.KeyCode.LeftControl) then
+		A10:ToggleUI();
+	end
+end);
+A12:LoadAutoloadConfig();
+game:GetService("Players").PlayerRemoving:Connect(function(A198)
+	if (A198 == A2) then
+		local FlatIdent_2C2F3 = 0;
+		while true do
+			if (3 == FlatIdent_2C2F3) then
+				if A17 then
+					A17:Destroy();
+				end
+				break;
+			end
+			if (FlatIdent_2C2F3 == 0) then
+				if A22 then
+					A22:Disconnect();
+				end
+				if A24 then
+					A24:Disconnect();
+				end
+				FlatIdent_2C2F3 = 1;
+			end
+			if (FlatIdent_2C2F3 == 1) then
+				if A25 then
+					A25:Disconnect();
+				end
+				if (A23 and (type(A23) == "table") and A23.Destroy) then
+					local FlatIdent_4609C = 0;
+					while true do
+						if (FlatIdent_4609C == 0) then
+							pcall(function()
+								A23:Destroy();
+							end);
+							A23 = nil;
+							break;
+						end
+					end
+				end
+				FlatIdent_2C2F3 = 2;
+			end
+			if (FlatIdent_2C2F3 == 2) then
+				for _, A199 in pairs(A27) do
+					if A199 then
+						pcall(function()
+							A199:Disconnect();
+						end);
+					end
+				end
+				if A26 then
+					A26:Destroy();
+				end
+				FlatIdent_2C2F3 = 3;
+			end
+		end
+	end
+end);
