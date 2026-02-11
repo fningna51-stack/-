@@ -1,0 +1,202 @@
+local RunScriptFirst = true
+
+local Translations = {
+    ["Games"]="游戏",
+    ["Key System"]="卡密系统",
+    ["Authentication"]="卡密验证",
+    ["Enter Key"]="输入卡密",
+    ["Get Key (Linkvertise)"]="复制解卡链接（link）",
+    ["Check Key"]="检查卡密",
+    ["Link Copied"]="链接已复制",
+    ["Key Check Failed"]="卡密验证失败",
+    ["Key is invalid"]="卡密无效",
+    ["Link Copied"]="链接已复制",
+    ["Work.ink Link has been copied to your clipboard"]="Work链接已复制到剪贴板",
+    ["Discord Server Link has been copied to your clipboard"]="Dc频道链接已复制到你的剪贴板",
+    ["Key linked to a different HWID. Please reset it using our bot"]="卡密已绑定其他设备请通过机器人重置（出bug了重新解一个）",
+    ["Get Key (Work.ink)"]="复制解卡链接（wieL）",
+    ["Linkverties Link has been copied to your clipboard"]="Link链接已复制到剪贴板",
+    ["Get Key"]="得到卡密",
+    ["Join Discord"]="加入DC频道",
+    ["Combat"]="战斗功能",
+    ["Miscs"]="杂项",
+    ["Settings"]="设置",
+    ["Toggle"]="开关",
+    ["AX-SCRIPTS"]="AX-鱿鱼x汉化",
+    ["Squid Game X | by AlexScriptX"]="有芙同享汉化",
+    ["Red Light, Green Light"]="红绿灯",
+    ["God Mode"]="无敌模式",
+    ["Honeycomb"]="扣糖饼",
+    ["Complete Shape"]="完没形状",
+    ["Pentathlon"]="五人六足",
+    ["Tug Of War"]="拔河",
+    ["Auto Pull Rope"]="自动拔河",
+    ["Hide N Seek"]="钥匙与刀",
+    ["Show Players (Red/Blue)"]="透视玩家(红/蓝)",
+    ["Show Exit Doors (Yellow)"]="透视逃出门(黄)",
+    ["Auto Pickups"]="自动拾取钥匙",
+    ["Hitbox Expander [HNS]"]="扩大碰撞箱（钥匙与刀模式）",
+    ["Hitbox Size"]="碰撞箱大小",
+    ["Squid Game"]="鱿鱼游戏",
+    ["God Mode"]="无敌模式",
+    ["Anti Push"]="防推",
+    ["Glass Bridge"]="玻璃桥",
+    ["Show Glass Bridge (Green)"]="真玻璃透视（绿）",
+    ["Jump Rope"]="跳绳",
+    ["Finish Jump Rope"]="传送到终点",
+    ["Disable Jump Rope"]="删除跳绳",
+    ["Sky Squid"]="天空游戏",
+    ["God Mode"]="无敌模式",
+    ["Anti Push"]="防推",
+    ["Show Players/Guards"]="透视玩家/守卫",
+    ["Exclude Same Team"]="队友检测",
+    ["Exclude Opposite Team"]="敌方检测",
+    ["Hitbox Expander"]="增大碰撞箱",
+    ["Hitbox Size"]="碰撞箱大小",
+    ["Exclude Same Team (Hitbox)"]="扩大队友碰撞箱",
+    ["Exclude Opposite Team (Hitbox)"]="扩大敌方碰撞箱",
+    ["Player"]="玩家",
+    ["WalkSpeed (16-100)"]="移速（16-100）",
+    ["Loop WalkSpeed"]="速度锁定",
+    ["Reset to Default"]="恢复默认速度",
+    ["Enable Shiftlock (LeftAlt)"]="视角锁定",
+    ["Fly"]="飞行",
+    ["Fly Speed"]="飞行速度",
+    ["Noclip"]="穿墙",
+    ["Infinite Jump"]="无限跳",
+    ["Instant Interact"]="秒互动",
+    ["Interact Reach"]="交互距离",
+    ["Game Features"]="游戏功能",
+    ["Auto Next Game"]="自动下一局",
+    ["Teleport to Safe Zone"]="传送至安全点",
+    ["Auto New Round"]="自动新回合",
+    ["Auto Daily Reward"]="自动领取每日奖励",
+    ["Voting System"]="自动投票",
+    ["Select Vote"]="选择",
+    ["Vote O"]="投O",
+    ["Vote X"]="投X",
+    ["Auto Vote"]="自动投票",
+        ["Enable Crosshair"]="十字瞄准",
+        ["Lock Button (Mobile)"]="锁定按钮",
+        ["Notification Side"]="十字拖架",
+        ["Top-Right"]="右上角",
+        ["DPI Scale"]="菜单占比",
+        ["Menu bind"]="菜单绑定",
+        ["Unload"]="卸载",
+        ["Themes"]="主题",
+        ["Background color"]="背景颜色",
+        ["Main color"]="主色调",
+        ["Accent color"]="强色调",
+        ["Outline color"]="轮廓颜色",
+        ["Font color"]="字体颜色",
+        ["Font Face"]="客户端字体",
+        ["Theme list"]="主题列表",
+        ["Default"]="默认",
+        ["Set as default"]="设置为默认",
+        ["Custom theme name"]="自己给文件名字",
+        ["Create theme"]="创建文件",
+        ["Custom themes"]="自定义文件",
+        ["Load theme"]="加载文件",
+        ["Overwrite theme"]="覆盖文件",
+        ["Delete theme"]="删除文件",
+        ["Refresh list"]="刷新列表",
+        ["Reset default"]="重置默认",
+        ["Configuration"]="配置",
+        ["Config name"]="配置名字",
+        ["Create config"]="创建配置",
+        ["Config list"]="配置列表",
+        ["Load config"]="加载配置",
+        ["Overwrite config"]="覆盖配置",
+        ["Delete config"]="删除配置",
+        ["Set as autoload"]="设置成自动加载",
+        ["Reset autoload"]="重置自动加载",
+        ["Current autoload config:"]="当前自动加载配置:"
+}
+
+local function translateText(text)
+    if not text or type(text) ~= "string" then return text end
+    if Translations[text] then return Translations[text] end
+    for en, cn in pairs(Translations) do
+        if text:find(en) then return text:gsub(en, cn) end
+    end
+    return text
+end
+
+local function translateAllElements()
+    local function translateGui(gui)
+        for _, element in ipairs(gui:GetDescendants()) do
+            if element:IsA("TextLabel") or element:IsA("TextButton") or element:IsA("TextBox") then
+                local currentText = element.Text
+                if currentText and currentText ~= "" then
+                    local translatedText = translateText(currentText)
+                    if translatedText ~= currentText then
+                        element.Text = translatedText
+                    end
+                end
+            end
+        end
+    end
+    
+    pcall(translateGui, game:GetService("CoreGui"))
+    
+    local player = game:GetService("Players").LocalPlayer
+    if player and player:FindFirstChild("PlayerGui") then
+        pcall(translateGui, player.PlayerGui)
+    end
+end
+
+local function setupListener()
+    local function connectToGui(gui)
+        gui.DescendantAdded:Connect(function(descendant)
+            if descendant:IsA("TextLabel") or descendant:IsA("TextButton") or descendant:IsA("TextBox") then
+                local currentText = descendant.Text
+                if currentText and currentText ~= "" then
+                    local translatedText = translateText(currentText)
+                    if translatedText ~= currentText then
+                        descendant.Text = translatedText
+                    end
+                end
+                
+                descendant:GetPropertyChangedSignal("Text"):Connect(function()
+                    local newText = descendant.Text
+                    if newText and newText ~= "" then
+                        local translatedText = translateText(newText)
+                        if translatedText ~= newText then
+                            descendant.Text = translatedText
+                        end
+                    end
+                end)
+            end
+        end)
+    end
+    
+    pcall(connectToGui, game:GetService("CoreGui"))
+    
+    local player = game:GetService("Players").LocalPlayer
+    if player and player:FindFirstChild("PlayerGui") then
+        pcall(connectToGui, player.PlayerGui)
+    end
+end
+
+local function startTranslation()
+    translateAllElements()
+    setupListener()
+end
+
+local function loadScript()
+    local success, err = pcall(function()
+        loadstring(game:HttpGet("https://officialaxscripts.vercel.app/scripts/AX-Loader.lua"))()
+    end)
+
+    if not success then
+        warn("加载失败:", err)
+    end
+end
+
+if RunScriptFirst then
+    loadScript()
+    startTranslation()
+else
+    startTranslation()
+    loadScript()
+end
