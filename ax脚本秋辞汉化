@@ -1,13 +1,21 @@
 local place = game.PlaceId
 local urls = {
-    [99567941238278] = "loadstring(game:HttpGet("https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%96%B0AX%E6%B1%89%E5%8C%96%E5%BA%93"))()",
-    [125009265613167] = "loadstring(game:HttpGet("https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%96%B0AX%E6%B1%89%E5%8C%96%E5%BA%93"))()",
+    [99567941238278] = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%96%B0AX%E6%B1%89%E5%8C%96%E5%BA%93",
+    [125009265613167] = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%96%B0AX%E6%B1%89%E5%8C%96%E5%BA%93",
     [7554888362] = "https://raw.githubusercontent.com/fningna51-stack/-/main/AX%E9%B1%BF%E9%B1%BCX%E8%84%9A%E6%9C%AC%E6%B1%89%E5%8C%96",
-    [119099244949868] = "loadstring(game:HttpGet("https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%96%B0AX%E6%B1%89%E5%8C%96%E5%BA%93"))()",
+    [119099244949868] = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%96%B0AX%E6%B1%89%E5%8C%96%E5%BA%93",
     [136801880565837] = "https://raw.githubusercontent.com/fningna51-stack/-/main/AX%E9%97%AA%E5%85%89fps%E6%B1%89%E5%8C%96",
     [7559074529] = "https://raw.githubusercontent.com/fningna51-stack/-/main/AX%E9%B1%BF%E9%B1%BCX%E8%84%9A%E6%9C%AC%E6%B1%89%E5%8C%96",
 }
-
 if urls[place] then
-    loadstring(game:HttpGet(urls[place]))()
+    local success, response = pcall(function()
+        local scriptContent = game:HttpGet(urls[place])
+        loadstring(scriptContent)()
+    end)
+    
+    if not success then
+        warn("执行脚本时出错: " .. tostring(response))
+    end
+else
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%96%B0AX%E6%B1%89%E5%8C%96%E5%BA%93"))()
 end
