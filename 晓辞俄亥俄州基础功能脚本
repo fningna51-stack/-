@@ -33,6 +33,321 @@ local MoneyFarmGroup = Tabs.GameFeatures:AddLeftGroupbox("银行功能")
 local MoneyUtilityGroup = Tabs.GameFeatures:AddRightGroupbox("金钱工具")
 local EventGroup = Tabs.GameFeatures:AddLeftGroupbox("活动功能")
 local UtilityGroup = Tabs.GameFeatures:AddRightGroupbox("实用工具")
+local MenuGroup = Tabs.Settings:AddRightGroupbox('菜单')
+local PlayersTab = Window:AddTab("玩家", "user")
+local TeleportGroup = PlayersTab:AddLeftGroupbox("玩家传送")
+local BypassTab = Window:AddTab("绕过", "shield")
+local BypassGroup = BypassTab:AddLeftGroupbox("绕过功能")
+local DrawTab = Window:AddTab("绘制", "eye")
+local DrawGroup = DrawTab:AddLeftGroupbox("绘制功能")
+
+local Csh = false
+local MB = false
+local NameSet = false
+local DistanceSet = false
+local HealthSet = false
+local H_Money = false
+local H_ATM = false
+
+local function clearAllESP()
+    -- 清除所有ESP
+    for _, obj in pairs(game:GetService("CoreGui"):GetChildren()) do
+        if obj.Name == "ESP_Drawing" then
+            obj:Destroy()
+        end
+    end
+end
+
+local function clearAllHighlights()
+    -- 清除所有描边
+    for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+        if player ~= LocalPlayer and player.Character then
+            local highlight = player.Character:FindFirstChild("ESP_Highlight")
+            if highlight then
+                highlight:Destroy()
+            end
+        end
+    end
+end
+
+local function clearMoneyESP()
+    -- 清除金钱ESP
+    for _, obj in pairs(workspace:GetChildren()) do
+        if obj:IsA("Model") and obj.Name == "MoneyESP" then
+            obj:Destroy()
+        end
+    end
+end
+
+local function clearATMESP()
+    -- 清除ATM ESP
+    for _, obj in pairs(workspace:GetChildren()) do
+        if obj:IsA("Model") and obj.Name == "ATMESP" then
+            obj:Destroy()
+        end
+    end
+end
+
+DrawGroup:AddToggle("DrawInitToggle", {
+    Text = "绘制初始化",
+    Default = false,
+    Tooltip = "开启/关闭绘制功能"
+}):OnChanged(function(value)
+    Csh = value
+    if not value then
+        clearAllESP()
+    end
+    Library:Notify("绘制初始化: " .. (value and "开启" or "关闭"), 2)
+end)
+
+DrawGroup:AddToggle("OutlineToggle", {
+    Text = "描边效果",
+    Default = false,
+    Tooltip = "为玩家添加描边效果"
+}):OnChanged(function(value)
+    MB = value
+    if not value then
+        clearAllHighlights()
+    end
+    Library:Notify("描边效果: " .. (value and "开启" or "关闭"), 2)
+end)
+
+DrawGroup:AddToggle("NameToggle", {
+    Text = "显示名称",
+    Default = false,
+    Tooltip = "显示玩家名称"
+}):OnChanged(function(value)
+    NameSet = value
+    Library:Notify("显示名称: " .. (value and "开启" or "关闭"), 2)
+end)
+
+DrawGroup:AddToggle("DistanceToggle", {
+    Text = "显示距离",
+    Default = false,
+    Tooltip = "显示玩家距离"
+}):OnChanged(function(value)
+    DistanceSet = value
+    Library:Notify("显示距离: " .. (value and "开启" or "关闭"), 2)
+end)
+
+DrawGroup:AddToggle("HealthToggle", {
+    Text = "显示血量",
+    Default = false,
+    Tooltip = "显示玩家血量"
+}):OnChanged(function(value)
+    HealthSet = value
+    Library:Notify("显示血量: " .. (value and "开启" or "关闭"), 2)
+end)
+
+DrawGroup:AddToggle("MoneyToggle", {
+    Text = "显示金钱",
+    Default = false,
+    Tooltip = "显示地上的金钱"
+}):OnChanged(function(value)
+    H_Money = value
+    if not value then
+        clearMoneyESP()
+    end
+    Library:Notify("显示金钱: " .. (value and "开启" or "关闭"), 2)
+end)
+
+DrawGroup:AddToggle("ATMToggle", {
+    Text = "显示ATM机",
+    Default = false,
+    Tooltip = "显示ATM机位置"
+}):OnChanged(function(value)
+    H_ATM = value
+    if not value then
+        clearATMESP()
+    end
+    Library:Notify("显示ATM机: " .. (value and "开启" or "关闭"), 2)
+end)
+
+BypassGroup:AddButton("绕过移动经销商", function()
+    local pjyd = hookmetamethod(game, "__namecall", function(self, ...)
+        local args = {...}
+        local method = getnamecallmethod()
+        if method == "InvokeServer" and args[2] == true then
+            args[2] = false
+            return pjyd(self, unpack(args))
+        end
+        return pjyd(self, ...)
+    end)
+    
+    game:GetService("Players").LocalPlayer:SetAttribute("mobileDealer", true)
+    
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local mobileDealer = require(ReplicatedStorage.devv.shared.Indicies.mobileDealer)
+    
+    for category, items in pairs(mobileDealer) do
+        for _, item in ipairs(items) do
+            item.stock = 999999
+        end
+    end
+    
+    table.insert(mobileDealer.Gun, {itemName = "Acid Gun", stock = 9999})
+    table.insert(mobileDealer.Gun, {itemName = "Candy Bucket", stock = 9999})
+    table.insert(mobileDealer.Gun, {itemName = "Golden Rose", stock = 9999})
+    table.insert(mobileDealer.Gun, {itemName = "Black Rose", stock = 9999})
+    table.insert(mobileDealer.Gun, {itemName = "Dollar Balloon", stock = 9999})
+    table.insert(mobileDealer.Gun, {itemName = "Bat Balloon", stock = 9999})
+    table.insert(mobileDealer.Gun, {itemName = "Bunny Balloon", stock = 9999})
+    table.insert(mobileDealer.Gun, {itemName = "Clover Balloon", stock = 9999})
+    table.insert(mobileDealer.Gun, {itemName = "Ghost Balloon", stock = 9999})
+    table.insert(mobileDealer.Gun, {itemName = "Gold Clover Balloon", stock = 9999})
+    table.insert(mobileDealer.Gun, {itemName = "Heart Balloon", stock = 9999})
+    table.insert(mobileDealer.Gun, {itemName = "Skull Balloon", stock = 9999})
+    table.insert(mobileDealer.Gun, {itemName = "Snowflake Balloon", stock = 9999})
+    table.insert(mobileDealer.Gun, {itemName = "Admin AK-47", stock = 9999})
+    table.insert(mobileDealer.Gun, {itemName = "Admin Nuke Launcher", stock = 9999})
+    table.insert(mobileDealer.Gun, {itemName = "Admin RPG", stock = 9999})
+    table.insert(mobileDealer.Gun, {itemName = "Void Gem", stock = 9999})
+    table.insert(mobileDealer.Gun, {itemName = "Pulse Rifle", stock = 9999})
+    table.insert(mobileDealer.Gun, {itemName = "Unusual Money Printer", stock = 9999})
+    table.insert(mobileDealer.Gun, {itemName = "Money Printer", stock = 9999})
+    table.insert(mobileDealer.Gun, {itemName = "Trident", stock = 9999})
+    table.insert(mobileDealer.Gun, {itemName = "NextBot Grenade", stock = 9999})
+    table.insert(mobileDealer.Gun, {itemName = "El Fuego", stock = 9999})
+    
+    Library:Notify("已绕过移动经销商", 3)
+end)
+
+BypassGroup:AddButton("绕过高级动作", function()
+    local success, result = pcall(function()
+        for _, v in pairs(game:GetService("Players").LocalPlayer.PlayerGui.Emotes.Frame.ScrollingFrame:GetDescendants()) do
+            if v.Name == "Locked" then
+                v.Visible = false
+            end
+        end
+    end)
+    
+    if success then
+        Library:Notify("已绕过高级动作锁定", 3)
+    else
+        Library:Notify("绕过失败: " .. tostring(result), 3)
+    end
+end)
+
+BypassGroup:AddButton("绕过飞行封禁", function()
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local devv = ReplicatedStorage:FindFirstChild("devv")
+    if devv then
+        local remoteStorage = devv:FindFirstChild("remoteStorage")
+        if remoteStorage then
+            local makeExplosion = remoteStorage:FindFirstChild("makeExplosion")
+            if makeExplosion then
+                makeExplosion:Destroy()
+                Library:Notify("已移除飞行检测爆炸功能", 3)
+            else
+                Library:Notify("未找到飞行检测脚本", 3)
+            end
+        else
+            Library:Notify("未找到remoteStorage", 3)
+        end
+    else
+        Library:Notify("未找到devv模块", 3)
+    end
+end)
+
+BypassGroup:AddButton("绕过物品栏封禁", function()
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local devv = ReplicatedStorage:FindFirstChild("devv")
+    if devv then
+        local remoteStorage = devv:FindFirstChild("remoteStorage")
+        if remoteStorage then
+            local makeExplosion = remoteStorage:FindFirstChild("makeExplosion")
+            if makeExplosion then
+                makeExplosion:Destroy()
+                Library:Notify("已绕过物品栏检测", 3)
+            else
+                Library:Notify("未找到相关检测脚本", 3)
+            end
+        else
+            Library:Notify("未找到remoteStorage", 3)
+        end
+    else
+        Library:Notify("未找到devv模块", 3)
+    end
+end)
+
+BypassGroup:AddButton("绕过战斗状态", function()
+    local success, _ = pcall(function()
+        for _, func in pairs(getgc(true)) do
+            if type(func) == "function" then
+                local info = debug.getinfo(func)
+                if info.name == "isInCombat" or (info.source and info.source:find("combatIndicator")) then
+                    hookfunction(func, function() 
+                        return false 
+                    end)
+                end
+            end
+        end
+    end)
+    
+    if success then
+        Library:Notify("已绕过战斗状态检测", 3)
+    else
+        Library:Notify("绕过战斗状态失败", 3)
+    end
+end)
+
+local PlayerList = {}
+local SelectedPlayer = nil
+
+local function updatePlayerList()
+    PlayerList = {}
+    for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+        if player ~= LocalPlayer then
+            table.insert(PlayerList, player.Name)
+        end
+    end
+    return PlayerList
+end
+
+local TeleportPlayerDropdown = TeleportGroup:AddDropdown("PlayerSelectDropdown", {
+    Values = updatePlayerList(),
+    Default = 1,
+    Multi = false,
+    Text = "选择玩家"
+})
+
+TeleportPlayerDropdown:OnChanged(function(value)
+    SelectedPlayer = value
+    Library:Notify("已选择玩家: " .. value, 2)
+end)
+
+TeleportGroup:AddButton("传送到玩家", function()
+    if SelectedPlayer then
+        local target = game:GetService("Players"):FindFirstChild(SelectedPlayer)
+        if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+            local targetRoot = target.Character.HumanoidRootPart
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                local myRoot = LocalPlayer.Character.HumanoidRootPart
+                myRoot.CFrame = targetRoot.CFrame
+                Library:Notify("已传送到 " .. SelectedPlayer, 3)
+            else
+                Library:Notify("你的角色未加载完成", 3)
+            end
+        else
+            Library:Notify("目标玩家不存在或未加载", 3)
+        end
+    else
+        Library:Notify("请先选择玩家", 3)
+    end
+end)
+
+TeleportGroup:AddButton("刷新玩家列表", function()
+    TeleportPlayerDropdown:SetValues(updatePlayerList())
+    Library:Notify("玩家列表已刷新", 2)
+end)
+
+game:GetService("Players").PlayerAdded:Connect(function()
+    TeleportPlayerDropdown:SetValues(updatePlayerList())
+end)
+
+game:GetService("Players").PlayerRemoving:Connect(function()
+    TeleportPlayerDropdown:SetValues(updatePlayerList())
+end)
 
 local lanternEnabled = false
 EventGroup:AddToggle("AutoLanternToggle", {
@@ -178,6 +493,65 @@ local function stopBankRobberyLoop()
     end
 end
 
+local autobank = false
+local bankTeleportCFrame = CFrame.new(1112.12671, 10.1856346, -324.815613)  
+local originalPosition = nil  
+
+local function robBankAndReturn()
+    if not autobank then return end
+    
+    local player = game:GetService("Players").LocalPlayer
+    local character = player.Character
+    if not character then return end
+    
+    local rootPart = character:FindFirstChild("HumanoidRootPart")
+    if not rootPart then return end
+    
+    originalPosition = rootPart.CFrame
+    
+    rootPart.CFrame = bankTeleportCFrame
+    task.wait(0.1)
+    
+    local Signal = require(game:GetService("ReplicatedStorage").devv).load("Signal")
+    
+    local waitTime = 0.1
+    local maxWait = 10.0
+    
+    local startTime = tick()
+    while autobank and (tick() - startTime) < maxWait do
+        Signal.FireServer("stealBankCash")
+        task.wait(waitTime)
+    end
+    
+    if autobank and originalPosition then
+        rootPart.CFrame = originalPosition
+        task.wait(0.1)
+    end
+    
+    originalPosition = nil
+end
+
+local bankThread = nil
+
+local function startBankRobberyLoop()
+    if bankThread then return end
+    
+    bankThread = task.spawn(function()
+        while autobank do
+            robBankAndReturn()
+            task.wait(0.5)
+        end
+        bankThread = nil
+    end)
+end
+
+local function stopBankRobberyLoop()
+    if bankThread then
+        task.cancel(bankThread)
+        bankThread = nil
+    end
+end
+
 MoneyFarmGroup:AddToggle("BankAuraToggle", {
     Text = "银行光环",
     Default = false,
@@ -192,6 +566,7 @@ MoneyFarmGroup:AddToggle("BankAuraToggle", {
         Library:Notify("银行光环已关闭", 3)
     end
 end)
+
 
 MoneyFarmGroup:AddToggle("ATMFarmToggle", {
     Text = "ATM农场",
@@ -530,7 +905,8 @@ GameFarmGroup:AddLabel("巡逻点数量: " .. tostring(#PatrolPoints), true)
 GameFarmGroup:AddLabel("当前目标类型: ATM / 收银机")
 
 local Speed = 16
-GamePlayerGroup:AddSlider("SpeedSlider", {
+
+local SpeedSlider = GamePlayerGroup:AddSlider("SpeedSlider", {
     Text = "速度设置",
     Min = 1,
     Max = 100,
@@ -538,15 +914,36 @@ GamePlayerGroup:AddSlider("SpeedSlider", {
     Rounding = 0,
     Compact = false,
     Suffix = " 单位"
-}):OnChanged(function(Value)
+})
+
+SpeedSlider:OnChanged(function(Value)
     Speed = Value
-    if LocalPlayer and LocalPlayer.Character then
-        local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
-        if humanoid then
-            humanoid.WalkSpeed = Speed
-        end
-    end
     Library:Notify("速度设置为: " .. Value, 2)
+end)
+
+local WalkSpeedToggle = GamePlayerGroup:AddToggle("WalkSpeedToggle", {
+    Text = "walkspeed(移速修改)",
+    Default = false
+})
+
+local sudu
+WalkSpeedToggle:OnChanged(function(v)
+    if v then
+        sudu = game:GetService("RunService").Heartbeat:Connect(function()
+            if game:GetService("Players").LocalPlayer.Character and 
+               game:GetService("Players").LocalPlayer.Character.Humanoid and 
+               game:GetService("Players").LocalPlayer.Character.Humanoid.Parent then
+                if game:GetService("Players").LocalPlayer.Character.Humanoid.MoveDirection.Magnitude > 0 then
+                    game:GetService("Players").LocalPlayer.Character:TranslateBy(
+                        game:GetService("Players").LocalPlayer.Character.Humanoid.MoveDirection * Speed / 10
+                    )
+                end
+            end
+        end)
+    elseif not v and sudu then
+        sudu:Disconnect()
+        sudu = nil
+    end
 end)
 
 local jumpConn = nil
