@@ -1,0 +1,731 @@
+local repo = 'https://raw.githubusercontent.com/KingScriptAE/No-sirve-nada./refs/heads/main/'
+
+local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
+local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
+local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
+
+local Options = Library.Options
+local Toggles = Library.Toggles
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local RunService = game:GetService("RunService")
+
+local Window = Library:CreateWindow({
+    Title = "晓辞俄亥俄州脚本",
+    Footer = "By Linni",
+    Icon = 131153193945220,
+    NotifySide = "Right",
+    ShowCustomCursor = true,
+})
+
+local Tabs = {
+    GameFeatures = Window:AddTab("俄亥俄州功能", "gamepad-2"),
+    Settings = Window:AddTab("设置", "settings"),
+}
+
+local GameCombatGroup = Tabs.GameFeatures:AddLeftGroupbox("战斗功能")
+local GameFarmGroup = Tabs.GameFeatures:AddRightGroupbox("自动农场")
+local GamePlayerGroup = Tabs.GameFeatures:AddLeftGroupbox("玩家功能")
+local GameWeaponsGroup = Tabs.GameFeatures:AddRightGroupbox("武器功能")
+local MoneyFarmGroup = Tabs.GameFeatures:AddLeftGroupbox("银行功能")
+local MoneyUtilityGroup = Tabs.GameFeatures:AddRightGroupbox("金钱工具")
+local EventGroup = Tabs.GameFeatures:AddLeftGroupbox("活动功能")
+local UtilityGroup = Tabs.GameFeatures:AddRightGroupbox("实用工具")
+
+local lanternEnabled = false
+EventGroup:AddToggle("AutoLanternToggle", {
+    Text = "自动领取所有灯笼",
+    Default = false,
+    Tooltip = "自动寻找并领取所有灯笼"
+}):OnChanged(function(state)
+    lanternEnabled = state
+    if state then
+        local lanternThread = task.spawn(function()
+            local plr = game:GetService("Players").LocalPlayer
+            local char = plr.Character or plr.CharacterAdded:Wait()
+            local root = char:WaitForChild("HumanoidRootPart")
+            
+            Library:Notify("自动领取灯笼已开启", 3)
+            
+            while lanternEnabled do
+                local targetFolder = workspace:FindFirstChild("LunarNewYear")
+                if targetFolder then
+                    local lanternFound = false
+                    for _, obj in pairs(targetFolder:GetChildren()) do
+                        if not lanternEnabled then break end
+                        if obj:IsA("Model") or obj:IsA("BasePart") then
+                            local pos
+                            if obj:IsA("Model") and obj.PrimaryPart then
+                                pos = obj.PrimaryPart.Position
+                            elseif obj:IsA("BasePart") then
+                                pos = obj.Position
+                            end
+                            if pos then
+                                lanternFound = true
+                                root.CFrame = CFrame.new(pos)
+                                task.wait(0.5)
+                                local prompt = obj:FindFirstChild("ProximityPrompt", true)
+                                if prompt then
+                                    fireproximityprompt(prompt)
+                                    Library:Notify("领取了灯笼", 1)
+                                end
+                                task.wait(0.5)
+                            end
+                        end
+                    end
+                    if not lanternFound then
+                        Library:Notify("未找到灯笼", 2)
+                        task.wait(2)
+                    end
+                else
+                    Library:Notify("未找到LunarNewYear文件夹", 2)
+                    task.wait(2)
+                end
+            end
+        end)
+        
+        Library:Notify("灯笼自动领取已开启", 3)
+    else
+        Library:Notify("灯笼自动领取已关闭", 3)
+    end
+end)
+
+EventGroup:AddLabel("适用于农历新年活动", true)
+
+local antiAFKEnabled = false
+UtilityGroup:AddToggle("AntiAFKToggle", {
+    Text = "反挂机(必开)",
+    Default = false,
+    Tooltip = "防止因挂机被踢出游戏"
+}):OnChanged(function(state)
+    antiAFKEnabled = state
+    if state then
+        local success, result = pcall(function()
+            local antiAFKScript = game:HttpGet("https://pastebin.com/raw/9fFu43FF")
+            if antiAFKScript then
+                loadstring(antiAFKScript)()
+                Library:Notify("反挂机已开启", 3)
+            else
+                Library:Notify("反挂机脚本加载失败", 3)
+            end
+        end)
+        
+        if not success then
+            Library:Notify("反挂机启动失败: " .. tostring(result), 3)
+        end
+    else
+        Library:Notify("反挂机已关闭", 3)
+    end
+end)
+
+UtilityGroup:AddLabel("防止因长时间不动被踢出", true)
+UtilityGroup:AddLabel("建议在长时间挂机时开启")
+
+local autobank = false
+local bankRobberyThread = nil
+local autoATMCashCombo = false
+local autoCraftEnabled = false
+local autoClaimEnabled = false
+local craftConnection = nil
+
+local function startBankRobberyLoop()
+    if bankRobberyThread then
+        bankRobberyThread:Disconnect()
+        bankRobberyThread = nil
+    end
+    
+    bankRobberyThread = RunService.Heartbeat:Connect(function()
+        if not autobank then return end
+        
+        local ATMsFolder = workspace:FindFirstChild("ATMs")
+        local BanksFolder = workspace:FindFirstChild("Banks")
+        
+        if ATMsFolder and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local rootPart = LocalPlayer.Character.HumanoidRootPart
+            
+            local nearestTarget = nil
+            local nearestDistance = math.huge
+            
+            for _, atm in ipairs(ATMsFolder:GetChildren()) do
+                if atm:IsA("Model") then
+                    local mainPart = atm:FindFirstChild("Main")
+                    if mainPart and mainPart:IsA("BasePart") then
+                        local hp = atm:GetAttribute("health")
+                        if hp and hp > 0 then
+                            local distance = (rootPart.Position - mainPart.Position).Magnitude
+                            if distance < nearestDistance then
+                                nearestTarget = mainPart
+                                nearestDistance = distance
+                            end
+                        end
+                    end
+                end
+            end
+            
+            if nearestTarget then
+                rootPart.CFrame = nearestTarget.CFram
+            end
+        end
+    end)
+end
+
+local function stopBankRobberyLoop()
+    if bankRobberyThread then
+        bankRobberyThread:Disconnect()
+        bankRobberyThread = nil
+    end
+end
+
+MoneyFarmGroup:AddToggle("BankAuraToggle", {
+    Text = "银行光环",
+    Default = false,
+    Tooltip = "自动抢劫银行和ATM"
+}):OnChanged(function(state)
+    autobank = state
+    if autobank then
+        startBankRobberyLoop()
+        Library:Notify("银行光环已开启", 3)
+    else
+        stopBankRobberyLoop()
+        Library:Notify("银行光环已关闭", 3)
+    end
+end)
+
+MoneyFarmGroup:AddToggle("ATMFarmToggle", {
+    Text = "ATM农场",
+    Default = false,
+    Tooltip = "自动收集ATM现金"
+}):OnChanged(function(Value)
+    autoATMCashCombo = Value
+    
+    if autoATMCashCombo then
+        local function collectCash()
+            local player = game:GetService("Players").LocalPlayer
+            local cashSize = Vector3.new(2, 0.2499999850988388, 1)
+            
+            -- 查找现金堆
+            local CashBundle = workspace:FindFirstChild("Game")
+            if CashBundle then
+                CashBundle = CashBundle:FindFirstChild("Entities")
+                if CashBundle then
+                    CashBundle = CashBundle:FindFirstChild("CashBundle")
+                end
+            end
+            
+            if CashBundle and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                local rootPart = player.Character.HumanoidRootPart
+                for _, part in ipairs(CashBundle:GetDescendants()) do
+                    if part:IsA("BasePart") and part.Size == cashSize then
+                        rootPart.CFrame = part.CFrame
+                        task.wait()
+                    end
+                end
+            end
+        end
+        
+        local atmFarmThread = task.spawn(function()
+            while autoATMCashCombo and task.wait() do
+                local ATMsFolder = workspace:FindFirstChild("ATMs")
+                local hasActiveATM = false
+                
+                if ATMsFolder and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                    local rootPart = LocalPlayer.Character.HumanoidRootPart
+                    for _, atm in ipairs(ATMsFolder:GetChildren()) do
+                        if atm:IsA("Model") then
+                            local hp = atm:GetAttribute("health")
+                            if hp and hp ~= 0 then
+                                hasActiveATM = true
+                                for _, part in ipairs(atm:GetChildren()) do
+                                    if part.Name == "Main" and part:IsA("BasePart") then
+                                        rootPart.CFrame = part.CFrame
+                                        task.wait()
+                                        atm:SetAttribute("health", 0)
+                                        break
+                                    end
+                                end
+                                task.wait()
+                            end
+                        end
+                    end
+                end
+                
+                if hasActiveATM then
+                    task.wait(0.1)
+                else
+                    collectCash()
+                    task.wait()
+                end
+            end
+        end)
+        
+        Library:Notify("ATM农场已开启", 3)
+    else
+        Library:Notify("ATM农场已关闭", 3)
+    end
+end)
+
+local function performCrafting()
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local devv = ReplicatedStorage:FindFirstChild("devv")
+    
+    if not devv then
+        Library:Notify("未找到devv模块", 3)
+        return
+    end
+    
+    local success, signalModule = pcall(require, devv)
+    if not success or not signalModule.load then
+        Library:Notify("加载Signal模块失败", 3)
+        return
+    end
+    
+    local Signal = signalModule.load("Signal")
+    
+    if autoCraftEnabled and Signal then
+        Signal.InvokeServer("beginCraft", 'RollieCraft')
+    end
+    
+    if autoClaimEnabled and Signal then
+        Signal.InvokeServer("claimCraft", 'RollieCraft')
+    end
+end
+
+if not craftConnection then
+    craftConnection = RunService.Heartbeat:Connect(function()
+        if autoCraftEnabled or autoClaimEnabled then
+            performCrafting()
+        end
+    end)
+end
+
+MoneyUtilityGroup:AddToggle("AutoCraftToggle", {
+    Text = "自动制作",
+    Default = false,
+    Tooltip = "自动制作物品"
+}):OnChanged(function(Value)
+    autoCraftEnabled = Value
+    if autoCraftEnabled then
+        Library:Notify("自动制作已开启", 3)
+    else
+        Library:Notify("自动制作已关闭", 3)
+    end
+end)
+
+MoneyUtilityGroup:AddToggle("AutoClaimToggle", {
+    Text = "自动领取",
+    Default = false,
+    Tooltip = "自动领取制作完成的物品"
+}):OnChanged(function(Value)
+    autoClaimEnabled = Value
+    if autoClaimEnabled then
+        Library:Notify("自动领取已开启", 3)
+    else
+        Library:Notify("自动领取已关闭", 3)
+    end
+end)
+
+MoneyUtilityGroup:AddLabel("注意：需要游戏内有相应制作系统", true)
+
+local bulletTrackingHook
+GameCombatGroup:AddToggle("BulletTrackingToggle", {
+    Text = "子弹追踪",
+    Default = false,
+    Tooltip = "自动瞄准最近的玩家头部"
+}):OnChanged(function(Enabled)
+    if Enabled then
+        local Workspace = game:GetService("Workspace")
+        local Camera = Workspace.CurrentCamera
+        
+        local function getClosestHead()
+            if not LocalPlayer.Character then return nil end
+            if not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then return nil end
+            
+            local closestHead = nil
+            local closestDistance = math.huge
+            
+            for _, player in ipairs(Players:GetPlayers()) do
+                if player ~= LocalPlayer and player.Character then
+                    local character = player.Character
+                    local root = character:FindFirstChild("HumanoidRootPart")
+                    local head = character:FindFirstChild("Head")
+                    local humanoid = character:FindFirstChildOfClass("Humanoid")
+                    local forcefield = character:FindFirstChild("ForceField")
+                    
+                    if root and head and humanoid and not forcefield and humanoid.Health > 0 then
+                        local distance = (root.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+                        if distance < closestDistance then
+                            closestHead = head
+                            closestDistance = distance
+                        end
+                    end
+                end
+            end
+            
+            return closestHead
+        end
+        
+        if not bulletTrackingHook then
+            bulletTrackingHook = hookmetamethod(game, "__namecall", function(self, ...)
+                local method = getnamecallmethod()
+                local args = {...}
+                
+                if method == "Raycast" and not checkcaller() then
+                    local origin = args[1] or Camera.CFrame.Position
+                    local closestHead = getClosestHead()
+                    
+                    if closestHead then
+                        return {
+                            Instance = closestHead,
+                            Position = closestHead.Position,
+                            Normal = (origin - closestHead.Position).Unit,
+                            Material = Enum.Material.Plastic,
+                            Distance = (closestHead.Position - origin).Magnitude
+                        }
+                    end
+                end
+                
+                return bulletTrackingHook(self, ...)
+            end)
+        end
+        
+        Library:Notify("子弹追踪已开启", 3)
+    else
+        Library:Notify("子弹追踪已关闭", 3)
+        if bulletTrackingHook then
+            hookmetamethod(game, "__namecall", bulletTrackingHook)
+            bulletTrackingHook = nil
+        end
+    end
+end)
+
+local RootPart = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+local GizmoFolder = workspace:FindFirstChild("Local") and workspace.Local:FindFirstChild("Gizmos") and workspace.Local.Gizmos:FindFirstChild("White") or nil
+
+local PatrolPoints = {
+    Vector3.new(-1137, 78, -1953),
+    Vector3.new(-44, 63, -2083),
+    Vector3.new(194, 60, -2884),
+    Vector3.new(-412, 106, -1301),
+    Vector3.new(-377, 410, -741),
+    Vector3.new(-985, 380, -1145),
+    Vector3.new(-854, 406, -1505)
+}
+
+local IsAutoFarmRunning = false
+local AutoFarmThread = nil
+
+local function GetBasePart(instance)
+    if not instance then return nil end
+    if instance:IsA("BasePart") then return instance end
+    for _, descendant in ipairs(instance:GetDescendants()) do
+        if descendant:IsA("BasePart") then return descendant end
+    end
+    return nil
+end
+
+local function IsValidTarget(instance)
+    local typeAttr = instance:GetAttribute("gizmoType")
+    return typeAttr == "ATM" or typeAttr == "Register"
+end
+
+local function FindClosestTarget()
+    if not GizmoFolder or not RootPart then return nil end
+    local minDistance = math.huge
+    local closestPart = nil
+    for _, item in ipairs(GizmoFolder:GetChildren()) do
+        if IsValidTarget(item) then
+            local part = GetBasePart(item)
+            if part then
+                local dist = (RootPart.Position - part.Position).Magnitude
+                if dist < minDistance then
+                    closestPart = part
+                    minDistance = dist
+                end
+            end
+        end
+    end
+    return closestPart
+end
+
+local function TeleportToTarget(target)
+    if not RootPart then return end
+    if typeof(target) == "Vector3" then
+        RootPart.CFrame = CFrame.new(target) 
+    elseif typeof(target) == "Instance" then
+        RootPart.CFrame = target.CFrame * CFrame.new(0, 1, 0) 
+    end
+end
+
+local function SpamInteract(duration)
+    local start = tick()
+    while tick() - start < duration do
+        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+        task.wait(0.01)
+    end
+end
+
+local function ProcessCollection(targetPart)
+    SpamInteract(1.5) 
+end
+
+local function StartAutoFarm()
+    if AutoFarmThread or not GizmoFolder or not RootPart then return end
+    IsAutoFarmRunning = true
+    AutoFarmThread = task.spawn(function()
+        while IsAutoFarmRunning do
+            pcall(function()
+                local target = FindClosestTarget()
+                if target then
+                    TeleportToTarget(target)
+                    ProcessCollection(target)
+                else
+                    local randomPoint = PatrolPoints[math.random(1, #PatrolPoints)]
+                    TeleportToTarget(randomPoint)
+                end
+                task.wait(1.5) 
+            end)
+        end
+    end)
+end
+
+local function StopAutoFarm()
+    IsAutoFarmRunning = false
+    if AutoFarmThread then 
+        task.cancel(AutoFarmThread) 
+        AutoFarmThread = nil 
+    end
+end
+
+local function InitRootPart()
+    if LocalPlayer.Character then
+        RootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    end
+end
+
+InitRootPart()
+
+LocalPlayer.CharacterAdded:Connect(function()
+    task.wait(1)
+    InitRootPart()
+end)
+
+GameFarmGroup:AddToggle("AutoFarmToggle", {
+    Text = "自动农场",
+    Default = false,
+    Tooltip = "自动收集ATM和收银机"
+}):OnChanged(function(value)
+    if value then
+        StartAutoFarm()
+        Library:Notify("自动农场已开启", 3)
+    else
+        StopAutoFarm()
+        Library:Notify("自动农场已关闭", 3)
+    end
+end)
+
+GameFarmGroup:AddLabel("巡逻点数量: " .. tostring(#PatrolPoints), true)
+GameFarmGroup:AddLabel("当前目标类型: ATM / 收银机")
+
+local Speed = 16
+GamePlayerGroup:AddSlider("SpeedSlider", {
+    Text = "速度设置",
+    Min = 1,
+    Max = 100,
+    Default = 16,
+    Rounding = 0,
+    Compact = false,
+    Suffix = " 单位"
+}):OnChanged(function(Value)
+    Speed = Value
+    if LocalPlayer and LocalPlayer.Character then
+        local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid.WalkSpeed = Speed
+        end
+    end
+    Library:Notify("速度设置为: " .. Value, 2)
+end)
+
+local jumpConn = nil
+GamePlayerGroup:AddToggle("InfiniteJumpToggle", {
+    Text = "无限跳跃",
+    Default = false,
+    Tooltip = "允许无限跳跃"
+}):OnChanged(function(Value)
+    if Value then
+        jumpConn = game:GetService("UserInputService").JumpRequest:Connect(function()
+            local humanoid = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            end
+        end)
+        Library:Notify("无限跳跃已开启", 3)
+    else
+        if jumpConn then
+            jumpConn:Disconnect()
+            jumpConn = nil
+        end
+        Library:Notify("无限跳跃已关闭", 3)
+    end
+end)
+
+GameWeaponsGroup:AddButton({
+    Text = "全枪无限子弹",
+    DoubleClick = true,
+    Tooltip = "设置所有武器为无限子弹",
+    Func = function()
+        local function setInfiniteAmmo()
+            local ReplicatedStorage = game:GetService("ReplicatedStorage")
+            local devv = ReplicatedStorage:FindFirstChild("devv")
+            if not devv then
+                Library:Notify("未找到devv模块", 3)
+                return
+            end
+            local success, itemSystem = pcall(require, devv)
+            if not success or not itemSystem.load then
+                Library:Notify("加载v3item失败", 3)
+                return
+            end
+            
+            local v3item = itemSystem.load("v3item")
+            if v3item and v3item.inventory then
+                for _, item in pairs(v3item.inventory.items) do
+                    if item and item.ammoManager then
+                        item.ammoManager:setAmmo(9999)
+                        item.ammoManager:setAmmoOut(9999)
+                    end
+                end
+            end
+        end
+        
+        setInfiniteAmmo()
+        
+        local infiniteAmmoLoop = task.spawn(function()
+            while true do
+                pcall(setInfiniteAmmo)
+                task.wait(25)
+            end
+        end)
+        
+        Library:Notify("无限子弹已启用", 3)
+    end
+})
+
+GameWeaponsGroup:AddButton({
+    Text = "全枪射速提升",
+    DoubleClick = true,
+    Tooltip = "提升所有武器的射速",
+    Func = function()
+        local function increaseFireRate()
+            local ReplicatedStorage = game:GetService("ReplicatedStorage")
+            local devv = ReplicatedStorage:FindFirstChild("devv")
+            if not devv then
+                Library:Notify("未找到devv模块", 3)
+                return
+            end
+            local success, itemSystem = pcall(require, devv)
+            if not success or not itemSystem.load then
+                Library:Notify("加载v3item失败", 3)
+                return
+            end
+            
+            local v3item = itemSystem.load("v3item")
+            if v3item and v3item.inventory then
+                for _, item in pairs(v3item.inventory.items) do
+                    if item then
+                        item.fireDebounce = 0.01
+                        item.reloadTime = 0.1
+                        if item.ammoManager then
+                            item.ammoManager.ammo = 9999
+                        end
+                    end
+                end
+            end
+        end
+        
+        increaseFireRate()
+        
+        local fireRateLoop = task.spawn(function()
+            while true do
+                pcall(increaseFireRate)
+                task.wait(30)
+            end
+        end)
+        
+        Library:Notify("射速已提升", 3)
+    end
+})
+
+GameWeaponsGroup:AddButton({
+    Text = "全枪无后坐力",
+    DoubleClick = true,
+    Tooltip = "移除所有武器的后坐力",
+    Func = function()
+        local function removeRecoil()
+            local ReplicatedStorage = game:GetService("ReplicatedStorage")
+            local devv = ReplicatedStorage:FindFirstChild("devv")
+            if not devv then
+                Library:Notify("未找到devv模块", 3)
+                return
+            end
+            local success, itemSystem = pcall(require, devv)
+            if not success or not itemSystem.load then
+                Library:Notify("加载v3item失败", 3)
+                return
+            end
+            
+            local v3item = itemSystem.load("v3item")
+            if v3item and v3item.inventory then
+                for _, item in pairs(v3item.inventory.items) do
+                    if item then
+                        item.recoilAdd = 0
+                        item.maxRecoil = 0
+                        item.recoilDiminishFactor = 0
+                        item.recoilFastDiminishFactor = 0
+                        item.baseSpread = 0
+                        item.baseAimSpread = 0
+                        item.spread = 0
+                        item.aimSpread = 0
+                    end
+                end
+            end
+        end
+        
+        removeRecoil()
+        
+        local recoilLoop = task.spawn(function()
+            while true do
+                pcall(removeRecoil)
+                task.wait(30)
+            end
+        end)
+        
+        Library:Notify("无后坐力已启用", 3)
+    end
+})
+
+GameWeaponsGroup:AddLabel("注意：武器功能需要游戏内有相应物品", true)
+
+local MenuGroup = Tabs.Settings:AddLeftGroupbox('菜单')
+MenuGroup:AddButton('卸载脚本', function() 
+    Library:Unload() 
+    Library:Notify("脚本已卸载", 3)
+end)
+MenuGroup:AddLabel('菜单快捷键'):AddKeyPicker('MenuKeybind', { 
+    Default = 'RightShift', 
+    NoUI = true, 
+    Text = '菜单键绑定' 
+})
+
+Library.ToggleKeybind = Options.MenuKeybind
+
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+ThemeManager:SetFolder("MyScriptTheme")
+SaveManager:SetFolder("MyScriptConfig")
+SaveManager:BuildConfigSection(Tabs.Settings)
+ThemeManager:ApplyToTab(Tabs.Settings)
