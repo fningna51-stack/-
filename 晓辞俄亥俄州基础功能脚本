@@ -13,7 +13,7 @@ local VirtualInputManager = game:GetService("VirtualInputManager")
 local RunService = game:GetService("RunService")
 
 local Window = Library:CreateWindow({
-    Title = "晓辞俄亥俄州脚本",
+    Title = "秋晓辞俄亥俄州脚本",
     Footer = "By Linni",
     Icon = 131153193945220,
     NotifySide = "Right",
@@ -163,7 +163,7 @@ DrawGroup:AddToggle("ATMToggle", {
     Library:Notify("显示ATM机: " .. (value and "开启" or "关闭"), 2)
 end)
 
-BypassGroup:AddButton("绕过移动经销商", function()
+BypassGroup:AddButton("绕过移动经销商（用了卡死）", function()
     local pjyd = hookmetamethod(game, "__namecall", function(self, ...)
         local args = {...}
         local method = getnamecallmethod()
@@ -888,7 +888,7 @@ LocalPlayer.CharacterAdded:Connect(function()
 end)
 
 GameFarmGroup:AddToggle("AutoFarmToggle", {
-    Text = "自动农场",
+    Text = "自动农场（这个没用）",
     Default = false,
     Tooltip = "自动收集ATM和收银机"
 }):OnChanged(function(value)
