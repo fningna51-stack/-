@@ -1,0 +1,208 @@
+local Translations = {
+    ["Borenhub"] = "秋辞有福同享汉化",
+    ["Green Light Red Light"] = "一二三木头人",
+    ["Tp to end"] = "传送终点",
+    ["Dalgona"] = "扣糖饼",
+    ["Complete Dalgona"] = "自动扣糖饼",
+    ["Anti crack"] = "防破",
+    ["Free Iighter"] = "免费打火机",
+    ["Auto win fying stl"] = "自动飞石",
+    ["Auto winGonggi"] = "自动接石子",
+    ["Auto win Jegi"] = "自动踢毽子",
+    ["Pentathlon"] = "五人六足",
+    ["Toggle"] = "切换",
+    ["Tug war"] = "拨河",
+    ["Legit Pull"] = "正常拔河",
+    ["Auto pull"] = "自动拔河",
+    ["Glass Bridge"] = "玻璃桥",
+    ["ESP Glass"] = "透视真假玻璃",
+    ["Teleport to end"] = "传送终点",
+    ["Anti Break"] = "防破假玻璃",
+    ["Sky squid"] = "天空鱿鱼游戏",
+    ["Anti Fall"] = "防坠",
+    ["Legit Anti Fall"] = "合法防坠",
+    ["Main"] = "游戏",
+    ["Combat"] = "战斗",
+    ["Guard"] = "守卫",
+    ["misc"] = "杂项",
+    ["Hide and seek"] = "捉迷藏",
+    ["Kill aura (hiders)"] = "杀戮光环（躲藏者）",
+    ["Kill spikes (tp hiders to spikes)"] = "尖刺击杀（传送躲藏者到尖刺）",
+    ["Remove spike"] = "移除尖刺",
+    ["ESP hiders and seeker"] = "透视躲藏者和寻找者",
+    ["ESP door"] = "透视门",
+    ["Tp 100 blocks Up"] = "向上传送100格",
+    ["Tp 40 block own"] = "传送至自身40格",
+    ["Auto Dodge"] = "自动闪避",
+    ["Tp random key"] = "随机传送到钥匙",
+    ["Tp random exit"] = "随机传送到出囗有可能石门有可能是真门",
+    ["Jump rope"] = "跳绳",
+    ["Teleport to end"] = "传送到终点",
+    ["Remove rope"] = "移除绳索",
+    ["Minge"] = "旋转木马",
+    ["Auto QTE Rage"] = "自动QTE狂暴",
+    ["Traitor"] = "叛徒",
+    ["Inf ammo"] = "无限弹药",
+    ["Bring guard"] = "守卫功能",
+    ["Instant Rebel"] = "立即反叛",
+    ["final"] = "鱿鱼游戏",
+    ["Orbit Radius"] = "环绕半径",
+    ["Orbit Speed"] = "环绕速度",
+    ["Aura"] = "光环",
+    ["Camlock"] = "自瞄锁头",
+    ["Attachment"] = "附加功能",
+    ["玩家 Attach"] = "玩家附着",
+    ["Attach Range"] = "附着范围",
+    ["Movement Type"] = "移动类型",
+    ["Tween"] = "缓动",
+    ["Tween Duration"] = "缓动时长",
+    ["Stay Behind Target"] = "保持在目标后方",
+    ["Behind Distance"] = "后方距离",
+    ["PlayableGuard feature"] = "可玩守卫功能",
+    ["Infinite Ammo"] = "无限弹药",
+    ["General"] = "通用",
+    ["FREE GUARD"] = "免费守卫",
+    ["Circle"] = "圆圈",
+    ["Spawn as Guard"] = "以守卫身份生成",
+    ["Toy Machine Farm"] = "玩具机刷取",
+    ["Auto Farm Money (35s 20M)"] = "自动刷钱（35秒2000万）",
+    ["Auto Skip"] = "自动跳过",
+    ["Auto Vote"] = "自动投票",
+    ["Vote"] = "投票",
+    ["KeepPlaying"] = "继续游戏",
+    ["Anti Fling"] = "防击飞",
+    ["Anti Banana"] = "防香蕉",
+    ["Anti Stun"] = "防眩晕",
+    ["Anti Ragdoll"] = "防布娃娃",
+    ["Auto Next game"] = "自动下一局",
+    ["Double Jump(parkour)"] = "二段跳（跑酷）",
+    ["No Cooldown Proximity"] = "近距离无冷却",
+    ["Anti Lag"] = "防卡顿",
+    ["Fun"] = "趣味",
+    ["Free VIP (Visual)"] = "免费VIP（视觉）",
+    ["Enable Specate"] = "开启观战(有可能卡住)",
+    ["Custom Win"] = "自定义胜利",
+    ["Custom tag"] = "自定义标签",
+    ["Enter tag number (0-999)"] = "输入标签编号（0-999）",
+    ["Select Title"] = "选择称号",
+    ["Rich Millionaire"] = "富豪百万富翁",
+    ["Free Title(NOT FE)"] = "免费称号",
+    ["Movement"] = "移动",
+    ["Infinite Jump"] = "无限跳跃",
+    ["Walkspeed"] = "行走速度",
+    ["Fly"] = "飞行",
+    ["Fly Speed"] = "飞行速度",
+    ["Walk Speed Value"] = "行走速度值",
+    ["Reset Walk Speed"] = "重置行走速度",
+    ["Automation"] = "自动化",
+    ["Auto Collect Flashbang"] = "自动收集闪光弹",
+    ["Auto Collect Bandage"] = "自动收集绷带"
+}
+
+local function translateText(text)
+    if not text or type(text) ~= "string" then return text end
+    if Translations[text] then return Translations[text] end
+    local translated = text
+    for en, cn in pairs(Translations) do
+        translated = translated:gsub(en, cn)
+    end
+    return translated
+end
+
+local translatedElements = {}
+local originalTexts = {}
+
+local function safeTranslateElement(element)
+    if translatedElements[element] then return end
+    
+    pcall(function()
+        if element:IsA("TextLabel") or element:IsA("TextButton") or element:IsA("TextBox") then
+            local currentText = element.Text
+            if currentText and currentText ~= "" then
+                if not originalTexts[element] then
+                    originalTexts[element] = currentText
+                end
+                
+                local translatedText = translateText(currentText)
+                if translatedText ~= currentText then
+                    element.Text = translatedText
+                    translatedElements[element] = true
+                end
+            end
+        end
+    end)
+end
+
+local function reTranslateAllUI()
+    translatedElements = {}
+    for _, gui in ipairs(game:GetService("CoreGui"):GetDescendants()) do
+        safeTranslateElement(gui)
+    end
+    local player = game:GetService("Players").LocalPlayer
+    if player and player:FindFirstChild("PlayerGui") then
+        for _, gui in ipairs(player.PlayerGui:GetDescendants()) do
+            safeTranslateElement(gui)
+        end
+    end
+end
+
+local function setupSmartListener()
+    local function onTextPropertyChanged(element)
+        if translatedElements[element] then
+            local currentText = element.Text
+            local originalText = originalTexts[element]
+            
+            if currentText == originalText or translateText(currentText) == currentText then
+                translatedElements[element] = nil
+                return
+            end
+            
+            local translatedText = translateText(currentText)
+            if translatedText ~= currentText then
+                element.Text = translatedText
+            end
+        else
+            safeTranslateElement(element)
+        end
+    end
+
+    local function addSmartListener(parent)
+        for _, desc in ipairs(parent:GetDescendants()) do
+            safeTranslateElement(desc)
+        end
+        parent.DescendantAdded:Connect(function(descendant)
+            task.wait(0.3)
+            safeTranslateElement(descendant)
+            
+            if descendant:IsA("TextLabel") or descendant:IsA("TextButton") or descendant:IsA("TextBox") then
+                descendant:GetPropertyChangedSignal("Text"):Connect(function()
+                    task.wait(0.1)
+                    onTextPropertyChanged(descendant)
+                end)
+            end
+        end)
+    end
+    
+    pcall(addSmartListener, game:GetService("CoreGui"))
+    local player = game:GetService("Players").LocalPlayer
+    if player and player:FindFirstChild("PlayerGui") then
+        pcall(addSmartListener, player.PlayerGui)
+    end
+end
+
+local function delayedInitialTranslate()
+    task.wait(5)
+    reTranslateAllUI()
+end
+
+task.wait(2)
+setupSmartListener()
+delayedInitialTranslate()
+
+local success, err = pcall(function()
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Ink-Game-Borenhub-Update-51600"))()
+end)
+
+if not success then
+    warn("加载失败:", err)
+end
