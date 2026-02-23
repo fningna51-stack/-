@@ -1,41 +1,28 @@
--- =======================
--- Ultimate Instant Localization Core
--- =======================
-
-local Players = game:GetService("Players")
-local CoreGui = game:GetService("CoreGui")
-
-local player = Players.LocalPlayer
-
--- =======================
--- 1. 翻译表 & 缓存
--- =======================
-
-local TRANSLATION = {
-                ["Toggle"]="开关",
-        ["AX-SCRIPTS"]="Ax 有芙同享秋晓辞汉化", 
+local Translations = {
+["Toggle"]="开关",
+        ["AX-SCRIPTS"]="Ax <font color='#7FC8F0'>有</font><font color='#74C0EB'>芙</font><font color='#69B8E6'>同</font><font color='#5EB0E1'>享</font><font color='#53A8DC'>秋</font><font color='#48A0D7'>辞</font><font color='#3D98D2'>汉</font><font color='#3290CD'>化</font>", 
         ["Games"]="游戏",
         ["Combat"]="攻击",
         ["Miscs"]="杂项",
         ["Players"]="玩家",
         ["Settings"]="设置",
-        ["Red Light, Green Light"]="一二三木头人",
+        ["Red Light, Green Light"]="动了就是gay",
         ["Auto Stop"]="自动停止",
         ["Disable Injury"]="移除受伤状态",
         ["Finish RLGL"]="传送终点",
-        ["Dalgona"]="扣糖饼",
+        ["Dalgona"]="错一次就等掉",
         ["Anti Crack"]="糖饼不碎（等动画结束后再开）",
         ["Get Lighter"]="免费火机",
         ["Auto Dalgona"]="自动扣糖饼",
         ["Auto Dalgona V2"]="自动扣糖饼V2(等动画结束后)",
-        ["Lights Out"]="熄灯",
+        ["Lights Out"]="好机会",
         ["Safe Zone"]="传送到安全点",
-        ["Tug of War"]="拔河(有点效果)",
+        ["Tug of War"]="比谁最牛逼",
         ["Rope Pull Mode"]="自动拔河力度",
         ["Normal"]="正常",
         ["没找到素材"]="狂暴",
         ["Pull Rope"]="自动拔河",
-        ["Hide N' Seek"]="捉迷藏",
+        ["Hide N' Seek"]="最好别让我找到你！😡",
         ["Show Exit Doors (Yellow)"]="透视逃生门(黄)",
         ["Show Doors (Green | Cir/Tri/Sqr)"]="透视门(绿|圆形/三角形/正方形)",
         ["Show Dropped Keys (Purple)"]="透视钥匙(紫)",
@@ -47,27 +34,27 @@ local TRANSLATION = {
         ["Infinite Stamina"]="无限耐力",
         ["Fast Sprint"]="解锁快速冲刺",
         ["Spikes Kill"]="尖刺陷阱击杀",
-        ["Disable Spikes"]="禁用尖刺伤害",
+        ["Disable Spikes"]="取消尖刺伤害",
         ["Teleport to Hider"]="传送到蓝队",
         ["Teleport to Seeker"]="传送到红队",
         ["Select Exit Door"]="选择逃生门",
         ["Teleport to Exit Door"]="传送到逃生门",
-        ["Rebel"]="反叛",
+        ["Rebel"]="反骨这一块",
         ["Auto Shoot Guards"]="自动攻击守卫",
         ["Wall Check"]="墙壁检测",
         ["Guards Hitbox + ESP"]="增大守卫范围和透视",
         ["Hitbox Size"]="范围大小",
         ["Hitbox Transparency"]="范围透明度",
-        ["Last Dinner"]="最后的晚餐",
+        ["Last Dinner"]="最后的倔强",
         ["Zone Kill"]="传送杀人",
-        ["Squid Game"]="螃蟹游戏",
+        ["Squid Game"]="真男人一V一",
         ["Get Rock"]="自动获得石头",
         ["Pentathlon"]="五人六足",
-        ["Glass Bridge"]="玻璃桥",
-        ["Reveal Safe & Fake Glass"]="真玻璃透视",
+        ["Glass Bridge"]="坑人好地方",
+        ["Reveal Safe & Fake Glass"]="玻璃透视",
         ["Anti Break Glass"]="防坠落",
         ["Finish Glass Bridge"]="传送到终点",
-        ["Jump Rope"]="跳绳",
+        ["Jump Rope"]="装杯！装杯！",
         ["Finish Jump Rope"]="传送到终点",
         ["Disable Game"]="删除绳子",
         ["Simulate Balance"]="自动平衡",
@@ -77,7 +64,7 @@ local TRANSLATION = {
         ["Auto Balance"]="自动平衡",
         ["Press Speed"]="点击速度",
         ["Randomize Press Speed"]="随机速度",
-        ["Sky Squid Game"]="天空游戏",
+        ["Sky Squid Game"]="没实力别玩😭😂",
         ["Press Button"]="自动按按钮",
         ["Get Pole"]="自动得到棍子",
         ["Anti Fall"]="防止摔倒",
@@ -658,118 +645,116 @@ local TRANSLATION = {
         ["Auto-load"]="自动加载（加载出来不是汉化）"
 }
 
--- ========================
--- 2. 缓存 & Pattern
--- ========================
-
-local CACHE = {}
-local PATTERNS = {}
-
-for k, v in pairs(TRANSLATION) do
-    CACHE[k] = v
-end
-
-local function registerPattern(pattern, handler)
-    PATTERNS[#PATTERNS + 1] = { p = pattern, f = handler }
-end
-
--- 示例：动态数值
-registerPattern("^HP:%s*(%d+)$", function(n)
-    return "生命值：" .. n
-end)
-
--- ========================
--- 3. 极速翻译（唯一入口）
--- ========================
-
-local function translate(text)
-    if not text or text == "" then return text end
-
-    local cached = CACHE[text]
-    if cached then return cached end
-
-    for i = 1, #PATTERNS do
-        local m = text:match(PATTERNS[i].p)
-        if m then
-            local out = PATTERNS[i].f(m)
-            CACHE[text] = out
-            return out
+local function translateText(text)
+    if not text or type(text) ~= "string" then return text end
+    
+    if Translations[text] then
+        return Translations[text]
+    end
+    
+    for en, cn in pairs(Translations) do
+        if text:find(en) then
+            return text:gsub(en, cn)
         end
     end
-
-    CACHE[text] = text
+    
     return text
 end
 
--- ========================
--- 4. Text 写入拦截
--- ========================
-
-local hooked = setmetatable({}, { __mode = "k" })
-
-local function hookTextObject(obj)
-    if hooked[obj] then return end
-    hooked[obj] = true
-
-    -- 立刻处理一次（防止执行前已有内容）
-    pcall(function()
-        obj.Text = translate(obj.Text)
+local function setupTranslationEngine()
+    local success, err = pcall(function()
+        local oldIndex = getrawmetatable(game).__newindex
+        setreadonly(getrawmetatable(game), false)
+        
+        getrawmetatable(game).__newindex = newcclosure(function(t, k, v)
+            if (t:IsA("TextLabel") or t:IsA("TextButton") or t:IsA("TextBox")) and k == "Text" then
+                v = translateText(tostring(v))
+            end
+            return oldIndex(t, k, v)
+        end)
+        
+        setreadonly(getrawmetatable(game), true)
     end)
-
-    obj:GetPropertyChangedSignal("Text"):Connect(function()
-        local raw = obj.Text
-        local out = translate(raw)
-        if out ~= raw then
-            obj.Text = out
+    
+    if not success then
+        warn("元表劫持失败:", err)
+       
+        local translated = {}
+        local function scanAndTranslate()
+            for _, gui in ipairs(game:GetService("CoreGui"):GetDescendants()) do
+                if (gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox")) and not translated[gui] then
+                    pcall(function()
+                        local text = gui.Text
+                        if text and text ~= "" then
+                            local translatedText = translateText(text)
+                            if translatedText ~= text then
+                                gui.Text = translatedText
+                                translated[gui] = true
+                            end
+                        end
+                    end)
+                end
+            end
+            
+            local player = game:GetService("Players").LocalPlayer
+            if player and player:FindFirstChild("PlayerGui") then
+                for _, gui in ipairs(player.PlayerGui:GetDescendants()) do
+                    if (gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox")) and not translated[gui] then
+                        pcall(function()
+                            local text = gui.Text
+                            if text and text ~= "" then
+                                local translatedText = translateText(text)
+                                if translatedText ~= text then
+                                    gui.Text = translatedText
+                                    translated[gui] = true
+                                end
+                            end
+                        end)
+                    end
+                end
+            end
         end
-    end)
-end
-
--- ========================
--- 5. 监听容器（不扫）
--- ========================
-
-local function watch(container)
-    container.DescendantAdded:Connect(function(d)
-        if d:IsA("TextLabel") or d:IsA("TextButton") or d:IsA("TextBox") then
-            hookTextObject(d)
+        
+        local function setupDescendantListener(parent)
+            parent.DescendantAdded:Connect(function(descendant)
+                if descendant:IsA("TextLabel") or descendant:IsA("TextButton") or descendant:IsA("TextBox") then
+                    task.wait(0.1)
+                    pcall(function()
+                        local text = descendant.Text
+                        if text and text ~= "" then
+                            local translatedText = translateText(text)
+                            if translatedText ~= text then
+                                descendant.Text = translatedText
+                            end
+                        end
+                    end)
+                end
+            end)
         end
-    end)
-end
-
--- ========================
--- 6. 一次性补扫（关键！）
--- ========================
-
-local function initialScan(container)
-    for _, d in ipairs(container:GetDescendants()) do
-        if d:IsA("TextLabel") or d:IsA("TextButton") or d:IsA("TextBox") then
-            hookTextObject(d)
+        
+        pcall(setupDescendantListener, game:GetService("CoreGui"))
+        local player = game:GetService("Players").LocalPlayer
+        if player and player:FindFirstChild("PlayerGui") then
+            pcall(setupDescendantListener, player.PlayerGui)
+        end
+        
+        while true do
+            scanAndTranslate()
+            task.wait(3)
         end
     end
 end
 
--- CoreGui（外部 Hub / 聊天 / 公告）
-initialScan(CoreGui)
-watch(CoreGui)
+task.wait(2)
 
--- PlayerGui（游戏 UI）
-if player then
-    local pg = player:WaitForChild("PlayerGui")
-    initialScan(pg)
-    watch(pg)
-end
+setupTranslationEngine()
 
--- ========================
--- 7.添加要汉化的脚本在下面
+local success, err = pcall(function()
 loadstring(game:HttpGet("https://officialaxscripts.vercel.app/scripts/AX-Loader.lua"))()
--- ========================
 
-_G.LocalizationCore = {
-    Add = function(en, zh)
-        TRANSLATION[en] = zh
-        CACHE[en] = zh
-    end,
-    AddPattern = registerPattern,
-    Translate = translate
-}
+
+end)
+
+if not success then
+    warn("加载失败:", err)
+end
