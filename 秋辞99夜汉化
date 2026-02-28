@@ -9,13 +9,9 @@ local player = Players.LocalPlayer
 -- 1. 翻译表 & 缓存 --
 -- ======================= --
 local TRANSLATION = {
-    ["Toggle"] = "切换",
     ["99 nights"] = "秋辞99夜汉化",
     ["v0.20"] = "版本0.20",
     ["Free"] = "免费",
-    ["22:32"] = "22:32",
-    ["22:38"] = "22:38",
-    ["22:39"] = "22:39",
     ["Search"] = "搜索",
     ["Info"] = "信息",
     ["Main"] = "主菜单",
@@ -69,11 +65,6 @@ local TRANSLATION = {
     ["extra things"] = "额外功能",
     ["Quick Interact"] = "快速交互",
     ["keybinds"] = "按键绑定",
-    ["600"] = "600",
-    ["17"] = "17",
-    ["Someljejanje"] = "Someljejanje",
-    ["SVB"] = "SVB",
-    [""] = "",
     ["aybinds"] = "aybinds",
     ["Auto Open All Chests"] = "自动打开所有宝箱",
     ["Opens any chest you're close to"] = "打开你附近的任何宝箱",
@@ -261,7 +252,6 @@ local TRANSLATION = {
     ["Mobile Fly"] = "移动飞行",
     ["Camera"] = "相机",
     ["FOV"] = "视野",
-    ["70"] = "70",
     ["Visual"] = "视觉",
     ["settings"] = "设置",
     ["Utilities"] = "实用工具",
@@ -271,7 +261,6 @@ local TRANSLATION = {
     ["Theme"] = "主题",
     ["Midnight"] = "午夜",
     ["Transparency"] = "透明度",
-    ["0.2"] = "0.2",
     ["Anonymous Mode"] = "匿名模式",
     ["Enable Profile"] = "启用个人资料",
     ["Update Logs"] = "更新日志",
@@ -413,7 +402,7 @@ local TRANSLATION = {
     ["Full Bright"] = "全亮模式",
     ["No Fog"] = "无雾",
     ["Disable Night Effect"] = "禁用夜间效果",
-} -- 修复：已在此处添加了缺失的右花括号
+}
 
 local CACHE = {}
 local PATTERNS = {}
