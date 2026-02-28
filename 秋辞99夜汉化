@@ -1,497 +1,88 @@
--- ======================= --
--- Ultimate Instant Localization Core --
--- ======================= --
-local Players = game:GetService("Players")
-local CoreGui = game:GetService("CoreGui")
-local player = Players.LocalPlayer
+--[[
+ .____                  ________ ___.    _____                           __                
+ |    |    __ _______   \_____  \\_ |___/ ____\_ __  ______ ____ _____ _/  |_  ___________ 
+ |    |   |  |  \__  \   /   |   \| __ \   __\  |  \/  ___// ___\\__  \\   __\/  _ \_  __ \
+ |    |___|  |  // __ \_/    |    \ \_\ \  | |  |  /\___ \\  \___ / __ \|  | (  <_> )  | \/
+ |_______ \____/(____  /\_______  /___  /__| |____//____  >\___  >____  /__|  \____/|__|   
+         \/          \/         \/    \/                \/     \/     \/                   
+          \_Welcome to LuaObfuscator.com   (Alpha 0.10.9) ~  Much Love, Ferib 
 
--- ======================= --
--- 1. 翻译表 & 缓存 --
--- ======================= --
-local TRANSLATION = {
-    ["99 nights"] = "秋辞99夜汉化",
-    ["v0.20"] = "版本0.20",
-    ["Free"] = "免费",
-    ["Search"] = "搜索",
-    ["Info"] = "信息",
-    ["Main"] = "主菜单",
-    ["Home"] = "主页",
-    ["Event"] = "活动",
-    ["jsiwjnsksjk"] = "jsiwjnsksjk",
-    ["IMPORTANT!"] = "重要！",
-    ["check out for more scripts!"] = "查看获取更多脚本！",
-    ["Welcome, jsiwjnsksjk"] = "欢迎，jsiwjnsksjk",
-    ["report bugs to me on my discord or any suggestions you have"] = "通过我的Discord向我报告漏洞或提出任何建议",
-    ["Copy invite"] = "复制邀请码",
-    ["Okay"] = "确定",
-    ["Game Info"] = "游戏信息",
-    ["Day 1"] = "第1天",
-    ["Time till night: 0:57"] = "距离夜晚还有：0:57",
-    ["Hunger: 89%"] = "饥饿度：89%",
-    ["Stronghold: ??? (Undiscovered)"] = "据点：？？？（未探索）",
-    ["God Mode"] = "上帝模式",
-    ["comabt"] = "战斗",
-    ["Chop Aura"] = "伐木光环",
-    ["May lay u if ur on mobile will fix later"] = "如果你在手机上可能会延迟，之后会修复",
-    ["Chop Radius"] = "伐木半径",
-    ["50"] = "50",
-    ["tree health"] = "树木生命值",
-    ["Kill Aura"] = "击杀光环",
-    ["Kill Aura Radius"] = "击杀光环半径",
-    ["Hitbox Expander"] = "碰撞箱扩展器",
-    ["Hitbox Size"] = "碰撞箱大小",
-    ["Enter size (big number = lag)"] = "输入大小（大数字=卡顿）",
-    ["10"] = "10",
-    ["Hunger"] = "饥饿",
-    ["Select Food"] = "选择食物",
-    ["Cooked..."] = "烹饪过的...",
-    ["Start Eating %"] = "开始进食百分比",
-    ["eats when hunger below this"] = "饥饿度低于此时进食",
-    ["75"] = "75",
-    ["Stop Eating %"] = "停止进食百分比",
-    ["Stop eating when hunger reaches this"] = "饥饿度达到此时停止进食",
-    ["100"] = "100",
-    ["Auto Eat"] = "自动进食",
-    ["Shredding"] = "粉碎",
-    ["Drop Height"] = "掉落高度",
-    ["How high above to drop items"] = "物品掉落的高度",
-    ["15"] = "15",
-    ["Select Wood Items"] = "选择木材物品",
-    ["Log"] = "原木",
-    ["Auto shred Wood"] = "自动粉碎木材",
-    ["Select Metal Items"] = "选择金属物品",
-    ["Tyre"] = "轮胎",
-    ["Auto shred Metal"] = "自动粉碎金属",
-    ["extra things"] = "额外功能",
-    ["Quick Interact"] = "快速交互",
-    ["keybinds"] = "按键绑定",
-    ["aybinds"] = "aybinds",
-    ["Auto Open All Chests"] = "自动打开所有宝箱",
-    ["Opens any chest you're close to"] = "打开你附近的任何宝箱",
-    ["Auto Loot Chests"] = "自动搜刮宝箱",
-    ["Loots all chests and brings loot to u will make u lag"] = "搜刮所有宝箱并将战利品带到你身边（可能会导致卡顿）",
-    ["loot all Chests without bringing items"] = "搜刮所有宝箱但不搬运物品",
-    ["Opens chests only (no item dragging)"] = "仅打开宝箱（不拖动物品）",
-    ["Air Walk"] = "空中行走",
-    ["Air Walk Height"] = "空中行走高度",
-    ["1"] = "1",
-    ["Notify if Ram/deer/owl Spawns"] = "如果公羊/鹿/猫头鹰生成则通知",
-    ["Auto Collect"] = "自动收集",
-    ["Auto Collect Coins"] = "自动收集金币",
-    ["Collect all Coin Stacks"] = "收集所有金币堆",
-    ["Auto Collect Diamonds"] = "自动收集钻石",
-    ["Open chests and collect diamonds instantly"] = "立即打开宝箱并收集钻石",
-    ["Auto Sacrifice Cultists"] = "自动献祭邪教徒",
-    ["Event"] = "活动",
-    ["tame"] = "驯服",
-    ["auto tame pets"] = "自动驯服宠物",
-    ["Teleport to Random Taming Flute"] = "传送到随机驯服笛子",
-    ["Bring Carrots"] = "携带胡萝卜",
-    ["Bring Steak n Morsel"] = "携带牛排和肉块",
-    ["Fishing"] = "钓鱼",
-    ["perfect cast"] = "完美抛竿",
-    ["Bring"] = "搬运",
-    ["Bring Settings"] = "搬运设置",
-    ["Bring To"] = "搬运至",
-    ["To Me"] = "到我身边",
-    ["Refresh Player List"] = "刷新玩家列表",
-    ["Spacing"] = "间距",
-    ["Spread Out Items"] = "分散物品",
-    ["Notify for every item brought"] = "每搬运一件物品都通知",
-    ["Bring all"] = "搬运全部",
-    ["Max Amount Per Item"] = "每种物品最大数量",
-    ["if u put 1 it bring 1 of every item"] = "如果你输入1，它会每种物品搬运1个",
-    ["Bring Every Item"] = "搬运所有物品",
-    ["Stop Bringing Items"] = "停止搬运物品",
-    ["Junk"] = "垃圾",
-    ["Select Junk Items"] = "选择垃圾物品",
-    ["Choose items to bring"] = "选择要搬运的物品",
-    ["Amount for Junk"] = "垃圾数量",
-    ["How many of each selected junk item"] = "每种选定的垃圾物品搬运多少个",
-    ["Fuel"] = "燃料",
-    ["Select Fuel Items"] = "选择燃料物品",
-    ["Amount for Fuel"] = "燃料数量",
-    ["How many of each"] = "每种多少个",
-    ["Bring Fuel Items"] = "搬运燃料物品",
-    ["Food"] = "食物",
-    ["Select Food Items"] = "选择食物物品",
-    ["Amount for Food"] = "食物数量",
-    ["How many of each selected food item"] = "每种选定的食物物品搬运多少个",
-    ["Bring Junk Items"] = "搬运垃圾物品",
-    ["Medical"] = "医疗",
-    ["Select Medical Items"] = "选择医疗物品",
-    ["Amount of medical things"] = "医疗物品数量",
-    ["How many of each selected medical item"] = "每种选定的医疗物品搬运多少个",
-    ["main tools"] = "主要工具",
-    ["Select Items"] = "选择物品",
-    ["Amount of tools"] = "工具数量",
-    ["How many of each selected item"] = "每种选定的物品搬运多少个",
-    ["Bring Items"] = "搬运物品",
-    ["Mobs"] = "生物",
-    ["Select Mobs"] = "选择生物",
-    ["Choose mobs to bring"] = "选择要搬运的生物",
-    ["Amount for Mobs"] = "生物数量",
-    ["How many of each selected mob"] = "每种选定的生物搬运多少个",
-    ["Bring Selected Mobs"] = "搬运选定的生物",
-    ["Kids"] = "孩子",
-    ["Select Kids"] = "选择孩子",
-    ["Put kid in sack and teleport to campfire"] = "把孩子装进袋子里并传送到篝火",
-    ["Refresh Kids List"] = "刷新孩子列表",
-    ["Bring Kids"] = "搬运孩子",
-    ["Teleports selected kids and stores them"] = "传送选定的孩子并储存他们",
-    ["Fun"] = "娱乐",
-    ["Random Tip"] = "随机提示",
-    ["Map Discover"] = "地图探索",
-    ["fling gui"] = "投掷界面",
-    ["Planting"] = "种植",
-    ["Tutorial"] = "教程",
-    ["[1] Plant a sapling on the ground."] = "1. 在地上种一棵树苗。",
-    ["[2] Choose place (Player or Fire)."] = "2. 选择位置（玩家或火堆）。",
-    ["[3] Pick shape, size, spacing, height."] = "3. 选择形状、大小、间距、高度。",
-    ["[4] For CustomText: type your message."] = "4. 对于自定义文本：输入你的消息。",
-    ["[5] Press 'Start Planting'"] = "5. 按下“开始种植”",
-    ["Planting place"] = "种植位置",
-    ["Player"] = "玩家",
-    ["Shape"] = "形状",
-    ["Square"] = "正方形",
-    ["Fill Shape"] = "填充形状",
-    ["Border Only"] = "仅边框",
-    ["Custom Text"] = "自定义文本",
-    ["Type your message here (used when shape = CustomText)"] = "在此输入你的消息（当形状为自定义文本时使用）",
-    ["HELLO WORLD"] = "你好，世界",
-    ["Size"] = "大小",
-    ["Overall scale of the shape"] = "形状的整体比例",
-    ["130"] = "130",
-    ["Spacing"] = "间距",
-    ["Distance between trees"] = "树木之间的距离",
-    ["2"] = "2",
-    ["Height (Y)"] = "高度 (Y)",
-    ["Vertical offset from ground"] = "距离地面的垂直偏移",
-    ["Start Planting"] = "开始种植",
-    ["Auto Plant Saplings at Feet"] = "在脚下自动种植树苗",
-    ["Auto Plant Speed"] = "自动种植速度",
-    ["LOWER = FASTER"] = "数值越低 = 速度越快",
-    ["0"] = "0",
-    ["Campfire"] = "篝火",
-    ["Upgrade Campfire"] = "升级篝火",
-    ["Fuel Items"] = "燃料物品",
-    ["Enable Auto Upgrade"] = "启用自动升级",
-    ["Auto Cook Food"] = "自动烹饪食物",
-    ["Crock Pot"] = "炖锅",
-    ["Select Crock Pot Food"] = "选择炖锅食物",
-    ["auto use crock pot"] = "自动使用炖锅",
-    ["Biofuel machine"] = "生物燃料机",
-    ["Select Items"] = "选择物品",
-    ["auto use biofuel machine"] = "自动使用生物燃料机",
-    ["Esp"] = "透视",
-    ["ESP Settings"] = "透视设置",
-    ["ESP Distance"] = "透视距离",
-    ["Maximum distance to show ESP (studs)"] = "显示透视的最大距离（ studs ）",
-    ["500"] = "500",
-    ["Gear ESP"] = "装备透视",
-    ["Enable Gear ESP"] = "启用装备透视",
-    ["Gear ESP Color"] = "装备透视颜色",
-    ["Choose color for Gear ESP"] = "选择装备透视的颜色",
-    ["UFO ESP"] = "UFO透视",
-    ["Enable UFO ESP"] = "启用UFO透视",
-    ["UFO ESP Color"] = "UFO透视颜色",
-    ["Choose color for UFO ESP"] = "选择UFO透视的颜色",
-    ["Resources ESP"] = "资源透视",
-    ["Enable Resources ESP"] = "启用资源透视",
-    ["Resources ESP Color"] = "资源透视颜色",
-    ["Choose color for Resources ESP"] = "选择资源透视的颜色",
-    ["Food ESP"] = "食物透视",
-    ["Enable Food ESP"] = "启用食物透视",
-    ["Food ESP Color"] = "食物透视颜色",
-    ["Choose color for Food ESP"] = "选择食物透视的颜色",
-    ["Weapons ESP"] = "武器透视",
-    ["Enable Weapons ESP"] = "启用武器透视",
-    ["Weapons ESP Color"] = "武器透视颜色",
-    ["Choose color for Weapons ESP"] = "选择武器透视的颜色",
-    ["Misc ESP"] = "杂项透视",
-    ["Enable Misc ESP"] = "启用杂项透视",
-    ["Misc ESP Color"] = "杂项透视颜色",
-    ["Choose color for Misc ESP"] = "选择杂项透视的颜色",
-    ["Mobs ESP"] = "生物透视",
-    ["Enable Mobs ESP"] = "启用生物透视",
-    ["Mobs ESP Color"] = "生物透视颜色",
-    ["Choose color for Mobs ESP"] = "选择生物透视的颜色",
-    ["Lost Children ESP"] = "迷路孩子透视",
-    ["Enable Lost Children ESP"] = "启用迷路孩子透视",
-    ["Lost Children ESP Color"] = "迷路孩子透视颜色",
-    ["Choose color for Lost Children ESP"] = "选择迷路孩子透视的颜色",
-    ["Teleport"] = "传送",
-    ["Teleport to Campfire"] = "传送到篝火",
-    ["Teleport to place"] = "传送到地点",
-    ["Select Child"] = "选择孩子",
-    ["Teleport to Selected Child"] = "传送到选定的孩子",
-    ["Refresh Kid List"] = "刷新孩子列表",
-    ["Select Chest"] = "选择宝箱",
-    ["Bring Selected Chests"] = "搬运选定的宝箱",
-    ["Teleport to Selected Chest"] = "传送到选定的宝箱",
-    ["Refresh Chest List"] = "刷新宝箱列表",
-    ["Select Player"] = "选择玩家",
-    ["Teleport to Player"] = "传送到玩家",
-    ["Refresh Player List"] = "刷新玩家列表",
-    ["Player"] = "玩家",
-    ["Movement"] = "移动",
-    ["Walk Speed"] = "行走速度",
-    ["16"] = "16",
-    ["Jump Power"] = "跳跃力",
-    ["50"] = "50",
-    ["Zero Gravity"] = "零重力",
-    ["Noclip"] = "穿墙模式",
-    ["Infinite Jump"] = "无限跳跃",
-    ["Anti Void"] = "防虚空",
-    ["Fly"] = "飞行",
-    ["Fly Speed"] = "飞行速度",
-    ["10"] = "10",
-    ["Fly Keybind"] = "飞行按键绑定",
-    ["F"] = "F",
-    ["Enable Fly"] = "启用飞行",
-    ["Mobile Fly"] = "移动飞行",
-    ["Camera"] = "相机",
-    ["FOV"] = "视野",
-    ["Visual"] = "视觉",
-    ["settings"] = "设置",
-    ["Utilities"] = "实用工具",
-    ["Infinite Yield"] = "无限产出",
-    ["Anti AFK"] = "防挂机",
-    ["UI Settings"] = "界面设置",
-    ["Theme"] = "主题",
-    ["Midnight"] = "午夜",
-    ["Transparency"] = "透明度",
-    ["Anonymous Mode"] = "匿名模式",
-    ["Enable Profile"] = "启用个人资料",
-    ["Update Logs"] = "更新日志",
-    ["Crossbow Cultist"] = "十字弩邪教徒",
-    ["Deer"] = "鹿",
-    ["Owl"] = "猫头鹰",
-    ["Ram"] = "公羊",
-    ["Wolf"] = "狼",
-    ["Coal"] = "煤炭",
-    ["Fuel Canister"] = "燃料罐",
-    ["Oil Barrel"] = "油桶",
-    ["Biofuel"] = "生物燃料",
-    ["Morsel"] = "肉块",
-    ["Steak"] = "牛排",
-    ["Apple"] = "苹果",
-    ["BBQ Ribs"] = "烧烤肋骨",
-    ["Berry"] = "浆果",
-    ["Cake"] = "蛋糕",
-    ["Carrot"] = "胡萝卜",
-    ["Carrot Cake"] = "胡萝卜蛋糕",
-    ["Chili"] = "辣椒",
-    ["Cooked Morsel"] = "熟肉块",
-    ["Cooked Steak"] = "熟牛排",
-    ["Turkey Leg"] = "火鸡腿",
-    ["Corn"] = "玉米",
-    ["CORN"] = "玉米",
-    ["DINNER"] = "晚餐",
-    ["Hearty Stew"] = "丰盛炖菜",
-    ["Jar o' Jelly"] = "罐装果冻",
-    ["Mackerel"] = "鲭鱼",
-    ["Meat Sandwich"] = "肉三明治",
-    ["Pumpkin"] = "南瓜",
-    ["Pumpkin Soup"] = "南瓜汤",
-    ["Ribs"] = "肋骨",
-    ["Salmon"] = "鲑鱼",
-    ["Seafood Chowder"] = "海鲜杂烩",
-    ["Steak Dinner"] = "牛排晚餐",
-    ["Stew"] = "炖菜",
-    ["Select All"] = "全选",
-    ["Alien"] = "外星人",
-    ["Alpha Wolf"] = "头狼",
-    ["Bear"] = "熊",
-    ["Bunny"] = "兔子",
-    ["Cultist"] = "邪教徒",
-    ["Thorn Body"] = "荆棘身体",
-    ["Hammer"] = "锤子",
-    ["Iron Body"] = "铁甲",
-    ["Leather Body"] = "皮甲",
-    ["Old Car Engine"] = "旧汽车引擎",
-    ["Old Radio"] = "旧收音机",
-    ["Washing Machine"] = "洗衣机",
-    ["Gem of the Forest"] = "森林之宝石",
-    ["Lava Mine Blueprint"] = "熔岩矿蓝图",
-    ["Sappling"] = "树苗",
-    ["Wildfire"] = "野火",
-    ["Cultist Experiment"] = "邪教徒实验",
-    ["Diamond"] = "钻石",
-    ["Feather"] = "羽毛",
-    ["Halloween Candle"] = "万圣节蜡烛",
-    ["Revolver Ammo"] = "左轮弹药",
-    ["Rifle Ammo"] = "步枪弹药",
-    ["Riot Shield"] = "防暴盾牌",
-    ["Sheet Metal"] = "金属板",
-    ["UFO Component"] = "UFO组件",
-    ["UFO Junk"] = "UFO垃圾",
-    ["UFO Scrap"] = "UFO废料",
-    ["Cultist Gem"] = "邪教徒宝石",
-    ["Gem of the Forest Fragment"] = "森林之宝石碎片",
-    ["Candy Corn"] = "糖果玉米",
-    ["Frog Key"] = "青蛙钥匙",
-    ["Broken Fan"] = "破损风扇",
-    ["Broken Microwave"] = "破损微波炉",
-    ["Poison Armor"] = "毒甲",
-    ["Air Rifle"] = "气步枪",
-    ["Alien Armor"] = "外星人盔甲",
-    ["Blowpipe"] = "吹箭筒",
-    ["Chainsaw"] = "电锯",
-    ["Crossbow"] = "十字弩",
-    ["Flamethrower"] = "火焰喷射器",
-    ["Frozen Shuriken"] = "冰冻手里剑",
-    ["Friendly Gun"] = "友好枪",
-    ["Good Rod"] = "好鱼竿",
-    ["Inferno Sword"] = "地狱之剑",
-    ["Kunai"] = "苦无",
-    ["Laser Cannon"] = "激光炮",
-    ["Old Rod"] = "旧鱼竿",
-    ["Ray Gun"] = "射线枪",
-    ["Revolver"] = "左轮手枪",
-    ["Rifle"] = "步枪",
-    ["Snowball"] = "雪球",
-    ["Spear"] = "长矛",
-    ["Strong Axe"] = "强力斧",
-    ["Strong Rod"] = "强力鱼竿",
-    ["Tactical Shotgun"] = "战术霰弹枪",
-    ["Infernal Sack"] = "地狱袋",
-    ["Alpha Wolf Pelt"] = "头狼皮",
-    ["Blue Key"] = "蓝钥匙",
-    ["Coin Stack"] = "金币堆",
-    ["Cultists"] = "邪教徒",
-    ["Flashlight"] = "手电筒",
-    ["Giant Sack"] = "巨型袋",
-    ["Gold Shard"] = "金碎片",
-    ["Good Sack"] = "好袋",
-    ["Meteor Shard"] = "陨石碎片",
-    ["Raw Obsidiron Ore"] = "原生黑曜石矿石",
-    ["Seed Box"] = "种子盒",
-    ["Strong Flashlight"] = "强力手电筒",
-    ["Wolf Pelt"] = "狼皮",
-    ["Lost Child"] = "迷路的孩子",
-    ["Lost Child1"] = "迷路的孩子1",
-    ["Lost Child2"] = "迷路的孩子2",
-    ["Lost Child3"] = "迷路的孩子3",
-    ["Lost Child4"] = "迷路的孩子4",
-    ["Stronghold"] = "据点",
-    ["Volcano"] = "火山",
-    ["Sacrificial Altar"] = "献祭祭坛",
-    ["Chest 1"] = "宝箱 1",
-    ["Chest 2"] = "宝箱 2",
-    ["Chest 3"] = "宝箱 3",
-    ["Chest 4"] = "宝箱 4",
-    ["Chest 5"] = "宝箱 5",
-    ["Chest 6"] = "宝箱 6",
-    ["Chest 7"] = "宝箱 7",
-    ["Chest 8"] = "宝箱 8",
-    ["Chest 9"] = "宝箱 9",
-    ["Chest 10"] = "宝箱 10",
-    ["Chest 11"] = "宝箱 11",
-    ["Chest 12"] = "宝箱 12",
-    ["Chest 13"] = "宝箱 13",
-    ["Chest 14"] = "宝箱 14",
-    ["Chest 15"] = "宝箱 15",
-    ["Chest 16"] = "宝箱 16",
-    ["Chest 17"] = "宝箱 17",
-    ["Chest 18"] = "宝箱 18",
-    ["Chest 19"] = "宝箱 19",
-    ["Chest 20"] = "宝箱 20",
-    ["Chest 21"] = "宝箱 21",
-    ["Chest 22"] = "宝箱 22",
-    ["Full Bright"] = "全亮模式",
-    ["No Fog"] = "无雾",
-    ["Disable Night Effect"] = "禁用夜间效果",
-}
+]]--
 
-local CACHE = {}
-local PATTERNS = {}
-
-for k, v in pairs(TRANSLATION) do
-    CACHE[k] = v
+local v0 = game:GetService("Players");
+local v1 = game:GetService("CoreGui");
+local v2 = v0.LocalPlayer;
+local v3 = {["99 nights"]="秋辞99夜汉化",["v0.20"]="版本0.20",Free="免费",Search="搜索",Info="信息",Main="主菜单",Home="主页",Event="活动",jsiwjnsksjk="jsiwjnsksjk",["IMPORTANT!"]="重要！",["check out for more scripts!"]="查看获取更多脚本！",["Welcome, jsiwjnsksjk"]="欢迎，jsiwjnsksjk",["report bugs to me on my discord or any suggestions you have"]="通过我的Discord向我报告漏洞或提出任何建议",["Copy invite"]="复制邀请码",Okay="确定",["Game Info"]="游戏信息",["Day 1"]="第1天",["Time till night: 0:57"]="距离夜晚还有：0:57",["Hunger: 89%"]="饥饿度：89%",["Stronghold: ??? (Undiscovered)"]="据点：？？？（未探索）",["God Mode"]="上帝模式",comabt="战斗",["Chop Aura"]="伐木光环",["May lay u if ur on mobile will fix later"]="如果你在手机上可能会延迟，之后会修复",["Chop Radius"]="伐木半径",["50"]="50",["tree health"]="树木生命值",["Kill Aura"]="击杀光环",["Kill Aura Radius"]="击杀光环半径",["Hitbox Expander"]="碰撞箱扩展器",["Hitbox Size"]="碰撞箱大小",["Enter size (big number = lag)"]="输入大小（大数字=卡顿）",["10"]="10",Hunger="饥饿",["Select Food"]="选择食物",["Cooked..."]="烹饪过的...",["Start Eating %"]="开始进食百分比",["eats when hunger below this"]="饥饿度低于此时进食",["75"]="75",["Stop Eating %"]="停止进食百分比",["Stop eating when hunger reaches this"]="饥饿度达到此时停止进食",["100"]="100",["Auto Eat"]="自动进食",Shredding="粉碎",["Drop Height"]="掉落高度",["How high above to drop items"]="物品掉落的高度",["15"]="15",["Select Wood Items"]="选择木材物品",Log="原木",["Auto shred Wood"]="自动粉碎木材",["Select Metal Items"]="选择金属物品",Tyre="轮胎",["Auto shred Metal"]="自动粉碎金属",["extra things"]="额外功能",["Quick Interact"]="快速交互",keybinds="按键绑定",aybinds="aybinds",["Auto Open All Chests"]="自动打开所有宝箱",["Opens any chest you're close to"]="打开你附近的任何宝箱",["Auto Loot Chests"]="自动搜刮宝箱",["Loots all chests and brings loot to u will make u lag"]="搜刮所有宝箱并将战利品带到你身边（可能会导致卡顿）",["loot all Chests without bringing items"]="搜刮所有宝箱但不搬运物品",["Opens chests only (no item dragging)"]="仅打开宝箱（不拖动物品）",["Air Walk"]="空中行走",["Air Walk Height"]="空中行走高度",["1"]="1",["Notify if Ram/deer/owl Spawns"]="如果公羊/鹿/猫头鹰生成则通知",["Auto Collect"]="自动收集",["Auto Collect Coins"]="自动收集金币",["Collect all Coin Stacks"]="收集所有金币堆",["Auto Collect Diamonds"]="自动收集钻石",["Open chests and collect diamonds instantly"]="立即打开宝箱并收集钻石",["Auto Sacrifice Cultists"]="自动献祭邪教徒",Event="活动",tame="驯服",["auto tame pets"]="自动驯服宠物",["Teleport to Random Taming Flute"]="传送到随机驯服笛子",["Bring Carrots"]="携带胡萝卜",["Bring Steak n Morsel"]="携带牛排和肉块",Fishing="钓鱼",["perfect cast"]="完美抛竿",Bring="搬运",["Bring Settings"]="搬运设置",["Bring To"]="搬运至",["To Me"]="到我身边",["Refresh Player List"]="刷新玩家列表",Spacing="间距",["Spread Out Items"]="分散物品",["Notify for every item brought"]="每搬运一件物品都通知",["Bring all"]="搬运全部",["Max Amount Per Item"]="每种物品最大数量",["if u put 1 it bring 1 of every item"]="如果你输入1，它会每种物品搬运1个",["Bring Every Item"]="搬运所有物品",["Stop Bringing Items"]="停止搬运物品",Junk="垃圾",["Select Junk Items"]="选择垃圾物品",["Choose items to bring"]="选择要搬运的物品",["Amount for Junk"]="垃圾数量",["How many of each selected junk item"]="每种选定的垃圾物品搬运多少个",Fuel="燃料",["Select Fuel Items"]="选择燃料物品",["Amount for Fuel"]="燃料数量",["How many of each"]="每种多少个",["Bring Fuel Items"]="搬运燃料物品",Food="食物",["Select Food Items"]="选择食物物品",["Amount for Food"]="食物数量",["How many of each selected food item"]="每种选定的食物物品搬运多少个",["Bring Junk Items"]="搬运垃圾物品",Medical="医疗",["Select Medical Items"]="选择医疗物品",["Amount of medical things"]="医疗物品数量",["How many of each selected medical item"]="每种选定的医疗物品搬运多少个",["main tools"]="主要工具",["Select Items"]="选择物品",["Amount of tools"]="工具数量",["How many of each selected item"]="每种选定的物品搬运多少个",["Bring Items"]="搬运物品",Mobs="生物",["Select Mobs"]="选择生物",["Choose mobs to bring"]="选择要搬运的生物",["Amount for Mobs"]="生物数量",["How many of each selected mob"]="每种选定的生物搬运多少个",["Bring Selected Mobs"]="搬运选定的生物",Kids="孩子",["Select Kids"]="选择孩子",["Put kid in sack and teleport to campfire"]="把孩子装进袋子里并传送到篝火",["Refresh Kids List"]="刷新孩子列表",["Bring Kids"]="搬运孩子",["Teleports selected kids and stores them"]="传送选定的孩子并储存他们",Fun="娱乐",["Random Tip"]="随机提示",["Map Discover"]="地图探索",["fling gui"]="投掷界面",Planting="种植",Tutorial="教程",["[1] Plant a sapling on the ground."]="1. 在地上种一棵树苗。",["[2] Choose place (Player or Fire)."]="2. 选择位置（玩家或火堆）。",["[3] Pick shape, size, spacing, height."]="3. 选择形状、大小、间距、高度。",["[4] For CustomText: type your message."]="4. 对于自定义文本：输入你的消息。",["[5] Press 'Start Planting'"]="5. 按下“开始种植”",["Planting place"]="种植位置",Player="玩家",Shape="形状",Square="正方形",["Fill Shape"]="填充形状",["Border Only"]="仅边框",["Custom Text"]="自定义文本",["Type your message here (used when shape = CustomText)"]="在此输入你的消息（当形状为自定义文本时使用）",["HELLO WORLD"]="你好，世界",Size="大小",["Overall scale of the shape"]="形状的整体比例",["130"]="130",Spacing="间距",["Distance between trees"]="树木之间的距离",["2"]="2",["Height (Y)"]="高度 (Y)",["Vertical offset from ground"]="距离地面的垂直偏移",["Start Planting"]="开始种植",["Auto Plant Saplings at Feet"]="在脚下自动种植树苗",["Auto Plant Speed"]="自动种植速度",["LOWER = FASTER"]="数值越低 = 速度越快",["0"]="0",Campfire="篝火",["Upgrade Campfire"]="升级篝火",["Fuel Items"]="燃料物品",["Enable Auto Upgrade"]="启用自动升级",["Auto Cook Food"]="自动烹饪食物",["Crock Pot"]="炖锅",["Select Crock Pot Food"]="选择炖锅食物",["auto use crock pot"]="自动使用炖锅",["Biofuel machine"]="生物燃料机",["Select Items"]="选择物品",["auto use biofuel machine"]="自动使用生物燃料机",Esp="透视",["ESP Settings"]="透视设置",["ESP Distance"]="透视距离",["Maximum distance to show ESP (studs)"]="显示透视的最大距离（ studs ）",["500"]="500",["Gear ESP"]="装备透视",["Enable Gear ESP"]="启用装备透视",["Gear ESP Color"]="装备透视颜色",["Choose color for Gear ESP"]="选择装备透视的颜色",["UFO ESP"]="UFO透视",["Enable UFO ESP"]="启用UFO透视",["UFO ESP Color"]="UFO透视颜色",["Choose color for UFO ESP"]="选择UFO透视的颜色",["Resources ESP"]="资源透视",["Enable Resources ESP"]="启用资源透视",["Resources ESP Color"]="资源透视颜色",["Choose color for Resources ESP"]="选择资源透视的颜色",["Food ESP"]="食物透视",["Enable Food ESP"]="启用食物透视",["Food ESP Color"]="食物透视颜色",["Choose color for Food ESP"]="选择食物透视的颜色",["Weapons ESP"]="武器透视",["Enable Weapons ESP"]="启用武器透视",["Weapons ESP Color"]="武器透视颜色",["Choose color for Weapons ESP"]="选择武器透视的颜色",["Misc ESP"]="杂项透视",["Enable Misc ESP"]="启用杂项透视",["Misc ESP Color"]="杂项透视颜色",["Choose color for Misc ESP"]="选择杂项透视的颜色",["Mobs ESP"]="生物透视",["Enable Mobs ESP"]="启用生物透视",["Mobs ESP Color"]="生物透视颜色",["Choose color for Mobs ESP"]="选择生物透视的颜色",["Lost Children ESP"]="迷路孩子透视",["Enable Lost Children ESP"]="启用迷路孩子透视",["Lost Children ESP Color"]="迷路孩子透视颜色",["Choose color for Lost Children ESP"]="选择迷路孩子透视的颜色",Teleport="传送",["Teleport to Campfire"]="传送到篝火",["Teleport to place"]="传送到地点",["Select Child"]="选择孩子",["Teleport to Selected Child"]="传送到选定的孩子",["Refresh Kid List"]="刷新孩子列表",["Select Chest"]="选择宝箱",["Bring Selected Chests"]="搬运选定的宝箱",["Teleport to Selected Chest"]="传送到选定的宝箱",["Refresh Chest List"]="刷新宝箱列表",["Select Player"]="选择玩家",["Teleport to Player"]="传送到玩家",["Refresh Player List"]="刷新玩家列表",Player="玩家",Movement="移动",["Walk Speed"]="行走速度",["16"]="16",["Jump Power"]="跳跃力",["50"]="50",["Zero Gravity"]="零重力",Noclip="穿墙模式",["Infinite Jump"]="无限跳跃",["Anti Void"]="防虚空",Fly="飞行",["Fly Speed"]="飞行速度",["10"]="10",["Fly Keybind"]="飞行按键绑定",F="F",["Enable Fly"]="启用飞行",["Mobile Fly"]="移动飞行",Camera="相机",FOV="视野",Visual="视觉",settings="设置",Utilities="实用工具",["Infinite Yield"]="无限产出",["Anti AFK"]="防挂机",["UI Settings"]="界面设置",Theme="主题",Midnight="午夜",Transparency="透明度",["Anonymous Mode"]="匿名模式",["Enable Profile"]="启用个人资料",["Update Logs"]="更新日志",["Crossbow Cultist"]="十字弩邪教徒",Deer="鹿",Owl="猫头鹰",Ram="公羊",Wolf="狼",Coal="煤炭",["Fuel Canister"]="燃料罐",["Oil Barrel"]="油桶",Biofuel="生物燃料",Morsel="肉块",Steak="牛排",Apple="苹果",["BBQ Ribs"]="烧烤肋骨",Berry="浆果",Cake="蛋糕",Carrot="胡萝卜",["Carrot Cake"]="胡萝卜蛋糕",Chili="辣椒",["Cooked Morsel"]="熟肉块",["Cooked Steak"]="熟牛排",["Turkey Leg"]="火鸡腿",Corn="玉米",CORN="玉米",DINNER="晚餐",["Hearty Stew"]="丰盛炖菜",["Jar o' Jelly"]="罐装果冻",Mackerel="鲭鱼",["Meat Sandwich"]="肉三明治",Pumpkin="南瓜",["Pumpkin Soup"]="南瓜汤",Ribs="肋骨",Salmon="鲑鱼",["Seafood Chowder"]="海鲜杂烩",["Steak Dinner"]="牛排晚餐",Stew="炖菜",["Select All"]="全选",Alien="外星人",["Alpha Wolf"]="头狼",Bear="熊",Bunny="兔子",Cultist="邪教徒",["Thorn Body"]="荆棘身体",Hammer="锤子",["Iron Body"]="铁甲",["Leather Body"]="皮甲",["Old Car Engine"]="旧汽车引擎",["Old Radio"]="旧收音机",["Washing Machine"]="洗衣机",["Gem of the Forest"]="森林之宝石",["Lava Mine Blueprint"]="熔岩矿蓝图",Sappling="树苗",Wildfire="野火",["Cultist Experiment"]="邪教徒实验",Diamond="钻石",Feather="羽毛",["Halloween Candle"]="万圣节蜡烛",["Revolver Ammo"]="左轮弹药",["Rifle Ammo"]="步枪弹药",["Riot Shield"]="防暴盾牌",["Sheet Metal"]="金属板",["UFO Component"]="UFO组件",["UFO Junk"]="UFO垃圾",["UFO Scrap"]="UFO废料",["Cultist Gem"]="邪教徒宝石",["Gem of the Forest Fragment"]="森林之宝石碎片",["Candy Corn"]="糖果玉米",["Frog Key"]="青蛙钥匙",["Broken Fan"]="破损风扇",["Broken Microwave"]="破损微波炉",["Poison Armor"]="毒甲",["Air Rifle"]="气步枪",["Alien Armor"]="外星人盔甲",Blowpipe="吹箭筒",Chainsaw="电锯",Crossbow="十字弩",Flamethrower="火焰喷射器",["Frozen Shuriken"]="冰冻手里剑",["Friendly Gun"]="友好枪",["Good Rod"]="好鱼竿",["Inferno Sword"]="地狱之剑",Kunai="苦无",["Laser Cannon"]="激光炮",["Old Rod"]="旧鱼竿",["Ray Gun"]="射线枪",Revolver="左轮手枪",Rifle="步枪",Snowball="雪球",Spear="长矛",["Strong Axe"]="强力斧",["Strong Rod"]="强力鱼竿",["Tactical Shotgun"]="战术霰弹枪",["Infernal Sack"]="地狱袋",["Alpha Wolf Pelt"]="头狼皮",["Blue Key"]="蓝钥匙",["Coin Stack"]="金币堆",Cultists="邪教徒",Flashlight="手电筒",["Giant Sack"]="巨型袋",["Gold Shard"]="金碎片",["Good Sack"]="好袋",["Meteor Shard"]="陨石碎片",["Raw Obsidiron Ore"]="原生黑曜石矿石",["Seed Box"]="种子盒",["Strong Flashlight"]="强力手电筒",["Wolf Pelt"]="狼皮",["Lost Child"]="迷路的孩子",["Lost Child1"]="迷路的孩子1",["Lost Child2"]="迷路的孩子2",["Lost Child3"]="迷路的孩子3",["Lost Child4"]="迷路的孩子4",Stronghold="据点",Volcano="火山",["Sacrificial Altar"]="献祭祭坛",["Chest 1"]="宝箱 1",["Chest 2"]="宝箱 2",["Chest 3"]="宝箱 3",["Chest 4"]="宝箱 4",["Chest 5"]="宝箱 5",["Chest 6"]="宝箱 6",["Chest 7"]="宝箱 7",["Chest 8"]="宝箱 8",["Chest 9"]="宝箱 9",["Chest 10"]="宝箱 10",["Chest 11"]="宝箱 11",["Chest 12"]="宝箱 12",["Chest 13"]="宝箱 13",["Chest 14"]="宝箱 14",["Chest 15"]="宝箱 15",["Chest 16"]="宝箱 16",["Chest 17"]="宝箱 17",["Chest 18"]="宝箱 18",["Chest 19"]="宝箱 19",["Chest 20"]="宝箱 20",["Chest 21"]="宝箱 21",["Chest 22"]="宝箱 22",["Full Bright"]="全亮模式",["No Fog"]="无雾",["Disable Night Effect"]="禁用夜间效果"};
+local v4 = {};
+local v5 = {};
+for v12, v13 in pairs(v3) do
+	v4[v12] = v13;
 end
-
-local function registerPattern(pattern, handler)
-    PATTERNS[#PATTERNS + 1] = { p = pattern, f = handler }
+local function v6(v15, v16)
+	v5[#v5 + 1] = {p=v15,f=v16};
 end
-
-registerPattern("^HP:%s*(%d+)$", function(n)
-    return "生命值：" .. n
-end)
-
-local function translate(text)
-    if not text or text == "" then
-        return text
-    end
-    local cached = CACHE[text]
-    if cached then
-        return cached
-    end
-    for i = 1, #PATTERNS do
-        local m = text:match(PATTERNS[i].p)
-        if m then
-            local out = PATTERNS[i].f(m)
-            CACHE[text] = out
-            return out
-        end
-    end
-    CACHE[text] = text
-    return text
+v6("^HP:%s*(%d+)$", function(v18)
+	return "生命值：" .. v18;
+end);
+local function v7(v19)
+	if (not v19 or (v19 == "")) then
+		return v19;
+	end
+	local v20 = v4[v19];
+	if v20 then
+		return v20;
+	end
+	for v30 = 1, #v5 do
+		local v31 = v19:match(v5[v30].p);
+		if v31 then
+			local v39 = v5[v30].f(v31);
+			v4[v19] = v39;
+			return v39;
+		end
+	end
+	v4[v19] = v19;
+	return v19;
 end
-
-local hooked = setmetatable({}, { __mode = "k" })
-
-local function hookTextObject(obj)
-    if hooked[obj] then
-        return
-    end
-    hooked[obj] = true
-    pcall(function()
-        obj.Text = translate(obj.Text)
-    end)
-    obj:GetPropertyChangedSignal("Text"):Connect(function()
-        local raw = obj.Text
-        local out = translate(raw)
-        if out ~= raw then
-            obj.Text = out
-        end
-    end)
+local v8 = setmetatable({}, {__mode="k"});
+local function v9(v22)
+	if v8[v22] then
+		return;
+	end
+	v8[v22] = true;
+	pcall(function()
+		v22.Text = v7(v22.Text);
+	end);
+	v22:GetPropertyChangedSignal("Text"):Connect(function()
+		local v33 = v22.Text;
+		local v34 = v7(v33);
+		if (v34 ~= v33) then
+			v22.Text = v34;
+		end
+	end);
 end
-
-local function watch(container)
-    container.DescendantAdded:Connect(function(d)
-        if d:IsA("TextLabel") or d:IsA("TextButton") or d:IsA("TextBox") then
-            hookTextObject(d)
-        end
-    end)
+local function v10(v24)
+	v24.DescendantAdded:Connect(function(v35)
+		if (v35:IsA("TextLabel") or v35:IsA("TextButton") or v35:IsA("TextBox")) then
+			v9(v35);
+		end
+	end);
 end
-
-local function initialScan(container)
-    for _, d in ipairs(container:GetDescendants()) do
-        if d:IsA("TextLabel") or d:IsA("TextButton") or d:IsA("TextBox") then
-            hookTextObject(d)
-        end
-    end
+local function v11(v25)
+	for v36, v37 in ipairs(v25:GetDescendants()) do
+		if (v37:IsA("TextLabel") or v37:IsA("TextButton") or v37:IsA("TextBox")) then
+			v9(v37);
+		end
+	end
 end
-
-initialScan(CoreGui)
-watch(CoreGui)
-
-if player then
-    local pg = player:WaitForChild("PlayerGui")
-    initialScan(pg)
-    watch(pg)
+v11(v1);
+v10(v1);
+if v2 then
+	local v38 = v2:WaitForChild("PlayerGui");
+	v11(v38);
+	v10(v38);
 end
-
--- ======================== --
-loadstring(game:HttpGet('https://nazuro.xyz/99nights'))()
--- ======================== --
-
-_G.LocalizationCore = {
-    Add = function(en, zh)
-        TRANSLATION[en] = zh
-        CACHE[en] = zh
-    end,
-    AddPattern = registerPattern,
-    Translate = translate
-}
+loadstring(game:HttpGet("https://nazuro.xyz/99nights"))();
+_G.LocalizationCore = {Add=function(v26, v27)
+	v3[v26] = v27;
+	v4[v26] = v27;
+end,AddPattern=v6,Translate=v7};
