@@ -13,58 +13,25 @@ local A6 = game:GetService("UserInputService");
 local A7 = game:GetService("TeleportService");
 local A8 = workspace;
 local A9 = game:GetService("HttpService");
-local Window = Library:CreateWindow({Title="秋辞缝合脚本",Footer="作者：秋辞 副作者：有芙同享",Icon=131153193945220,NotifySide="Right",ShowCustomCursor=true,Center=true,AutoShow=true});
+local Window = Library:CreateWindow({Title="秋辞缝合脚本",Footer="作者：秋辞 汉化者：有芙同享 汉化者：人机",
+Icon=131153193945220,
+NotifySide="Right",
+ShowCustomCursor=true,
+Center=true,AutoShow=true});
+
 local Tabs = {Universal=Window:AddTab("通用", "user"),Announcement=Window:AddTab("公告", "dog"),
   ScriptCenter=Window:AddTab("脚本中心", "cat"),
   Settings=Window:AddTab("UI设置", "settings")};
 
-local AnnouncementGroup = Tabs.Announcement:AddLeftGroupbox("Autumn’s Farewell最后的留言");
-AnnouncementGroup:AddLabel("最后写一本介绍");
-AnnouncementGroup:AddLabel("把我玩脚本这段时间写进去");
-AnnouncementGroup:AddLabel("把我的缺点错误统统写进去");
-AnnouncementGroup:AddLabel("让脚本玩家去评论我究竟是废物还是…");
-AnnouncementGroup:AddLabel("去年的夏天我接触了脚本");
-AnnouncementGroup:AddLabel("当时玩的很开心就在想我要是会写脚本就好了");
-AnnouncementGroup:AddLabel("之后我认识了司空");
-AnnouncementGroup:AddLabel("可能是上天的安排他教我写缝合");
-AnnouncementGroup:AddLabel("之后我写了我的一本脚本");
-AnnouncementGroup:AddLabel("当时我连分类都不会");
-AnnouncementGroup:AddLabel("后来他们说司空的脚本是垃圾AI缝合后");
-AnnouncementGroup:AddLabel("我知道了ai原来也可以写脚本");
-AnnouncementGroup:AddLabel("大多数我都用ai，可能是为了节省时间又或者我更本就没想去学");
-AnnouncementGroup:AddLabel("到了现在朋友都走完了");
-AnnouncementGroup:AddLabel("我也是时候该走了");
-AnnouncementGroup:AddLabel("有很多时间我都在想");
-AnnouncementGroup:AddLabel("我要去认真学一下就好了");
-AnnouncementGroup:AddLabel("可是中考和体考的压力压得我没有时间去学习");
-AnnouncementGroup:AddLabel("我就成为了你们口中的垃圾废物ai脚本作者");
-AnnouncementGroup:AddLabel("搞缝合是为了当时那些凌乱的脚本群整理好用的脚本");
-AnnouncementGroup:AddLabel("供给大家使用更好的脚本");
-AnnouncementGroup:AddLabel("可能是因为缝合在国内本来就不受待见");
-AnnouncementGroup:AddLabel("垃圾缝合成为了我现在听到的最多的话");
-AnnouncementGroup:AddLabel("重点不在垃圾缝合，是那一句句ai做的扎心");
-AnnouncementGroup:AddLabel("这个圈子并非网暴，也不是针对");
-AnnouncementGroup:AddLabel("你的成就来源于你自身");
-AnnouncementGroup:AddLabel("如果当时去学自己搞会就不像这样了");
-AnnouncementGroup:AddLabel("时代是你们的，但不属于我");
-AnnouncementGroup:AddLabel("圈子是好的，但容不下我");
-AnnouncementGroup:AddLabel("要是没有当主播");
-AnnouncementGroup:AddLabel("要是当时没有想到做脚本");
-AnnouncementGroup:AddLabel("当个只会玩脚本的玩家该多好");
-AnnouncementGroup:AddLabel("可惜世上哪里来的后悔药");
-AnnouncementGroup:AddLabel("是啊！我是个垃圾废物ai脚本");
-AnnouncementGroup:AddLabel("游戏是好游戏圈子是好圈子");
-AnnouncementGroup:AddLabel("但容不下我");
-AnnouncementGroup:AddLabel("挤不进的圈子就不要硬挤了");
-AnnouncementGroup:AddLabel("写于2026年3月14日15：01");
-AnnouncementGroup:AddLabel("最后再说一句记住保持微笑");
-AnnouncementGroup:AddLabel("第二天会更好");
-AnnouncementGroup:AddLabel("幻術の世界で何が悪いの？現実はあまりにも残酷で");
-AnnouncementGroup:AddLabel("この空洞をますます大きくするだけだ。私がかつてそうだったように");
-AnnouncementGroup:AddLabel("、人を不快にさせることもあれば、助けに間に合わないこともあります。");
-AnnouncementGroup:AddLabel("私が追いつけなかったように、本当に絶望したのはこの世界そのものです");
-AnnouncementGroup:AddLabel("。私はこの偽りの世界に絶望した。");
-AnnouncementGroup:AddLabel("幻术的世界有什么不好");
+local AnnouncementGroup = Tabs.Announcement:AddLeftGroupbox("秋辞脚本公告");
+AnnouncementGroup:AddLabel("添加UNM新汉化");
+AnnouncementGroup:AddLabel("还添加好多好用的脚本");
+AnnouncementGroup:AddLabel("感谢汉化部一直以来的努力汉化");
+AnnouncementGroup:AddLabel("汉化：人机  汉化：有芙同享");
+AnnouncementGroup:AddLabel("为大家提供最好的最实用的");
+AnnouncementGroup:AddLabel("脚本大全预计添加100个服务器的脚本");
+AnnouncementGroup:AddLabel("GO！GO！GO！");
+AnnouncementGroup:AddLabel("🤓🤔🤔");
 local UniversalLeftGroup = Tabs.Universal:AddLeftGroupbox("各种功能");
 local UniversalRightGroup = Tabs.Universal:AddRightGroupbox("信息与翻译");
 local A17 = nil;
@@ -84,973 +51,973 @@ local PL = {};
 local CP = nil;
 local bulletTrackingHook = nil;
 local function safeNotify(title, message, duration)
-	warn(title .. ": " .. message);
+        warn(title .. ": " .. message);
 end
 UniversalLeftGroup:AddSlider("WalkSpeedSlider", {Text="移动速度",Default=16,Min=16,Max=200,Rounding=0,Compact=false,Callback=function(Value)
-	if (A2 and A2.Character) then
-		local Humanoid = A2.Character:FindFirstChild("Humanoid");
-		if Humanoid then
-			Humanoid.WalkSpeed = Value;
-		end
-	end
+        if (A2 and A2.Character) then
+                local Humanoid = A2.Character:FindFirstChild("Humanoid");
+                if Humanoid then
+                        Humanoid.WalkSpeed = Value;
+                end
+        end
 end});
 UniversalLeftGroup:AddSlider("JumpPowerSlider", {Text="跳跃高度",Default=50,Min=50,Max=200,Rounding=0,Compact=false,Callback=function(Value)
-	if (A2 and A2.Character) then
-		local Humanoid = A2.Character:FindFirstChild("Humanoid");
-		if Humanoid then
-			Humanoid.JumpPower = Value;
-		end
-	end
+        if (A2 and A2.Character) then
+                local Humanoid = A2.Character:FindFirstChild("Humanoid");
+                if Humanoid then
+                        Humanoid.JumpPower = Value;
+                end
+        end
 end});
 UniversalLeftGroup:AddInput("JumpPowerInput", {Text="跳跃高度设置",Default="",Placeholder="输入跳跃高度值",Numeric=true,Finished=false,Callback=function(Value)
-	local numValue = tonumber(Value);
-	if (numValue and A2 and A2.Character) then
-		local Humanoid = A2.Character:FindFirstChild("Humanoid");
-		if Humanoid then
-			Humanoid.JumpPower = numValue;
-		end
-	end
+        local numValue = tonumber(Value);
+        if (numValue and A2 and A2.Character) then
+                local Humanoid = A2.Character:FindFirstChild("Humanoid");
+                if Humanoid then
+                        Humanoid.JumpPower = numValue;
+                end
+        end
 end});
 UniversalLeftGroup:AddInput("WalkSpeedInput", {Text="移动速度设置",Default="",Placeholder="输入移动速度值",Numeric=true,Finished=false,Callback=function(Value)
-	local numValue = tonumber(Value);
-	if (numValue and A2 and A2.Character) then
-		local Humanoid = A2.Character:FindFirstChild("Humanoid");
-		if Humanoid then
-			Humanoid.WalkSpeed = numValue;
-		end
-	end
+        local numValue = tonumber(Value);
+        if (numValue and A2 and A2.Character) then
+                local Humanoid = A2.Character:FindFirstChild("Humanoid");
+                if Humanoid then
+                        Humanoid.WalkSpeed = numValue;
+                end
+        end
 end});
 UniversalLeftGroup:AddInput("GravityInput", {Text="重力设置",Default="",Placeholder="输入重力值",Numeric=true,Finished=false,Callback=function(Value)
-	local numValue = tonumber(Value);
-	if numValue then
-		A8.Gravity = numValue;
-	end
+        local numValue = tonumber(Value);
+        if numValue then
+                A8.Gravity = numValue;
+        end
 end});
 UniversalLeftGroup:AddToggle("NightVisionToggle", {Text="夜视",Default=false,Callback=function(Value)
-	A28 = Value;
-	if Value then
-		A4.Ambient = Color3.new(1, 1, 1);
-		A4.Brightness = 1;
-		A4.OutdoorAmbient = Color3.new(1, 1, 1);
-		A4.FogEnd = 100000;
-		A4.FogStart = 0;
-		A4.GlobalShadows = false;
-	else
-		A4.Ambient = Color3.new(0, 0, 0);
-		A4.Brightness = 1;
-		A4.OutdoorAmbient = Color3.new(0.5, 0.5, 0.5);
-		A4.FogEnd = 100000;
-		A4.FogStart = 0;
-		A4.GlobalShadows = true;
-	end
+        A28 = Value;
+        if Value then
+                A4.Ambient = Color3.new(1, 1, 1);
+                A4.Brightness = 1;
+                A4.OutdoorAmbient = Color3.new(1, 1, 1);
+                A4.FogEnd = 100000;
+                A4.FogStart = 0;
+                A4.GlobalShadows = false;
+        else
+                A4.Ambient = Color3.new(0, 0, 0);
+                A4.Brightness = 1;
+                A4.OutdoorAmbient = Color3.new(0.5, 0.5, 0.5);
+                A4.FogEnd = 100000;
+                A4.FogStart = 0;
+                A4.GlobalShadows = true;
+        end
 end});
 UniversalLeftGroup:AddToggle("ESPToggle", {Text="透视",Default=false,Callback=function(Value)
-	if Value then
-		if not A26 then
-			A26 = Instance.new("Folder");
-			A26.Name = "Highlight_Storage";
-			A26.Parent = A5;
-		end
-		local FillColor = Color3.fromRGB(175, 25, 255);
-		local OutlineColor = Color3.fromRGB(255, 255, 255);
-		for _, Player in pairs(A1:GetPlayers()) do
-			if (Player ~= A2) then
-				local Highlight = Instance.new("Highlight");
-				Highlight.Name = Player.Name;
-				Highlight.FillColor = FillColor;
-				Highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop;
-				Highlight.FillTransparency = 0.5;
-				Highlight.OutlineColor = OutlineColor;
-				Highlight.OutlineTransparency = 0;
-				Highlight.Parent = A26;
-				local function AssignAdornee(Character)
-					if Character then
-						Highlight.Adornee = Character;
-					end
-				end
-				if Player.Character then
-					AssignAdornee(Player.Character);
-				end
-				local Connection = Player.CharacterAdded:Connect(AssignAdornee);
-				A27[Player] = Connection;
-			end
-		end
-		local PlayerAddedConn = A1.PlayerAdded:Connect(function(Player)
-			local Highlight = Instance.new("Highlight");
-			Highlight.Name = Player.Name;
-			Highlight.FillColor = FillColor;
-			Highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop;
-			Highlight.FillTransparency = 0.5;
-			Highlight.OutlineColor = OutlineColor;
-			Highlight.OutlineTransparency = 0;
-			Highlight.Parent = A26;
-			local function AssignAdornee(Character)
-				if Character then
-					Highlight.Adornee = Character;
-				end
-			end
-			if Player.Character then
-				AssignAdornee(Player.Character);
-			end
-			local Connection = Player.CharacterAdded:Connect(AssignAdornee);
-			A27[Player] = Connection;
-		end);
-		local PlayerRemovingConn = A1.PlayerRemoving:Connect(function(Player)
-			if A27[Player] then
-				A27[Player]:Disconnect();
-				A27[Player] = nil;
-			end
-			if A26 then
-				local Highlight = A26:FindFirstChild(Player.Name);
-				if Highlight then
-					Highlight:Destroy();
-				end
-			end
-		end);
-		A27['PlayerAdded'] = PlayerAddedConn;
-		A27['PlayerRemoving'] = PlayerRemovingConn;
-	else
-		for _, Connection in pairs(A27) do
-			if Connection then
-				pcall(function()
-					Connection:Disconnect();
-				end);
-			end
-		end
-		A27 = {};
-		if A26 then
-			A26:Destroy();
-			A26 = nil;
-		end
-	end
+        if Value then
+                if not A26 then
+                        A26 = Instance.new("Folder");
+                        A26.Name = "Highlight_Storage";
+                        A26.Parent = A5;
+                end
+                local FillColor = Color3.fromRGB(175, 25, 255);
+                local OutlineColor = Color3.fromRGB(255, 255, 255);
+                for _, Player in pairs(A1:GetPlayers()) do
+                        if (Player ~= A2) then
+                                local Highlight = Instance.new("Highlight");
+                                Highlight.Name = Player.Name;
+                                Highlight.FillColor = FillColor;
+                                Highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop;
+                                Highlight.FillTransparency = 0.5;
+                                Highlight.OutlineColor = OutlineColor;
+                                Highlight.OutlineTransparency = 0;
+                                Highlight.Parent = A26;
+                                local function AssignAdornee(Character)
+                                        if Character then
+                                                Highlight.Adornee = Character;
+                                        end
+                                end
+                                if Player.Character then
+                                        AssignAdornee(Player.Character);
+                                end
+                                local Connection = Player.CharacterAdded:Connect(AssignAdornee);
+                                A27[Player] = Connection;
+                        end
+                end
+                local PlayerAddedConn = A1.PlayerAdded:Connect(function(Player)
+                        local Highlight = Instance.new("Highlight");
+                        Highlight.Name = Player.Name;
+                        Highlight.FillColor = FillColor;
+                        Highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop;
+                        Highlight.FillTransparency = 0.5;
+                        Highlight.OutlineColor = OutlineColor;
+                        Highlight.OutlineTransparency = 0;
+                        Highlight.Parent = A26;
+                        local function AssignAdornee(Character)
+                                if Character then
+                                        Highlight.Adornee = Character;
+                                end
+                        end
+                        if Player.Character then
+                                AssignAdornee(Player.Character);
+                        end
+                        local Connection = Player.CharacterAdded:Connect(AssignAdornee);
+                        A27[Player] = Connection;
+                end);
+                local PlayerRemovingConn = A1.PlayerRemoving:Connect(function(Player)
+                        if A27[Player] then
+                                A27[Player]:Disconnect();
+                                A27[Player] = nil;
+                        end
+                        if A26 then
+                                local Highlight = A26:FindFirstChild(Player.Name);
+                                if Highlight then
+                                        Highlight:Destroy();
+                                end
+                        end
+                end);
+                A27['PlayerAdded'] = PlayerAddedConn;
+                A27['PlayerRemoving'] = PlayerRemovingConn;
+        else
+                for _, Connection in pairs(A27) do
+                        if Connection then
+                                pcall(function()
+                                        Connection:Disconnect();
+                                end);
+                        end
+                end
+                A27 = {};
+                if A26 then
+                        A26:Destroy();
+                        A26 = nil;
+                end
+        end
 end});
 UniversalLeftGroup:AddToggle("BulletTrackingToggle", {Text="通用子弹追踪",Default=false,Callback=function(Enabled)
-	if Enabled then
-		if not bulletTrackingHook then
-			local Workspace = game:GetService("Workspace");
-			local Camera = Workspace.CurrentCamera;
-			local function getClosestHead()
-				if not A2.Character then
-					return nil;
-				end
-				if not A2.Character:FindFirstChild("HumanoidRootPart") then
-					return nil;
-				end
-				local closestHead = nil;
-				local closestDistance = math.huge;
-				for _, player in ipairs(A1:GetPlayers()) do
-					if ((player ~= A2) and player.Character) then
-						local character = player.Character;
-						local root = character:FindFirstChild("HumanoidRootPart");
-						local head = character:FindFirstChild("Head");
-						local humanoid = character:FindFirstChildOfClass("Humanoid");
-						local forcefield = character:FindFirstChild("ForceField");
-						if (root and head and humanoid and not forcefield and (humanoid.Health > 0)) then
-							local distance = (root.Position - A2.Character.HumanoidRootPart.Position).Magnitude;
-							if (distance < closestDistance) then
-								closestHead = head;
-								closestDistance = distance;
-							end
-						end
-					end
-				end
-				return closestHead;
-			end
-			bulletTrackingHook = hookmetamethod(game, "__namecall", function(self, ...)
-				local method = getnamecallmethod();
-				local args = {...};
-				if ((method == "Raycast") and not checkcaller()) then
-					local origin = args[1] or Camera.CFrame.Position;
-					local closestHead = getClosestHead();
-					if closestHead then
-						return {Instance=closestHead,Position=closestHead.Position,Normal=(origin - closestHead.Position).Unit,Material=Enum.Material.Plastic,Distance=(closestHead.Position - origin).Magnitude};
-					end
-				end
-				return bulletTrackingHook(self, ...);
-			end);
-		end
-	elseif bulletTrackingHook then
-		hookmetamethod(game, "__namecall", bulletTrackingHook);
-		bulletTrackingHook = nil;
-	end
+        if Enabled then
+                if not bulletTrackingHook then
+                        local Workspace = game:GetService("Workspace");
+                        local Camera = Workspace.CurrentCamera;
+                        local function getClosestHead()
+                                if not A2.Character then
+                                        return nil;
+                                end
+                                if not A2.Character:FindFirstChild("HumanoidRootPart") then
+                                        return nil;
+                                end
+                                local closestHead = nil;
+                                local closestDistance = math.huge;
+                                for _, player in ipairs(A1:GetPlayers()) do
+                                        if ((player ~= A2) and player.Character) then
+                                                local character = player.Character;
+                                                local root = character:FindFirstChild("HumanoidRootPart");
+                                                local head = character:FindFirstChild("Head");
+                                                local humanoid = character:FindFirstChildOfClass("Humanoid");
+                                                local forcefield = character:FindFirstChild("ForceField");
+                                                if (root and head and humanoid and not forcefield and (humanoid.Health > 0)) then
+                                                        local distance = (root.Position - A2.Character.HumanoidRootPart.Position).Magnitude;
+                                                        if (distance < closestDistance) then
+                                                                closestHead = head;
+                                                                closestDistance = distance;
+                                                        end
+                                                end
+                                        end
+                                end
+                                return closestHead;
+                        end
+                        bulletTrackingHook = hookmetamethod(game, "__namecall", function(self, ...)
+                                local method = getnamecallmethod();
+                                local args = {...};
+                                if ((method == "Raycast") and not checkcaller()) then
+                                        local origin = args[1] or Camera.CFrame.Position;
+                                        local closestHead = getClosestHead();
+                                        if closestHead then
+                                                return {Instance=closestHead,Position=closestHead.Position,Normal=(origin - closestHead.Position).Unit,Material=Enum.Material.Plastic,Distance=(closestHead.Position - origin).Magnitude};
+                                        end
+                                end
+                                return bulletTrackingHook(self, ...);
+                        end);
+                end
+        elseif bulletTrackingHook then
+                hookmetamethod(game, "__namecall", bulletTrackingHook);
+                bulletTrackingHook = nil;
+        end
 end});
 local RotationControlGroup = Tabs.Universal:AddRightGroupbox("旋转控制");
 RotationControlGroup:AddButton({Text="旋转 10",Func=function()
-	if (A2 and A2.Character) then
-		local HRP = A2.Character:FindFirstChild("HumanoidRootPart");
-		if HRP then
-			if A17 then
-				A17:Destroy();
-			end
-			A17 = Instance.new("BodyAngularVelocity");
-			A17.Parent = HRP;
-			A17.Name = "CustomSpin";
-			A17.MaxTorque = Vector3.new(0, 400000, 0);
-			A17.AngularVelocity = Vector3.new(0, 10, 0);
-		end
-	end
+        if (A2 and A2.Character) then
+                local HRP = A2.Character:FindFirstChild("HumanoidRootPart");
+                if HRP then
+                        if A17 then
+                                A17:Destroy();
+                        end
+                        A17 = Instance.new("BodyAngularVelocity");
+                        A17.Parent = HRP;
+                        A17.Name = "CustomSpin";
+                        A17.MaxTorque = Vector3.new(0, 400000, 0);
+                        A17.AngularVelocity = Vector3.new(0, 10, 0);
+                end
+        end
 end});
 RotationControlGroup:AddButton({Text="旋转 20",Func=function()
-	if (A2 and A2.Character) then
-		local HRP = A2.Character:FindFirstChild("HumanoidRootPart");
-		if HRP then
-			if A17 then
-				A17:Destroy();
-			end
-			A17 = Instance.new("BodyAngularVelocity");
-			A17.Parent = HRP;
-			A17.Name = "CustomSpin";
-			A17.MaxTorque = Vector3.new(0, 400000, 0);
-			A17.AngularVelocity = Vector3.new(0, 20, 0);
-		end
-	end
+        if (A2 and A2.Character) then
+                local HRP = A2.Character:FindFirstChild("HumanoidRootPart");
+                if HRP then
+                        if A17 then
+                                A17:Destroy();
+                        end
+                        A17 = Instance.new("BodyAngularVelocity");
+                        A17.Parent = HRP;
+                        A17.Name = "CustomSpin";
+                        A17.MaxTorque = Vector3.new(0, 400000, 0);
+                        A17.AngularVelocity = Vector3.new(0, 20, 0);
+                end
+        end
 end});
 RotationControlGroup:AddButton({Text="旋转 30",Func=function()
-	if (A2 and A2.Character) then
-		local HRP = A2.Character:FindFirstChild("HumanoidRootPart");
-		if HRP then
-			if A17 then
-				A17:Destroy();
-			end
-			A17 = Instance.new("BodyAngularVelocity");
-			A17.Parent = HRP;
-			A17.Name = "CustomSpin";
-			A17.MaxTorque = Vector3.new(0, 400000, 0);
-			A17.AngularVelocity = Vector3.new(0, 30, 0);
-		end
-	end
+        if (A2 and A2.Character) then
+                local HRP = A2.Character:FindFirstChild("HumanoidRootPart");
+                if HRP then
+                        if A17 then
+                                A17:Destroy();
+                        end
+                        A17 = Instance.new("BodyAngularVelocity");
+                        A17.Parent = HRP;
+                        A17.Name = "CustomSpin";
+                        A17.MaxTorque = Vector3.new(0, 400000, 0);
+                        A17.AngularVelocity = Vector3.new(0, 30, 0);
+                end
+        end
 end});
 RotationControlGroup:AddButton({Text="旋转 50",Func=function()
-	if (A2 and A2.Character) then
-		local HRP = A2.Character:FindFirstChild("HumanoidRootPart");
-		if HRP then
-			if A17 then
-				A17:Destroy();
-			end
-			A17 = Instance.new("BodyAngularVelocity");
-			A17.Parent = HRP;
-			A17.Name = "CustomSpin";
-			A17.MaxTorque = Vector3.new(0, 400000, 0);
-			A17.AngularVelocity = Vector3.new(0, 50, 0);
-		end
-	end
+        if (A2 and A2.Character) then
+                local HRP = A2.Character:FindFirstChild("HumanoidRootPart");
+                if HRP then
+                        if A17 then
+                                A17:Destroy();
+                        end
+                        A17 = Instance.new("BodyAngularVelocity");
+                        A17.Parent = HRP;
+                        A17.Name = "CustomSpin";
+                        A17.MaxTorque = Vector3.new(0, 400000, 0);
+                        A17.AngularVelocity = Vector3.new(0, 50, 0);
+                end
+        end
 end});
 RotationControlGroup:AddButton({Text="旋转 100",Func=function()
-	if (A2 and A2.Character) then
-		local HRP = A2.Character:FindFirstChild("HumanoidRootPart");
-		if HRP then
-			if A17 then
-				A17:Destroy();
-			end
-			A17 = Instance.new("BodyAngularVelocity");
-			A17.Parent = HRP;
-			A17.Name = "CustomSpin";
-			A17.MaxTorque = Vector3.new(0, 400000, 0);
-			A17.AngularVelocity = Vector3.new(0, 100, 0);
-		end
-	end
+        if (A2 and A2.Character) then
+                local HRP = A2.Character:FindFirstChild("HumanoidRootPart");
+                if HRP then
+                        if A17 then
+                                A17:Destroy();
+                        end
+                        A17 = Instance.new("BodyAngularVelocity");
+                        A17.Parent = HRP;
+                        A17.Name = "CustomSpin";
+                        A17.MaxTorque = Vector3.new(0, 400000, 0);
+                        A17.AngularVelocity = Vector3.new(0, 100, 0);
+                end
+        end
 end});
 RotationControlGroup:AddButton({Text="旋转 200",Func=function()
-	if (A2 and A2.Character) then
-		local HRP = A2.Character:FindFirstChild("HumanoidRootPart");
-		if HRP then
-			if A17 then
-				A17:Destroy();
-			end
-			A17 = Instance.new("BodyAngularVelocity");
-			A17.Parent = HRP;
-			A17.Name = "CustomSpin";
-			A17.MaxTorque = Vector3.new(0, 400000, 0);
-			A17.AngularVelocity = Vector3.new(0, 200, 0);
-		end
-	end
+        if (A2 and A2.Character) then
+                local HRP = A2.Character:FindFirstChild("HumanoidRootPart");
+                if HRP then
+                        if A17 then
+                                A17:Destroy();
+                        end
+                        A17 = Instance.new("BodyAngularVelocity");
+                        A17.Parent = HRP;
+                        A17.Name = "CustomSpin";
+                        A17.MaxTorque = Vector3.new(0, 400000, 0);
+                        A17.AngularVelocity = Vector3.new(0, 200, 0);
+                end
+        end
 end});
 RotationControlGroup:AddButton({Text="旋转 500",Func=function()
-	if (A2 and A2.Character) then
-		local HRP = A2.Character:FindFirstChild("HumanoidRootPart");
-		if HRP then
-			if A17 then
-				A17:Destroy();
-			end
-			A17 = Instance.new("BodyAngularVelocity");
-			A17.Parent = HRP;
-			A17.Name = "CustomSpin";
-			A17.MaxTorque = Vector3.new(0, 400000, 0);
-			A17.AngularVelocity = Vector3.new(0, 500, 0);
-		end
-	end
+        if (A2 and A2.Character) then
+                local HRP = A2.Character:FindFirstChild("HumanoidRootPart");
+                if HRP then
+                        if A17 then
+                                A17:Destroy();
+                        end
+                        A17 = Instance.new("BodyAngularVelocity");
+                        A17.Parent = HRP;
+                        A17.Name = "CustomSpin";
+                        A17.MaxTorque = Vector3.new(0, 400000, 0);
+                        A17.AngularVelocity = Vector3.new(0, 500, 0);
+                end
+        end
 end});
 RotationControlGroup:AddButton({Text="停止旋转",Func=function()
-	if A17 then
-		A17:Destroy();
-		A17 = nil;
-	end
+        if A17 then
+                A17:Destroy();
+                A17 = nil;
+        end
 end});
 UniversalLeftGroup:AddSlider("SpinSpeedSlider", {Text="旋转速度",Default=0,Min=0,Max=500,Rounding=0,Compact=false,Callback=function(Value)
-	if (A2 and A2.Character) then
-		local HRP = A2.Character:FindFirstChild("HumanoidRootPart");
-		if HRP then
-			if (Value > 0) then
-				if A17 then
-					A17:Destroy();
-				end
-				A17 = Instance.new("BodyAngularVelocity");
-				A17.Parent = HRP;
-				A17.Name = "CustomSpin";
-				A17.MaxTorque = Vector3.new(0, 400000, 0);
-				A17.AngularVelocity = Vector3.new(0, Value, 0);
-			elseif A17 then
-				A17:Destroy();
-				A17 = nil;
-			end
-		end
-	end
+        if (A2 and A2.Character) then
+                local HRP = A2.Character:FindFirstChild("HumanoidRootPart");
+                if HRP then
+                        if (Value > 0) then
+                                if A17 then
+                                        A17:Destroy();
+                                end
+                                A17 = Instance.new("BodyAngularVelocity");
+                                A17.Parent = HRP;
+                                A17.Name = "CustomSpin";
+                                A17.MaxTorque = Vector3.new(0, 400000, 0);
+                                A17.AngularVelocity = Vector3.new(0, Value, 0);
+                        elseif A17 then
+                                A17:Destroy();
+                                A17 = nil;
+                        end
+                end
+        end
 end});
 UniversalLeftGroup:AddButton({Text="墨水飞行",Func=function()
-	local FlyModule = {};
-	FlyModule.Config = {MoveSpeed=10,FreezeEnabled=false,FreezeY=nil};
-	FlyModule.State = {UI=nil,Connections={},Initialized=false};
-	FlyModule.Init = function()
-		if FlyModule.State.Initialized then
-			return;
-		end
-		FlyModule.Services = {Players=game:GetService("Players"),UserInputService=game:GetService("UserInputService"),RunService=game:GetService("RunService"),CoreGui=game:GetService("CoreGui")};
-		FlyModule.Player = FlyModule.Services.Players.LocalPlayer;
-		FlyModule.State.Initialized = true;
-	end;
-	FlyModule.CreateUI = function()
-		if FlyModule.State.UI then
-			FlyModule.State.UI:Destroy();
-			FlyModule.State.UI = nil;
-		end
-		local ScreenGui = Instance.new("ScreenGui");
-		ScreenGui.Name = "QC_FlyUI";
-		ScreenGui.Parent = FlyModule.Services.CoreGui;
-		ScreenGui.DisplayOrder = 2000;
-		ScreenGui.ResetOnSpawn = false;
-		local SpeedInput = Instance.new("TextBox");
-		SpeedInput.Name = "SpeedInput";
-		SpeedInput.Parent = ScreenGui;
-		SpeedInput.Size = UDim2.new(0, 120, 0, 30);
-		SpeedInput.Position = UDim2.new(0.95, -120, 0.05, 38);
-		SpeedInput.Text = tostring(FlyModule.Config.MoveSpeed);
-		SpeedInput.TextSize = 18;
-		SpeedInput.PlaceholderText = "移动速度";
-		SpeedInput.BackgroundColor3 = Color3.fromRGB(255, 255, 255);
-		SpeedInput.BackgroundTransparency = 0.2;
-		SpeedInput.TextColor3 = Color3.fromRGB(0, 0, 0);
-		Instance.new("UICorner").Parent = SpeedInput;
-		SpeedInput.FocusLost:Connect(function()
-			local num = tonumber(SpeedInput.Text);
-			if (num and (num > 0)) then
-				FlyModule.Config.MoveSpeed = num;
-			else
-				SpeedInput.Text = tostring(FlyModule.Config.MoveSpeed);
-			end
-		end);
-		local FreezeBtn = Instance.new("TextButton");
-		FreezeBtn.Name = "FreezeBtn";
-		FreezeBtn.Parent = ScreenGui;
-		FreezeBtn.Size = UDim2.new(0, 120, 0, 38);
-		FreezeBtn.Position = UDim2.new(0.95, -120, 0.05, 0);
-		FreezeBtn.Text = "开启空中悬挂";
-		FreezeBtn.TextSize = 20;
-		FreezeBtn.BackgroundColor3 = Color3.fromRGB(210, 240, 255);
-		FreezeBtn.BackgroundTransparency = 0.2;
-		FreezeBtn.TextColor3 = Color3.fromRGB(0, 0, 0);
-		Instance.new("UICorner").Parent = FreezeBtn;
-		FreezeBtn.MouseButton1Click:Connect(function()
-			FlyModule.Config.FreezeEnabled = not FlyModule.Config.FreezeEnabled;
-			FreezeBtn.Text = (FlyModule.Config.FreezeEnabled and "悬挂√") or "开启空中悬挂";
-			FreezeBtn.BackgroundColor3 = (FlyModule.Config.FreezeEnabled and Color3.fromRGB(255, 200, 200)) or Color3.fromRGB(210, 240, 255);
-			if not FlyModule.Config.FreezeEnabled then
-				FlyModule.Config.FreezeY = nil;
-			end
-		end);
-		FlyModule.State.UI = ScreenGui;
-		return ScreenGui;
-	end;
-	FlyModule.SetupCharacter = function(Character)
-		FlyModule.Character = Character;
-		FlyModule.Humanoid = Character:WaitForChild("Humanoid", 10);
-		FlyModule.HRP = Character:WaitForChild("HumanoidRootPart", 10);
-		FlyModule.Humanoid.Died:Connect(function()
-			FlyModule.Config.FreezeEnabled = false;
-			FlyModule.Config.FreezeY = nil;
-			if FlyModule.State.UI then
-				local FreezeBtn = FlyModule.State.UI:FindFirstChild("FreezeBtn");
-				if FreezeBtn then
-					FreezeBtn.Text = "开启空中悬挂";
-					FreezeBtn.BackgroundColor3 = Color3.fromRGB(210, 240, 255);
-				end
-			end
-		end);
-	end;
-	FlyModule.SetupInfiniteJump = function()
-		table.insert(FlyModule.State.Connections, FlyModule.Services.UserInputService.JumpRequest:Connect(function()
-			if (FlyModule.Humanoid and (FlyModule.Humanoid:GetState() ~= Enum.HumanoidStateType.Dead)) then
-				FlyModule.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping);
-			end
-		end));
-	end;
-	FlyModule.SetupMainLoop = function()
-		table.insert(FlyModule.State.Connections, FlyModule.Services.RunService.Heartbeat:Connect(function(dt)
-			if (FlyModule.Humanoid and FlyModule.HRP and (FlyModule.Humanoid:GetState() ~= Enum.HumanoidStateType.Dead)) then
-				local MoveDirection = FlyModule.Humanoid.MoveDirection;
-				if FlyModule.Config.FreezeEnabled then
-					local State = FlyModule.Humanoid:GetState();
-					if ((State == Enum.HumanoidStateType.Freefall) and (FlyModule.Humanoid:GetState() ~= Enum.HumanoidStateType.Jumping)) then
-						if (MoveDirection.Magnitude > 0) then
-							if not FlyModule.Config.FreezeY then
-								FlyModule.Config.FreezeY = FlyModule.HRP.Position.Y;
-							end
-							local Move = Vector3.new(MoveDirection.X, 0, MoveDirection.Z) * FlyModule.Config.MoveSpeed * dt;
-							local CurrentPos = FlyModule.HRP.Position;
-							local NewPos = Vector3.new(CurrentPos.X, FlyModule.Config.FreezeY, CurrentPos.Z) + Move;
-							FlyModule.HRP.CFrame = CFrame.new(NewPos, NewPos + FlyModule.HRP.CFrame.LookVector);
-							FlyModule.HRP.Velocity = Vector3.new(0, 0, 0);
-						else
-							FlyModule.Config.FreezeY = nil;
-						end
-						return;
-					else
-						FlyModule.Config.FreezeY = nil;
-					end
-				end
-				if (MoveDirection.Magnitude > 0) then
-					FlyModule.HRP.CFrame = FlyModule.HRP.CFrame + (MoveDirection.Unit * FlyModule.Config.MoveSpeed * dt);
-				end
-			end
-		end));
-	end;
-	FlyModule.SetupCharacterListeners = function()
-		if FlyModule.Player.Character then
-			FlyModule.SetupCharacter(FlyModule.Player.Character);
-		end
-		table.insert(FlyModule.State.Connections, FlyModule.Player.CharacterAdded:Connect(function(Character)
-			FlyModule.SetupCharacter(Character);
-		end));
-		table.insert(FlyModule.State.Connections, FlyModule.Player.CharacterRemoving:Connect(function()
-			FlyModule.Character = nil;
-			FlyModule.Humanoid = nil;
-			FlyModule.HRP = nil;
-			FlyModule.Config.FreezeEnabled = false;
-			FlyModule.Config.FreezeY = nil;
-		end));
-	end;
-	FlyModule.Start = function()
-		FlyModule.Init();
-		FlyModule.CreateUI();
-		FlyModule.SetupInfiniteJump();
-		FlyModule.SetupMainLoop();
-		FlyModule.SetupCharacterListeners();
-	end;
-	FlyModule.Start();
+        local FlyModule = {};
+        FlyModule.Config = {MoveSpeed=10,FreezeEnabled=false,FreezeY=nil};
+        FlyModule.State = {UI=nil,Connections={},Initialized=false};
+        FlyModule.Init = function()
+                if FlyModule.State.Initialized then
+                        return;
+                end
+                FlyModule.Services = {Players=game:GetService("Players"),UserInputService=game:GetService("UserInputService"),RunService=game:GetService("RunService"),CoreGui=game:GetService("CoreGui")};
+                FlyModule.Player = FlyModule.Services.Players.LocalPlayer;
+                FlyModule.State.Initialized = true;
+        end;
+        FlyModule.CreateUI = function()
+                if FlyModule.State.UI then
+                        FlyModule.State.UI:Destroy();
+                        FlyModule.State.UI = nil;
+                end
+                local ScreenGui = Instance.new("ScreenGui");
+                ScreenGui.Name = "QC_FlyUI";
+                ScreenGui.Parent = FlyModule.Services.CoreGui;
+                ScreenGui.DisplayOrder = 2000;
+                ScreenGui.ResetOnSpawn = false;
+                local SpeedInput = Instance.new("TextBox");
+                SpeedInput.Name = "SpeedInput";
+                SpeedInput.Parent = ScreenGui;
+                SpeedInput.Size = UDim2.new(0, 120, 0, 30);
+                SpeedInput.Position = UDim2.new(0.95, -120, 0.05, 38);
+                SpeedInput.Text = tostring(FlyModule.Config.MoveSpeed);
+                SpeedInput.TextSize = 18;
+                SpeedInput.PlaceholderText = "移动速度";
+                SpeedInput.BackgroundColor3 = Color3.fromRGB(255, 255, 255);
+                SpeedInput.BackgroundTransparency = 0.2;
+                SpeedInput.TextColor3 = Color3.fromRGB(0, 0, 0);
+                Instance.new("UICorner").Parent = SpeedInput;
+                SpeedInput.FocusLost:Connect(function()
+                        local num = tonumber(SpeedInput.Text);
+                        if (num and (num > 0)) then
+                                FlyModule.Config.MoveSpeed = num;
+                        else
+                                SpeedInput.Text = tostring(FlyModule.Config.MoveSpeed);
+                        end
+                end);
+                local FreezeBtn = Instance.new("TextButton");
+                FreezeBtn.Name = "FreezeBtn";
+                FreezeBtn.Parent = ScreenGui;
+                FreezeBtn.Size = UDim2.new(0, 120, 0, 38);
+                FreezeBtn.Position = UDim2.new(0.95, -120, 0.05, 0);
+                FreezeBtn.Text = "开启空中悬挂";
+                FreezeBtn.TextSize = 20;
+                FreezeBtn.BackgroundColor3 = Color3.fromRGB(210, 240, 255);
+                FreezeBtn.BackgroundTransparency = 0.2;
+                FreezeBtn.TextColor3 = Color3.fromRGB(0, 0, 0);
+                Instance.new("UICorner").Parent = FreezeBtn;
+                FreezeBtn.MouseButton1Click:Connect(function()
+                        FlyModule.Config.FreezeEnabled = not FlyModule.Config.FreezeEnabled;
+                        FreezeBtn.Text = (FlyModule.Config.FreezeEnabled and "悬挂√") or "开启空中悬挂";
+                        FreezeBtn.BackgroundColor3 = (FlyModule.Config.FreezeEnabled and Color3.fromRGB(255, 200, 200)) or Color3.fromRGB(210, 240, 255);
+                        if not FlyModule.Config.FreezeEnabled then
+                                FlyModule.Config.FreezeY = nil;
+                        end
+                end);
+                FlyModule.State.UI = ScreenGui;
+                return ScreenGui;
+        end;
+        FlyModule.SetupCharacter = function(Character)
+                FlyModule.Character = Character;
+                FlyModule.Humanoid = Character:WaitForChild("Humanoid", 10);
+                FlyModule.HRP = Character:WaitForChild("HumanoidRootPart", 10);
+                FlyModule.Humanoid.Died:Connect(function()
+                        FlyModule.Config.FreezeEnabled = false;
+                        FlyModule.Config.FreezeY = nil;
+                        if FlyModule.State.UI then
+                                local FreezeBtn = FlyModule.State.UI:FindFirstChild("FreezeBtn");
+                                if FreezeBtn then
+                                        FreezeBtn.Text = "开启空中悬挂";
+                                        FreezeBtn.BackgroundColor3 = Color3.fromRGB(210, 240, 255);
+                                end
+                        end
+                end);
+        end;
+        FlyModule.SetupInfiniteJump = function()
+                table.insert(FlyModule.State.Connections, FlyModule.Services.UserInputService.JumpRequest:Connect(function()
+                        if (FlyModule.Humanoid and (FlyModule.Humanoid:GetState() ~= Enum.HumanoidStateType.Dead)) then
+                                FlyModule.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping);
+                        end
+                end));
+        end;
+        FlyModule.SetupMainLoop = function()
+                table.insert(FlyModule.State.Connections, FlyModule.Services.RunService.Heartbeat:Connect(function(dt)
+                        if (FlyModule.Humanoid and FlyModule.HRP and (FlyModule.Humanoid:GetState() ~= Enum.HumanoidStateType.Dead)) then
+                                local MoveDirection = FlyModule.Humanoid.MoveDirection;
+                                if FlyModule.Config.FreezeEnabled then
+                                        local State = FlyModule.Humanoid:GetState();
+                                        if ((State == Enum.HumanoidStateType.Freefall) and (FlyModule.Humanoid:GetState() ~= Enum.HumanoidStateType.Jumping)) then
+                                                if (MoveDirection.Magnitude > 0) then
+                                                        if not FlyModule.Config.FreezeY then
+                                                                FlyModule.Config.FreezeY = FlyModule.HRP.Position.Y;
+                                                        end
+                                                        local Move = Vector3.new(MoveDirection.X, 0, MoveDirection.Z) * FlyModule.Config.MoveSpeed * dt;
+                                                        local CurrentPos = FlyModule.HRP.Position;
+                                                        local NewPos = Vector3.new(CurrentPos.X, FlyModule.Config.FreezeY, CurrentPos.Z) + Move;
+                                                        FlyModule.HRP.CFrame = CFrame.new(NewPos, NewPos + FlyModule.HRP.CFrame.LookVector);
+                                                        FlyModule.HRP.Velocity = Vector3.new(0, 0, 0);
+                                                else
+                                                        FlyModule.Config.FreezeY = nil;
+                                                end
+                                                return;
+                                        else
+                                                FlyModule.Config.FreezeY = nil;
+                                        end
+                                end
+                                if (MoveDirection.Magnitude > 0) then
+                                        FlyModule.HRP.CFrame = FlyModule.HRP.CFrame + (MoveDirection.Unit * FlyModule.Config.MoveSpeed * dt);
+                                end
+                        end
+                end));
+        end;
+        FlyModule.SetupCharacterListeners = function()
+                if FlyModule.Player.Character then
+                        FlyModule.SetupCharacter(FlyModule.Player.Character);
+                end
+                table.insert(FlyModule.State.Connections, FlyModule.Player.CharacterAdded:Connect(function(Character)
+                        FlyModule.SetupCharacter(Character);
+                end));
+                table.insert(FlyModule.State.Connections, FlyModule.Player.CharacterRemoving:Connect(function()
+                        FlyModule.Character = nil;
+                        FlyModule.Humanoid = nil;
+                        FlyModule.HRP = nil;
+                        FlyModule.Config.FreezeEnabled = false;
+                        FlyModule.Config.FreezeY = nil;
+                end));
+        end;
+        FlyModule.Start = function()
+                FlyModule.Init();
+                FlyModule.CreateUI();
+                FlyModule.SetupInfiniteJump();
+                FlyModule.SetupMainLoop();
+                FlyModule.SetupCharacterListeners();
+        end;
+        FlyModule.Start();
 end});
 UniversalLeftGroup:AddButton({Text="无限跳",Func=function()
-	A20 = not A20;
-	if A25 then
-		A25:Disconnect();
-		A25 = nil;
-	end
-	if A20 then
-		A25 = A6.JumpRequest:Connect(function()
-			if A2.Character then
-				local Humanoid = A2.Character:FindFirstChildOfClass("Humanoid");
-				if Humanoid then
-					Humanoid:ChangeState("Jumping");
-				end
-			end
-		end);
-	end
+        A20 = not A20;
+        if A25 then
+                A25:Disconnect();
+                A25 = nil;
+        end
+        if A20 then
+                A25 = A6.JumpRequest:Connect(function()
+                        if A2.Character then
+                                local Humanoid = A2.Character:FindFirstChildOfClass("Humanoid");
+                                if Humanoid then
+                                        Humanoid:ChangeState("Jumping");
+                                end
+                        end
+                end);
+        end
 end});
 UniversalLeftGroup:AddButton({Text="爬墙",Func=function()
-	A18 = not A18;
-	if A24 then
-		A24:Disconnect();
-		A24 = nil;
-	end
-	if A18 then
-		A24 = A3.Heartbeat:Connect(function()
-			if A2.Character then
-				local Humanoid = A2.Character:FindFirstChildOfClass("Humanoid");
-				local HRP = A2.Character:FindFirstChild("HumanoidRootPart");
-				if (Humanoid and HRP) then
-					local Ray = Ray.new(HRP.Position, HRP.CFrame.LookVector * 5);
-					local Hit, Position = A8:FindPartOnRay(Ray, A2.Character);
-					if Hit then
-						Humanoid:ChangeState(Enum.HumanoidStateType.Climbing);
-						HRP.CFrame = CFrame.new(Position) * CFrame.new(0, 3, 0);
-					end
-				end
-			end
-		end);
-	end
+        A18 = not A18;
+        if A24 then
+                A24:Disconnect();
+                A24 = nil;
+        end
+        if A18 then
+                A24 = A3.Heartbeat:Connect(function()
+                        if A2.Character then
+                                local Humanoid = A2.Character:FindFirstChildOfClass("Humanoid");
+                                local HRP = A2.Character:FindFirstChild("HumanoidRootPart");
+                                if (Humanoid and HRP) then
+                                        local Ray = Ray.new(HRP.Position, HRP.CFrame.LookVector * 5);
+                                        local Hit, Position = A8:FindPartOnRay(Ray, A2.Character);
+                                        if Hit then
+                                                Humanoid:ChangeState(Enum.HumanoidStateType.Climbing);
+                                                HRP.CFrame = CFrame.new(Position) * CFrame.new(0, 3, 0);
+                                        end
+                                end
+                        end
+                end);
+        end
 end});
 UniversalLeftGroup:AddButton({Text="飞行",Func=function()
-	A21 = not A21;
-	if A21 then
-		local ScreenGui = Instance.new("ScreenGui");
-		local Frame = Instance.new("Frame");
-		local UpBtn = Instance.new("TextButton");
-		local DownBtn = Instance.new("TextButton");
-		local ToggleBtn = Instance.new("TextButton");
-		local TitleLabel = Instance.new("TextLabel");
-		local PlusBtn = Instance.new("TextButton");
-		local SpeedLabel = Instance.new("TextLabel");
-		local MinusBtn = Instance.new("TextButton");
-		local CloseBtn = Instance.new("TextButton");
-		local MinimizeBtn = Instance.new("TextButton");
-		local MaximizeBtn = Instance.new("TextButton");
-		ScreenGui.Name = "main";
-		ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui");
-		ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
-		ScreenGui.ResetOnSpawn = false;
-		Frame.Parent = ScreenGui;
-		Frame.BackgroundColor3 = Color3.fromRGB(163, 255, 137);
-		Frame.BorderColor3 = Color3.fromRGB(103, 221, 213);
-		Frame.Position = UDim2.new(0.100320168, 0, 0.379746825, 0);
-		Frame.Size = UDim2.new(0, 190, 0, 57);
-		Frame.Active = true;
-		Frame.Draggable = true;
-		UpBtn.Name = "up";
-		UpBtn.Parent = Frame;
-		UpBtn.BackgroundColor3 = Color3.fromRGB(79, 255, 152);
-		UpBtn.Size = UDim2.new(0, 44, 0, 28);
-		UpBtn.Font = Enum.Font.SourceSans;
-		UpBtn.Text = "上升";
-		UpBtn.TextColor3 = Color3.fromRGB(0, 0, 0);
-		UpBtn.TextSize = 14;
-		DownBtn.Name = "down";
-		DownBtn.Parent = Frame;
-		DownBtn.BackgroundColor3 = Color3.fromRGB(215, 255, 121);
-		DownBtn.Position = UDim2.new(0, 0, 0.491228074, 0);
-		DownBtn.Size = UDim2.new(0, 44, 0, 28);
-		DownBtn.Font = Enum.Font.SourceSans;
-		DownBtn.Text = "下降";
-		DownBtn.TextColor3 = Color3.fromRGB(0, 0, 0);
-		DownBtn.TextSize = 14;
-		ToggleBtn.Name = "onof";
-		ToggleBtn.Parent = Frame;
-		ToggleBtn.BackgroundColor3 = Color3.fromRGB(255, 249, 74);
-		ToggleBtn.Position = UDim2.new(0.702823281, 0, 0.491228074, 0);
-		ToggleBtn.Size = UDim2.new(0, 56, 0, 28);
-		ToggleBtn.Font = Enum.Font.SourceSans;
-		ToggleBtn.Text = "起飞";
-		ToggleBtn.TextColor3 = Color3.fromRGB(0, 0, 0);
-		ToggleBtn.TextSize = 14;
-		TitleLabel.Parent = Frame;
-		TitleLabel.BackgroundColor3 = Color3.fromRGB(242, 60, 255);
-		TitleLabel.Position = UDim2.new(0.469327301, 0, 0, 0);
-		TitleLabel.Size = UDim2.new(0, 100, 0, 28);
-		TitleLabel.Font = Enum.Font.SourceSans;
-		TitleLabel.Text = " 秋辞飞行";
-		TitleLabel.TextColor3 = Color3.fromRGB(0, 0, 0);
-		TitleLabel.TextScaled = true;
-		TitleLabel.TextSize = 14;
-		TitleLabel.TextWrapped = true;
-		PlusBtn.Name = "plus";
-		PlusBtn.Parent = Frame;
-		PlusBtn.BackgroundColor3 = Color3.fromRGB(133, 145, 255);
-		PlusBtn.Position = UDim2.new(0.231578946, 0, 0, 0);
-		PlusBtn.Size = UDim2.new(0, 45, 0, 28);
-		PlusBtn.Font = Enum.Font.SourceSans;
-		PlusBtn.Text = "+";
-		PlusBtn.TextColor3 = Color3.fromRGB(0, 0, 0);
-		PlusBtn.TextScaled = true;
-		PlusBtn.TextSize = 14;
-		PlusBtn.TextWrapped = true;
-		SpeedLabel.Name = "speed";
-		SpeedLabel.Parent = Frame;
-		SpeedLabel.BackgroundColor3 = Color3.fromRGB(255, 85, 0);
-		SpeedLabel.Position = UDim2.new(0.468421042, 0, 0.491228074, 0);
-		SpeedLabel.Size = UDim2.new(0, 44, 0, 28);
-		SpeedLabel.Font = Enum.Font.SourceSans;
-		SpeedLabel.Text = "1";
-		SpeedLabel.TextColor3 = Color3.fromRGB(0, 0, 0);
-		SpeedLabel.TextScaled = true;
-		SpeedLabel.TextSize = 14;
-		SpeedLabel.TextWrapped = true;
-		MinusBtn.Name = "mine";
-		MinusBtn.Parent = Frame;
-		MinusBtn.BackgroundColor3 = Color3.fromRGB(123, 255, 247);
-		MinusBtn.Position = UDim2.new(0.231578946, 0, 0.491228074, 0);
-		MinusBtn.Size = UDim2.new(0, 45, 0, 29);
-		MinusBtn.Font = Enum.Font.SourceSans;
-		MinusBtn.Text = "-";
-		MinusBtn.TextColor3 = Color3.fromRGB(0, 0, 0);
-		MinusBtn.TextScaled = true;
-		MinusBtn.TextSize = 14;
-		MinusBtn.TextWrapped = true;
-		CloseBtn.Name = "Close";
-		CloseBtn.Parent = ScreenGui.Frame;
-		CloseBtn.BackgroundColor3 = Color3.fromRGB(225, 25, 0);
-		CloseBtn.Font = "SourceSans";
-		CloseBtn.Size = UDim2.new(0, 45, 0, 28);
-		CloseBtn.Text = "X";
-		CloseBtn.TextSize = 30;
-		CloseBtn.Position = UDim2.new(0, 0, -1, 27);
-		MinimizeBtn.Name = "minimize";
-		MinimizeBtn.Parent = ScreenGui.Frame;
-		MinimizeBtn.BackgroundColor3 = Color3.fromRGB(192, 150, 230);
-		MinimizeBtn.Font = "SourceSans";
-		MinimizeBtn.Size = UDim2.new(0, 45, 0, 28);
-		MinimizeBtn.Text = "-";
-		MinimizeBtn.TextSize = 40;
-		MinimizeBtn.Position = UDim2.new(0, 44, -1, 27);
-		MaximizeBtn.Name = "minimize2";
-		MaximizeBtn.Parent = ScreenGui.Frame;
-		MaximizeBtn.BackgroundColor3 = Color3.fromRGB(192, 150, 230);
-		MaximizeBtn.Font = "SourceSans";
-		MaximizeBtn.Size = UDim2.new(0, 45, 0, 28);
-		MaximizeBtn.Text = "+";
-		MaximizeBtn.TextSize = 40;
-		MaximizeBtn.Position = UDim2.new(0, 44, -1, 57);
-		MaximizeBtn.Visible = false;
-		local speeds = 1;
-		local LocalPlayer = game:GetService("Players").LocalPlayer;
-		local Character = game.Players.LocalPlayer.Character;
-		local Humanoid = Character and Character:FindFirstChildWhichIsA("Humanoid");
-		local nowe = false;
-		ToggleBtn.MouseButton1Down:connect(function()
-			if (nowe == true) then
-				nowe = false;
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing, true);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, true);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Flying, true);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall, true);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp, true);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, true);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Landed, true);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics, true);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.PlatformStanding, true);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, true);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Running, true);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics, true);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics, true);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming, true);
-				LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.RunningNoPhysics);
-			else
-				nowe = true;
-				for i = 1, speeds do
-					spawn(function()
-						local Heartbeat = game:GetService("RunService").Heartbeat;
-						local tpwalking = true;
-						local Char = game.Players.LocalPlayer.Character;
-						local Hum = Char and Char:FindFirstChildWhichIsA("Humanoid");
-						while tpwalking and Heartbeat:Wait() and Char and Hum and Hum.Parent do
-							if (Hum.MoveDirection.Magnitude > 0) then
-								Char:TranslateBy(Hum.MoveDirection);
-							end
-						end
-					end);
-				end
-				game.Players.LocalPlayer.Character.Animate.Disabled = true;
-				local Char = game.Players.LocalPlayer.Character;
-				local Hum = Char:FindFirstChildOfClass("Humanoid") or Char:FindFirstChildOfClass("AnimationController");
-				for i, v in next, Hum:GetPlayingAnimationTracks() do
-					v:AdjustSpeed(0);
-				end
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing, false);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Flying, false);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall, false);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp, false);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, false);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Landed, false);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics, false);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.PlatformStanding, false);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Running, false);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics, false);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics, false);
-				LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming, false);
-				LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Swimming);
-			end
-			if (game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid").RigType == Enum.HumanoidRigType.R6) then
-				local Player = game.Players.LocalPlayer;
-				local Torso = Player.Character.Torso;
-				local keys = {f=0,b=0,l=0,r=0};
-				local previous = {f=0,b=0,l=0,r=0};
-				local maxSpeed = 50;
-				local speed = 0;
-				local gyro = Instance.new("BodyGyro", Torso);
-				gyro.P = 90000;
-				gyro.maxTorque = Vector3.new(8999999488, 8999999488, 8999999488);
-				gyro.cframe = Torso.CFrame;
-				local velocity = Instance.new("BodyVelocity", Torso);
-				velocity.velocity = Vector3.new(0, 0.1, 0);
-				velocity.maxForce = Vector3.new(8999999488, 8999999488, 8999999488);
-				if (nowe == true) then
-					Player.Character.Humanoid.PlatformStand = true;
-				end
-				while (nowe == true) or (game:GetService("Players").LocalPlayer.Character.Humanoid.Health == 0) do
-					game:GetService("RunService").RenderStepped:Wait();
-					if (((keys.l + keys.r) ~= 0) or ((keys.f + keys.b) ~= 0)) then
-						speed = speed + 0.5 + (speed / maxSpeed);
-						if (speed > maxSpeed) then
-							speed = maxSpeed;
-						end
-					elseif (not (((keys.l + keys.r) ~= 0) or ((keys.f + keys.b) ~= 0)) and (speed ~= 0)) then
-						speed = speed - 1;
-						if (speed < 0) then
-							speed = 0;
-						end
-					end
-					if (((keys.l + keys.r) ~= 0) or ((keys.f + keys.b) ~= 0)) then
-						velocity.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (keys.f + keys.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(keys.l + keys.r, (keys.f + keys.b) * 0.2, 0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p)) * speed;
-						previous = {f=keys.f,b=keys.b,l=keys.l,r=keys.r};
-					elseif (((keys.l + keys.r) == 0) and ((keys.f + keys.b) == 0) and (speed ~= 0)) then
-						velocity.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (previous.f + previous.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(previous.l + previous.r, (previous.f + previous.b) * 0.2, 0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p)) * speed;
-					else
-						velocity.velocity = Vector3.new(0, 0, 0);
-					end
-					gyro.cframe = game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad(((keys.f + keys.b) * 50 * speed) / maxSpeed), 0, 0);
-				end
-				keys = {f=0,b=0,l=0,r=0};
-				previous = {f=0,b=0,l=0,r=0};
-				speed = 0;
-				gyro:Destroy();
-				velocity:Destroy();
-				Player.Character.Humanoid.PlatformStand = false;
-				game.Players.LocalPlayer.Character.Animate.Disabled = false;
-			else
-				local Player = game.Players.LocalPlayer;
-				local UpperTorso = Player.Character.UpperTorso;
-				local keys = {f=0,b=0,l=0,r=0};
-				local previous = {f=0,b=0,l=0,r=0};
-				local maxSpeed = 50;
-				local speed = 0;
-				local gyro = Instance.new("BodyGyro", UpperTorso);
-				gyro.P = 90000;
-				gyro.maxTorque = Vector3.new(8999999488, 8999999488, 8999999488);
-				gyro.cframe = UpperTorso.CFrame;
-				local velocity = Instance.new("BodyVelocity", UpperTorso);
-				velocity.velocity = Vector3.new(0, 0.1, 0);
-				velocity.maxForce = Vector3.new(8999999488, 8999999488, 8999999488);
-				if (nowe == true) then
-					Player.Character.Humanoid.PlatformStand = true;
-				end
-				while (nowe == true) or (game:GetService("Players").LocalPlayer.Character.Humanoid.Health == 0) do
-					wait();
-					if (((keys.l + keys.r) ~= 0) or ((keys.f + keys.b) ~= 0)) then
-						speed = speed + 0.5 + (speed / maxSpeed);
-						if (speed > maxSpeed) then
-							speed = maxSpeed;
-						end
-					elseif (not (((keys.l + keys.r) ~= 0) or ((keys.f + keys.b) ~= 0)) and (speed ~= 0)) then
-						speed = speed - 1;
-						if (speed < 0) then
-							speed = 0;
-						end
-					end
-					if (((keys.l + keys.r) ~= 0) or ((keys.f + keys.b) ~= 0)) then
-						velocity.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (keys.f + keys.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(keys.l + keys.r, (keys.f + keys.b) * 0.2, 0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p)) * speed;
-						previous = {f=keys.f,b=keys.b,l=keys.l,r=keys.r};
-					elseif (((keys.l + keys.r) == 0) and ((keys.f + keys.b) == 0) and (speed ~= 0)) then
-						velocity.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (previous.f + previous.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(previous.l + previous.r, (previous.f + previous.b) * 0.2, 0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p)) * speed;
-					else
-						velocity.velocity = Vector3.new(0, 0, 0);
-					end
-					gyro.cframe = game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad(((keys.f + keys.b) * 50 * speed) / maxSpeed), 0, 0);
-				end
-				keys = {f=0,b=0,l=0,r=0};
-				previous = {f=0,b=0,l=0,r=0};
-				speed = 0;
-				gyro:Destroy();
-				velocity:Destroy();
-				Player.Character.Humanoid.PlatformStand = false;
-				game.Players.LocalPlayer.Character.Animate.Disabled = false;
-			end
-		end);
-		local upConnection;
-		UpBtn.MouseButton1Down:connect(function()
-			upConnection = UpBtn.MouseEnter:connect(function()
-				while upConnection do
-					wait();
-					game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 1, 0);
-				end
-			end);
-		end);
-		UpBtn.MouseLeave:connect(function()
-			if upConnection then
-				upConnection:Disconnect();
-				upConnection = nil;
-			end
-		end);
-		local downConnection;
-		DownBtn.MouseButton1Down:connect(function()
-			downConnection = DownBtn.MouseEnter:connect(function()
-				while downConnection do
-					wait();
-					game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, -1, 0);
-				end
-			end);
-		end);
-		DownBtn.MouseLeave:connect(function()
-			if downConnection then
-				downConnection:Disconnect();
-				downConnection = nil;
-			end
-		end);
-		game:GetService("Players").LocalPlayer.CharacterAdded:Connect(function(Character)
-			wait(0.7);
-			game.Players.LocalPlayer.Character.Humanoid.PlatformStand = false;
-			game.Players.LocalPlayer.Character.Animate.Disabled = false;
-		end);
-		PlusBtn.MouseButton1Down:connect(function()
-			speeds = speeds + 1;
-			SpeedLabel.Text = speeds;
-			if (nowe == true) then
-				for i = 1, speeds do
-					spawn(function()
-						local Heartbeat = game:GetService("RunService").Heartbeat;
-						local tpwalking = true;
-						local Char = game.Players.LocalPlayer.Character;
-						local Hum = Char and Char:FindFirstChildWhichIsA("Humanoid");
-						while tpwalking and Heartbeat:Wait() and Char and Hum and Hum.Parent do
-							if (Hum.MoveDirection.Magnitude > 0) then
-								Char:TranslateBy(Hum.MoveDirection);
-							end
-						end
-					end);
-				end
-			end
-		end);
-		MinusBtn.MouseButton1Down:connect(function()
-			if (speeds == 1) then
-				SpeedLabel.Text = "cannot be less than 1";
-				wait(1);
-				SpeedLabel.Text = speeds;
-			else
-				speeds = speeds - 1;
-				SpeedLabel.Text = speeds;
-				if (nowe == true) then
-					for i = 1, speeds do
-						spawn(function()
-							local Heartbeat = game:GetService("RunService").Heartbeat;
-							local tpwalking = true;
-							local Char = game.Players.LocalPlayer.Character;
-							local Hum = Char and Char:FindFirstChildWhichIsA("Humanoid");
-							while tpwalking and Heartbeat:Wait() and Char and Hum and Hum.Parent do
-								if (Hum.MoveDirection.Magnitude > 0) then
-									Char:TranslateBy(Hum.MoveDirection);
-								end
-							end
-						end);
-					end
-				end
-			end
-		end);
-		CloseBtn.MouseButton1Click:Connect(function()
-			ScreenGui:Destroy();
-			A21 = false;
-		end);
-		MinimizeBtn.MouseButton1Click:Connect(function()
-			UpBtn.Visible = false;
-			DownBtn.Visible = false;
-			ToggleBtn.Visible = false;
-			PlusBtn.Visible = false;
-			SpeedLabel.Visible = false;
-			MinusBtn.Visible = false;
-			MinimizeBtn.Visible = false;
-			MaximizeBtn.Visible = true;
-			ScreenGui.Frame.BackgroundTransparency = 1;
-			CloseBtn.Position = UDim2.new(0, 0, -1, 57);
-		end);
-		MaximizeBtn.MouseButton1Click:Connect(function()
-			UpBtn.Visible = true;
-			DownBtn.Visible = true;
-			ToggleBtn.Visible = true;
-			PlusBtn.Visible = true;
-			SpeedLabel.Visible = true;
-			MinusBtn.Visible = true;
-			MinimizeBtn.Visible = true;
-			MaximizeBtn.Visible = false;
-			ScreenGui.Frame.BackgroundTransparency = 0;
-			CloseBtn.Position = UDim2.new(0, 0, -1, 27);
-		end);
-	end
+        A21 = not A21;
+        if A21 then
+                local ScreenGui = Instance.new("ScreenGui");
+                local Frame = Instance.new("Frame");
+                local UpBtn = Instance.new("TextButton");
+                local DownBtn = Instance.new("TextButton");
+                local ToggleBtn = Instance.new("TextButton");
+                local TitleLabel = Instance.new("TextLabel");
+                local PlusBtn = Instance.new("TextButton");
+                local SpeedLabel = Instance.new("TextLabel");
+                local MinusBtn = Instance.new("TextButton");
+                local CloseBtn = Instance.new("TextButton");
+                local MinimizeBtn = Instance.new("TextButton");
+                local MaximizeBtn = Instance.new("TextButton");
+                ScreenGui.Name = "main";
+                ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui");
+                ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
+                ScreenGui.ResetOnSpawn = false;
+                Frame.Parent = ScreenGui;
+                Frame.BackgroundColor3 = Color3.fromRGB(163, 255, 137);
+                Frame.BorderColor3 = Color3.fromRGB(103, 221, 213);
+                Frame.Position = UDim2.new(0.100320168, 0, 0.379746825, 0);
+                Frame.Size = UDim2.new(0, 190, 0, 57);
+                Frame.Active = true;
+                Frame.Draggable = true;
+                UpBtn.Name = "up";
+                UpBtn.Parent = Frame;
+                UpBtn.BackgroundColor3 = Color3.fromRGB(79, 255, 152);
+                UpBtn.Size = UDim2.new(0, 44, 0, 28);
+                UpBtn.Font = Enum.Font.SourceSans;
+                UpBtn.Text = "上升";
+                UpBtn.TextColor3 = Color3.fromRGB(0, 0, 0);
+                UpBtn.TextSize = 14;
+                DownBtn.Name = "down";
+                DownBtn.Parent = Frame;
+                DownBtn.BackgroundColor3 = Color3.fromRGB(215, 255, 121);
+                DownBtn.Position = UDim2.new(0, 0, 0.491228074, 0);
+                DownBtn.Size = UDim2.new(0, 44, 0, 28);
+                DownBtn.Font = Enum.Font.SourceSans;
+                DownBtn.Text = "下降";
+                DownBtn.TextColor3 = Color3.fromRGB(0, 0, 0);
+                DownBtn.TextSize = 14;
+                ToggleBtn.Name = "onof";
+                ToggleBtn.Parent = Frame;
+                ToggleBtn.BackgroundColor3 = Color3.fromRGB(255, 249, 74);
+                ToggleBtn.Position = UDim2.new(0.702823281, 0, 0.491228074, 0);
+                ToggleBtn.Size = UDim2.new(0, 56, 0, 28);
+                ToggleBtn.Font = Enum.Font.SourceSans;
+                ToggleBtn.Text = "起飞";
+                ToggleBtn.TextColor3 = Color3.fromRGB(0, 0, 0);
+                ToggleBtn.TextSize = 14;
+                TitleLabel.Parent = Frame;
+                TitleLabel.BackgroundColor3 = Color3.fromRGB(242, 60, 255);
+                TitleLabel.Position = UDim2.new(0.469327301, 0, 0, 0);
+                TitleLabel.Size = UDim2.new(0, 100, 0, 28);
+                TitleLabel.Font = Enum.Font.SourceSans;
+                TitleLabel.Text = " 秋辞飞行";
+                TitleLabel.TextColor3 = Color3.fromRGB(0, 0, 0);
+                TitleLabel.TextScaled = true;
+                TitleLabel.TextSize = 14;
+                TitleLabel.TextWrapped = true;
+                PlusBtn.Name = "plus";
+                PlusBtn.Parent = Frame;
+                PlusBtn.BackgroundColor3 = Color3.fromRGB(133, 145, 255);
+                PlusBtn.Position = UDim2.new(0.231578946, 0, 0, 0);
+                PlusBtn.Size = UDim2.new(0, 45, 0, 28);
+                PlusBtn.Font = Enum.Font.SourceSans;
+                PlusBtn.Text = "+";
+                PlusBtn.TextColor3 = Color3.fromRGB(0, 0, 0);
+                PlusBtn.TextScaled = true;
+                PlusBtn.TextSize = 14;
+                PlusBtn.TextWrapped = true;
+                SpeedLabel.Name = "speed";
+                SpeedLabel.Parent = Frame;
+                SpeedLabel.BackgroundColor3 = Color3.fromRGB(255, 85, 0);
+                SpeedLabel.Position = UDim2.new(0.468421042, 0, 0.491228074, 0);
+                SpeedLabel.Size = UDim2.new(0, 44, 0, 28);
+                SpeedLabel.Font = Enum.Font.SourceSans;
+                SpeedLabel.Text = "1";
+                SpeedLabel.TextColor3 = Color3.fromRGB(0, 0, 0);
+                SpeedLabel.TextScaled = true;
+                SpeedLabel.TextSize = 14;
+                SpeedLabel.TextWrapped = true;
+                MinusBtn.Name = "mine";
+                MinusBtn.Parent = Frame;
+                MinusBtn.BackgroundColor3 = Color3.fromRGB(123, 255, 247);
+                MinusBtn.Position = UDim2.new(0.231578946, 0, 0.491228074, 0);
+                MinusBtn.Size = UDim2.new(0, 45, 0, 29);
+                MinusBtn.Font = Enum.Font.SourceSans;
+                MinusBtn.Text = "-";
+                MinusBtn.TextColor3 = Color3.fromRGB(0, 0, 0);
+                MinusBtn.TextScaled = true;
+                MinusBtn.TextSize = 14;
+                MinusBtn.TextWrapped = true;
+                CloseBtn.Name = "Close";
+                CloseBtn.Parent = ScreenGui.Frame;
+                CloseBtn.BackgroundColor3 = Color3.fromRGB(225, 25, 0);
+                CloseBtn.Font = "SourceSans";
+                CloseBtn.Size = UDim2.new(0, 45, 0, 28);
+                CloseBtn.Text = "X";
+                CloseBtn.TextSize = 30;
+                CloseBtn.Position = UDim2.new(0, 0, -1, 27);
+                MinimizeBtn.Name = "minimize";
+                MinimizeBtn.Parent = ScreenGui.Frame;
+                MinimizeBtn.BackgroundColor3 = Color3.fromRGB(192, 150, 230);
+                MinimizeBtn.Font = "SourceSans";
+                MinimizeBtn.Size = UDim2.new(0, 45, 0, 28);
+                MinimizeBtn.Text = "-";
+                MinimizeBtn.TextSize = 40;
+                MinimizeBtn.Position = UDim2.new(0, 44, -1, 27);
+                MaximizeBtn.Name = "minimize2";
+                MaximizeBtn.Parent = ScreenGui.Frame;
+                MaximizeBtn.BackgroundColor3 = Color3.fromRGB(192, 150, 230);
+                MaximizeBtn.Font = "SourceSans";
+                MaximizeBtn.Size = UDim2.new(0, 45, 0, 28);
+                MaximizeBtn.Text = "+";
+                MaximizeBtn.TextSize = 40;
+                MaximizeBtn.Position = UDim2.new(0, 44, -1, 57);
+                MaximizeBtn.Visible = false;
+                local speeds = 1;
+                local LocalPlayer = game:GetService("Players").LocalPlayer;
+                local Character = game.Players.LocalPlayer.Character;
+                local Humanoid = Character and Character:FindFirstChildWhichIsA("Humanoid");
+                local nowe = false;
+                ToggleBtn.MouseButton1Down:connect(function()
+                        if (nowe == true) then
+                                nowe = false;
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing, true);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, true);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Flying, true);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall, true);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp, true);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, true);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Landed, true);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics, true);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.PlatformStanding, true);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, true);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Running, true);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics, true);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics, true);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming, true);
+                                LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.RunningNoPhysics);
+                        else
+                                nowe = true;
+                                for i = 1, speeds do
+                                        spawn(function()
+                                                local Heartbeat = game:GetService("RunService").Heartbeat;
+                                                local tpwalking = true;
+                                                local Char = game.Players.LocalPlayer.Character;
+                                                local Hum = Char and Char:FindFirstChildWhichIsA("Humanoid");
+                                                while tpwalking and Heartbeat:Wait() and Char and Hum and Hum.Parent do
+                                                        if (Hum.MoveDirection.Magnitude > 0) then
+                                                                Char:TranslateBy(Hum.MoveDirection);
+                                                        end
+                                                end
+                                        end);
+                                end
+                                game.Players.LocalPlayer.Character.Animate.Disabled = true;
+                                local Char = game.Players.LocalPlayer.Character;
+                                local Hum = Char:FindFirstChildOfClass("Humanoid") or Char:FindFirstChildOfClass("AnimationController");
+                                for i, v in next, Hum:GetPlayingAnimationTracks() do
+                                        v:AdjustSpeed(0);
+                                end
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing, false);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Flying, false);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall, false);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp, false);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, false);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Landed, false);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics, false);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.PlatformStanding, false);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Running, false);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics, false);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics, false);
+                                LocalPlayer.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming, false);
+                                LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Swimming);
+                        end
+                        if (game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid").RigType == Enum.HumanoidRigType.R6) then
+                                local Player = game.Players.LocalPlayer;
+                                local Torso = Player.Character.Torso;
+                                local keys = {f=0,b=0,l=0,r=0};
+                                local previous = {f=0,b=0,l=0,r=0};
+                                local maxSpeed = 50;
+                                local speed = 0;
+                                local gyro = Instance.new("BodyGyro", Torso);
+                                gyro.P = 90000;
+                                gyro.maxTorque = Vector3.new(8999999488, 8999999488, 8999999488);
+                                gyro.cframe = Torso.CFrame;
+                                local velocity = Instance.new("BodyVelocity", Torso);
+                                velocity.velocity = Vector3.new(0, 0.1, 0);
+                                velocity.maxForce = Vector3.new(8999999488, 8999999488, 8999999488);
+                                if (nowe == true) then
+                                        Player.Character.Humanoid.PlatformStand = true;
+                                end
+                                while (nowe == true) or (game:GetService("Players").LocalPlayer.Character.Humanoid.Health == 0) do
+                                        game:GetService("RunService").RenderStepped:Wait();
+                                        if (((keys.l + keys.r) ~= 0) or ((keys.f + keys.b) ~= 0)) then
+                                                speed = speed + 0.5 + (speed / maxSpeed);
+                                                if (speed > maxSpeed) then
+                                                        speed = maxSpeed;
+                                                end
+                                        elseif (not (((keys.l + keys.r) ~= 0) or ((keys.f + keys.b) ~= 0)) and (speed ~= 0)) then
+                                                speed = speed - 1;
+                                                if (speed < 0) then
+                                                        speed = 0;
+                                                end
+                                        end
+                                        if (((keys.l + keys.r) ~= 0) or ((keys.f + keys.b) ~= 0)) then
+                                                velocity.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (keys.f + keys.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(keys.l + keys.r, (keys.f + keys.b) * 0.2, 0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p)) * speed;
+                                                previous = {f=keys.f,b=keys.b,l=keys.l,r=keys.r};
+                                        elseif (((keys.l + keys.r) == 0) and ((keys.f + keys.b) == 0) and (speed ~= 0)) then
+                                                velocity.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (previous.f + previous.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(previous.l + previous.r, (previous.f + previous.b) * 0.2, 0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p)) * speed;
+                                        else
+                                                velocity.velocity = Vector3.new(0, 0, 0);
+                                        end
+                                        gyro.cframe = game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad(((keys.f + keys.b) * 50 * speed) / maxSpeed), 0, 0);
+                                end
+                                keys = {f=0,b=0,l=0,r=0};
+                                previous = {f=0,b=0,l=0,r=0};
+                                speed = 0;
+                                gyro:Destroy();
+                                velocity:Destroy();
+                                Player.Character.Humanoid.PlatformStand = false;
+                                game.Players.LocalPlayer.Character.Animate.Disabled = false;
+                        else
+                                local Player = game.Players.LocalPlayer;
+                                local UpperTorso = Player.Character.UpperTorso;
+                                local keys = {f=0,b=0,l=0,r=0};
+                                local previous = {f=0,b=0,l=0,r=0};
+                                local maxSpeed = 50;
+                                local speed = 0;
+                                local gyro = Instance.new("BodyGyro", UpperTorso);
+                                gyro.P = 90000;
+                                gyro.maxTorque = Vector3.new(8999999488, 8999999488, 8999999488);
+                                gyro.cframe = UpperTorso.CFrame;
+                                local velocity = Instance.new("BodyVelocity", UpperTorso);
+                                velocity.velocity = Vector3.new(0, 0.1, 0);
+                                velocity.maxForce = Vector3.new(8999999488, 8999999488, 8999999488);
+                                if (nowe == true) then
+                                        Player.Character.Humanoid.PlatformStand = true;
+                                end
+                                while (nowe == true) or (game:GetService("Players").LocalPlayer.Character.Humanoid.Health == 0) do
+                                        wait();
+                                        if (((keys.l + keys.r) ~= 0) or ((keys.f + keys.b) ~= 0)) then
+                                                speed = speed + 0.5 + (speed / maxSpeed);
+                                                if (speed > maxSpeed) then
+                                                        speed = maxSpeed;
+                                                end
+                                        elseif (not (((keys.l + keys.r) ~= 0) or ((keys.f + keys.b) ~= 0)) and (speed ~= 0)) then
+                                                speed = speed - 1;
+                                                if (speed < 0) then
+                                                        speed = 0;
+                                                end
+                                        end
+                                        if (((keys.l + keys.r) ~= 0) or ((keys.f + keys.b) ~= 0)) then
+                                                velocity.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (keys.f + keys.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(keys.l + keys.r, (keys.f + keys.b) * 0.2, 0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p)) * speed;
+                                                previous = {f=keys.f,b=keys.b,l=keys.l,r=keys.r};
+                                        elseif (((keys.l + keys.r) == 0) and ((keys.f + keys.b) == 0) and (speed ~= 0)) then
+                                                velocity.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (previous.f + previous.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(previous.l + previous.r, (previous.f + previous.b) * 0.2, 0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p)) * speed;
+                                        else
+                                                velocity.velocity = Vector3.new(0, 0, 0);
+                                        end
+                                        gyro.cframe = game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad(((keys.f + keys.b) * 50 * speed) / maxSpeed), 0, 0);
+                                end
+                                keys = {f=0,b=0,l=0,r=0};
+                                previous = {f=0,b=0,l=0,r=0};
+                                speed = 0;
+                                gyro:Destroy();
+                                velocity:Destroy();
+                                Player.Character.Humanoid.PlatformStand = false;
+                                game.Players.LocalPlayer.Character.Animate.Disabled = false;
+                        end
+                end);
+                local upConnection;
+                UpBtn.MouseButton1Down:connect(function()
+                        upConnection = UpBtn.MouseEnter:connect(function()
+                                while upConnection do
+                                        wait();
+                                        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 1, 0);
+                                end
+                        end);
+                end);
+                UpBtn.MouseLeave:connect(function()
+                        if upConnection then
+                                upConnection:Disconnect();
+                                upConnection = nil;
+                        end
+                end);
+                local downConnection;
+                DownBtn.MouseButton1Down:connect(function()
+                        downConnection = DownBtn.MouseEnter:connect(function()
+                                while downConnection do
+                                        wait();
+                                        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, -1, 0);
+                                end
+                        end);
+                end);
+                DownBtn.MouseLeave:connect(function()
+                        if downConnection then
+                                downConnection:Disconnect();
+                                downConnection = nil;
+                        end
+                end);
+                game:GetService("Players").LocalPlayer.CharacterAdded:Connect(function(Character)
+                        wait(0.7);
+                        game.Players.LocalPlayer.Character.Humanoid.PlatformStand = false;
+                        game.Players.LocalPlayer.Character.Animate.Disabled = false;
+                end);
+                PlusBtn.MouseButton1Down:connect(function()
+                        speeds = speeds + 1;
+                        SpeedLabel.Text = speeds;
+                        if (nowe == true) then
+                                for i = 1, speeds do
+                                        spawn(function()
+                                                local Heartbeat = game:GetService("RunService").Heartbeat;
+                                                local tpwalking = true;
+                                                local Char = game.Players.LocalPlayer.Character;
+                                                local Hum = Char and Char:FindFirstChildWhichIsA("Humanoid");
+                                                while tpwalking and Heartbeat:Wait() and Char and Hum and Hum.Parent do
+                                                        if (Hum.MoveDirection.Magnitude > 0) then
+                                                                Char:TranslateBy(Hum.MoveDirection);
+                                                        end
+                                                end
+                                        end);
+                                end
+                        end
+                end);
+                MinusBtn.MouseButton1Down:connect(function()
+                        if (speeds == 1) then
+                                SpeedLabel.Text = "cannot be less than 1";
+                                wait(1);
+                                SpeedLabel.Text = speeds;
+                        else
+                                speeds = speeds - 1;
+                                SpeedLabel.Text = speeds;
+                                if (nowe == true) then
+                                        for i = 1, speeds do
+                                                spawn(function()
+                                                        local Heartbeat = game:GetService("RunService").Heartbeat;
+                                                        local tpwalking = true;
+                                                        local Char = game.Players.LocalPlayer.Character;
+                                                        local Hum = Char and Char:FindFirstChildWhichIsA("Humanoid");
+                                                        while tpwalking and Heartbeat:Wait() and Char and Hum and Hum.Parent do
+                                                                if (Hum.MoveDirection.Magnitude > 0) then
+                                                                        Char:TranslateBy(Hum.MoveDirection);
+                                                                end
+                                                        end
+                                                end);
+                                        end
+                                end
+                        end
+                end);
+                CloseBtn.MouseButton1Click:Connect(function()
+                        ScreenGui:Destroy();
+                        A21 = false;
+                end);
+                MinimizeBtn.MouseButton1Click:Connect(function()
+                        UpBtn.Visible = false;
+                        DownBtn.Visible = false;
+                        ToggleBtn.Visible = false;
+                        PlusBtn.Visible = false;
+                        SpeedLabel.Visible = false;
+                        MinusBtn.Visible = false;
+                        MinimizeBtn.Visible = false;
+                        MaximizeBtn.Visible = true;
+                        ScreenGui.Frame.BackgroundTransparency = 1;
+                        CloseBtn.Position = UDim2.new(0, 0, -1, 57);
+                end);
+                MaximizeBtn.MouseButton1Click:Connect(function()
+                        UpBtn.Visible = true;
+                        DownBtn.Visible = true;
+                        ToggleBtn.Visible = true;
+                        PlusBtn.Visible = true;
+                        SpeedLabel.Visible = true;
+                        MinusBtn.Visible = true;
+                        MinimizeBtn.Visible = true;
+                        MaximizeBtn.Visible = false;
+                        ScreenGui.Frame.BackgroundTransparency = 0;
+                        CloseBtn.Position = UDim2.new(0, 0, -1, 27);
+                end);
+        end
 end});
 UniversalLeftGroup:AddButton({Text="重新加载角色",Func=function()
-	if A2.Character then
-		A2.Character:BreakJoints();
-	end
+        if A2.Character then
+                A2.Character:BreakJoints();
+        end
 end});
 UniversalLeftGroup:AddButton({Text="通用甩飞",Func=function()
-	local ScriptContent = game:HttpGet("https://pastebin.com/raw/zqyDSUWX");
-	local Func = loadstring(ScriptContent);
-	if Func then
-		Func();
-	end
+        local ScriptContent = game:HttpGet("https://pastebin.com/raw/zqyDSUWX");
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
 end});
 UniversalLeftGroup:AddButton({Text="取消坠落伤害",Func=function()
-	if A2.Character then
-		local HRP = A2.Character:FindFirstChild("HumanoidRootPart");
-		if HRP then
-			local ScriptContent = game:HttpGet("http://rawscripts.net/raw/Universal-Script-Touch-fling-script-22447");
-			local Func = loadstring(ScriptContent);
-			if Func then
-				Func();
-			end
-		end
-	end
+        if A2.Character then
+                local HRP = A2.Character:FindFirstChild("HumanoidRootPart");
+                if HRP then
+                        local ScriptContent = game:HttpGet("http://rawscripts.net/raw/Universal-Script-Touch-fling-script-22447");
+                        local Func = loadstring(ScriptContent);
+                        if Func then
+                                Func();
+                        end
+                end
+        end
 end});
 UniversalLeftGroup:AddButton({Text="穿墙模式",Func=function()
-	A19 = not A19;
-	if A22 then
-		A22:Disconnect();
-		A22 = nil;
-	end
-	if A19 then
-		A22 = A3.Stepped:Connect(function()
-			if A2.Character then
-				for _, Part in pairs(A2.Character:GetDescendants()) do
-					if Part:IsA("BasePart") then
-						Part.CanCollide = false;
-					end
-				end
-			end
-		end);
-	end
+        A19 = not A19;
+        if A22 then
+                A22:Disconnect();
+                A22 = nil;
+        end
+        if A19 then
+                A22 = A3.Stepped:Connect(function()
+                        if A2.Character then
+                                for _, Part in pairs(A2.Character:GetDescendants()) do
+                                        if Part:IsA("BasePart") then
+                                                Part.CanCollide = false;
+                                        end
+                                end
+                        end
+                end);
+        end
 end});
 UniversalLeftGroup:AddButton({Text="刷新游戏",Func=function()
-	A7:Teleport(game.PlaceId, A2);
+        A7:Teleport(game.PlaceId, A2);
 end});
 UniversalLeftGroup:AddToggle("SafeModeToggle", {Text="安全模式",Default=true,Callback=function(Value)
-	A29 = Value;
-	if Value then
-		if A17 then
-			A17:Destroy();
-			A17 = nil;
-		end
-		if (A23 and (type(A23) == "table") and A23.Destroy) then
-			pcall(function()
-				A23:Destroy();
-			end);
-			A23 = nil;
-		end
-	end
+        A29 = Value;
+        if Value then
+                if A17 then
+                        A17:Destroy();
+                        A17 = nil;
+                end
+                if (A23 and (type(A23) == "table") and A23.Destroy) then
+                        pcall(function()
+                                A23:Destroy();
+                        end);
+                        A23 = nil;
+                end
+        end
 end});
 UniversalRightGroup:AddLabel("QQ群");
 UniversalRightGroup:AddButton({Text="点击复制QQ群链接用浏览器打开",Func=function()
-	setclipboard("https://qun.qq.com/universal-share/share?ac=1&authKey=bEmFYn95LgJAyVYjM00CBWVn8i23mWAyj5Z%2Ba3rithMWPxzDwKlZ9wKtaB7q2s6n&busi_data=eyJncm91cENvZGUiOiI5Mzg3MTQ0MjciLCJ0b2tlbiI6IkFGL2Z6QTE5WUNRU2UrOGF6SzRQRVJDdmc5YzJjZVVmQXdEbmhObHNnRUhQZDUzL3djamJUdm5SRThDSjFrQmYiLCJ1aW4iOiIzNDM1Mjg2MTc3In0%3D&data=ahUTHr2un-Gf0AHE1oBjxdt0-y4VEoLSnZ1D6Ve-6KdsYM4R_Rw-hJ-amg0HfFokPb9CyhFVCDesPER_Ave_8A&svctype=4&tempid=h5_group_info");
+        setclipboard("https://qun.qq.com/universal-share/share?ac=1&authKey=bEmFYn95LgJAyVYjM00CBWVn8i23mWAyj5Z%2Ba3rithMWPxzDwKlZ9wKtaB7q2s6n&busi_data=eyJncm91cENvZGUiOiI5Mzg3MTQ0MjciLCJ0b2tlbiI6IkFGL2Z6QTE5WUNRU2UrOGF6SzRQRVJDdmc5YzJjZVVmQXdEbmhObHNnRUhQZDUzL3djamJUdm5SRThDSjFrQmYiLCJ1aW4iOiIzNDM1Mjg2MTc3In0%3D&data=ahUTHr2un-Gf0AHE1oBjxdt0-y4VEoLSnZ1D6Ve-6KdsYM4R_Rw-hJ-amg0HfFokPb9CyhFVCDesPER_Ave_8A&svctype=4&tempid=h5_group_info");
 end});
 UniversalRightGroup:AddLabel("快手号");
 UniversalRightGroup:AddButton({Text="点击复制快手号",Func=function()
-	setclipboard("XQWANYYDS");
+        setclipboard("XQWANYYDS");
 end});
 UniversalRightGroup:AddLabel("TX全自动翻译");
 UniversalRightGroup:AddButton({Text="TX全自动翻译",Func=function()
-	TX = "TX Script"
+        TX = "TX Script"
 Script = "全自动翻译"
 loadstring(game:HttpGet("https://raw.githubusercontent.com/JsYb666/Item/refs/heads/main/Auto-language"))()
-	local Func = loadstring(ScriptContent);
-	if Func then
-		Func();
-	end
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
 end});
 
 local scriptCategories = {
@@ -1094,9 +1061,10 @@ local scriptCategories = {
         GroupName = "墨水游戏",
         List = {
             {Name = "AX墨水脚本有芙同享秋辞汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/ax%E8%84%9A%E6%9C%AC%E7%A7%8B%E8%BE%9E%E6%B1%89%E5%8C%96"},
+            {Name = "墨水游戏人机汉化(里面有反作弊甩飞)", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/inkgame-ADEN-robot"},
             {Name = "墨水Ringta汉化", Url = "https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/Ringta"},
             {Name = "博伦墨水脚本", Url = "https://pastebin.com/raw/Q64rPkwu"},
-            {Name = "Unm汉化，卡密ink50", Url = "https://pastebin.com/raw/Cq7144NJ"},
+            {Name = "Unm汉化，卡密ink50", Url = "https://github.com/youfutongxiang1145/unm-CN/releases/download/unm%E6%B1%89%E5%8C%96/unm.txt"},
         }
     },
     {
@@ -1104,6 +1072,7 @@ local scriptCategories = {
         List = {
             {Name = "Doors脚本", Url = "https://raw.githubusercontent.com/atnew2025/Chinese-scripts/refs/heads/main/mshax(prohax).txt"},
             {Name = "doors最新脚本", Url = "https://raw.githubusercontent.com/TheHunterSolo1/Scripts/refs/heads/main/Protected_2809220311826785.lua.txt"},
+            {Name = "doorsDP汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/doors-DP-robot"},
         }
     },
     {
@@ -1156,10 +1125,8 @@ local scriptCategories = {
     {
     GroupName = "最坚强的战场",
         List = {
-            {Name = "最坚强的战场脚本", Url = "https://raw.githubusercontent.com/HellishAgem/HellishMovesetCutscene/refs/heads/main/Protected_6748082827088148.txt"},
+            {Name = "最强战场Phantasm汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/thestongestbattlegrounds-Phantasm-robot"},
             {Name = "最坚强的战场脚本2", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/phantasm.lua"},
-            {Name = "最坚强的战场脚本3", Url = "https://rawscripts.net/raw/Universal-Script-GarlordHub-KeyLess-Tsbg-Script-24860"},
-            {Name = "最坚强的战争最好用的脚本", Url = "https://raw.githubusercontent.com/DiosDi/VexonHub/refs/heads/main/VexonHub"},
         }
     },
     {
@@ -1167,6 +1134,7 @@ local scriptCategories = {
         List = {
             {Name = "偷走脑红脚本", Url = "https://raw.githubusercontent.com/DynaFetchy/Scripts/refs/heads/main/Loader.lua"},
             {Name = "偷走脑红脚本2", Url = "https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/偷走脑红"},
+            {Name = "偷走脑红KURD汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/Brainrot-KURD-robot"},
         }
     },
     {
@@ -1200,6 +1168,32 @@ local scriptCategories = {
             }
     },
     {
+    GroupName = "死亡球",
+        List = {
+            {Name = "死亡球Fluxin汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/deathball-Fluxin-robot"},
+            {Name = "死亡球stark汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/Deathballs-stark-robot"},
+            }
+    },
+    {
+    GroupName = "监狱人生",
+        List = {
+            {Name = "监狱人生Rayfield汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/prisonlife-Rayfield-robot"},
+            }
+    },
+    {
+    GroupName = "逃脱海啸",
+        List = {
+            {Name = "逃脱海啸并带走红Merqur汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/EscapeTsunamiForBrinrots-Merqury-robot"},
+            {Name = "逃脱海啸并拿走脑红Solix汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/EscapeTsunamiForBrinrots-Solix-robot"},
+            }
+    },
+    {
+    GroupName = "安静或者死亡",
+        List = {
+            {Name = "安静或者死亡candyz汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/quietordie-candyz-robo"},
+            }
+    },
+    {
             GroupName = "驾驶帝国",
         List = {
             {Name = "驾驶帝国脚本", Url = "https://raw.githubusercontent.com/Marco8642/science/main/drivingempire"},
@@ -1212,40 +1206,40 @@ local ScriptCenterRightGroup = Tabs.ScriptCenter:AddRightGroupbox("脚本中心"
 local leftIndex = 0;
 local rightIndex = 0;
 for _, category in ipairs(scriptCategories) do
-	local targetGroup = ((leftIndex <= rightIndex) and ScriptCenterLeftGroup) or ScriptCenterRightGroup;
-	if (((targetGroup == ScriptCenterLeftGroup) and (leftIndex > 0)) or ((targetGroup == ScriptCenterRightGroup) and (rightIndex > 0))) then
-		targetGroup:AddLabel("--------------------------------------------------------------------------------");
-	end
-	targetGroup:AddLabel(category.GroupName);
-	for _, btn in ipairs(category.List) do
-		targetGroup:AddButton({Text=btn.Name,Func=function()
-			local success, err = pcall(function()
-				local scriptContent = game:HttpGet(btn.Url);
-				local func = loadstring(scriptContent);
-				if func then
-					func();
-				end
-			end);
-		end});
-	end
-	if (targetGroup == ScriptCenterLeftGroup) then
-		leftIndex = leftIndex + 1;
-	else
-		rightIndex = rightIndex + 1;
-	end
+        local targetGroup = ((leftIndex <= rightIndex) and ScriptCenterLeftGroup) or ScriptCenterRightGroup;
+        if (((targetGroup == ScriptCenterLeftGroup) and (leftIndex > 0)) or ((targetGroup == ScriptCenterRightGroup) and (rightIndex > 0))) then
+                targetGroup:AddLabel("--------------------------------------------------------------------------------");
+        end
+        targetGroup:AddLabel(category.GroupName);
+        for _, btn in ipairs(category.List) do
+                targetGroup:AddButton({Text=btn.Name,Func=function()
+                        local success, err = pcall(function()
+                                local scriptContent = game:HttpGet(btn.Url);
+                                local func = loadstring(scriptContent);
+                                if func then
+                                        func();
+                                end
+                        end);
+                end});
+        end
+        if (targetGroup == ScriptCenterLeftGroup) then
+                leftIndex = leftIndex + 1;
+        else
+                rightIndex = rightIndex + 1;
+        end
 end
 
 local SettingsGroup = Tabs.Settings:AddLeftGroupbox("系统设置");
 SettingsGroup:AddButton({Text="查看公告",Func=function()
-	Library:Notify("查看公告功能", 3);
+        Library:Notify("查看公告功能", 3);
 end});
 SettingsGroup:AddButton({Text="重新加载公告",Func=function()
-	local gui = A5:FindFirstChild("AnnouncementGui");
-	if gui then
-		gui:Destroy();
-	end
-	wait(0.1);
-	Library:Notify("公告已重新加载", 3);
+        local gui = A5:FindFirstChild("AnnouncementGui");
+        if gui then
+                gui:Destroy();
+        end
+        wait(0.1);
+        Library:Notify("公告已重新加载", 3);
 end});
 SettingsGroup:AddButton('卸载脚本', function() Library:Unload() end)
 
@@ -1258,7 +1252,7 @@ ThemeManager:ApplyToTab(Tabs.Settings);
 SaveManager:BuildConfigSection(Tabs.Settings);
 Library.KeybindFrame.Visible = true;
 Library:OnKeyPress(function(Key)
-	if (Key == Enum.KeyCode.LeftControl) then
-		Library:ToggleUI();
-	end
+        if (Key == Enum.KeyCode.LeftControl) then
+                Library:ToggleUI();
+        end
 end);
