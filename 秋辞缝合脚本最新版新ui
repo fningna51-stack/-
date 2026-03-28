@@ -14,7 +14,10 @@ local A7 = game:GetService("TeleportService");
 local A8 = workspace;
 local A9 = game:GetService("HttpService");
 local Window = Library:CreateWindow({Title="秋辞缝合脚本",Footer="作者：秋辞 副作者：有芙同享",Icon=131153193945220,NotifySide="Right",ShowCustomCursor=true,Center=true,AutoShow=true});
-local Tabs = {Universal=Window:AddTab("通用", "user"),Announcement=Window:AddTab("公告", "dog"),ScriptCenter=Window:AddTab("脚本中心", "cat"),Settings=Window:AddTab("UI设置", "settings")};
+local Tabs = {Universal=Window:AddTab("通用", "user"),Announcement=Window:AddTab("公告", "dog"),
+  ScriptCenter=Window:AddTab("脚本中心", "cat"),
+  Settings=Window:AddTab("UI设置", "settings")};
+
 local AnnouncementGroup = Tabs.Announcement:AddLeftGroupbox("Autumn’s Farewell最后的留言");
 AnnouncementGroup:AddLabel("最后写一本介绍");
 AnnouncementGroup:AddLabel("把我玩脚本这段时间写进去");
@@ -1032,12 +1035,18 @@ UniversalLeftGroup:AddToggle("SafeModeToggle", {Text="安全模式",Default=true
 	end
 end});
 UniversalRightGroup:AddLabel("QQ群");
-UniversalRightGroup:AddButton({Text="QQ群: 938714427",Func=function()
-	setclipboard("938714427");
+UniversalRightGroup:AddButton({Text="点击复制QQ群链接用浏览器打开",Func=function()
+	setclipboard("https://qun.qq.com/universal-share/share?ac=1&authKey=bEmFYn95LgJAyVYjM00CBWVn8i23mWAyj5Z%2Ba3rithMWPxzDwKlZ9wKtaB7q2s6n&busi_data=eyJncm91cENvZGUiOiI5Mzg3MTQ0MjciLCJ0b2tlbiI6IkFGL2Z6QTE5WUNRU2UrOGF6SzRQRVJDdmc5YzJjZVVmQXdEbmhObHNnRUhQZDUzL3djamJUdm5SRThDSjFrQmYiLCJ1aW4iOiIzNDM1Mjg2MTc3In0%3D&data=ahUTHr2un-Gf0AHE1oBjxdt0-y4VEoLSnZ1D6Ve-6KdsYM4R_Rw-hJ-amg0HfFokPb9CyhFVCDesPER_Ave_8A&svctype=4&tempid=h5_group_info");
+end});
+UniversalRightGroup:AddLabel("快手号");
+UniversalRightGroup:AddButton({Text="点击复制快手号",Func=function()
+	setclipboard("XQWANYYDS");
 end});
 UniversalRightGroup:AddLabel("TX全自动翻译");
 UniversalRightGroup:AddButton({Text="TX全自动翻译",Func=function()
-	local ScriptContent = game:HttpGet("https://raw.githubusercontent.com/JsYb666/Item/refs/heads/main/Auto-language");
+	TX = "TX Script"
+Script = "全自动翻译"
+loadstring(game:HttpGet("https://raw.githubusercontent.com/JsYb666/Item/refs/heads/main/Auto-language"))()
 	local Func = loadstring(ScriptContent);
 	if Func then
 		Func();
@@ -1053,6 +1062,7 @@ local scriptCategories = {
             {Name = "xk脚本", Url = "https://github.com/devslopo/DVES/raw/main/XK%20Hub"},
             {Name = "新版XA脚本", Url = "https://github.com/YunLua/Lua/raw/main/XA_Hub.lua"},
             {Name = "皮脚本", Url = "https://raw.githubusercontent.com/xiaopi77/xiaopi77/main/QQ1002100032-Roblox-Pi-script.lua"},
+            {Name = "BHBOU脚本", Url = "https://raw.githubusercontent.com/xiaopi77/xiaopi77/main/QQ1002100032-Roblox-Pi-script.lua"},
         }
     },
     {
@@ -1113,6 +1123,7 @@ local scriptCategories = {
         GroupName = "被遗弃",
         List = {
             {Name = "被遗弃无卡密超好用", Url = "https://rawscripts.net/raw/G666-Forsaken-Keyless-auto-gen-reach-autoblock-+-more-63283"},
+            {Name = "被遗弃英文无卡密", Url = "https://github.com/shenxiuqi974/guesting-but-chinese/releases/download/hushwhw/default.txt"},
         }
     },
     {
@@ -1143,11 +1154,11 @@ local scriptCategories = {
         }
     },
     {
-    GroupName = "最坚强的战争",
+    GroupName = "最坚强的战场",
         List = {
-            {Name = "最坚强的战争脚本", Url = "https://raw.githubusercontent.com/HellishAgem/HellishMovesetCutscene/refs/heads/main/Protected_6748082827088148.txt"},
-            {Name = "最坚强的战争脚本2", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/phantasm.lua"},
-            {Name = "最坚强的战争脚本3", Url = "https://rawscripts.net/raw/Universal-Script-GarlordHub-KeyLess-Tsbg-Script-24860"},
+            {Name = "最坚强的战场脚本", Url = "https://raw.githubusercontent.com/HellishAgem/HellishMovesetCutscene/refs/heads/main/Protected_6748082827088148.txt"},
+            {Name = "最坚强的战场脚本2", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/phantasm.lua"},
+            {Name = "最坚强的战场脚本3", Url = "https://rawscripts.net/raw/Universal-Script-GarlordHub-KeyLess-Tsbg-Script-24860"},
             {Name = "最坚强的战争最好用的脚本", Url = "https://raw.githubusercontent.com/DiosDi/VexonHub/refs/heads/main/VexonHub"},
         }
     },
@@ -1174,6 +1185,24 @@ local scriptCategories = {
         GroupName = "竞争对手",
         List = {
             {Name = "竞争对手脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/竞争对手汉化脚本"},
+            }
+    },
+    {
+            GroupName = "chain脚本",
+        List = {
+            {Name = "chain英文脚本", Url = "https://api.getpolsec.com/scripts/hosted/79fcede2ce14619990c741986e6123ddbc41cd9e4a25c4dc4da13c5f63a25f2b.lua"},
+            }
+    },
+    {
+            GroupName = "跳跃对决",
+        List = {
+            {Name = "跳跃对决脚本", Url = "https://raw.githubusercontent.com/solarastuff/sorryjimpee/refs/heads/main/Jumper.lua"},
+            }
+    },
+    {
+            GroupName = "驾驶帝国",
+        List = {
+            {Name = "驾驶帝国脚本", Url = "https://raw.githubusercontent.com/Marco8642/science/main/drivingempire"},
         }
     }
 }
@@ -1205,6 +1234,7 @@ for _, category in ipairs(scriptCategories) do
 		rightIndex = rightIndex + 1;
 	end
 end
+
 local SettingsGroup = Tabs.Settings:AddLeftGroupbox("系统设置");
 SettingsGroup:AddButton({Text="查看公告",Func=function()
 	Library:Notify("查看公告功能", 3);
@@ -1217,6 +1247,8 @@ SettingsGroup:AddButton({Text="重新加载公告",Func=function()
 	wait(0.1);
 	Library:Notify("公告已重新加载", 3);
 end});
+SettingsGroup:AddButton('卸载脚本', function() Library:Unload() end)
+
 ThemeManager:SetLibrary(Library);
 SaveManager:SetLibrary(Library);
 SaveManager:IgnoreThemeSettings();
