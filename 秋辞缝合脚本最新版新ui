@@ -1,37 +1,104 @@
-local repo = "https://raw.githubusercontent.com/KingScriptAE/No-sirve-nada./refs/heads/main/";
-local Library = loadstring(game:HttpGet(repo .. "Library.lua"))();
-local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))();
-local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))();
-local Options = Library.Options;
-local Toggles = Library.Toggles;
-local A1 = game:GetService("Players");
-local A2 = A1.LocalPlayer;
-local A3 = game:GetService("RunService");
-local A4 = game:GetService("Lighting");
-local A5 = game:GetService("CoreGui");
-local A6 = game:GetService("UserInputService");
-local A7 = game:GetService("TeleportService");
-local A8 = workspace;
-local A9 = game:GetService("HttpService");
-local Window = Library:CreateWindow({Title="秋辞缝合脚本",Footer="作者：秋辞 汉化者：有芙同享 汉化者：人机",
-Icon=131153193945220,
-NotifySide="Right",
-ShowCustomCursor=true,
-Center=true,AutoShow=true});
+local repo = "https://raw.githubusercontent.com/KingScriptAE/No-sirve-nada./refs/heads/main/"
+local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
+local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 
-local Tabs = {Universal=Window:AddTab("通用", "user"),Announcement=Window:AddTab("公告", "dog"),
-  ScriptCenter=Window:AddTab("脚本中心", "cat"),
-  Settings=Window:AddTab("UI设置", "settings")};
+do
+    local function createTimeLabel()
+        local ScreenGui = Instance.new("ScreenGui")
+        ScreenGui.Name = "TimeDisplayGUI"
+        ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+        ScreenGui.Parent = game:GetService("CoreGui")
+        
+        local MainLabel = Instance.new("TextLabel")
+        MainLabel.Name = "TimeLabel"
+        MainLabel.Size = UDim2.new(0, 180, 0, 40)
+        MainLabel.Position = UDim2.new(0.5, -90, 0, 10)
+        MainLabel.AnchorPoint = Vector2.new(0.5, 0)
+        MainLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        MainLabel.BackgroundTransparency = 0.5
+        MainLabel.TextColor3 = Color3.new(1, 1, 1)
+        MainLabel.TextSize = 20
+        MainLabel.Font = Enum.Font.SourceSansBold
+        MainLabel.Text = "加载中..."
+        MainLabel.BorderSizePixel = 0
+        MainLabel.Parent = ScreenGui
+        
+        return MainLabel, ScreenGui
+    end
+    
+    local MainLabel, TimeGui = createTimeLabel()
+    local fpsTable = {}
+    local hue = 0
+    local frameTime = tick()
+    local lastTick = tick()
+    local Heartbeat = game:GetService("RunService").Heartbeat
+    
+    local function UpdateTimeLabel()
+        lastTick = tick()
+        
+        for i = #fpsTable, 1, -1 do
+            fpsTable[i + 1] = fpsTable[i] >= lastTick - 1 and fpsTable[i] or nil
+        end
+        fpsTable[1] = lastTick
+        
+        local fps = tick() - frameTime >= 1 and #fpsTable or #fpsTable / (tick() - frameTime)
+        local _ = fps - fps % 1
+        
+        MainLabel.Text = ("秋辞时间:" .. os.date("%H") .. "时" .. os.date("%M") .. "分" .. os.date("%S")) .. "秒"
+        
+        MainLabel.TextColor3 = Color3.fromHSV(hue, 1, 1)
+        hue = (hue + 0.001) % 1
+    end
+    
+    frameTime = tick()
+    Heartbeat:Connect(UpdateTimeLabel)
+    
+    game:GetService("CoreGui").ChildRemoved:Connect(function(child)
+        if child.Name == "TimeDisplayGUI" then
+            createTimeLabel()
+        end
+    end)
+end
 
-local AnnouncementGroup = Tabs.Announcement:AddLeftGroupbox("秋辞脚本公告");
-AnnouncementGroup:AddLabel("添加UNM新汉化");
-AnnouncementGroup:AddLabel("还添加好多好用的脚本");
-AnnouncementGroup:AddLabel("感谢汉化部一直以来的努力汉化");
-AnnouncementGroup:AddLabel("汉化：人机  汉化：有芙同享");
-AnnouncementGroup:AddLabel("为大家提供最好的最实用的");
-AnnouncementGroup:AddLabel("脚本大全预计添加100个服务器的脚本");
-AnnouncementGroup:AddLabel("GO！GO！GO！");
-AnnouncementGroup:AddLabel("🤓🤔🤔");
+local Options = Library.Options
+local Toggles = Library.Toggles
+local A1 = game:GetService("Players")
+local A2 = A1.LocalPlayer
+local A3 = game:GetService("RunService")
+local A4 = game:GetService("Lighting")
+local A5 = game:GetService("CoreGui")
+local A6 = game:GetService("UserInputService")
+local A7 = game:GetService("TeleportService")
+local A8 = workspace
+local A9 = game:GetService("HttpService")
+
+local Window = Library:CreateWindow({
+    Title = "秋辞缝合脚本",
+    Footer = "作者：秋辞 汉化者：有芙同享 汉化者：人机",
+    Icon = 131153193945220,
+    NotifySide = "Right",
+    ShowCustomCursor = true,
+    Center = true,
+    AutoShow = true
+})
+
+local Tabs = {
+    Universal = Window:AddTab("通用", "user"),
+    Announcement = Window:AddTab("公告", "dog"),
+    ScriptCenter = Window:AddTab("脚本中心", "cat"),
+    Settings = Window:AddTab("UI设置", "settings")
+}
+
+local AnnouncementGroup = Tabs.Announcement:AddLeftGroupbox("秋辞脚本公告")
+AnnouncementGroup:AddLabel("添加UNM新汉化")
+AnnouncementGroup:AddLabel("还添加好多好用的脚本")
+AnnouncementGroup:AddLabel("感谢汉化部一直以来的努力汉化")
+AnnouncementGroup:AddLabel("汉化：人机  汉化：有芙同享")
+AnnouncementGroup:AddLabel("为大家提供最好的最实用的")
+AnnouncementGroup:AddLabel("脚本大全预计添加100个服务器的脚本")
+AnnouncementGroup:AddLabel("GO！GO！GO！")
+AnnouncementGroup:AddLabel("🤓🤔🤔")
 local UniversalLeftGroup = Tabs.Universal:AddLeftGroupbox("各种功能");
 local UniversalRightGroup = Tabs.Universal:AddRightGroupbox("信息与翻译");
 local A17 = nil;
@@ -109,86 +176,6 @@ UniversalLeftGroup:AddToggle("NightVisionToggle", {Text="夜视",Default=false,C
                 A4.FogEnd = 100000;
                 A4.FogStart = 0;
                 A4.GlobalShadows = true;
-        end
-end});
-UniversalLeftGroup:AddToggle("ESPToggle", {Text="透视",Default=false,Callback=function(Value)
-        if Value then
-                if not A26 then
-                        A26 = Instance.new("Folder");
-                        A26.Name = "Highlight_Storage";
-                        A26.Parent = A5;
-                end
-                local FillColor = Color3.fromRGB(175, 25, 255);
-                local OutlineColor = Color3.fromRGB(255, 255, 255);
-                for _, Player in pairs(A1:GetPlayers()) do
-                        if (Player ~= A2) then
-                                local Highlight = Instance.new("Highlight");
-                                Highlight.Name = Player.Name;
-                                Highlight.FillColor = FillColor;
-                                Highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop;
-                                Highlight.FillTransparency = 0.5;
-                                Highlight.OutlineColor = OutlineColor;
-                                Highlight.OutlineTransparency = 0;
-                                Highlight.Parent = A26;
-                                local function AssignAdornee(Character)
-                                        if Character then
-                                                Highlight.Adornee = Character;
-                                        end
-                                end
-                                if Player.Character then
-                                        AssignAdornee(Player.Character);
-                                end
-                                local Connection = Player.CharacterAdded:Connect(AssignAdornee);
-                                A27[Player] = Connection;
-                        end
-                end
-                local PlayerAddedConn = A1.PlayerAdded:Connect(function(Player)
-                        local Highlight = Instance.new("Highlight");
-                        Highlight.Name = Player.Name;
-                        Highlight.FillColor = FillColor;
-                        Highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop;
-                        Highlight.FillTransparency = 0.5;
-                        Highlight.OutlineColor = OutlineColor;
-                        Highlight.OutlineTransparency = 0;
-                        Highlight.Parent = A26;
-                        local function AssignAdornee(Character)
-                                if Character then
-                                        Highlight.Adornee = Character;
-                                end
-                        end
-                        if Player.Character then
-                                AssignAdornee(Player.Character);
-                        end
-                        local Connection = Player.CharacterAdded:Connect(AssignAdornee);
-                        A27[Player] = Connection;
-                end);
-                local PlayerRemovingConn = A1.PlayerRemoving:Connect(function(Player)
-                        if A27[Player] then
-                                A27[Player]:Disconnect();
-                                A27[Player] = nil;
-                        end
-                        if A26 then
-                                local Highlight = A26:FindFirstChild(Player.Name);
-                                if Highlight then
-                                        Highlight:Destroy();
-                                end
-                        end
-                end);
-                A27['PlayerAdded'] = PlayerAddedConn;
-                A27['PlayerRemoving'] = PlayerRemovingConn;
-        else
-                for _, Connection in pairs(A27) do
-                        if Connection then
-                                pcall(function()
-                                        Connection:Disconnect();
-                                end);
-                        end
-                end
-                A27 = {};
-                if A26 then
-                        A26:Destroy();
-                        A26 = nil;
-                end
         end
 end});
 UniversalLeftGroup:AddToggle("BulletTrackingToggle", {Text="通用子弹追踪",Default=false,Callback=function(Enabled)
@@ -953,6 +940,45 @@ UniversalLeftGroup:AddButton({Text="通用甩飞",Func=function()
                 Func();
         end
 end});
+UniversalLeftGroup:AddButton({
+    Text = "无敌",
+    Func = function()
+        local lp = game:GetService("Players").LocalPlayer
+        if lp.Character:FindFirstChild("Head") then
+            local char = lp.Character
+            char.Archivable = true
+            local new = char:Clone()
+            new.Parent = workspace
+            lp.Character = new
+            wait(2)
+            local oldhum = char:FindFirstChildWhichIsA("Humanoid")
+            local newhum = oldhum:Clone()
+            newhum.Parent = char
+            newhum.RequiresNeck = false
+            oldhum.Parent = nil
+            wait(2)
+            lp.Character = char
+            new:Destroy()
+            wait(1)
+            newhum:GetPropertyChangedSignal("Health"):Connect(
+                function()
+                    if newhum.Health <= 0 then
+                        oldhum.Parent = lp.Character
+                        wait(1)
+                        oldhum:Destroy()
+                    end
+                end
+            )
+            workspace.CurrentCamera.CameraSubject = char
+            if char:FindFirstChild("Animate") then
+                char.Animate.Disabled = true
+                wait(.1)
+                char.Animate.Disabled = false
+            end
+            lp.Character:FindFirstChild("Head"):Destroy()
+        end
+    end
+})
 UniversalLeftGroup:AddButton({Text="取消坠落伤害",Func=function()
         if A2.Character then
                 local HRP = A2.Character:FindFirstChild("HumanoidRootPart");
@@ -1037,7 +1063,7 @@ local scriptCategories = {
         List = {
             {Name = "虚空99夜脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/99%E5%A4%9C%E6%B1%89%E5%8C%96"},
             {Name = "99夜脚本可杀队友", Url = "https://raw.githubusercontent.com/358545698555/roblox-/refs/heads/main/%E5%8F%AF%E6%9D%80%E9%98%9F%E5%8F%8B99%E5%A4%9C"},
-            {Name = "99夜英文脚本", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%A7%8B%E8%BE%9E99%E5%A4%9C%E6%B1%89%E5%8C%96"},
+            {Name = "99夜汉化脚本(无敌有效果)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%A7%8B%E8%BE%9E99%E5%A4%9C%E6%B1%89%E5%8C%96"},
         }
     },
     {
