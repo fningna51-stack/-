@@ -1062,7 +1062,7 @@ local scriptCategories = {
         List = {
             {Name = "AX墨水脚本有芙同享秋辞汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/ax%E8%84%9A%E6%9C%AC%E7%A7%8B%E8%BE%9E%E6%B1%89%E5%8C%96"},
             {Name = "墨水游戏人机汉化(里面有反作弊甩飞)", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/inkgame-ADEN-robot"},
-            {Name = "墨水Ringta汉化", Url = "https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/Ringta"},
+            {Name = "墨水Ringta汉化(无卡密)", Url = "https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/Ringta"},
             {Name = "博伦墨水脚本", Url = "https://pastebin.com/raw/Q64rPkwu"},
             {Name = "Unm汉化，卡密ink50", Url = "https://github.com/youfutongxiang1145/unm-CN/releases/download/unm%E6%B1%89%E5%8C%96/unm.txt"},
         }
@@ -1191,6 +1191,18 @@ local scriptCategories = {
     GroupName = "安静或者死亡",
         List = {
             {Name = "安静或者死亡candyz汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/quietordie-candyz-robo"},
+            }
+    },
+    {
+    GroupName = "盲射",
+        List = {
+            {Name = "盲射ToraIsMe汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/blindshot-ToraIsMe-robot"},
+            }
+    },
+    {
+    GroupName = "彩虹朋友",
+        List = {
+            {Name = "彩虹朋友二UB汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/RainbowFriends-UB-robot"},
             }
     },
     {
