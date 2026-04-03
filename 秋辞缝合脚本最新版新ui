@@ -1258,6 +1258,12 @@ local scriptCategories = {
             }
     },
     {
+    GroupName = "撕咬之夜",
+        List = {
+            {Name = "撕咬之夜", Url = "https://raw.githubusercontent.com/Youfutongxiang1/Msploit-v2-CN/refs/heads/main/Msploit-v2-CN"},
+            }
+    },
+    {
             GroupName = "驾驶帝国",
         List = {
             {Name = "驾驶帝国脚本", Url = "https://raw.githubusercontent.com/Marco8642/science/main/drivingempire"},
