@@ -1395,8 +1395,8 @@ end
 
 local YOffset = 0
 
-YOffset = YOffset + CreateUpdateItem("🆕", "新增功能", "暂无", YOffset)
-YOffset = YOffset + CreateUpdateItem("", "", "暂无", YOffset - 25)
+YOffset = YOffset + CreateUpdateItem("🆕", "新增功能", "撕咬之夜脚本", YOffset)
+YOffset = YOffset + CreateUpdateItem("", "", "应该是英文也可以汉化过了", YOffset - 25)
 
 YOffset = YOffset + CreateUpdateItem("⚡", "AX脚本秋辞汉化", "加群获取，", YOffset)
 YOffset = YOffset + CreateUpdateItem("", "", "并提供翻译错误", YOffset - 25)
