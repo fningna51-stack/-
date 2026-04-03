@@ -1,0 +1,307 @@
+local WasUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/WasKKal/WasUI-For-Roblox/main/WasUI.lua", true))()
+
+if not WasUI then
+    warn("秋辞缝合 加载失败")
+    return
+end
+
+local mainWindow = WasUI:CreateWindow("秋辞纯服务器脚本", nil, nil, nil, true)
+mainWindow:SetWelcome("欢迎使用 秋辞多功能脚本")
+
+WasUI.DialogTitle = "确定要退出吗？"
+WasUI:SetGroupButtonText("加入QQ群")
+WasUI:SetGroupCopyContent("938714427")
+
+local tabGame = mainWindow:AddTab("脚本中心")
+local tabAbout = mainWindow:AddTab("关于")
+
+local function addSpacing(target, height)
+    local spacing = Instance.new("Frame")
+    spacing.Name = "Spacing"
+    spacing.Size = UDim2.new(1, 0, 0, height or 4)
+    spacing.BackgroundTransparency = 1
+    spacing.Parent = target
+end
+
+local scriptCategories = {
+    {
+        GroupName = "各大脚本",
+        List = {
+            {Name = "秋容脚本复刻版", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%A7%8B%E5%AE%B9%E8%84%9A%E6%9C%AC%E5%A4%8D%E5%88%BB%E7%89%88"},
+            {Name = "叶脚本", Url = "https://raw.githubusercontent.com/roblox-ye/QQ515966991/refs/heads/main/ROBLOX-CNVIP-XIAOYE.lua"},
+            {Name = "xk脚本", Url = "https://github.com/devslopo/DVES/raw/main/XK%20Hub"},
+            {Name = "新版XA脚本", Url = "https://github.com/YunLua/Lua/raw/main/XA_Hub.lua"},
+            {Name = "皮脚本", Url = "https://raw.githubusercontent.com/xiaopi77/xiaopi77/main/QQ1002100032-Roblox-Pi-script.lua"},
+            {Name = "BHBOU脚本", Url = "https://raw.githubusercontent.com/xiaopi77/xiaopi77/main/QQ1002100032-Roblox-Pi-script.lua"},
+        }
+    },
+    {
+        GroupName = "99夜",
+        List = {
+            {Name = "虚空99夜脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/99%E5%A4%9C%E6%B1%89%E5%8C%96"},
+            {Name = "99夜脚本可杀队友", Url = "https://raw.githubusercontent.com/358545698555/roblox-/refs/heads/main/%E5%8F%AF%E6%9D%80%E9%98%9F%E5%8F%8B99%E5%A4%9C"},
+            {Name = "99夜汉化脚本(无敌有效果)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%A7%8B%E8%BE%9E99%E5%A4%9C%E6%B1%89%E5%8C%96"},
+        }
+    },
+    {
+        GroupName = "亡命速递",
+        List = {
+            {Name = "亡命速递脚本无法使用", Url = "https://raw.githubusercontent.com/JanseJYC/Script/refs/heads/main/Deadly-Deliver.lua"},
+            {Name = "亡命速递英文脚本", Url = "https://raw.githubusercontent.com/xxdaysheus01/RuneX/refs/heads/main/DeadlyDeliveryScript.lua"},
+            {Name = "亡命速递", Url = "https://pandadevelopment.net/virtual/file/c96973c95ae3aaec"},
+        }
+    },
+    {
+        GroupName = "死铁轨",
+        List = {
+            {Name = "仿红叶脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E4%BB%BF%E7%BA%A2%E5%8F%B6%E8%84%9A%E6%9C%AC%E6%B1%89%E5%8C%96"},
+            {Name = "红叶脚本", Url = "https://getnative.cc/script/loader"},
+            {Name = "速通脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%AD%BB%E9%93%81%E8%BD%A8%E6%B1%89%E5%8C%96%E8%84%9A%E6%9C%AC"},
+            {Name = "死铁轨脚本", Url = "https://raw.githubusercontent.com/gumanba/Scripts/refs/heads/main/DeadRails"},
+        }
+    },
+    {
+        GroupName = "墨水游戏",
+        List = {
+            {Name = "AX墨水脚本有芙同享秋辞汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/ax%E8%84%9A%E6%9C%AC%E7%A7%8B%E8%BE%9E%E6%B1%89%E5%8C%96"},
+            {Name = "墨水游戏人机汉化(里面有反作弊甩飞)", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/inkgame-ADEN-robot"},
+            {Name = "墨水Ringta汉化(无卡密)", Url = "https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/Ringta"},
+            {Name = "博伦墨水脚本", Url = "https://pastebin.com/raw/Q64rPkwu"},
+            {Name = "Unm汉化，卡密ink50", Url = "https://github.com/youfutongxiang1145/unm-CN/releases/download/unm%E6%B1%89%E5%8C%96/unm.txt"},
+        }
+    },
+    {
+        GroupName = "doors",
+        List = {
+            {Name = "Doors脚本", Url = "https://raw.githubusercontent.com/atnew2025/Chinese-scripts/refs/heads/main/mshax(prohax).txt"},
+            {Name = "doors最新脚本", Url = "https://raw.githubusercontent.com/TheHunterSolo1/Scripts/refs/heads/main/Protected_2809220311826785.lua.txt"},
+            {Name = "doorsDP汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/doors-DP-robot"},
+        }
+    },
+    {
+        GroupName = "监狱生活",
+        List = {
+            {Name = "监狱生活汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%9B%91%E7%8B%B1%E7%94%9F%E6%B4%BB%E8%84%9A%E6%9C%AC"},
+        }
+    },
+    {
+        GroupName = "战争大亨",
+        List = {
+            {Name = "战争大亨最强脚本", Url = "https://raw.githubusercontent.com/MaxPikaa/PureLove/refs/heads/main/520"},
+            {Name = "战争大亨无卡密高级脚本", Url = "https://raw.githubusercontent.com/Macintosh1983/ChillHubMain/main/ChillHubOilWarfareTycoon.lua"},
+        }
+    },
+    {
+        GroupName = "被遗弃",
+        List = {
+            {Name = "被遗弃无卡密超好用", Url = "https://rawscripts.net/raw/G666-Forsaken-Keyless-auto-gen-reach-autoblock-+-more-63283"},
+            {Name = "被遗弃英文无卡密", Url = "https://github.com/shenxiuqi974/guesting-but-chinese/releases/download/hushwhw/default.txt"},
+        }
+    },
+    {
+        GroupName = "俄亥俄州",
+        List = {
+            {Name = "俄亥俄州英文脚本", Url = "https://raw.githubusercontent.com/PUSCRIPTS/V1sion/refs/heads/main/Pinguin"},
+            {Name = "晓辞俄亥俄州基础功能脚本", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%99%93%E8%BE%9E%E4%BF%84%E4%BA%A5%E4%BF%84%E5%B7%9E%E5%9F%BA%E7%A1%80%E5%8A%9F%E8%83%BD%E8%84%9A%E6%9C%AC"},
+            {Name = "俄亥俄州英文脚本", Url = "https://raw.githubusercontent.com/rxn-xyz/Ohio./main/Ohio.lua"},
+        }
+    },
+    {
+        GroupName = "画我",
+        List = {
+            {Name = "无卡密画我脚本", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/KENNY画我.lua"},
+        }
+    },
+    {
+        GroupName = "通缉脚本",
+        List = {
+            {Name = "SX HUB", Url = "https://api.luarmor.net/files/v3/loaders/87a8a4f4c2d2ef535ccd1bdb949218fe.lua"},
+            {Name = "KENNY", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/KENNY通缉换服.lua"},
+            {Name = "通缉", Url = "https://raw.githubusercontent.com/combatlegnd/combatlegnd/refs/heads/main/NH-Loader"},
+        }
+    },
+    {
+        GroupName = "闪光",
+        List = {
+            {Name = "闪光脚本", Url = "https://apigetunx.vercel.app/UNX.lua"},
+        }
+    },
+    {
+        GroupName = "最坚强的战场",
+        List = {
+            {Name = "最强战场Phantasm汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/thestongestbattlegrounds-Phantasm-robot"},
+            {Name = "最坚强的战场脚本2", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/phantasm.lua"},
+        }
+    },
+    {
+        GroupName = "偷走脑红",
+        List = {
+            {Name = "偷走脑红脚本", Url = "https://raw.githubusercontent.com/DynaFetchy/Scripts/refs/heads/main/Loader.lua"},
+            {Name = "偷走脑红脚本2", Url = "https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/偷走脑红"},
+            {Name = "偷走脑红KURD汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/Brainrot-KURD-robot"},
+        }
+    },
+    {
+        GroupName = "萨凡娜",
+        List = {
+            {Name = "萨凡娜-悔脚本", Url = "https://raw.githubusercontent.com/sdxs221/sd/main/萨凡娜"},
+        }
+    },
+    {
+        GroupName = "住宅大逃杀",
+        List = {
+            {Name = "住宅大逃杀-悔脚本", Url = "https://raw.githubusercontent.com/sdxs221/sd/main/住宅大屠杀"},
+        }
+    },
+    {
+        GroupName = "竞争对手",
+        List = {
+            {Name = "竞争对手脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/竞争对手汉化脚本"},
+        }
+    },
+    {
+        GroupName = "chain脚本",
+        List = {
+            {Name = "chain英文脚本", Url = "https://api.getpolsec.com/scripts/hosted/79fcede2ce14619990c741986e6123ddbc41cd9e4a25c4dc4da13c5f63a25f2b.lua"},
+        }
+    },
+    {
+        GroupName = "跳跃对决",
+        List = {
+            {Name = "跳跃对决脚本", Url = "https://raw.githubusercontent.com/solarastuff/sorryjimpee/refs/heads/main/Jumper.lua"},
+        }
+    },
+    {
+        GroupName = "死亡球",
+        List = {
+            {Name = "死亡球Fluxin汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/deathball-Fluxin-robot"},
+            {Name = "死亡球stark汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/Deathballs-stark-robot"},
+        }
+    },
+    {
+        GroupName = "监狱人生",
+        List = {
+            {Name = "监狱人生Rayfield汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/prisonlife-Rayfield-robot"},
+        }
+    },
+    {
+        GroupName = "逃脱海啸",
+        List = {
+            {Name = "逃脱海啸并带走红Merqur汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/EscapeTsunamiForBrinrots-Merqury-robot"},
+            {Name = "逃脱海啸并拿走脑红Solix汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/EscapeTsunamiForBrinrots-Solix-robot"},
+        }
+    },
+    {
+        GroupName = "安静或者死亡",
+        List = {
+            {Name = "安静或者死亡candyz汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/quietordie-candyz-robo"},
+        }
+    },
+    {
+        GroupName = "盲射",
+        List = {
+            {Name = "盲射ToraIsMe汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/blindshot-ToraIsMe-robot"},
+        }
+    },
+    {
+        GroupName = "彩虹朋友",
+        List = {
+            {Name = "彩虹朋友二UB汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/RainbowFriends-UB-robot"},
+        }
+    },
+    {
+        GroupName = "撕咬之夜",
+        List = {
+            {Name = "撕咬之夜", Url = "https://raw.githubusercontent.com/Youfutongxiang1/Msploit-v2-CN/refs/heads/main/Msploit-v2-CN"},
+            {Name = "殺脚本撕咬之夜", Url = "https://raw.githubusercontent.com/FengYu-X/Max/refs/heads/X/BBN.lua"},
+        }
+    },
+    {
+        GroupName = "死刑",
+        List = {
+            {Name = "死刑脚本(无卡密)", Url = "https://api.luarmor.net/files/v3/loaders/8c08b8f2252eec7dbb78d253d269bb65.lua"},
+        }
+    },
+    {
+        GroupName = "驾驶帝国",
+        List = {
+            {Name = "驾驶帝国脚本", Url = "https://raw.githubusercontent.com/Marco8642/science/main/drivingempire"},
+        }
+    }
+}
+
+-- 循环生成所有脚本按钮
+for _, category in ipairs(scriptCategories) do
+    WasUI:CreateCategory(tabGame, category.GroupName)
+    addSpacing(tabGame)
+    for _, script in ipairs(category.List) do
+        WasUI:CreateButton(tabGame, script.Name, function()
+            local success, err = pcall(function()
+                loadstring(game:HttpGet(script.Url))()
+            end)
+            if success then
+                WasUI:Notify({
+                    Title = "加载成功",
+                    Content = script.Name,
+                    Duration = 3
+                })
+            else
+                WasUI:Notify({
+                    Title = "加载失败",
+                    Content = "链接可能失效",
+                    Duration = 3
+                })
+            end
+        end)
+        addSpacing(tabGame)
+    end
+end
+
+-- 额外工具
+WasUI:CreateCategory(tabGame, "实用工具")
+addSpacing(tabGame)
+
+WasUI:CreateButton(tabGame, "TX全自动翻译", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/JsYb666/Item/refs/heads/main/Auto-language"))()
+    WasUI:Notify({Title = "翻译", Content = "已加载", Duration = 2})
+end)
+addSpacing(tabGame)
+
+WasUI:CreateButton(tabGame, "音乐播放器", function()
+    loadstring(game:HttpGet("http://music.567099.xyz/music.php"))()
+    WasUI:Notify({Title = "音乐", Content = "播放器已加载", Duration = 2})
+end)
+addSpacing(tabGame)
+
+WasUI:CreateCategory(tabAbout, "关于")
+addSpacing(tabAbout)
+
+WasUI:CreateLabel(tabAbout, "秋辞多功能脚本")
+WasUI:CreateLabel(tabAbout, "QQ群：938714427")
+WasUI:CreateLabel(tabAbout, "快手：XQWANYYDS")
+WasUI:CreateLabel(tabAbout, "F1 显示/隐藏窗口")
+
+WasUI:CreateButton(tabAbout, "复制QQ群链接", function()
+    setclipboard("https://qun.qq.com/universal-share/share?ac=1&authKey=bEmFYn95LgJAyVYjM00CBWVn8i23mWAyj5Z%2Ba3rithMWPxzDwKlZ9wKtaB7q2s6n&busi_data=eyJncm91cENvZGUiOiI5Mzg3MTQ0MjciLCJ0b2tlbiI6IkFGL2Z6QTE5WUNRU2UrOGF6SzRQRVJDdmc5YzJjZVVmQXdEbmhObHNnRUhQZDUzL3djamJUdm5SRThDSjFrQmYiLCJ1aW4iOiIzNDM1Mjg2MTc3In0%3D&data=ahUTHr2un-Gf0AHE1oBjxdt0-y4VEoLSnZ1D6Ve-6KdsYM4R_Rw-hJ-amg0HfFokPb9CyhFVCDesPER_Ave_8A&svctype=4&tempid=h5_group_info")
+    WasUI:Notify({Title = "复制", Content = "QQ群链接已复制", Duration = 2})
+end)
+addSpacing(tabAbout)
+
+WasUI:CreateButton(tabAbout, "复制快手号", function()
+    setclipboard("XQWANYYDS")
+    WasUI:Notify({Title = "复制", Content = "快手号已复制", Duration = 2})
+end)
+addSpacing(tabAbout)
+
+game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.F1 then
+        if mainWindow.IsMinimized then
+            mainWindow:RestoreFromDots()
+        else
+            mainWindow:MinimizeToDots()
+        end
+    end
+end)
+
+WasUI:Notify({Title = "加载完成", Content = "脚本已就绪", Duration = 3})
