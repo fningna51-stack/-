@@ -1,7 +1,7 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/nfpw/Simple-KeySystem-Roblox/refs/heads/main/Library.lua"))()
 
 local KeyWindow = Library:CreateWindow("密钥系统", UDim2.fromOffset(300, 180))
-local UpdateWindow = Library:CreateWindow("更新日志", UDim2.fromOffset(300, 300))
+local UpdateWindow = Library:CreateWindow("秋辞缝合更新内容一定要看", UDim2.fromOffset(300, 300))
 UpdateWindow.Outer.Position = UDim2.new(0.7, 0, 0.5, 0)
 
 local KeyBox = KeyWindow:AddTextBox("输入密钥...", UDim2.new(0.1, 0, 0.15, 0))
@@ -16,7 +16,7 @@ if SavedKey then
     RememberToggle.SetState(true)
 end
 
-local SubmitButton = KeyWindow:AddButton("提交", UDim2.new(0.1, 0, 0.65, 0), function()
+local SubmitButton = KeyWindow:AddButton("执行脚本", UDim2.new(0.1, 0, 0.65, 0), function()
     if KeyBox.Text == "GsjdtyGjwUYbcsdQokL" then
         if RememberToggle.GetState() then
             Library:SaveKey(KeyPath, FileName, KeyBox.Text)
@@ -28,7 +28,7 @@ local SubmitButton = KeyWindow:AddButton("提交", UDim2.new(0.1, 0, 0.65, 0), f
 local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
 local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
-
+        
 do
     local function createTimeLabel()
         local ScreenGui = Instance.new("ScreenGui")
@@ -111,20 +111,11 @@ local Window = Library:CreateWindow({
 
 local Tabs = {
     Universal = Window:AddTab("通用", "user"),
-    Announcement = Window:AddTab("公告", "dog"),
     ScriptCenter = Window:AddTab("脚本中心", "cat"),
+    ScriptTbgvfg = Window:AddTab("绘制(透视)", "key"),
     Settings = Window:AddTab("UI设置", "settings")
 }
 
-local AnnouncementGroup = Tabs.Announcement:AddLeftGroupbox("秋辞脚本公告")
-AnnouncementGroup:AddLabel("添加UNM新汉化")
-AnnouncementGroup:AddLabel("还添加好多好用的脚本")
-AnnouncementGroup:AddLabel("感谢汉化部一直以来的努力汉化")
-AnnouncementGroup:AddLabel("汉化：人机  汉化：有芙同享")
-AnnouncementGroup:AddLabel("为大家提供最好的最实用的")
-AnnouncementGroup:AddLabel("脚本大全预计添加100个服务器的脚本")
-AnnouncementGroup:AddLabel("GO！GO！GO！")
-AnnouncementGroup:AddLabel("🤓🤔🤔")
 local UniversalLeftGroup = Tabs.Universal:AddLeftGroupbox("各种功能");
 local UniversalRightGroup = Tabs.Universal:AddRightGroupbox("信息与翻译");
 local A17 = nil;
@@ -1071,6 +1062,14 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/JsYb666/Item/refs/hea
                 Func();
         end
 end});
+UniversalRightGroup:AddLabel("音乐播放器");
+UniversalRightGroup:AddButton({Text="音乐播放器脚本",Func=function()
+        loadstring(game:HttpGet("http://music.567099.xyz/music.php"))()
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
 
 local scriptCategories = {
     {
@@ -1150,8 +1149,9 @@ local scriptCategories = {
     {
     GroupName = "俄亥俄州",
         List = {
-            {Name = "俄亥俄州汉化脚本", Url = "https://raw.githubusercontent.com/tnine-n9/tnine/refs/heads/main/free.lua"},
+            {Name = "俄亥俄州英文脚本", Url = "https://raw.githubusercontent.com/PUSCRIPTS/V1sion/refs/heads/main/Pinguin"},
             {Name = "晓辞俄亥俄州基础功能脚本", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%99%93%E8%BE%9E%E4%BF%84%E4%BA%A5%E4%BF%84%E5%B7%9E%E5%9F%BA%E7%A1%80%E5%8A%9F%E8%83%BD%E8%84%9A%E6%9C%AC"},
+            {Name = "俄亥俄州英文脚本", Url = "https://raw.githubusercontent.com/rxn-xyz/Ohio./main/Ohio.lua"},
         }
     },
     {
@@ -1261,6 +1261,13 @@ local scriptCategories = {
     GroupName = "撕咬之夜",
         List = {
             {Name = "撕咬之夜", Url = "https://raw.githubusercontent.com/Youfutongxiang1/Msploit-v2-CN/refs/heads/main/Msploit-v2-CN"},
+            {Name = "殺脚本撕咬之夜", Url = "https://raw.githubusercontent.com/FengYu-X/Max/refs/heads/X/BBN.lua"},
+            }
+    },
+    {
+    GroupName = "死刑",
+        List = {
+            {Name = "死刑脚本(无卡密)", Url = "https://api.luarmor.net/files/v3/loaders/8c08b8f2252eec7dbb77d253d269bb65.lua"},
             }
     },
     {
@@ -1395,13 +1402,14 @@ end
 
 local YOffset = 0
 
-YOffset = YOffset + CreateUpdateItem("🆕", "新增功能", "撕咬之夜脚本", YOffset)
-YOffset = YOffset + CreateUpdateItem("", "", "应该是英文也可以汉化过了", YOffset - 25)
+YOffset = YOffset + CreateUpdateItem("🆕", "新增功能", "嘶哑之夜，死刑脚本，新添加2个俄亥俄州英文脚本\n把原版的公告给进行了删除\n俄亥俄州脚本可能不好用尽量别用\n绘制功能正在开发尽请期待", YOffset)
+
+YOffset = YOffset + CreateUpdateItem("🏠", "主要公告介绍", "势必为大家找到好玩而且免费的脚本\n预计给大家添加100多种服务器的脚本，", YOffset)
+
+YOffset = YOffset + CreateUpdateItem("🔑", "英文脚本汉化", "如果是英文脚本请使用TX全自动汉化进行汉化，", YOffset)
 
 YOffset = YOffset + CreateUpdateItem("⚡", "AX脚本秋辞汉化", "加群获取，", YOffset)
-YOffset = YOffset + CreateUpdateItem("", "", "并提供翻译错误", YOffset - 25)
 
-YOffset = YOffset + CreateUpdateItem("🔧", "BUG修复", "暂无", YOffset)
-YOffset = YOffset + CreateUpdateItem("", "", "以及多处用户界面改进", YOffset - 25)
+YOffset = YOffset + CreateUpdateItem("🔧", "BUG修复", "把无法执行的脚本修复了", YOffset)
 
-ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, YOffset + 20)
+ScrollFrame.CanvasSize = UDim2.new(2, 5, 0.5, YOffset + 25)
