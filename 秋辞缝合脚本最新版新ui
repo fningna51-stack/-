@@ -1735,6 +1735,8 @@ end
 
 local YOffset = 0
 
+YOffset = YOffset + CreateUpdateItem("😂", "某些乐子", "觉得卡密傻就别用这个脚本免费给你好用的脚本又叫上了\n可能会说又不是只有我这一个缝合我用别的\n那就去用别人的我这里不欢迎没有素质的人", YOffset)
+
 YOffset = YOffset + CreateUpdateItem("🆕", "新增功能", "添加更多的通用脚本\n还添加了动作的脚本", YOffset)
 
 YOffset = YOffset + CreateUpdateItem("🏠", "主要公告介绍", "势必为大家找到好玩而且免费的脚本\n预计给大家添加100多种服务器的脚本，", YOffset)
