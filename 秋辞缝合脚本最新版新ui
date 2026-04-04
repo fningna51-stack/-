@@ -28,7 +28,6 @@ local SubmitButton = KeyWindow:AddButton("执行脚本", UDim2.new(0.1, 0, 0.65,
 local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
 local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
-        
 do
     local function createTimeLabel()
         local ScreenGui = Instance.new("ScreenGui")
@@ -86,7 +85,6 @@ do
         end
     end)
 end
-
 local Options = Library.Options
 local Toggles = Library.Toggles
 local A1 = game:GetService("Players")
@@ -195,6 +193,244 @@ UniversalLeftGroup:AddToggle("NightVisionToggle", {Text="夜视",Default=false,C
                 A4.GlobalShadows = true;
         end
 end});
+local TranslationStats = {
+    TranslationCount = 0,
+    TranslationSpeed = 0,
+    LastUpdateTime = tick(),
+    TranslationsPerMinute = 0
+}
+
+local function SetupAutoTranslation()
+    local Http = game:GetService("HttpService")
+    local Players = game:GetService("Players")
+    local CoreGui = game:GetService("CoreGui")
+    
+    local request = request or http_request or 
+        (syn and syn.request) or 
+        (fluxus and fluxus.request)
+    
+    if not (request and hookmetamethod) then
+        safeNotify("翻译错误", "不支持此执行器", 5)
+        return
+    end
+    
+    local Encode, Decode, Spawn = 
+        Http.UrlEncode, 
+        Http.JSONDecode, 
+        task.spawn
+    
+    local Cache, Queue, RealText, Locks = 
+        {}, 
+        {}, 
+        setmetatable({}, { __mode = "k" }), 
+        {}
+    
+    local API = "https://clients5.google.com/translate_a/t?client=dict-chrome-ex&sl=auto&tl=zh-CN&q="
+    local MonitoredContainers = {}
+    
+    local OldIdx
+    OldIdx = hookmetamethod(game, "__index", function(t, k)
+        if k == "Text" and not checkcaller() then
+            return RealText[t]
+        end
+        return OldIdx(t, k)
+    end)
+    
+    local function UpdateTranslationStats()
+        local currentTime = tick()
+        local elapsedMinutes = (currentTime - TranslationStats.LastUpdateTime) / 60
+        if elapsedMinutes > 0 then
+            TranslationStats.TranslationsPerMinute = TranslationStats.TranslationCount / elapsedMinutes
+        end
+    end
+    
+    local function SetTrans(obj, origin, trans, vars)
+        if obj.Text ~= origin then
+            return
+        end
+        local k = 0
+        local val = trans:gsub("%s?{[nN]}%s?", function()
+            k = k + 1
+            return vars[k] or ""
+        end)
+        if obj.Text ~= val then
+            Locks[obj] = true
+            RealText[obj] = origin
+            obj.Text = val
+            Locks[obj] = nil
+            
+            TranslationStats.TranslationCount = TranslationStats.TranslationCount + 1
+            UpdateTranslationStats()
+        end
+    end
+    
+    local function Process(obj)
+        if Locks[obj] then
+            return
+        end
+        local txt = obj.Text
+        if #txt < 2 then
+            return
+        end
+        if txt:match("^[%d%s%p]+$") then
+            return
+        end
+        local vars = {}
+        local skel = txt:gsub("[%+$%-¥]?%d+[%d%.%,:]*[%d%%]*", function(m)
+            vars[#vars + 1] = m
+            return "{n}"
+        end)
+        if Cache[skel] then
+            return SetTrans(obj, txt, Cache[skel], vars)
+        end
+        local q = Queue[skel]
+        if q then
+            q[#q + 1] = { obj, vars, txt }
+            return
+        end
+        Queue[skel] = { { obj, vars, txt } }
+        Spawn(function()
+            local s, r = pcall(request, { 
+                Url = API .. Encode(Http, skel), 
+                Method = "GET" 
+            })
+            local d = s and r.StatusCode == 200 and Decode(Http, r.Body)
+            local res = type(d) == "table" and 
+                (type(d[1]) == "string" and d[1] or d[1][1])
+            if res then
+                Cache[skel] = res
+                for _, i in next, Queue[skel] do
+                    if i[1].Parent then
+                        SetTrans(i[1], i[3], res, i[2])
+                    end
+                end
+            end
+            Queue[skel] = nil
+        end)
+    end
+    
+    local function MonitorContainer(container)
+        if MonitoredContainers[container] then
+            return
+        end
+        MonitoredContainers[container] = true
+        for _, v in next, container:GetDescendants() do
+            if v:IsA("TextLabel") or 
+               v:IsA("TextButton") or 
+               v:IsA("TextBox") then
+                Process(v)
+                v:GetPropertyChangedSignal("Text"):Connect(function()
+                    Process(v)
+                end)
+            end
+        end
+        container.DescendantAdded:Connect(function(child)
+            if child:IsA("TextLabel") or 
+               child:IsA("TextButton") or 
+               child:IsA("TextBox") then
+                Process(child)
+                child:GetPropertyChangedSignal("Text"):Connect(function()
+                    Process(child)
+                end)
+            end
+        end)
+    end
+    
+    local function StartTranslation()
+        local Roots = { 
+            Players.LocalPlayer:WaitForChild("PlayerGui"), 
+            (gethui and gethui()) or CoreGui, 
+            workspace 
+        }
+        
+        for _, root in next, Roots do
+            MonitorContainer(root)
+        end
+        
+        if CoreGui:FindFirstChildWhichIsA("ScreenGui") then
+            for _, gui in next, CoreGui:GetChildren() do
+                if gui:IsA("ScreenGui") then
+                    MonitorContainer(gui)
+                end
+            end
+        end
+        
+        CoreGui.ChildAdded:Connect(function(child)
+            if child:IsA("ScreenGui") then
+                MonitorContainer(child)
+            end
+        end)
+        
+        Players.LocalPlayer:WaitForChild("PlayerGui").ChildAdded:Connect(function(child)
+            if child:IsA("GuiBase2d") then
+                MonitorContainer(child)
+            end
+        end)
+        
+        workspace.DescendantAdded:Connect(function(child)
+            if child:IsA("SurfaceGui") or child:IsA("BillboardGui") then
+                MonitorContainer(child)
+            end
+        end)
+    end
+    
+    return StartTranslation
+end
+
+local startTranslationFunc
+local translationActive = false
+
+UniversalLeftGroup:AddToggle("AutoTranslateToggle", {
+    Text = "自动翻译(墨水游戏会被检测秒封)", 
+    Default = false, 
+    Callback = function(Value)
+        if Value then
+            if not startTranslationFunc then
+                startTranslationFunc = SetupAutoTranslation()
+            end
+            
+            TranslationStats.TranslationCount = 0
+            TranslationStats.TranslationSpeed = 0
+            TranslationStats.LastUpdateTime = tick()
+            TranslationStats.TranslationsPerMinute = 0
+            
+            startTranslationFunc()
+            translationActive = true
+            
+            -- 启动统计更新
+            spawn(function()
+                while translationActive and wait(5) do
+                    UpdateTranslationStats()
+                end
+            end)
+        else
+            translationActive = false
+        end
+    end
+})
+
+-- 在右侧信息组添加翻译统计显示
+UniversalRightGroup:AddLabel("翻译统计:")
+local TranslatedLabel = UniversalRightGroup:AddLabel("已翻译: 0")
+local SpeedLabel = UniversalRightGroup:AddLabel("速度: 0/分钟")
+
+-- 创建函数来更新统计显示
+local function UpdateTranslationDisplay()
+    if TranslatedLabel and SpeedLabel then
+        TranslatedLabel:SetText("已翻译: " .. tostring(TranslationStats.TranslationCount))
+        SpeedLabel:SetText("速度: " .. string.format("%.1f/分钟", TranslationStats.TranslationsPerMinute))
+    end
+end
+
+spawn(function()
+    while wait(5) do
+        if translationActive then
+            UpdateTranslationStats()
+            UpdateTranslationDisplay()
+        end
+    end
+end)
+
 UniversalLeftGroup:AddToggle("BulletTrackingToggle", {Text="通用子弹追踪",Default=false,Callback=function(Enabled)
         if Enabled then
                 if not bulletTrackingHook then
@@ -1008,6 +1244,18 @@ UniversalLeftGroup:AddButton({Text="取消坠落伤害",Func=function()
                 end
         end
 end});
+UniversalLeftGroup:AddButton({Text="走路创人",Func=function()
+        if A2.Character then
+                local HRP = A2.Character:FindFirstChild("HumanoidRootPart");
+                if HRP then
+                        local ScriptContent = game:HttpGet("https://raw.githubusercontent.com/0Ben1/fe./main/Fling%20GUI");
+                        local Func = loadstring(ScriptContent);
+                        if Func then
+                                Func();
+                        end
+                end
+        end
+end});
 UniversalLeftGroup:AddButton({Text="穿墙模式",Func=function()
         A19 = not A19;
         if A22 then
@@ -1307,6 +1555,32 @@ for _, category in ipairs(scriptCategories) do
 end
 
 local SettingsGroup = Tabs.Settings:AddLeftGroupbox("系统设置");
+
+SettingsGroup:AddButton({Text="查看公告",Func=function()
+        Library:Notify("查看公告功能", 3);
+end});
+
+SettingsGroup:AddButton({Text="重新加载公告",Func=function()
+        local gui = A5:FindFirstChild("AnnouncementGui");
+        if gui then
+                gui:Destroy();
+        end
+        wait(0.1);
+        Library:Notify("公告已重新加载", 3);
+end});
+
+local function updateTimeButtonState()
+    local timeGui = game:GetService("CoreGui"):FindFirstChild("TimeDisplayGUI")
+    if timeGui then
+        local timeLabel = timeGui:FindFirstChild("TimeLabel")
+        if timeLabel then
+            return timeLabel.Visible
+        end
+    end
+    return false
+end
+
+local SettingsGroup = Tabs.Settings:AddLeftGroupbox("系统设置");
 SettingsGroup:AddButton({Text="查看公告",Func=function()
         Library:Notify("查看公告功能", 3);
 end});
@@ -1318,6 +1592,42 @@ SettingsGroup:AddButton({Text="重新加载公告",Func=function()
         wait(0.1);
         Library:Notify("公告已重新加载", 3);
 end});
+
+local timeToggleBtn = SettingsGroup:AddButton("隐藏时间显示", function()
+    local timeGui = game:GetService("CoreGui"):FindFirstChild("TimeDisplayGUI")
+    
+    if timeGui then
+        local timeLabel = timeGui:FindFirstChild("TimeLabel")
+        local toggleButton = timeGui:FindFirstChild("ToggleButton")
+        
+        if timeLabel then
+            if timeLabel.Visible then
+                timeLabel.Visible = false
+                if toggleButton then
+                    toggleButton.Text = "显示"
+                    toggleButton.BackgroundColor3 = Color3.fromRGB(40, 160, 40)
+                end
+                
+                timeToggleBtn:SetText("显示时间显示")
+                Library:Notify("时间显示已隐藏", 3)
+            else
+                timeLabel.Visible = true
+                if toggleButton then
+                    toggleButton.Text = "隐藏"
+                    toggleButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+                end
+                
+                timeToggleBtn:SetText("隐藏时间显示")
+                Library:Notify("时间显示已显示", 3)
+            end
+        else
+            Library:Notify("未找到时间标签", 3)
+        end
+    else
+        Library:Notify("时间显示GUI未找到", 3)
+    end
+end)
+
 SettingsGroup:AddButton('卸载脚本', function() Library:Unload() end)
 
 ThemeManager:SetLibrary(Library);
@@ -1402,7 +1712,7 @@ end
 
 local YOffset = 0
 
-YOffset = YOffset + CreateUpdateItem("🆕", "新增功能", "嘶哑之夜，死刑脚本，新添加2个俄亥俄州英文脚本\n把原版的公告给进行了删除\n俄亥俄州脚本可能不好用尽量别用\n绘制功能正在开发尽请期待", YOffset)
+YOffset = YOffset + CreateUpdateItem("🆕", "新增功能", "自动翻译，时间隐藏和显示开关在最后设置里面", YOffset)
 
 YOffset = YOffset + CreateUpdateItem("🏠", "主要公告介绍", "势必为大家找到好玩而且免费的脚本\n预计给大家添加100多种服务器的脚本，", YOffset)
 
