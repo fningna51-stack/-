@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>领取卡密 - 秋楓（增强验证版）</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body { 
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; 
+            text-align: center; 
+            padding: 20px; 
+            max-width: 450px; 
+            margin: 0 auto;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        
+        .description {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .step { 
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            padding: 20px; 
+            margin: 15px 0; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 4px solid #FF6B6B;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .step.completed {
+            border-left-color: #4CAF50;
+            background: linear-gradient(135deg, #f0f8f0 0%, #e8f5e9 100%);
+        }
+        
+        .step-number {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            background: #FF6B6B;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .step.completed .step-number {
+            background: #4CAF50;
+        }
+        
+        .step h3 { 
+            color: #333; 
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .step p { 
+            color: #666; 
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .status.pending {
+            background: #ffeb3b;
+            color: #333;
+        }
+        
+        .status.completed {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .step.completed h3::after {
+            content: " ✓";
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        button { 
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
+            color: white; 
+            border: none; 
+            padding: 12px 25px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 15px; 
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(255, 107, 107, 0.2);
+        }
+        
+        button:hover:not(:disabled) { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(255, 107, 107, 0.3);
+        }
+        
+        button:disabled { 
+            background: #cccccc; 
+            cursor: not-allowed; 
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .verify-button {
+            background: linear-gradient(135deg, #2196F3 0%, #21CBF3 100%);
+            margin-right: 10px;
+        }
+        
+        .countdown {
+            font-size: 12px;
+            color: #FF9800;
+            margin-top: 8px;
+            font-weight: bold;
+        }
+        
+        #cardKey { 
+            font-size: 18px; 
+            font-weight: bold; 
+            color: #4CAF50; 
+            word-break: break-all;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8fff8;
+            border-radius: 8px;
+            border: 2px solid #4CAF50;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+        }
+        
+        a { 
+            text-decoration: none; 
+            display: inline-block;
+        }
+        
+        .tip {
+            font-size: 12px;
+            color: #999;
+            margin-top: 8px;
+            font-style: italic;
+        }
+        
+        .progress-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0 30px;
+            position: relative;
+        }
+        
+        .progress-bar {
+            flex-grow: 1;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin: 0 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FF6B6B, #4CAF50);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            z-index: 2;
+        }
+        
+        .progress-step.active {
+            background: #FF6B6B;
+        }
+        
+        .progress-step.completed {
+            background: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎁 领取卡密</h1>
+        <p class="description">请按顺序完成以下任务即可获取您的专属卡密</p>
+        
+        <div class="progress-container">
+            <div class="progress-step completed" id="step1-progress">1</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-step" id="step2-progress">2</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill-2"></div>
+            </div>
+            <div class="progress-step" id="step3-progress">3</div>
+        </div>
+
+        <!-- 步骤1：加入QQ群 -->
+        <div class="step" id="step1">
+            <div class="step-number">1</div>
+            <h3>加入QQ群聊 <span class="status pending" id="step1-status">未完成</span></h3>
+            <p>点击下方按钮加入群聊获取最新活动通知，完成加群后返回本页面</p>
+            <a href="https://qm.qq.com/q/你的QQ群号" target="_blank" id="qq-link">
+                <button>立即加入QQ群</button>
+            </a>
+            <button class="verify-button" onclick="verifyStep1()">我已加群 ✓</button>
+            <p class="tip">提示：完成加群后请点击右侧验证按钮</p>
+        </div>
+
+        <!-- 步骤2：跳转快手关注 -->
+        <div class="step" id="step2">
+            <div class="step-number">2</div>
+            <h3>关注快手账号 <span class="status pending" id="step2-status">未完成</span></h3>
+            <p>点击跳转快手关注【秋楓】后返回本页</p>
+            <a href="https://v.kuaishou.com/你的快手短链" target="_blank" id="kuaishou-link">
+                <button>去快手关注</button>
+            </a>
+            <div>
+                <button class="verify-button" onclick="startVerification()" id="verify-btn">开始验证关注</button>
+                <div class="countdown" id="countdown" style="display:none;">请在新页面停留<span id="time">10</span>秒以确保关注完成...</div>
+            </div>
+        </div>
+
+        <!-- 步骤3：获取卡密 -->
+        <div class="step" id="step3">
+            <div class="step-number">3</div>
+            <h3>领取卡密 <span class="status pending" id="step3-status">已锁定</span></h3>
+            <p>完成以上所有步骤后即可领取您的卡密</p>
+            <button onclick="generateKey()" id="getKeyBtn" disabled>完成前两步后解锁</button>
+            <div id="cardKey"></div>
+        </div>
+        
+        <div style="margin-top: 20px; font-size: 12px; color: #888;">
+            <p>⚠️ 注意事项：请按顺序完成任务，每个步骤完成后需点击验证按钮</p>
+            <p>🔐 使用本地存储记录进度，刷新页面不会丢失已完成步骤</p>
+        </div>
+    </div>
+
+    <script>
+        // 初始化状态
+        let step1Completed = localStorage.getItem('step1Completed') === 'true';
+        let step2Completed = localStorage.getItem('step2Completed') === 'true';
+        let verificationTimer = null;
+        let countdownTime = 10;
+        
+        // 页面加载时检查状态
+        window.onload = function() {
+            updateUI();
+        };
+        
+        // 更新UI状态
+        function updateUI() {
+            const step1El = document.getElementById('step1');
+            const step2El = document.getElementById('step2');
+            const step3El = document.getElementById('step3');
+            const getKeyBtn = document.getElementById('getKeyBtn');
+            const step1Status = document.getElementById('step1-status');
+            const step2Status = document.getElementById('step2-status');
+            const step3Status = document.getElementById('step3-status');
+            const progressFill = document.getElementById('progress-fill');
+            const progressFill2 = document.getElementById('progress-fill-2');
+            const step1Progress = document.getElementById('step1-progress');
+            const step2Progress = document.getElementById('step2-progress');
+            const step3Progress = document.getElementById('step3-progress');
+            
+            // 步骤1状态
+            if (step1Completed) {
+                step1El.classList.add('completed');
+                step1Status.textContent = '已完成';
+                step1Status.className = 'status completed';
+                step1Progress.className = 'progress-step completed';
+            }
+            
+            // 步骤2状态
+            if (step2Completed) {
+                step2El.classList.add('completed');
+                step2Status.textContent = '已完成';
+                step2Status.className = 'status completed';
+                step2Progress.className = 'progress-step completed';
+            }
+            
+            // 步骤3状态
+            if (step1Completed && step2Completed) {
+                step3Status.textContent = '可领取';
+                step3Status.className = 'status completed';
+                getKeyBtn.disabled = false;
+                getKeyBtn.textContent = '点击领取卡密';
+                step3Progress.className = 'progress-step active';
+            } else {
+                step3Status.textContent = '已锁定';
+                step3Status.className = 'status pending';
+                getKeyBtn.disabled = true;
+                getKeyBtn.textContent = '完成前两步后解锁';
+                step3Progress.className = 'progress-step';
+            }
+            
+            // 更新进度条
+            let progressWidth = 0;
+            if (step1Completed) progressWidth = 50;
+            if (step1Completed && step2Completed) progressWidth = 100;
+            
+            progressFill.style.width = progressWidth + '%';
+            progressFill2.style.width = (progressWidth > 50 ? 100 : 0) + '%';
+        }
+        
+        // 验证步骤1：用户确认已加群
+        function verifyStep1() {
+            step1Completed = true;
+            localStorage.setItem('step1Completed', 'true');
+            
+            // 更新QQ链接，防止重复点击
+            const qqLink = document.getElementById('qq-link');
+            qqLink.innerHTML = '<button style="background: #4CAF50;">✓ 已加群</button>';
+            qqLink.href = 'javascript:void(0)';
+            
+            updateUI();
+            
+            // 显示提示
+            alert('✅ 步骤1验证成功！请继续完成步骤2。');
+        }
+        
+        // 开始验证步骤2
+        function startVerification() {
+            if (!step1Completed) {
+                alert('请先完成步骤1：加入QQ群');
+                return;
+            }
+            
+            const verifyBtn = document.getElementById('verify-btn');
+            const countdownEl = document.getElementById('countdown');
+            const timeEl = document.getElementById('time');
+            
+            // 打开快手页面
+            window.open('https://v.kuaishou.com/你的快手短链', '_blank');
+            
+            // 显示倒计时
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = '验证中...';
+            countdownEl.style.display = 'block';
+            
+            countdownTime = 10;
+            timeEl.textContent = countdownTime;
+            
+            // 开始倒计时
+            verificationTimer = setInterval(() => {
+                countdownTime--;
+                timeEl.textContent = countdownTime;
+                
+                if (countdownTime <= 0) {
+                    clearInterval(verificationTimer);
+                    completeStep2();
+                }
+            }, 1000);
+        }
+        
+        // 完成步骤2
+        function completeStep2() {
+            step2Completed = true;
+            localStorage.setItem('step2Completed', 'true');
+            
+            // 更新快手链接
+            const ksLink = document.getElementById('kuaishou-link');
+            ksLink.innerHTML = '<button style="background: #4CAF50;">✓ 已关注</button>';
+            ksLink.href = 'javascript:void(0)';
+            
+            // 重置按钮
+            const verifyBtn = document.getElementById('verify-btn');
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = '✓ 已验证';
+            
+            // 隐藏倒计时
+            document.getElementById('countdown').style.display = 'none';
+            
+            updateUI();
+            
+            // 显示成功提示
+            alert('🎉 恭喜！您已成功完成所有任务，现在可以领取卡密了！');
+        }
+        
+        // 生成卡密
+        function generateKey() {
+            if (!step1Completed || !step2Completed) {
+                alert('请先完成前两个步骤！');
+                return;
+            }
+            
+            // 模拟生成卡密（实际应用中应从服务器获取）
+            const prefix = "QF";
+            const timestamp = Date.now().toString().slice(-6);
+            const randomStr = Math.random().toString(36).substr(2, 6).toUpperCase();
+            const key = prefix + timestamp + randomStr;
+            
+            // 显示卡密
+            document.getElementById('cardKey').innerHTML = 
+                `🎁 您的卡密：<strong style="color: #FF6B6B; font-size: 20px;">${key}</strong><br>
+                 <small style="color: #666;">请妥善保存此卡密，勿泄露给他人</small>`;
+            
+            // 禁用按钮防止重复点击
+            const getKeyBtn = document.getElementById('getKeyBtn');
+            getKeyBtn.disabled = true;
+            getKeyBtn.textContent = '卡密已领取';
+            getKeyBtn.style.background = 'linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%)';
+            
+            // 保存领取记录
+            localStorage.setItem('keyGenerated', 'true');
+            localStorage.setItem('generatedKey', key);
+            
+            // 显示使用提示
+            setTimeout(() => {
+                alert('✅ 卡密已生成！请复制保存。\n\n使用说明：\n1. 请妥善保管您的卡密\n2. 卡密仅限一次使用\n3. 如有问题请联系QQ群管理员');
+            }, 500);
+        }
+        
+        // 重置所有进度（测试用）
+        function resetAll() {
+            if (confirm('确定要重置所有进度吗？这将清除所有已完成的步骤。')) {
+                localStorage.removeItem('step1Completed');
+                localStorage.removeItem('step2Completed');
+                localStorage.removeItem('keyGenerated');
+                localStorage.removeItem('generatedKey');
+                
+                step1Completed = false;
+                step2Completed = false;
+                
+                // 重置链接
+                document.getElementById('qq-link').innerHTML = '<button>立即加入QQ群</button>';
+                document.getElementById('qq-link').href = 'https://qm.qq.com/q/你的QQ群号';
+                document.getElementById('kuaishou-link').innerHTML = '<button>去快手关注</button>';
+                document.getElementById('kuaishou-link').href = 'https://v.kuaishou.com/你的快手短链';
+                
+                // 重置按钮
+                document.getElementById('verify-btn').disabled = false;
+                document.getElementById('verify-btn').textContent = '开始验证关注';
+                document.getElementById('countdown').style.display = 'none';
+                
+                // 清除卡密显示
+                document.getElementById('cardKey').innerHTML = '';
+                
+                updateUI();
+                alert('进度已重置，可以重新开始任务。');
+            }
+        }
+        
+        // 添加重置按钮（用于测试）
+        document.addEventListener('DOMContentLoaded', function() {
+            const resetBtn = document.createElement('button');
+            resetBtn.textContent = '🔄 重置进度（测试用）';
+            resetBtn.onclick = resetAll;
+            resetBtn.style.cssText = 'background: #9E9E9E; margin-top: 10px; font-size: 12px; padding: 8px 15px;';
+            document.querySelector('.container').appendChild(resetBtn);
+        });
+    </script>
+</body>
+</html>
