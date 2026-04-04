@@ -1655,7 +1655,7 @@ end)
 
 local GetKeyButton = KeyWindow:AddButton("获取密钥", UDim2.new(0.55, 0, 0.65, 0), function()
     if setclipboard then
-        setclipboard("https://qun.qq.com/universal-share/share?ac=1&authKey=p2%2BbYLpawkITKJcawBjhqIUII5Qer%2F3HLakw4W6tvulIG0yJB24vEFqOoMW0pQmP&busi_data=eyJncm91cENvZGUiOiI5Mzg3MTQ0MjciLCJ0b2tlbiI6ImE5UDdGU29hTUpnVTYzbTZSZnlkNnlkT1lTaTY3THJ5dnY3MGlYdWhXeUFPQzhjbnRsOEhCZFAxcjVPdXZpOEciLCJ1aW4iOiIzODUyODA3MDE1In0%3D&data=CfWwHS7-juP-cFHV57mRrw3A8NHXXpMwt6MZvfgKne33IoaXBnCKL8rE4djZUsoSfdlX8a_IZP5l_0dnBdYM7w&svctype=4&tempid=h5_group_info")
+        setclipboard("https://pub-98e77454d5fc46438fe6f46cf574e4e5.r2.dev/%E8%8E%B7%E5%BE%97%E7%BD%91%E5%9D%80.html")
     else
         warn("setclipboard 不可用。")
     end
