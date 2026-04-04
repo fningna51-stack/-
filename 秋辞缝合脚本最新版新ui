@@ -110,7 +110,6 @@ local Window = Library:CreateWindow({
 local Tabs = {
     Universal = Window:AddTab("通用", "user"),
     ScriptCenter = Window:AddTab("脚本中心", "cat"),
-    ScriptTbgvfg = Window:AddTab("绘制(透视)", "key"),
     Settings = Window:AddTab("UI设置", "settings")
 }
 
@@ -1318,6 +1317,21 @@ UniversalRightGroup:AddButton({Text="音乐播放器脚本",Func=function()
                 Func();
         end
 end});
+UniversalRightGroup:AddLabel("柳宗权同款撸屌脚本(不能在墨水使用)");
+UniversalRightGroup:AddButton({Text="撸屌R6",Func=function()
+        loadstring(game:HttpGet("https://pastefy.app/wa3v2Vgm/raw"))()
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
+UniversalRightGroup:AddButton({Text="撸屌R15",Func=function()
+        loadstring(game:HttpGet("https://pastefy.app/YZoglOyJ/raw"))()
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
 
 local scriptCategories = {
     {
@@ -1328,7 +1342,8 @@ local scriptCategories = {
             {Name = "xk脚本", Url = "https://github.com/devslopo/DVES/raw/main/XK%20Hub"},
             {Name = "新版XA脚本", Url = "https://github.com/YunLua/Lua/raw/main/XA_Hub.lua"},
             {Name = "皮脚本", Url = "https://raw.githubusercontent.com/xiaopi77/xiaopi77/main/QQ1002100032-Roblox-Pi-script.lua"},
-            {Name = "BHBOU脚本", Url = "https://raw.githubusercontent.com/xiaopi77/xiaopi77/main/QQ1002100032-Roblox-Pi-script.lua"},
+            {Name = "落叶脚本", Url = "https://raw.githubusercontent.com/krlpl/Deciduous-center-LS/main/%E8%90%BD%E5%8F%B6%E4%B8%AD%E5%BF%83%E6%B7%B7%E6%B7%86.txt"},
+            {Name = "Rb脚本中心＿汉化中心", Url = "https://api.luarmor.net/files/v3/loaders/4fe525637e43a1be8cb0cdf902d107c2.lua"},
         }
     },
     {
@@ -1478,6 +1493,7 @@ local scriptCategories = {
     GroupName = "监狱人生",
         List = {
             {Name = "监狱人生Rayfield汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/prisonlife-Rayfield-robot"},
+            {Name = "监狱人生人机汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/PrisonLife-Serk4rx-robot"},
             }
     },
     {
@@ -1516,6 +1532,13 @@ local scriptCategories = {
     GroupName = "死刑",
         List = {
             {Name = "死刑脚本(无卡密)", Url = "https://api.luarmor.net/files/v3/loaders/8c08b8f2252eec7dbb77d253d269bb65.lua"},
+            }
+    },
+    {
+    GroupName = "活了7天",
+        List = {
+            {Name = "活了7天刷废料", Url = "https://raw.githubusercontent.com/rndmq/Serverlist/refs/heads/main/Server87"},
+            {Name = "活了7天汉化", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/%E4%B8%83%E6%97%A5%E7%94%9F%E6%88%90kkk.txt"},
             }
     },
     {
@@ -1712,7 +1735,7 @@ end
 
 local YOffset = 0
 
-YOffset = YOffset + CreateUpdateItem("🆕", "新增功能", "自动翻译，时间隐藏和显示开关在最后设置里面", YOffset)
+YOffset = YOffset + CreateUpdateItem("🆕", "新增功能", "添加更多的通用脚本\n还添加了动作的脚本", YOffset)
 
 YOffset = YOffset + CreateUpdateItem("🏠", "主要公告介绍", "势必为大家找到好玩而且免费的脚本\n预计给大家添加100多种服务器的脚本，", YOffset)
 
