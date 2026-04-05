@@ -1,5 +1,8 @@
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 
+local isWindowMinimized = false
+local backgroundNotification
+
 local MusicPlayer = {}
 MusicPlayer.__index = MusicPlayer
 
@@ -14,10 +17,6 @@ function MusicPlayer.new()
     self.currentTrack = nil
     self.playlist = {}
     self.currentIndex = 1
-    self.playingQueue = {}
-    self.favorites = {}
-    self.history = {}
-    self.maxHistory = 20
     self.playbackMode = "sequential"
     
     return self
@@ -27,10 +26,13 @@ function MusicPlayer:createSound(trackId)
     if not trackId or trackId == "" then return end
     
     local sound = Instance.new("Sound")
-    sound.SoundId = "rbxassetid://79277371759525" .. trackId
+    sound.SoundId = "rbxassetid://" .. trackId
     sound.Volume = self.volume
     sound.Pitch = self.pitch
     sound.Looped = self.loop
+    sound.RollOffMaxDistance = 1e6
+    sound.RollOffMinDistance = 1e6
+    sound.Playing = false
     sound.Parent = game:GetService("SoundService")
     
     return sound
@@ -43,18 +45,6 @@ function MusicPlayer:playTrack(track)
         self.currentSound:Stop()
         self.currentSound:Destroy()
         self.currentSound = nil
-    end
-    
-    table.insert(self.history, 1, {
-        id = track.id,
-        title = track.title or "未知曲目",
-        artist = track.artist or "未知艺术家",
-        duration = track.duration or 0,
-        thumbnail = track.thumbnail
-    })
-    
-    if #self.history > self.maxHistory then
-        table.remove(self.history, #self.history)
     end
     
     self.currentSound = self:createSound(track.id)
@@ -74,16 +64,22 @@ function MusicPlayer:togglePlayPause()
         self.currentSound:Pause()
         self.isPlaying = false
     else
-        self.currentSound:Play()
+        if self.currentSound.IsPaused then
+            self.currentSound:Resume()
+        else
+            self.currentSound:Play()
+        end
         self.isPlaying = true
     end
 end
 
 function MusicPlayer:stop()
     if self.currentSound then
-        self.currentSound:Stop()
-        self.currentSound:Destroy()
-        self.currentSound = nil
+        if not isWindowMinimized then
+            self.currentSound:Stop()
+            self.currentSound:Destroy()
+            self.currentSound = nil
+        end
     end
     self.isPlaying = false
     self.currentTrack = nil
@@ -143,101 +139,79 @@ function MusicPlayer:setLoop(loop)
     end
 end
 
-function MusicPlayer:addFavorite(track)
-    if not track or not track.id then return end
-    
-    for _, fav in ipairs(self.favorites) do
-        if fav.id == track.id then
-            return
-        end
-    end
-    
-    table.insert(self.favorites, track)
-end
-
-function MusicPlayer:removeFavorite(trackId)
-    for i, fav in ipairs(self.favorites) do
-        if fav.id == trackId then
-            table.remove(self.favorites, i)
-            break
-        end
-    end
-end
-
-function MusicPlayer:isFavorite(trackId)
-    for _, fav in ipairs(self.favorites) do
-        if fav.id == trackId then
-            return true
-        end
-    end
-    return false
-end
-
 local player = MusicPlayer.new()
 
 local musicLibrary = {
     {
         id = "79277371759525",
-        title = "雨爱dj",
+        title = "雨爱 DJ",
         artist = "Unknown Artist",
         duration = 180,
-        genre = "Ambient",
-        thumbnail = "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=400"
+        genre = "Electronic",
+        thumbnail = "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=400&h=400"
     },
     {
-        id = "134012322",
-        title = "胜利音效",
+        id = "109693244185458",
+        title = "lQOO进行曲",
         artist = "Game Music Studio",
         duration = 45,
         genre = "Orchestral",
         thumbnail = "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=400&h=400"
     },
     {
-        id = "275699518",
-        title = "点击音效",
+        id = "82944401312241",
+        title = "法修散打",
         artist = "SFX Library",
         duration = 1,
         genre = "SFX",
-        thumbnail = "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=400"
+        thumbnail = "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=400&h=400"
     },
     {
-        id = "9046004667",
-        title = "通知音",
+        id = "131649148795563",
+        title = "不值得",
         artist = "UI Sounds",
         duration = 2,
         genre = "Electronic",
-        thumbnail = "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=400"
+        thumbnail = "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=400&h=400"
     },
     {
-        id = "9124267240",
-        title = "氛围音乐",
+        id = "91550314012338",
+        title = "银河奥特曼主题曲",
         artist = "Ambient Collective",
         duration = 300,
         genre = "Ambient",
-        thumbnail = "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=400"
+        thumbnail = "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=400&h=400"
     },
     {
-        id = "9124267241",
-        title = "合成波",
+        id = "99498025749186",
+        title = "纯dj",
         artist = "Retro Waves",
         duration = 240,
         genre = "Synthwave",
-        thumbnail = "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=400"
+        thumbnail = "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=400&h=400"
     },
     {
-        id = "9124267242",
-        title = "放松氛围",
+        id = "97285892199649",
+        title = "把回忆拼好给你",
         artist = "Lofi Beats",
         duration = 210,
         genre = "Lo-Fi",
-        thumbnail = "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=400"
+        thumbnail = "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=400&h=400"
     },
     {
-        id = "9124267243",
-        title = "能量提升",
+        id = "114372452919028",
+        title = "山楂树之恋",
         artist = "Workout Music",
         duration = 195,
         genre = "EDM",
+        thumbnail = "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=400&h=400"
+    },
+    {
+        id = "95969253144150",
+        title = "青衣",
+        artist = "Wrtf rtfd",
+        duration = 210,
+        genre = "QYDJ",
         thumbnail = "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=400"
     }
 }
@@ -278,18 +252,6 @@ Tabs.PlaylistTab = Window:Tab({
     ShowTabTitle = true
 })
 
-Tabs.FavoritesTab = Window:Tab({ 
-    Title = "我的收藏", 
-    Icon = "heart",
-    ShowTabTitle = true
-})
-
-Tabs.HistoryTab = Window:Tab({ 
-    Title = "播放历史", 
-    Icon = "history",
-    ShowTabTitle = true
-})
-
 Tabs.SettingsTab = Window:Tab({ 
     Title = "设置", 
     Icon = "settings",
@@ -299,22 +261,157 @@ Tabs.SettingsTab = Window:Tab({
 Window:SelectTab(1)
 
 local nowPlayingParagraph
-local nowPlayingTitleText
-local nowPlayingDescText
-local nowPlayingImage
-local favoriteBtn
 local playPauseBtn
 
 local function updateNowPlaying()
     if player.currentTrack then
         nowPlayingParagraph:SetTitle(player.currentTrack.title or "未知曲目")
         nowPlayingParagraph:SetDesc(player.currentTrack.artist or "未知艺术家")
+    end
+end
+
+local function showBackgroundNotification()
+    if backgroundNotification then
+        backgroundNotification:Destroy()
+        backgroundNotification = nil
+    end
+    
+    if player.currentTrack and player.isPlaying then
+        local screenGui = Instance.new("ScreenGui")
+        screenGui.Name = "BackgroundMusicNotification"
+        screenGui.IgnoreGuiInset = true
+        screenGui.DisplayOrder = 999
+        screenGui.ResetOnSpawn = false
         
-        if player:isFavorite(player.currentTrack.id) then
-            favoriteBtn:SetIcon("heart-filled")
-        else
-            favoriteBtn:SetIcon("heart")
-        end
+        local frame = Instance.new("Frame")
+        frame.Size = UDim2.new(0, 220, 0, 70)
+        frame.Position = UDim2.new(1, -230, 0, 20)
+        frame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+        frame.BackgroundTransparency = 0.2
+        frame.BorderSizePixel = 0
+        frame.AnchorPoint = Vector2.new(1, 0)
+        
+        local UICorner = Instance.new("UICorner")
+        UICorner.CornerRadius = UDim.new(0, 8)
+        UICorner.Parent = frame
+        
+        local UIStroke = Instance.new("UIStroke")
+        UIStroke.Color = Color3.fromRGB(100, 100, 120)
+        UIStroke.Thickness = 2
+        UIStroke.Parent = frame
+        
+        local icon = Instance.new("TextLabel")
+        icon.Text = "🎵"
+        icon.Size = UDim2.new(0, 40, 1, 0)
+        icon.Position = UDim2.new(0, 10, 0, 0)
+        icon.BackgroundTransparency = 1
+        icon.TextColor3 = Color3.fromRGB(255, 255, 255)
+        icon.TextSize = 24
+        icon.Font = Enum.Font.GothamBold
+        
+        local title = Instance.new("TextLabel")
+        title.Text = "后台播放中"
+        title.Size = UDim2.new(1, -60, 0.4, 0)
+        title.Position = UDim2.new(0, 50, 0, 10)
+        title.BackgroundTransparency = 1
+        title.TextColor3 = Color3.fromRGB(255, 255, 255)
+        title.TextXAlignment = Enum.TextXAlignment.Left
+        title.Font = Enum.Font.GothamMedium
+        title.TextSize = 16
+        
+        local trackTitle = Instance.new("TextLabel")
+        trackTitle.Text = player.currentTrack.title or "未知曲目"
+        trackTitle.Size = UDim2.new(1, -60, 0.4, 0)
+        trackTitle.Position = UDim2.new(0, 50, 0, 35)
+        trackTitle.BackgroundTransparency = 1
+        trackTitle.TextColor3 = Color3.fromRGB(200, 200, 220)
+        trackTitle.TextXAlignment = Enum.TextXAlignment.Left
+        trackTitle.Font = Enum.Font.Gotham
+        trackTitle.TextSize = 14
+        trackTitle.TextTruncate = Enum.TextTruncate.AtEnd
+        
+        local playBtn = Instance.new("TextButton")
+        playBtn.Text = player.isPlaying and "⏸️" or "▶️"
+        playBtn.Size = UDim2.new(0, 30, 0, 30)
+        playBtn.Position = UDim2.new(1, -80, 0.5, -15)
+        playBtn.BackgroundTransparency = 1
+        playBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        playBtn.TextSize = 20
+        playBtn.Font = Enum.Font.GothamBold
+        
+        playBtn.MouseButton1Click:Connect(function()
+            player:togglePlayPause()
+            playBtn.Text = player.isPlaying and "⏸️" or "▶️"
+        end)
+        
+        local closeBtn = Instance.new("TextButton")
+        closeBtn.Text = "✕"
+        closeBtn.Size = UDim2.new(0, 30, 0, 30)
+        closeBtn.Position = UDim2.new(1, -40, 0.5, -15)
+        closeBtn.BackgroundTransparency = 1
+        closeBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+        closeBtn.TextSize = 20
+        closeBtn.Font = Enum.Font.GothamBold
+        
+        closeBtn.MouseButton1Click:Connect(function()
+            if screenGui then
+                screenGui:Destroy()
+                backgroundNotification = nil
+            end
+        end)
+        
+        frame.Parent = screenGui
+        icon.Parent = frame
+        title.Parent = frame
+        trackTitle.Parent = frame
+        playBtn.Parent = frame
+        closeBtn.Parent = frame
+        screenGui.Parent = game:GetService("CoreGui")
+        
+        backgroundNotification = screenGui
+        
+        local dragging = false
+        local dragInput
+        local dragStart
+        local startPos
+        
+        frame.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                dragging = true
+                dragStart = input.Position
+                startPos = frame.Position
+                
+                input.Changed:Connect(function()
+                    if input.UserInputState == Enum.UserInputState.End then
+                        dragging = false
+                    end
+                end)
+            end
+        end)
+        
+        frame.InputChanged:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseMovement then
+                dragInput = input
+            end
+        end)
+        
+        game:GetService("UserInputService").InputChanged:Connect(function(input)
+            if dragging and input == dragInput then
+                local delta = input.Position - dragStart
+                frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, 
+                                           startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+            end
+        end)
+        
+        return screenGui
+    end
+    return nil
+end
+
+local function removeBackgroundNotification()
+    if backgroundNotification then
+        backgroundNotification:Destroy()
+        backgroundNotification = nil
     end
 end
 
@@ -330,17 +427,6 @@ do
     
     Tabs.HomeTab:Section({ Title = "播放控制", Opened = true })
     
-    local controlButtons = {}
-    
-    table.insert(controlButtons, Tabs.HomeTab:Button({
-        Title = "上一首",
-        Icon = "skip-back",
-        Callback = function()
-            player:prev()
-            updateNowPlaying()
-        end
-    }))
-    
     playPauseBtn = Tabs.HomeTab:Button({
         Title = "播放",
         Icon = "play",
@@ -353,20 +439,41 @@ do
                 playPauseBtn:SetTitle("播放")
                 playPauseBtn:SetIcon("play")
             end
+           
+            if isWindowMinimized then
+                removeBackgroundNotification()
+                showBackgroundNotification()
+            end
         end
     })
-    table.insert(controlButtons, playPauseBtn)
     
-    table.insert(controlButtons, Tabs.HomeTab:Button({
+    Tabs.HomeTab:Button({
+        Title = "上一首",
+        Icon = "skip-back",
+        Callback = function()
+            player:prev()
+            updateNowPlaying()
+            if isWindowMinimized then
+                removeBackgroundNotification()
+                showBackgroundNotification()
+            end
+        end
+    })
+    
+    Tabs.HomeTab:Button({
         Title = "下一首",
         Icon = "skip-forward",
         Callback = function()
             player:next()
             updateNowPlaying()
+            if isWindowMinimized then
+                removeBackgroundNotification()
+                showBackgroundNotification()
+            end
         end
-    }))
+    })
     
-    table.insert(controlButtons, Tabs.HomeTab:Button({
+    Tabs.HomeTab:Button({
         Title = "停止",
         Icon = "square",
         Callback = function()
@@ -375,29 +482,15 @@ do
             playPauseBtn:SetIcon("play")
             nowPlayingParagraph:SetTitle("未播放")
             nowPlayingParagraph:SetDesc("请选择一首音乐开始播放")
-        end
-    }))
-    
-    favoriteBtn = Tabs.HomeTab:Button({
-        Title = "收藏",
-        Icon = "heart",
-        Callback = function()
-            if player.currentTrack then
-                if player:isFavorite(player.currentTrack.id) then
-                    player:removeFavorite(player.currentTrack.id)
-                    favoriteBtn:SetIcon("heart")
-                else
-                    player:addFavorite(player.currentTrack)
-                    favoriteBtn:SetIcon("heart-filled")
-                end
+            if isWindowMinimized then
+                removeBackgroundNotification()
             end
         end
     })
-    table.insert(controlButtons, favoriteBtn)
     
     Tabs.HomeTab:Section({ Title = "播放设置", Opened = true })
     
-    local volumeSlider = Tabs.HomeTab:Slider({
+    Tabs.HomeTab:Slider({
         Title = "音量",
         Value = {
             Min = 0,
@@ -409,7 +502,7 @@ do
         end
     })
     
-    local pitchSlider = Tabs.HomeTab:Slider({
+    Tabs.HomeTab:Slider({
         Title = "音调",
         Value = {
             Min = 10,
@@ -421,7 +514,7 @@ do
         end
     })
     
-    local loopToggle = Tabs.HomeTab:Toggle({
+    Tabs.HomeTab:Toggle({
         Title = "循环播放",
         Value = false,
         Callback = function(value)
@@ -429,15 +522,13 @@ do
         end
     })
     
-    local playbackModeDropdown = Tabs.HomeTab:Dropdown({
+    Tabs.HomeTab:Dropdown({
         Title = "播放模式",
-        Values = { "顺序播放", "随机播放", "单曲循环" },
+        Values = { "顺序播放", "随机播放" },
         Value = "顺序播放",
         Callback = function(value)
             if value == "随机播放" then
                 player.playbackMode = "random"
-            elseif value == "单曲循环" then
-                player.playbackMode = "repeat_one"
             else
                 player.playbackMode = "sequential"
             end
@@ -447,13 +538,6 @@ end
 
 do
     Tabs.PlaylistTab:Section({ Title = "音乐库", Opened = true })
-    
-    local searchInput = Tabs.PlaylistTab:Input({
-        Title = "搜索音乐",
-        Placeholder = "输入歌曲名、艺术家或流派...",
-        Callback = function(text)
-        end
-    })
     
     for _, track in ipairs(musicLibrary) do
         Tabs.PlaylistTab:Paragraph({
@@ -475,147 +559,19 @@ do
                                 end
                             end
                             updateNowPlaying()
-                        end
-                    end
-                },
-                {
-                    Title = "收藏",
-                    Icon = "heart",
-                    Variant = "Secondary",
-                    Callback = function()
-                        if not player:isFavorite(track.id) then
-                            player:addFavorite(track)
+                            playPauseBtn:SetTitle("暂停")
+                            playPauseBtn:SetIcon("pause")
+                            
+                            if isWindowMinimized then
+                                removeBackgroundNotification()
+                                showBackgroundNotification()
+                            end
                         end
                     end
                 }
             }
         })
     end
-end
-
-do
-    Tabs.FavoritesTab:Section({ Title = "我的收藏", Opened = true })
-    
-    local function updateFavoritesDisplay()
-    end
-    
-    local function showFavorites()
-        if #player.favorites == 0 then
-            Tabs.FavoritesTab:Paragraph({
-                Title = "暂无收藏",
-                Desc = "点击歌曲的收藏按钮添加到收藏夹",
-                Color = "Grey"
-            })
-        else
-            for _, track in ipairs(player.favorites) do
-                Tabs.FavoritesTab:Paragraph({
-                    Title = track.title,
-                    Desc = track.artist .. " • " .. (track.duration or 0) .. "秒",
-                    Image = track.thumbnail,
-                    ImageSize = 40,
-                    Buttons = {
-                        {
-                            Title = "播放",
-                            Icon = "play",
-                            Variant = "Primary",
-                            Callback = function()
-                                if player:playTrack(track) then
-                                    updateNowPlaying()
-                                end
-                            end
-                        },
-                        {
-                            Title = "移除",
-                            Icon = "x",
-                            Variant = "Secondary",
-                            Callback = function()
-                                player:removeFavorite(track.id)
-                                -- 重新打开收藏夹标签页以刷新显示
-                                local currentTab = Window.SelectedTab
-                                Window:SelectTab(3)
-                            end
-                        }
-                    }
-                })
-            end
-        end
-    end
-    
-    showFavorites()
-end
-
-do
-    Tabs.HistoryTab:Section({ Title = "播放历史", Opened = true })
-    
-    local function showHistory()
-        if #player.history == 0 then
-            Tabs.HistoryTab:Paragraph({
-                Title = "暂无播放历史",
-                Desc = "播放过的歌曲会出现在这里",
-                Color = "Grey"
-            })
-        else
-            for _, historyItem in ipairs(player.history) do
-                Tabs.HistoryTab:Paragraph({
-                    Title = historyItem.title,
-                    Desc = historyItem.artist .. " • 最近播放",
-                    Image = historyItem.thumbnail,
-                    ImageSize = 40,
-                    Buttons = {
-                        {
-                            Title = "播放",
-                            Icon = "play",
-                            Variant = "Primary",
-                            Callback = function()
-                                if player:playTrack(historyItem) then
-                                    updateNowPlaying()
-                                end
-                            end
-                        },
-                        {
-                            Title = "收藏",
-                            Icon = "heart",
-                            Variant = "Secondary",
-                            Callback = function()
-                                player:addFavorite(historyItem)
-                            end
-                        }
-                    }
-                })
-            end
-        end
-    end
-    
-    Tabs.HistoryTab:Button({
-        Title = "清空历史记录",
-        Icon = "trash-2",
-        Callback = function()
-            Window:Dialog({
-                Title = "确认清空",
-                Content = "确定要清空所有历史记录吗？",
-                Icon = "alert-triangle",
-                Buttons = {
-                    {
-                        Title = "取消",
-                        Variant = "Secondary",
-                        Callback = function() end
-                    },
-                    {
-                        Title = "清空",
-                        Variant = "Primary",
-                        Callback = function()
-                            player.history = {}
-                            -- 重新打开历史记录标签页以刷新显示
-                            local currentTab = Window.SelectedTab
-                            Window:SelectTab(4)
-                        end
-                    }
-                }
-            })
-        end
-    })
-    
-    showHistory()
 end
 
 do
@@ -629,32 +585,11 @@ do
         end
     })
     
-    Tabs.SettingsTab:Dropdown({
-        Title = "音质设置",
-        Values = { "标准 (128kbps)", "高音质 (192kbps)", "极高音质 (320kbps)", "无损" },
-        Value = "高音质 (192kbps)",
-        Callback = function(value)
-            print("音质设置为: " .. value)
-        end
-    })
-    
-    local maxHistorySlider = Tabs.SettingsTab:Slider({
-        Title = "最大历史记录数",
-        Value = {
-            Min = 10,
-            Max = 100,
-            Default = 20
-        },
-        Callback = function(value)
-            player.maxHistory = value
-        end
-    })
-    
     Tabs.SettingsTab:Section({ Title = "外观设置", Opened = true })
     
-    local themeDropdown = Tabs.SettingsTab:Dropdown({
+    Tabs.SettingsTab:Dropdown({
         Title = "界面主题",
-        Values = { "深色", "浅色", "自动" },
+        Values = { "深色", "浅色" },
         Value = "深色",
         Callback = function(value)
             if value == "浅色" then
@@ -682,54 +617,18 @@ do
     
     Tabs.SettingsTab:Paragraph({
         Title = "秋辞音乐播放器",
-        Desc = "版本 1.0.0\n一个简洁优雅的Roblox音乐播放器\n\n功能特性：\n• 支持多种音乐格式\n• 播放列表管理\n• 收藏功能\n• 播放历史\n• 音质调节\n• 多主题切换",
+        Desc = "版本 1.0.0\n一个简洁优雅的Roblox音乐播放器\n\n功能特性：\n• 支持多种音乐格式\n• 播放列表管理\n• 后台播放",
         Image = "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=150&h=150",
         ImageSize = 60
     })
     
     Tabs.SettingsTab:Button({
-        Title = "导入音乐",
-        Icon = "folder-plus",
+        Title = "最小化到后台",
+        Icon = "minimize-2",
         Callback = function()
-            Window:Dialog({
-                Title = "导入音乐",
-                Content = "此功能暂未实现\n请在代码中手动添加音乐",
-                Icon = "music",
-                Buttons = {
-                    {
-                        Title = "确定",
-                        Variant = "Primary",
-                        Callback = function() end
-                    }
-                }
-            })
-        end
-    })
-    
-    Tabs.SettingsTab:Button({
-        Title = "导出配置",
-        Icon = "download",
-        Callback = function()
-            print("配置导出功能")
-        end
-    })
-    
-    Tabs.SettingsTab:Button({
-        Title = "重置设置",
-        Icon = "refresh-ccw",
-        Callback = function()
-            Window:Dialog({
-                Title = "重置设置",
-                Content = "此功能暂未实现",
-                Icon = "alert-triangle",
-                Buttons = {
-                    {
-                        Title = "确定",
-                        Variant = "Primary",
-                        Callback = function() end
-                    }
-                }
-            })
+            Window:Close()
+            isWindowMinimized = true
+            showBackgroundNotification()
         end
     })
 end
@@ -772,47 +671,49 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     elseif input.KeyCode == Enum.KeyCode.Down then
         player:setVolume(math.max(player.volume - 0.1, 0))
     end
+    
+    if isWindowMinimized then
+        removeBackgroundNotification()
+        if player.currentTrack and player.isPlaying then
+            showBackgroundNotification()
+        end
+    end
 end)
 
-local tabSwitchConnections = {}
-
-local function setupTabSwitch(tab, callback)
-    tabSwitchConnections[tab] = callback
-end
-
 Window:OnClose(function()
-    player:stop()
-    print("秋辞音乐播放器已关闭")
-    
-    for _, connection in pairs(tabSwitchConnections) do
-        if connection then
-            pcall(function() connection:Disconnect() end)
-        end
+    if not isWindowMinimized then
+        player:stop()
+        removeBackgroundNotification()
+        print("秋辞音乐播放器已关闭")
     end
 end)
 
 task.wait(1)
 WindUI:Notify({
     Title = "秋辞音乐播放器",
-    Content = "欢迎使用秋辞音乐播放器！\n使用空格键暂停/播放，方向键控制",
+    Content = "欢迎使用秋辞音乐播放器！\n使用空格键暂停/播放，方向键控制\n最小化后会在后台继续播放",
     Icon = "music",
     Duration = 5,
 })
 
-task.wait(2)
-if #musicLibrary > 0 then
-    local firstTrack = musicLibrary[1]
-    if player:playTrack(firstTrack) then
-        player.currentIndex = 1
-        updateNowPlaying()
-        playPauseBtn:SetTitle("暂停")
-        playPauseBtn:SetIcon("pause")
-        
-        WindUI:Notify({
-            Title = "音乐已开始播放",
-            Content = "正在播放: " .. firstTrack.title,
-            Icon = "play",
-            Duration = 3,
-        })
+task.spawn(function()
+    task.wait(2)
+    if #musicLibrary > 0 and not player.isPlaying then
+        local firstTrack = musicLibrary[1]
+        if player:playTrack(firstTrack) then
+            player.currentIndex = 1
+            updateNowPlaying()
+            if playPauseBtn then
+                playPauseBtn:SetTitle("暂停")
+                playPauseBtn:SetIcon("pause")
+            end
+            
+            WindUI:Notify({
+                Title = "音乐已开始播放",
+                Content = "正在播放: " .. firstTrack.title,
+                Icon = "play",
+                Duration = 3,
+            })
+        end
     end
-end
+end)
