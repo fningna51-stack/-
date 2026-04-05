@@ -1,307 +1,818 @@
-local WasUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/WasKKal/WasUI-For-Roblox/main/WasUI.lua", true))()
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 
-if not WasUI then
-    warn("秋辞缝合 加载失败")
-    return
+local MusicPlayer = {}
+MusicPlayer.__index = MusicPlayer
+
+function MusicPlayer.new()
+    local self = setmetatable({}, MusicPlayer)
+    self.sounds = {}
+    self.currentSound = nil
+    self.isPlaying = false
+    self.volume = 0.5
+    self.pitch = 1.0
+    self.loop = false
+    self.currentTrack = nil
+    self.playlist = {}
+    self.currentIndex = 1
+    self.playingQueue = {}
+    self.favorites = {}
+    self.history = {}
+    self.maxHistory = 20
+    self.playbackMode = "sequential"
+    
+    return self
 end
 
-local mainWindow = WasUI:CreateWindow("秋辞纯服务器脚本", nil, nil, nil, true)
-mainWindow:SetWelcome("欢迎使用 秋辞多功能脚本")
-
-WasUI.DialogTitle = "确定要退出吗？"
-WasUI:SetGroupButtonText("加入QQ群")
-WasUI:SetGroupCopyContent("938714427")
-
-local tabGame = mainWindow:AddTab("脚本中心")
-local tabAbout = mainWindow:AddTab("关于")
-
-local function addSpacing(target, height)
-    local spacing = Instance.new("Frame")
-    spacing.Name = "Spacing"
-    spacing.Size = UDim2.new(1, 0, 0, height or 4)
-    spacing.BackgroundTransparency = 1
-    spacing.Parent = target
+function MusicPlayer:createSound(trackId)
+    if not trackId or trackId == "" then return end
+    
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://79277371759525" .. trackId
+    sound.Volume = self.volume
+    sound.Pitch = self.pitch
+    sound.Looped = self.loop
+    sound.Parent = game:GetService("SoundService")
+    
+    return sound
 end
 
-local scriptCategories = {
-    {
-        GroupName = "各大脚本",
-        List = {
-            {Name = "秋容脚本复刻版", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%A7%8B%E5%AE%B9%E8%84%9A%E6%9C%AC%E5%A4%8D%E5%88%BB%E7%89%88"},
-            {Name = "叶脚本", Url = "https://raw.githubusercontent.com/roblox-ye/QQ515966991/refs/heads/main/ROBLOX-CNVIP-XIAOYE.lua"},
-            {Name = "xk脚本", Url = "https://github.com/devslopo/DVES/raw/main/XK%20Hub"},
-            {Name = "新版XA脚本", Url = "https://github.com/YunLua/Lua/raw/main/XA_Hub.lua"},
-            {Name = "皮脚本", Url = "https://raw.githubusercontent.com/xiaopi77/xiaopi77/main/QQ1002100032-Roblox-Pi-script.lua"},
-            {Name = "BHBOU脚本", Url = "https://raw.githubusercontent.com/xiaopi77/xiaopi77/main/QQ1002100032-Roblox-Pi-script.lua"},
-        }
-    },
-    {
-        GroupName = "99夜",
-        List = {
-            {Name = "虚空99夜脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/99%E5%A4%9C%E6%B1%89%E5%8C%96"},
-            {Name = "99夜脚本可杀队友", Url = "https://raw.githubusercontent.com/358545698555/roblox-/refs/heads/main/%E5%8F%AF%E6%9D%80%E9%98%9F%E5%8F%8B99%E5%A4%9C"},
-            {Name = "99夜汉化脚本(无敌有效果)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%A7%8B%E8%BE%9E99%E5%A4%9C%E6%B1%89%E5%8C%96"},
-        }
-    },
-    {
-        GroupName = "亡命速递",
-        List = {
-            {Name = "亡命速递脚本无法使用", Url = "https://raw.githubusercontent.com/JanseJYC/Script/refs/heads/main/Deadly-Deliver.lua"},
-            {Name = "亡命速递英文脚本", Url = "https://raw.githubusercontent.com/xxdaysheus01/RuneX/refs/heads/main/DeadlyDeliveryScript.lua"},
-            {Name = "亡命速递", Url = "https://pandadevelopment.net/virtual/file/c96973c95ae3aaec"},
-        }
-    },
-    {
-        GroupName = "死铁轨",
-        List = {
-            {Name = "仿红叶脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E4%BB%BF%E7%BA%A2%E5%8F%B6%E8%84%9A%E6%9C%AC%E6%B1%89%E5%8C%96"},
-            {Name = "红叶脚本", Url = "https://getnative.cc/script/loader"},
-            {Name = "速通脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%AD%BB%E9%93%81%E8%BD%A8%E6%B1%89%E5%8C%96%E8%84%9A%E6%9C%AC"},
-            {Name = "死铁轨脚本", Url = "https://raw.githubusercontent.com/gumanba/Scripts/refs/heads/main/DeadRails"},
-        }
-    },
-    {
-        GroupName = "墨水游戏",
-        List = {
-            {Name = "AX墨水脚本有芙同享秋辞汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/ax%E8%84%9A%E6%9C%AC%E7%A7%8B%E8%BE%9E%E6%B1%89%E5%8C%96"},
-            {Name = "墨水游戏人机汉化(里面有反作弊甩飞)", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/inkgame-ADEN-robot"},
-            {Name = "墨水Ringta汉化(无卡密)", Url = "https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/Ringta"},
-            {Name = "博伦墨水脚本", Url = "https://pastebin.com/raw/Q64rPkwu"},
-            {Name = "Unm汉化，卡密ink50", Url = "https://github.com/youfutongxiang1145/unm-CN/releases/download/unm%E6%B1%89%E5%8C%96/unm.txt"},
-        }
-    },
-    {
-        GroupName = "doors",
-        List = {
-            {Name = "Doors脚本", Url = "https://raw.githubusercontent.com/atnew2025/Chinese-scripts/refs/heads/main/mshax(prohax).txt"},
-            {Name = "doors最新脚本", Url = "https://raw.githubusercontent.com/TheHunterSolo1/Scripts/refs/heads/main/Protected_2809220311826785.lua.txt"},
-            {Name = "doorsDP汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/doors-DP-robot"},
-        }
-    },
-    {
-        GroupName = "监狱生活",
-        List = {
-            {Name = "监狱生活汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%9B%91%E7%8B%B1%E7%94%9F%E6%B4%BB%E8%84%9A%E6%9C%AC"},
-        }
-    },
-    {
-        GroupName = "战争大亨",
-        List = {
-            {Name = "战争大亨最强脚本", Url = "https://raw.githubusercontent.com/MaxPikaa/PureLove/refs/heads/main/520"},
-            {Name = "战争大亨无卡密高级脚本", Url = "https://raw.githubusercontent.com/Macintosh1983/ChillHubMain/main/ChillHubOilWarfareTycoon.lua"},
-        }
-    },
-    {
-        GroupName = "被遗弃",
-        List = {
-            {Name = "被遗弃无卡密超好用", Url = "https://rawscripts.net/raw/G666-Forsaken-Keyless-auto-gen-reach-autoblock-+-more-63283"},
-            {Name = "被遗弃英文无卡密", Url = "https://github.com/shenxiuqi974/guesting-but-chinese/releases/download/hushwhw/default.txt"},
-        }
-    },
-    {
-        GroupName = "俄亥俄州",
-        List = {
-            {Name = "俄亥俄州英文脚本", Url = "https://raw.githubusercontent.com/PUSCRIPTS/V1sion/refs/heads/main/Pinguin"},
-            {Name = "晓辞俄亥俄州基础功能脚本", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%99%93%E8%BE%9E%E4%BF%84%E4%BA%A5%E4%BF%84%E5%B7%9E%E5%9F%BA%E7%A1%80%E5%8A%9F%E8%83%BD%E8%84%9A%E6%9C%AC"},
-            {Name = "俄亥俄州英文脚本", Url = "https://raw.githubusercontent.com/rxn-xyz/Ohio./main/Ohio.lua"},
-        }
-    },
-    {
-        GroupName = "画我",
-        List = {
-            {Name = "无卡密画我脚本", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/KENNY画我.lua"},
-        }
-    },
-    {
-        GroupName = "通缉脚本",
-        List = {
-            {Name = "SX HUB", Url = "https://api.luarmor.net/files/v3/loaders/87a8a4f4c2d2ef535ccd1bdb949218fe.lua"},
-            {Name = "KENNY", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/KENNY通缉换服.lua"},
-            {Name = "通缉", Url = "https://raw.githubusercontent.com/combatlegnd/combatlegnd/refs/heads/main/NH-Loader"},
-        }
-    },
-    {
-        GroupName = "闪光",
-        List = {
-            {Name = "闪光脚本", Url = "https://apigetunx.vercel.app/UNX.lua"},
-        }
-    },
-    {
-        GroupName = "最坚强的战场",
-        List = {
-            {Name = "最强战场Phantasm汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/thestongestbattlegrounds-Phantasm-robot"},
-            {Name = "最坚强的战场脚本2", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/phantasm.lua"},
-        }
-    },
-    {
-        GroupName = "偷走脑红",
-        List = {
-            {Name = "偷走脑红脚本", Url = "https://raw.githubusercontent.com/DynaFetchy/Scripts/refs/heads/main/Loader.lua"},
-            {Name = "偷走脑红脚本2", Url = "https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/偷走脑红"},
-            {Name = "偷走脑红KURD汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/Brainrot-KURD-robot"},
-        }
-    },
-    {
-        GroupName = "萨凡娜",
-        List = {
-            {Name = "萨凡娜-悔脚本", Url = "https://raw.githubusercontent.com/sdxs221/sd/main/萨凡娜"},
-        }
-    },
-    {
-        GroupName = "住宅大逃杀",
-        List = {
-            {Name = "住宅大逃杀-悔脚本", Url = "https://raw.githubusercontent.com/sdxs221/sd/main/住宅大屠杀"},
-        }
-    },
-    {
-        GroupName = "竞争对手",
-        List = {
-            {Name = "竞争对手脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/竞争对手汉化脚本"},
-        }
-    },
-    {
-        GroupName = "chain脚本",
-        List = {
-            {Name = "chain英文脚本", Url = "https://api.getpolsec.com/scripts/hosted/79fcede2ce14619990c741986e6123ddbc41cd9e4a25c4dc4da13c5f63a25f2b.lua"},
-        }
-    },
-    {
-        GroupName = "跳跃对决",
-        List = {
-            {Name = "跳跃对决脚本", Url = "https://raw.githubusercontent.com/solarastuff/sorryjimpee/refs/heads/main/Jumper.lua"},
-        }
-    },
-    {
-        GroupName = "死亡球",
-        List = {
-            {Name = "死亡球Fluxin汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/deathball-Fluxin-robot"},
-            {Name = "死亡球stark汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/Deathballs-stark-robot"},
-        }
-    },
-    {
-        GroupName = "监狱人生",
-        List = {
-            {Name = "监狱人生Rayfield汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/prisonlife-Rayfield-robot"},
-        }
-    },
-    {
-        GroupName = "逃脱海啸",
-        List = {
-            {Name = "逃脱海啸并带走红Merqur汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/EscapeTsunamiForBrinrots-Merqury-robot"},
-            {Name = "逃脱海啸并拿走脑红Solix汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/EscapeTsunamiForBrinrots-Solix-robot"},
-        }
-    },
-    {
-        GroupName = "安静或者死亡",
-        List = {
-            {Name = "安静或者死亡candyz汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/quietordie-candyz-robo"},
-        }
-    },
-    {
-        GroupName = "盲射",
-        List = {
-            {Name = "盲射ToraIsMe汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/blindshot-ToraIsMe-robot"},
-        }
-    },
-    {
-        GroupName = "彩虹朋友",
-        List = {
-            {Name = "彩虹朋友二UB汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/RainbowFriends-UB-robot"},
-        }
-    },
-    {
-        GroupName = "撕咬之夜",
-        List = {
-            {Name = "撕咬之夜", Url = "https://raw.githubusercontent.com/Youfutongxiang1/Msploit-v2-CN/refs/heads/main/Msploit-v2-CN"},
-            {Name = "殺脚本撕咬之夜", Url = "https://raw.githubusercontent.com/FengYu-X/Max/refs/heads/X/BBN.lua"},
-        }
-    },
-    {
-        GroupName = "死刑",
-        List = {
-            {Name = "死刑脚本(无卡密)", Url = "https://api.luarmor.net/files/v3/loaders/8c08b8f2252eec7dbb78d253d269bb65.lua"},
-        }
-    },
-    {
-        GroupName = "驾驶帝国",
-        List = {
-            {Name = "驾驶帝国脚本", Url = "https://raw.githubusercontent.com/Marco8642/science/main/drivingempire"},
-        }
-    }
-}
+function MusicPlayer:playTrack(track)
+    if not track or not track.id then return false end
+    
+    if self.currentSound then
+        self.currentSound:Stop()
+        self.currentSound:Destroy()
+        self.currentSound = nil
+    end
+    
+    table.insert(self.history, 1, {
+        id = track.id,
+        title = track.title or "未知曲目",
+        artist = track.artist or "未知艺术家",
+        duration = track.duration or 0,
+        thumbnail = track.thumbnail
+    })
+    
+    if #self.history > self.maxHistory then
+        table.remove(self.history, #self.history)
+    end
+    
+    self.currentSound = self:createSound(track.id)
+    if self.currentSound then
+        self.currentSound:Play()
+        self.isPlaying = true
+        self.currentTrack = track
+        return true
+    end
+    return false
+end
 
--- 循环生成所有脚本按钮
-for _, category in ipairs(scriptCategories) do
-    WasUI:CreateCategory(tabGame, category.GroupName)
-    addSpacing(tabGame)
-    for _, script in ipairs(category.List) do
-        WasUI:CreateButton(tabGame, script.Name, function()
-            local success, err = pcall(function()
-                loadstring(game:HttpGet(script.Url))()
-            end)
-            if success then
-                WasUI:Notify({
-                    Title = "加载成功",
-                    Content = script.Name,
-                    Duration = 3
-                })
-            else
-                WasUI:Notify({
-                    Title = "加载失败",
-                    Content = "链接可能失效",
-                    Duration = 3
-                })
-            end
-        end)
-        addSpacing(tabGame)
+function MusicPlayer:togglePlayPause()
+    if not self.currentSound then return end
+    
+    if self.isPlaying then
+        self.currentSound:Pause()
+        self.isPlaying = false
+    else
+        self.currentSound:Play()
+        self.isPlaying = true
     end
 end
 
--- 额外工具
-WasUI:CreateCategory(tabGame, "实用工具")
-addSpacing(tabGame)
+function MusicPlayer:stop()
+    if self.currentSound then
+        self.currentSound:Stop()
+        self.currentSound:Destroy()
+        self.currentSound = nil
+    end
+    self.isPlaying = false
+    self.currentTrack = nil
+end
 
-WasUI:CreateButton(tabGame, "TX全自动翻译", function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/JsYb666/Item/refs/heads/main/Auto-language"))()
-    WasUI:Notify({Title = "翻译", Content = "已加载", Duration = 2})
-end)
-addSpacing(tabGame)
+function MusicPlayer:next()
+    if #self.playlist == 0 then return end
+    
+    if self.playbackMode == "random" then
+        self.currentIndex = math.random(1, #self.playlist)
+    else
+        self.currentIndex = (self.currentIndex % #self.playlist) + 1
+    end
+    
+    local nextTrack = self.playlist[self.currentIndex]
+    if nextTrack then
+        self:playTrack(nextTrack)
+    end
+end
 
-WasUI:CreateButton(tabGame, "音乐播放器", function()
-    loadstring(game:HttpGet("http://music.567099.xyz/music.php"))()
-    WasUI:Notify({Title = "音乐", Content = "播放器已加载", Duration = 2})
-end)
-addSpacing(tabGame)
+function MusicPlayer:prev()
+    if #self.playlist == 0 then return end
+    
+    if self.playbackMode == "random" then
+        self.currentIndex = math.random(1, #self.playlist)
+    else
+        self.currentIndex = self.currentIndex - 1
+        if self.currentIndex < 1 then
+            self.currentIndex = #self.playlist
+        end
+    end
+    
+    local prevTrack = self.playlist[self.currentIndex]
+    if prevTrack then
+        self:playTrack(prevTrack)
+    end
+end
 
-WasUI:CreateCategory(tabAbout, "关于")
-addSpacing(tabAbout)
+function MusicPlayer:setVolume(vol)
+    self.volume = math.clamp(vol, 0, 1)
+    if self.currentSound then
+        self.currentSound.Volume = self.volume
+    end
+end
 
-WasUI:CreateLabel(tabAbout, "秋辞多功能脚本")
-WasUI:CreateLabel(tabAbout, "QQ群：938714427")
-WasUI:CreateLabel(tabAbout, "快手：XQWANYYDS")
-WasUI:CreateLabel(tabAbout, "F1 显示/隐藏窗口")
+function MusicPlayer:setPitch(pitch)
+    self.pitch = math.clamp(pitch, 0.1, 3)
+    if self.currentSound then
+        self.currentSound.Pitch = self.pitch
+    end
+end
 
-WasUI:CreateButton(tabAbout, "复制QQ群链接", function()
-    setclipboard("https://qun.qq.com/universal-share/share?ac=1&authKey=bEmFYn95LgJAyVYjM00CBWVn8i23mWAyj5Z%2Ba3rithMWPxzDwKlZ9wKtaB7q2s6n&busi_data=eyJncm91cENvZGUiOiI5Mzg3MTQ0MjciLCJ0b2tlbiI6IkFGL2Z6QTE5WUNRU2UrOGF6SzRQRVJDdmc5YzJjZVVmQXdEbmhObHNnRUhQZDUzL3djamJUdm5SRThDSjFrQmYiLCJ1aW4iOiIzNDM1Mjg2MTc3In0%3D&data=ahUTHr2un-Gf0AHE1oBjxdt0-y4VEoLSnZ1D6Ve-6KdsYM4R_Rw-hJ-amg0HfFokPb9CyhFVCDesPER_Ave_8A&svctype=4&tempid=h5_group_info")
-    WasUI:Notify({Title = "复制", Content = "QQ群链接已复制", Duration = 2})
-end)
-addSpacing(tabAbout)
+function MusicPlayer:setLoop(loop)
+    self.loop = loop
+    if self.currentSound then
+        self.currentSound.Looped = self.loop
+    end
+end
 
-WasUI:CreateButton(tabAbout, "复制快手号", function()
-    setclipboard("XQWANYYDS")
-    WasUI:Notify({Title = "复制", Content = "快手号已复制", Duration = 2})
-end)
-addSpacing(tabAbout)
+function MusicPlayer:addFavorite(track)
+    if not track or not track.id then return end
+    
+    for _, fav in ipairs(self.favorites) do
+        if fav.id == track.id then
+            return
+        end
+    end
+    
+    table.insert(self.favorites, track)
+end
 
-game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.F1 then
-        if mainWindow.IsMinimized then
-            mainWindow:RestoreFromDots()
+function MusicPlayer:removeFavorite(trackId)
+    for i, fav in ipairs(self.favorites) do
+        if fav.id == trackId then
+            table.remove(self.favorites, i)
+            break
+        end
+    end
+end
+
+function MusicPlayer:isFavorite(trackId)
+    for _, fav in ipairs(self.favorites) do
+        if fav.id == trackId then
+            return true
+        end
+    end
+    return false
+end
+
+local player = MusicPlayer.new()
+
+local musicLibrary = {
+    {
+        id = "79277371759525",
+        title = "雨爱dj",
+        artist = "Unknown Artist",
+        duration = 180,
+        genre = "Ambient",
+        thumbnail = "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=400"
+    },
+    {
+        id = "134012322",
+        title = "胜利音效",
+        artist = "Game Music Studio",
+        duration = 45,
+        genre = "Orchestral",
+        thumbnail = "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=400&h=400"
+    },
+    {
+        id = "275699518",
+        title = "点击音效",
+        artist = "SFX Library",
+        duration = 1,
+        genre = "SFX",
+        thumbnail = "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=400"
+    },
+    {
+        id = "9046004667",
+        title = "通知音",
+        artist = "UI Sounds",
+        duration = 2,
+        genre = "Electronic",
+        thumbnail = "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=400"
+    },
+    {
+        id = "9124267240",
+        title = "氛围音乐",
+        artist = "Ambient Collective",
+        duration = 300,
+        genre = "Ambient",
+        thumbnail = "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=400"
+    },
+    {
+        id = "9124267241",
+        title = "合成波",
+        artist = "Retro Waves",
+        duration = 240,
+        genre = "Synthwave",
+        thumbnail = "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=400"
+    },
+    {
+        id = "9124267242",
+        title = "放松氛围",
+        artist = "Lofi Beats",
+        duration = 210,
+        genre = "Lo-Fi",
+        thumbnail = "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=400"
+    },
+    {
+        id = "9124267243",
+        title = "能量提升",
+        artist = "Workout Music",
+        duration = 195,
+        genre = "EDM",
+        thumbnail = "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=400"
+    }
+}
+
+player.playlist = musicLibrary
+
+local Window = WindUI:CreateWindow({
+    Title = "秋辞音乐播放器",
+    Icon = "music",
+    Author = "秋辞音乐",
+    Folder = "秋辞音乐播放器",
+    Size = UDim2.fromOffset(700, 500),
+    Transparent = true,
+    Theme = "Dark",
+    User = {
+        Enabled = false,
+    },
+    SideBarWidth = 180,
+    ScrollBarEnabled = true,
+    KeySystem = {
+        Key = { "秋辞音乐", "autumnmusic" },
+        Note = "秋辞音乐播放器\n\n密钥: '秋辞音乐' 或 'autumnmusic'",
+        SaveKey = true,
+    },
+})
+
+local Tabs = {}
+
+Tabs.HomeTab = Window:Tab({ 
+    Title = "首页", 
+    Icon = "home",
+    ShowTabTitle = true
+})
+
+Tabs.PlaylistTab = Window:Tab({ 
+    Title = "播放列表", 
+    Icon = "list-music",
+    ShowTabTitle = true
+})
+
+Tabs.FavoritesTab = Window:Tab({ 
+    Title = "我的收藏", 
+    Icon = "heart",
+    ShowTabTitle = true
+})
+
+Tabs.HistoryTab = Window:Tab({ 
+    Title = "播放历史", 
+    Icon = "history",
+    ShowTabTitle = true
+})
+
+Tabs.SettingsTab = Window:Tab({ 
+    Title = "设置", 
+    Icon = "settings",
+    ShowTabTitle = true
+})
+
+Window:SelectTab(1)
+
+local nowPlayingParagraph
+local nowPlayingTitleText
+local nowPlayingDescText
+local nowPlayingImage
+local favoriteBtn
+local playPauseBtn
+
+local function updateNowPlaying()
+    if player.currentTrack then
+        nowPlayingParagraph:SetTitle(player.currentTrack.title or "未知曲目")
+        nowPlayingParagraph:SetDesc(player.currentTrack.artist or "未知艺术家")
+        
+        if player:isFavorite(player.currentTrack.id) then
+            favoriteBtn:SetIcon("heart-filled")
         else
-            mainWindow:MinimizeToDots()
+            favoriteBtn:SetIcon("heart")
+        end
+    end
+end
+
+do
+    Tabs.HomeTab:Section({ Title = "当前播放", Opened = true })
+    
+    nowPlayingParagraph = Tabs.HomeTab:Paragraph({
+        Title = "未播放",
+        Desc = "请选择一首音乐开始播放",
+        Thumbnail = "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=300&h=300",
+        ThumbnailSize = 200
+    })
+    
+    Tabs.HomeTab:Section({ Title = "播放控制", Opened = true })
+    
+    local controlButtons = {}
+    
+    table.insert(controlButtons, Tabs.HomeTab:Button({
+        Title = "上一首",
+        Icon = "skip-back",
+        Callback = function()
+            player:prev()
+            updateNowPlaying()
+        end
+    }))
+    
+    playPauseBtn = Tabs.HomeTab:Button({
+        Title = "播放",
+        Icon = "play",
+        Callback = function()
+            player:togglePlayPause()
+            if player.isPlaying then
+                playPauseBtn:SetTitle("暂停")
+                playPauseBtn:SetIcon("pause")
+            else
+                playPauseBtn:SetTitle("播放")
+                playPauseBtn:SetIcon("play")
+            end
+        end
+    })
+    table.insert(controlButtons, playPauseBtn)
+    
+    table.insert(controlButtons, Tabs.HomeTab:Button({
+        Title = "下一首",
+        Icon = "skip-forward",
+        Callback = function()
+            player:next()
+            updateNowPlaying()
+        end
+    }))
+    
+    table.insert(controlButtons, Tabs.HomeTab:Button({
+        Title = "停止",
+        Icon = "square",
+        Callback = function()
+            player:stop()
+            playPauseBtn:SetTitle("播放")
+            playPauseBtn:SetIcon("play")
+            nowPlayingParagraph:SetTitle("未播放")
+            nowPlayingParagraph:SetDesc("请选择一首音乐开始播放")
+        end
+    }))
+    
+    favoriteBtn = Tabs.HomeTab:Button({
+        Title = "收藏",
+        Icon = "heart",
+        Callback = function()
+            if player.currentTrack then
+                if player:isFavorite(player.currentTrack.id) then
+                    player:removeFavorite(player.currentTrack.id)
+                    favoriteBtn:SetIcon("heart")
+                else
+                    player:addFavorite(player.currentTrack)
+                    favoriteBtn:SetIcon("heart-filled")
+                end
+            end
+        end
+    })
+    table.insert(controlButtons, favoriteBtn)
+    
+    Tabs.HomeTab:Section({ Title = "播放设置", Opened = true })
+    
+    local volumeSlider = Tabs.HomeTab:Slider({
+        Title = "音量",
+        Value = {
+            Min = 0,
+            Max = 100,
+            Default = 50
+        },
+        Callback = function(value)
+            player:setVolume(value / 100)
+        end
+    })
+    
+    local pitchSlider = Tabs.HomeTab:Slider({
+        Title = "音调",
+        Value = {
+            Min = 10,
+            Max = 300,
+            Default = 100
+        },
+        Callback = function(value)
+            player:setPitch(value / 100)
+        end
+    })
+    
+    local loopToggle = Tabs.HomeTab:Toggle({
+        Title = "循环播放",
+        Value = false,
+        Callback = function(value)
+            player:setLoop(value)
+        end
+    })
+    
+    local playbackModeDropdown = Tabs.HomeTab:Dropdown({
+        Title = "播放模式",
+        Values = { "顺序播放", "随机播放", "单曲循环" },
+        Value = "顺序播放",
+        Callback = function(value)
+            if value == "随机播放" then
+                player.playbackMode = "random"
+            elseif value == "单曲循环" then
+                player.playbackMode = "repeat_one"
+            else
+                player.playbackMode = "sequential"
+            end
+        end
+    })
+end
+
+do
+    Tabs.PlaylistTab:Section({ Title = "音乐库", Opened = true })
+    
+    local searchInput = Tabs.PlaylistTab:Input({
+        Title = "搜索音乐",
+        Placeholder = "输入歌曲名、艺术家或流派...",
+        Callback = function(text)
+        end
+    })
+    
+    for _, track in ipairs(musicLibrary) do
+        Tabs.PlaylistTab:Paragraph({
+            Title = track.title,
+            Desc = track.artist .. " • " .. (track.duration or 0) .. "秒 • " .. (track.genre or "未分类"),
+            Image = track.thumbnail,
+            ImageSize = 40,
+            Buttons = {
+                {
+                    Title = "播放",
+                    Icon = "play",
+                    Variant = "Primary",
+                    Callback = function()
+                        if player:playTrack(track) then
+                            for i, t in ipairs(player.playlist) do
+                                if t.id == track.id then
+                                    player.currentIndex = i
+                                    break
+                                end
+                            end
+                            updateNowPlaying()
+                        end
+                    end
+                },
+                {
+                    Title = "收藏",
+                    Icon = "heart",
+                    Variant = "Secondary",
+                    Callback = function()
+                        if not player:isFavorite(track.id) then
+                            player:addFavorite(track)
+                        end
+                    end
+                }
+            }
+        })
+    end
+end
+
+do
+    Tabs.FavoritesTab:Section({ Title = "我的收藏", Opened = true })
+    
+    local function updateFavoritesDisplay()
+    end
+    
+    local function showFavorites()
+        if #player.favorites == 0 then
+            Tabs.FavoritesTab:Paragraph({
+                Title = "暂无收藏",
+                Desc = "点击歌曲的收藏按钮添加到收藏夹",
+                Color = "Grey"
+            })
+        else
+            for _, track in ipairs(player.favorites) do
+                Tabs.FavoritesTab:Paragraph({
+                    Title = track.title,
+                    Desc = track.artist .. " • " .. (track.duration or 0) .. "秒",
+                    Image = track.thumbnail,
+                    ImageSize = 40,
+                    Buttons = {
+                        {
+                            Title = "播放",
+                            Icon = "play",
+                            Variant = "Primary",
+                            Callback = function()
+                                if player:playTrack(track) then
+                                    updateNowPlaying()
+                                end
+                            end
+                        },
+                        {
+                            Title = "移除",
+                            Icon = "x",
+                            Variant = "Secondary",
+                            Callback = function()
+                                player:removeFavorite(track.id)
+                                -- 重新打开收藏夹标签页以刷新显示
+                                local currentTab = Window.SelectedTab
+                                Window:SelectTab(3)
+                            end
+                        }
+                    }
+                })
+            end
+        end
+    end
+    
+    showFavorites()
+end
+
+do
+    Tabs.HistoryTab:Section({ Title = "播放历史", Opened = true })
+    
+    local function showHistory()
+        if #player.history == 0 then
+            Tabs.HistoryTab:Paragraph({
+                Title = "暂无播放历史",
+                Desc = "播放过的歌曲会出现在这里",
+                Color = "Grey"
+            })
+        else
+            for _, historyItem in ipairs(player.history) do
+                Tabs.HistoryTab:Paragraph({
+                    Title = historyItem.title,
+                    Desc = historyItem.artist .. " • 最近播放",
+                    Image = historyItem.thumbnail,
+                    ImageSize = 40,
+                    Buttons = {
+                        {
+                            Title = "播放",
+                            Icon = "play",
+                            Variant = "Primary",
+                            Callback = function()
+                                if player:playTrack(historyItem) then
+                                    updateNowPlaying()
+                                end
+                            end
+                        },
+                        {
+                            Title = "收藏",
+                            Icon = "heart",
+                            Variant = "Secondary",
+                            Callback = function()
+                                player:addFavorite(historyItem)
+                            end
+                        }
+                    }
+                })
+            end
+        end
+    end
+    
+    Tabs.HistoryTab:Button({
+        Title = "清空历史记录",
+        Icon = "trash-2",
+        Callback = function()
+            Window:Dialog({
+                Title = "确认清空",
+                Content = "确定要清空所有历史记录吗？",
+                Icon = "alert-triangle",
+                Buttons = {
+                    {
+                        Title = "取消",
+                        Variant = "Secondary",
+                        Callback = function() end
+                    },
+                    {
+                        Title = "清空",
+                        Variant = "Primary",
+                        Callback = function()
+                            player.history = {}
+                            -- 重新打开历史记录标签页以刷新显示
+                            local currentTab = Window.SelectedTab
+                            Window:SelectTab(4)
+                        end
+                    }
+                }
+            })
+        end
+    })
+    
+    showHistory()
+end
+
+do
+    Tabs.SettingsTab:Section({ Title = "播放设置", Opened = true })
+    
+    Tabs.SettingsTab:Toggle({
+        Title = "自动播放下一首",
+        Value = true,
+        Callback = function(value)
+            print("自动播放: " .. tostring(value))
+        end
+    })
+    
+    Tabs.SettingsTab:Dropdown({
+        Title = "音质设置",
+        Values = { "标准 (128kbps)", "高音质 (192kbps)", "极高音质 (320kbps)", "无损" },
+        Value = "高音质 (192kbps)",
+        Callback = function(value)
+            print("音质设置为: " .. value)
+        end
+    })
+    
+    local maxHistorySlider = Tabs.SettingsTab:Slider({
+        Title = "最大历史记录数",
+        Value = {
+            Min = 10,
+            Max = 100,
+            Default = 20
+        },
+        Callback = function(value)
+            player.maxHistory = value
+        end
+    })
+    
+    Tabs.SettingsTab:Section({ Title = "外观设置", Opened = true })
+    
+    local themeDropdown = Tabs.SettingsTab:Dropdown({
+        Title = "界面主题",
+        Values = { "深色", "浅色", "自动" },
+        Value = "深色",
+        Callback = function(value)
+            if value == "浅色" then
+                WindUI:SetTheme("Light")
+            else
+                WindUI:SetTheme("Dark")
+            end
+        end
+    })
+    
+    Tabs.SettingsTab:Slider({
+        Title = "界面透明度",
+        Value = {
+            Min = 0,
+            Max = 100,
+            Default = 0
+        },
+        Callback = function(value)
+            local transparency = value / 100
+            Window:ToggleTransparency(transparency)
+        end
+    })
+    
+    Tabs.SettingsTab:Section({ Title = "关于", Opened = true })
+    
+    Tabs.SettingsTab:Paragraph({
+        Title = "秋辞音乐播放器",
+        Desc = "版本 1.0.0\n一个简洁优雅的Roblox音乐播放器\n\n功能特性：\n• 支持多种音乐格式\n• 播放列表管理\n• 收藏功能\n• 播放历史\n• 音质调节\n• 多主题切换",
+        Image = "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=150&h=150",
+        ImageSize = 60
+    })
+    
+    Tabs.SettingsTab:Button({
+        Title = "导入音乐",
+        Icon = "folder-plus",
+        Callback = function()
+            Window:Dialog({
+                Title = "导入音乐",
+                Content = "此功能暂未实现\n请在代码中手动添加音乐",
+                Icon = "music",
+                Buttons = {
+                    {
+                        Title = "确定",
+                        Variant = "Primary",
+                        Callback = function() end
+                    }
+                }
+            })
+        end
+    })
+    
+    Tabs.SettingsTab:Button({
+        Title = "导出配置",
+        Icon = "download",
+        Callback = function()
+            print("配置导出功能")
+        end
+    })
+    
+    Tabs.SettingsTab:Button({
+        Title = "重置设置",
+        Icon = "refresh-ccw",
+        Callback = function()
+            Window:Dialog({
+                Title = "重置设置",
+                Content = "此功能暂未实现",
+                Icon = "alert-triangle",
+                Buttons = {
+                    {
+                        Title = "确定",
+                        Variant = "Primary",
+                        Callback = function() end
+                    }
+                }
+            })
+        end
+    })
+end
+
+Window:EditOpenButton({
+    Title = "秋辞音乐",
+    Icon = "music",
+    CornerRadius = UDim.new(0, 12),
+    StrokeThickness = 2,
+    Color = ColorSequence.new(
+        Color3.fromHex("FF0F7B"), 
+        Color3.fromHex("F89B29")
+    ),
+    Draggable = true,
+})
+
+local UserInputService = game:GetService("UserInputService")
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    
+    if input.KeyCode == Enum.KeyCode.Space then
+        player:togglePlayPause()
+        if playPauseBtn then
+            if player.isPlaying then
+                playPauseBtn:SetTitle("暂停")
+                playPauseBtn:SetIcon("pause")
+            else
+                playPauseBtn:SetTitle("播放")
+                playPauseBtn:SetIcon("play")
+            end
+        end
+    elseif input.KeyCode == Enum.KeyCode.Right then
+        player:next()
+        updateNowPlaying()
+    elseif input.KeyCode == Enum.KeyCode.Left then
+        player:prev()
+        updateNowPlaying()
+    elseif input.KeyCode == Enum.KeyCode.Up then
+        player:setVolume(math.min(player.volume + 0.1, 1))
+    elseif input.KeyCode == Enum.KeyCode.Down then
+        player:setVolume(math.max(player.volume - 0.1, 0))
+    end
+end)
+
+local tabSwitchConnections = {}
+
+local function setupTabSwitch(tab, callback)
+    tabSwitchConnections[tab] = callback
+end
+
+Window:OnClose(function()
+    player:stop()
+    print("秋辞音乐播放器已关闭")
+    
+    for _, connection in pairs(tabSwitchConnections) do
+        if connection then
+            pcall(function() connection:Disconnect() end)
         end
     end
 end)
 
-WasUI:Notify({Title = "加载完成", Content = "脚本已就绪", Duration = 3})
+task.wait(1)
+WindUI:Notify({
+    Title = "秋辞音乐播放器",
+    Content = "欢迎使用秋辞音乐播放器！\n使用空格键暂停/播放，方向键控制",
+    Icon = "music",
+    Duration = 5,
+})
+
+task.wait(2)
+if #musicLibrary > 0 then
+    local firstTrack = musicLibrary[1]
+    if player:playTrack(firstTrack) then
+        player.currentIndex = 1
+        updateNowPlaying()
+        playPauseBtn:SetTitle("暂停")
+        playPauseBtn:SetIcon("pause")
+        
+        WindUI:Notify({
+            Title = "音乐已开始播放",
+            Content = "正在播放: " .. firstTrack.title,
+            Icon = "play",
+            Duration = 3,
+        })
+    end
+end
