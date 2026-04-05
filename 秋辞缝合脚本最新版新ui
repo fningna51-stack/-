@@ -1568,6 +1568,12 @@ local scriptCategories = {
             }
     },
     {
+    GroupName = "破坏者谜团",
+        List = {
+            {Name = "破坏者谜团脚本", Url = "https://pastebin.com/raw/VRwdkSG3"},
+            }
+    },
+    {
             GroupName = "驾驶帝国",
         List = {
             {Name = "驾驶帝国脚本", Url = "https://raw.githubusercontent.com/Marco8642/science/main/drivingempire"},
