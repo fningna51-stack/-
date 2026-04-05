@@ -1552,6 +1552,7 @@ local scriptCategories = {
         List = {
             {Name = "撕咬之夜", Url = "https://raw.githubusercontent.com/Youfutongxiang1/Msploit-v2-CN/refs/heads/main/Msploit-v2-CN"},
             {Name = "殺脚本撕咬之夜", Url = "https://raw.githubusercontent.com/FengYu-X/Max/refs/heads/X/BBN.lua"},
+            {Name = "撕咬之夜Kurby汉化", Url = "https://raw.githubusercontent.com/ojdoxbkvxosh/-lol/refs/heads/main/Kurby汉化"},
             }
     },
     {
