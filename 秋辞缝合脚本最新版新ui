@@ -1255,6 +1255,18 @@ UniversalLeftGroup:AddButton({Text="走路创人",Func=function()
                 end
         end
 end});
+UniversalLeftGroup:AddButton({Text="无敌少侠飞行脚本",Func=function()
+        if A2.Character then
+                local HRP = A2.Character:FindFirstChild("HumanoidRootPart");
+                if HRP then
+                        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Invinicible-Flight-R15-45414"))()
+                        local Func = loadstring(ScriptContent);
+                        if Func then
+                                Func();
+                        end
+                end
+        end
+end});
 UniversalLeftGroup:AddButton({Text="穿墙模式",Func=function()
         A19 = not A19;
         if A22 then
@@ -1309,9 +1321,23 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/JsYb666/Item/refs/hea
                 Func();
         end
 end});
+UniversalRightGroup:AddButton({Text="SX翻译",Func=function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/SQ182/y/refs/heads/main/翻译.lua"))()
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
 UniversalRightGroup:AddLabel("音乐播放器");
 UniversalRightGroup:AddButton({Text="音乐播放器脚本",Func=function()
         loadstring(game:HttpGet("http://music.567099.xyz/music.php"))()
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
+UniversalRightGroup:AddButton({Text="秋辞音乐播放器(正在开发)",Func=function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%A7%8B%E8%BE%9E%E7%BA%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%84%9A%E6%9C%AC"))()
         local Func = loadstring(ScriptContent);
         if Func then
                 Func();
@@ -1332,7 +1358,6 @@ UniversalRightGroup:AddButton({Text="撸屌R15",Func=function()
                 Func();
         end
 end});
-
 local scriptCategories = {
     {
         GroupName = "各大脚本",
@@ -1344,6 +1369,7 @@ local scriptCategories = {
             {Name = "皮脚本", Url = "https://raw.githubusercontent.com/xiaopi77/xiaopi77/main/QQ1002100032-Roblox-Pi-script.lua"},
             {Name = "落叶脚本", Url = "https://raw.githubusercontent.com/krlpl/Deciduous-center-LS/main/%E8%90%BD%E5%8F%B6%E4%B8%AD%E5%BF%83%E6%B7%B7%E6%B7%86.txt"},
             {Name = "Rb脚本中心＿汉化中心", Url = "https://api.luarmor.net/files/v3/loaders/4fe525637e43a1be8cb0cdf902d107c2.lua"},
+            {Name = "NOL免费版", Url = "https://raw.githubusercontent.com/Syndromehsh/BETA2/refs/heads/main/NOL"},
         }
     },
     {
@@ -1737,7 +1763,7 @@ local YOffset = 0
 
 YOffset = YOffset + CreateUpdateItem("😂", "某些乐子", "觉得卡密傻就别用这个脚本免费给你好用的脚本又叫上了\n可能会说又不是只有我这一个缝合我用别的\n那就去用别人的我这里不欢迎没有素质和自大的人", YOffset)
 
-YOffset = YOffset + CreateUpdateItem("🆕", "新增功能", "添加更多的通用脚本\n还添加了动作的脚本", YOffset)
+YOffset = YOffset + CreateUpdateItem("🆕", "新增功能", "这几天可能不会更新缝合因为在搞音乐播放器", YOffset)
 
 YOffset = YOffset + CreateUpdateItem("🏠", "主要公告介绍", "势必为大家找到好玩而且免费的脚本\n预计给大家添加100多种服务器的脚本，", YOffset)
 
