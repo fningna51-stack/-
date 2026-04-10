@@ -142,23 +142,6 @@ UniversalLeftGroup:AddSlider("WalkSpeedSlider", {Text="移动速度",Default=16,
                 end
         end
 end});
-UniversalLeftGroup:AddSlider("JumpPowerSlider", {Text="跳跃高度",Default=50,Min=50,Max=200,Rounding=0,Compact=false,Callback=function(Value)
-        if (A2 and A2.Character) then
-                local Humanoid = A2.Character:FindFirstChild("Humanoid");
-                if Humanoid then
-                        Humanoid.JumpPower = Value;
-                end
-        end
-end});
-UniversalLeftGroup:AddInput("JumpPowerInput", {Text="跳跃高度设置",Default="",Placeholder="输入跳跃高度值",Numeric=true,Finished=false,Callback=function(Value)
-        local numValue = tonumber(Value);
-        if (numValue and A2 and A2.Character) then
-                local Humanoid = A2.Character:FindFirstChild("Humanoid");
-                if Humanoid then
-                        Humanoid.JumpPower = numValue;
-                end
-        end
-end});
 UniversalLeftGroup:AddInput("WalkSpeedInput", {Text="移动速度设置",Default="",Placeholder="输入移动速度值",Numeric=true,Finished=false,Callback=function(Value)
         local numValue = tonumber(Value);
         if (numValue and A2 and A2.Character) then
@@ -166,12 +149,6 @@ UniversalLeftGroup:AddInput("WalkSpeedInput", {Text="移动速度设置",Default
                 if Humanoid then
                         Humanoid.WalkSpeed = numValue;
                 end
-        end
-end});
-UniversalLeftGroup:AddInput("GravityInput", {Text="重力设置",Default="",Placeholder="输入重力值",Numeric=true,Finished=false,Callback=function(Value)
-        local numValue = tonumber(Value);
-        if numValue then
-                A8.Gravity = numValue;
         end
 end});
 UniversalLeftGroup:AddToggle("NightVisionToggle", {Text="夜视",Default=false,Callback=function(Value)
@@ -192,244 +169,6 @@ UniversalLeftGroup:AddToggle("NightVisionToggle", {Text="夜视",Default=false,C
                 A4.GlobalShadows = true;
         end
 end});
-local TranslationStats = {
-    TranslationCount = 0,
-    TranslationSpeed = 0,
-    LastUpdateTime = tick(),
-    TranslationsPerMinute = 0
-}
-
-local function SetupAutoTranslation()
-    local Http = game:GetService("HttpService")
-    local Players = game:GetService("Players")
-    local CoreGui = game:GetService("CoreGui")
-    
-    local request = request or http_request or 
-        (syn and syn.request) or 
-        (fluxus and fluxus.request)
-    
-    if not (request and hookmetamethod) then
-        safeNotify("翻译错误", "不支持此执行器", 5)
-        return
-    end
-    
-    local Encode, Decode, Spawn = 
-        Http.UrlEncode, 
-        Http.JSONDecode, 
-        task.spawn
-    
-    local Cache, Queue, RealText, Locks = 
-        {}, 
-        {}, 
-        setmetatable({}, { __mode = "k" }), 
-        {}
-    
-    local API = "https://clients5.google.com/translate_a/t?client=dict-chrome-ex&sl=auto&tl=zh-CN&q="
-    local MonitoredContainers = {}
-    
-    local OldIdx
-    OldIdx = hookmetamethod(game, "__index", function(t, k)
-        if k == "Text" and not checkcaller() then
-            return RealText[t]
-        end
-        return OldIdx(t, k)
-    end)
-    
-    local function UpdateTranslationStats()
-        local currentTime = tick()
-        local elapsedMinutes = (currentTime - TranslationStats.LastUpdateTime) / 60
-        if elapsedMinutes > 0 then
-            TranslationStats.TranslationsPerMinute = TranslationStats.TranslationCount / elapsedMinutes
-        end
-    end
-    
-    local function SetTrans(obj, origin, trans, vars)
-        if obj.Text ~= origin then
-            return
-        end
-        local k = 0
-        local val = trans:gsub("%s?{[nN]}%s?", function()
-            k = k + 1
-            return vars[k] or ""
-        end)
-        if obj.Text ~= val then
-            Locks[obj] = true
-            RealText[obj] = origin
-            obj.Text = val
-            Locks[obj] = nil
-            
-            TranslationStats.TranslationCount = TranslationStats.TranslationCount + 1
-            UpdateTranslationStats()
-        end
-    end
-    
-    local function Process(obj)
-        if Locks[obj] then
-            return
-        end
-        local txt = obj.Text
-        if #txt < 2 then
-            return
-        end
-        if txt:match("^[%d%s%p]+$") then
-            return
-        end
-        local vars = {}
-        local skel = txt:gsub("[%+$%-¥]?%d+[%d%.%,:]*[%d%%]*", function(m)
-            vars[#vars + 1] = m
-            return "{n}"
-        end)
-        if Cache[skel] then
-            return SetTrans(obj, txt, Cache[skel], vars)
-        end
-        local q = Queue[skel]
-        if q then
-            q[#q + 1] = { obj, vars, txt }
-            return
-        end
-        Queue[skel] = { { obj, vars, txt } }
-        Spawn(function()
-            local s, r = pcall(request, { 
-                Url = API .. Encode(Http, skel), 
-                Method = "GET" 
-            })
-            local d = s and r.StatusCode == 200 and Decode(Http, r.Body)
-            local res = type(d) == "table" and 
-                (type(d[1]) == "string" and d[1] or d[1][1])
-            if res then
-                Cache[skel] = res
-                for _, i in next, Queue[skel] do
-                    if i[1].Parent then
-                        SetTrans(i[1], i[3], res, i[2])
-                    end
-                end
-            end
-            Queue[skel] = nil
-        end)
-    end
-    
-    local function MonitorContainer(container)
-        if MonitoredContainers[container] then
-            return
-        end
-        MonitoredContainers[container] = true
-        for _, v in next, container:GetDescendants() do
-            if v:IsA("TextLabel") or 
-               v:IsA("TextButton") or 
-               v:IsA("TextBox") then
-                Process(v)
-                v:GetPropertyChangedSignal("Text"):Connect(function()
-                    Process(v)
-                end)
-            end
-        end
-        container.DescendantAdded:Connect(function(child)
-            if child:IsA("TextLabel") or 
-               child:IsA("TextButton") or 
-               child:IsA("TextBox") then
-                Process(child)
-                child:GetPropertyChangedSignal("Text"):Connect(function()
-                    Process(child)
-                end)
-            end
-        end)
-    end
-    
-    local function StartTranslation()
-        local Roots = { 
-            Players.LocalPlayer:WaitForChild("PlayerGui"), 
-            (gethui and gethui()) or CoreGui, 
-            workspace 
-        }
-        
-        for _, root in next, Roots do
-            MonitorContainer(root)
-        end
-        
-        if CoreGui:FindFirstChildWhichIsA("ScreenGui") then
-            for _, gui in next, CoreGui:GetChildren() do
-                if gui:IsA("ScreenGui") then
-                    MonitorContainer(gui)
-                end
-            end
-        end
-        
-        CoreGui.ChildAdded:Connect(function(child)
-            if child:IsA("ScreenGui") then
-                MonitorContainer(child)
-            end
-        end)
-        
-        Players.LocalPlayer:WaitForChild("PlayerGui").ChildAdded:Connect(function(child)
-            if child:IsA("GuiBase2d") then
-                MonitorContainer(child)
-            end
-        end)
-        
-        workspace.DescendantAdded:Connect(function(child)
-            if child:IsA("SurfaceGui") or child:IsA("BillboardGui") then
-                MonitorContainer(child)
-            end
-        end)
-    end
-    
-    return StartTranslation
-end
-
-local startTranslationFunc
-local translationActive = false
-
-UniversalLeftGroup:AddToggle("AutoTranslateToggle", {
-    Text = "自动翻译(墨水游戏会被检测秒封)", 
-    Default = false, 
-    Callback = function(Value)
-        if Value then
-            if not startTranslationFunc then
-                startTranslationFunc = SetupAutoTranslation()
-            end
-            
-            TranslationStats.TranslationCount = 0
-            TranslationStats.TranslationSpeed = 0
-            TranslationStats.LastUpdateTime = tick()
-            TranslationStats.TranslationsPerMinute = 0
-            
-            startTranslationFunc()
-            translationActive = true
-            
-            -- 启动统计更新
-            spawn(function()
-                while translationActive and wait(5) do
-                    UpdateTranslationStats()
-                end
-            end)
-        else
-            translationActive = false
-        end
-    end
-})
-
--- 在右侧信息组添加翻译统计显示
-UniversalRightGroup:AddLabel("翻译统计:")
-local TranslatedLabel = UniversalRightGroup:AddLabel("已翻译: 0")
-local SpeedLabel = UniversalRightGroup:AddLabel("速度: 0/分钟")
-
--- 创建函数来更新统计显示
-local function UpdateTranslationDisplay()
-    if TranslatedLabel and SpeedLabel then
-        TranslatedLabel:SetText("已翻译: " .. tostring(TranslationStats.TranslationCount))
-        SpeedLabel:SetText("速度: " .. string.format("%.1f/分钟", TranslationStats.TranslationsPerMinute))
-    end
-end
-
-spawn(function()
-    while wait(5) do
-        if translationActive then
-            UpdateTranslationStats()
-            UpdateTranslationDisplay()
-        end
-    end
-end)
-
 UniversalLeftGroup:AddToggle("BulletTrackingToggle", {Text="通用子弹追踪",Default=false,Callback=function(Enabled)
         if Enabled then
                 if not bulletTrackingHook then
@@ -1358,6 +1097,749 @@ UniversalRightGroup:AddButton({Text="撸屌R15",Func=function()
                 Func();
         end
 end});
+UniversalRightGroup:AddLabel("秋辞脚本测试区");
+UniversalRightGroup:AddButton({Text="秋辞缝合脚本1.0 3DUI测试脚本(只有脚本)",Func=function()
+        local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local HttpService = game:GetService("HttpService")
+
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+local secureParent = pcall(function() return CoreGui end) and CoreGui or LocalPlayer:WaitForChild("PlayerGui")
+
+local req = (syn and syn.request) or (http and http.request) or http_request or request
+local getasset = getcustomasset or getsynasset
+
+if not req or not getasset or not writefile then
+    warn("环境缺失高级API！无法运行此脚本。") return
+end
+
+local ConfigFolder = "NeteaseData_Vision"
+if not isfolder(ConfigFolder) then makefolder(ConfigFolder) end
+
+if getgenv()._CleanHoloLib then getgenv()._CleanHoloLib() end
+
+local HoloLib = {}
+local UI_Instances = {}
+
+local AttachTarget = nil
+
+local function GetPlayerFromString(str)
+    if not str or str == "" then return nil end
+    str = string.lower(str)
+    if str == "me" then return LocalPlayer end
+    for _, p in ipairs(Players:GetPlayers()) do
+        if string.find(string.lower(p.Name), str) or string.find(string.lower(p.DisplayName), str) then
+            return p
+        end
+    end
+    return nil
+end
+
+local AppleTheme = {
+    GlassBG = Color3.fromRGB(15, 15, 18),
+    GlassTransparency = 0.35,
+    Stroke = Color3.fromRGB(255, 255, 255),
+    StrokeTransparency = 0.88,
+    Accent = Color3.fromRGB(10, 132, 255),
+    ComponentBG = Color3.fromRGB(45, 45, 50),
+    TextPrimary = Color3.fromRGB(245, 245, 245),
+    TextSecondary = Color3.fromRGB(150, 150, 155),
+    Corner = UDim.new(0, 16)
+}
+
+local function CreateSpatialPanel(title, initialOffset, isMain)
+    local isVisible = isMain 
+    local isPinned = false
+    local pinnedPosition = Vector3.new()
+    local currentHoloOffset = initialOffset
+    
+    local PanelPart = Instance.new("Part")
+    PanelPart.Size = Vector3.new(3.2, 4.0, 0.01)
+    PanelPart.Anchored = true
+    PanelPart.CanCollide = false
+    PanelPart.Transparency = 1 
+    PanelPart.Parent = workspace
+    table.insert(UI_Instances, PanelPart)
+
+    local SurfaceUI = Instance.new("SurfaceGui")
+    SurfaceUI.Adornee = PanelPart
+    SurfaceUI.Face = Enum.NormalId.Back 
+    SurfaceUI.AlwaysOnTop = true 
+    SurfaceUI.LightInfluence = 0 
+    SurfaceUI.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud 
+    SurfaceUI.PixelsPerStud = 100 
+    SurfaceUI.Enabled = isVisible
+    SurfaceUI.Parent = secureParent
+    table.insert(UI_Instances, SurfaceUI)
+
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Size = UDim2.new(1, 0, 1, 0)
+    MainFrame.BackgroundColor3 = AppleTheme.GlassBG
+    MainFrame.BackgroundTransparency = AppleTheme.GlassTransparency
+    MainFrame.BorderSizePixel = 0
+    MainFrame.Parent = SurfaceUI
+    Instance.new("UICorner", MainFrame).CornerRadius = AppleTheme.Corner
+    local uiStroke = Instance.new("UIStroke", MainFrame)
+    uiStroke.Color = AppleTheme.Stroke
+    uiStroke.Transparency = AppleTheme.StrokeTransparency
+    uiStroke.Thickness = 1.5
+
+    local TopBar = Instance.new("Frame")
+    TopBar.Size = UDim2.new(1, 0, 0, 40)
+    TopBar.BackgroundTransparency = 1
+    TopBar.Parent = MainFrame
+
+    local DragBar = Instance.new("TextButton")
+    DragBar.Size = UDim2.new(1, -50, 1, 0)
+    DragBar.BackgroundTransparency = 1
+    DragBar.Text = "  " .. title
+    DragBar.TextColor3 = AppleTheme.TextPrimary
+    DragBar.Font = Enum.Font.GothamBold
+    DragBar.TextSize = 16
+    DragBar.TextXAlignment = Enum.TextXAlignment.Left
+    DragBar.Parent = TopBar
+
+    local PinBtn = Instance.new("TextButton")
+    PinBtn.Size = UDim2.new(0, 30, 0, 30)
+    PinBtn.Position = UDim2.new(1, -40, 0, 5)
+    PinBtn.BackgroundColor3 = AppleTheme.ComponentBG
+    PinBtn.BackgroundTransparency = 0.5
+    PinBtn.Text = "📍"
+    PinBtn.TextSize = 16
+    PinBtn.Parent = TopBar
+    Instance.new("UICorner", PinBtn).CornerRadius = UDim.new(1, 0)
+
+    PinBtn.MouseButton1Click:Connect(function()
+        isPinned = not isPinned
+        if isPinned then
+            pinnedPosition = PanelPart.Position
+            TweenService:Create(PinBtn, TweenInfo.new(0.3), {BackgroundColor3 = AppleTheme.Accent, BackgroundTransparency = 0}):Play()
+            PinBtn.Text = "📌"
+        else
+            TweenService:Create(PinBtn, TweenInfo.new(0.3), {BackgroundColor3 = AppleTheme.ComponentBG, BackgroundTransparency = 0.5}):Play()
+            PinBtn.Text = "📍"
+        end
+    end)
+
+    local isDraggingHolo, initTouch, initOffset = false, Vector2.new(), CFrame.new()
+    DragBar.InputBegan:Connect(function(input)
+        if not AttachTarget and not isPinned and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+            isDraggingHolo = true; initTouch = input.Position; initOffset = currentHoloOffset
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if isDraggingHolo and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - initTouch
+            currentHoloOffset = CFrame.new(
+                math.clamp(initOffset.X - (delta.X * 0.005), -6, 6),
+                math.clamp(initOffset.Y - (delta.Y * 0.005), -3, 4),
+                initOffset.Z
+            )
+        end
+    end)
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then isDraggingHolo = false end
+    end)
+
+    local ScrollFrame = Instance.new("ScrollingFrame")
+    ScrollFrame.Size = UDim2.new(1, -30, 1, -55)
+    ScrollFrame.Position = UDim2.new(0, 15, 0, 40)
+    ScrollFrame.BackgroundTransparency = 1
+    ScrollFrame.ScrollBarThickness = 3
+    ScrollFrame.ScrollBarImageColor3 = AppleTheme.TextSecondary
+    ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+    ScrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    ScrollFrame.Parent = MainFrame
+
+    local UIListLayout = Instance.new("UIListLayout")
+    UIListLayout.Padding = UDim.new(0, 12)
+    UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    UIListLayout.Parent = ScrollFrame
+
+    local followConn = RunService.RenderStepped:Connect(function(dt)
+        if not isVisible then 
+            PanelPart.CFrame = CFrame.new(0, -9999, 0)
+            return 
+        end
+        
+        if AttachTarget and AttachTarget.Character and AttachTarget.Character:FindFirstChild("HumanoidRootPart") then
+            local hrp = AttachTarget.Character.HumanoidRootPart
+            local baseCFrame = hrp.CFrame * CFrame.new(0, 1.5, 3.5) 
+            if isMain then
+                PanelPart.CFrame = PanelPart.CFrame:Lerp(baseCFrame * CFrame.new(-1.8, 0, 0), dt * 10)
+            else
+                PanelPart.CFrame = PanelPart.CFrame:Lerp(baseCFrame * CFrame.new(-5.2, 0, 0), dt * 10)
+            end
+        elseif not isPinned then
+            PanelPart.CFrame = PanelPart.CFrame:Lerp(Camera.CFrame * currentHoloOffset, dt * 15)
+        else
+            local targetRot = CFrame.lookAt(pinnedPosition, Camera.CFrame.Position) * CFrame.Angles(0, math.pi, 0)
+            PanelPart.CFrame = PanelPart.CFrame:Lerp(targetRot, dt * 10)
+        end
+    end)
+    table.insert(UI_Instances, followConn)
+
+    local PanelAPI = {}
+    function PanelAPI:GetBasePart() return PanelPart end
+    function PanelAPI:IsVisible() return isVisible end
+
+    function PanelAPI:SetVisible(state)
+        isVisible = state; SurfaceUI.Enabled = state
+        if state and isPinned then
+            isPinned = false; PinBtn.Text = "📍"
+            TweenService:Create(PinBtn, TweenInfo.new(0.3), {BackgroundColor3 = AppleTheme.ComponentBG, BackgroundTransparency = 0.5}):Play()
+            PanelPart.CFrame = Camera.CFrame * currentHoloOffset
+        end
+    end
+
+    function PanelAPI:ToggleVisible() self:SetVisible(not isVisible) end
+
+    function PanelAPI:CreateLabel(text, center)
+        local Label = Instance.new("TextLabel")
+        Label.Size = UDim2.new(1, 0, 0, 20)
+        Label.BackgroundTransparency = 1
+        Label.Text = text
+        Label.TextColor3 = AppleTheme.TextSecondary
+        Label.Font = Enum.Font.GothamMedium
+        Label.TextSize = 13
+        Label.TextWrapped = true
+        Label.TextXAlignment = center and Enum.TextXAlignment.Center or Enum.TextXAlignment.Left
+        Label.Parent = ScrollFrame
+        return Label
+    end
+
+    function PanelAPI:CreateButton(text, callback)
+        local Btn = Instance.new("TextButton")
+        Btn.Size = UDim2.new(1, 0, 0, 40)
+        Btn.BackgroundColor3 = AppleTheme.ComponentBG
+        Btn.BackgroundTransparency = 0.4
+        Btn.Text = text
+        Btn.TextColor3 = AppleTheme.TextPrimary
+        Btn.Font = Enum.Font.GothamMedium
+        Btn.TextSize = 14
+        Btn.Parent = ScrollFrame
+        Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 10)
+        
+        Btn.MouseButton1Click:Connect(function()
+            TweenService:Create(Btn, TweenInfo.new(0.1), {BackgroundColor3 = AppleTheme.Accent}):Play()
+            pcall(callback)
+            task.wait(0.1)
+            TweenService:Create(Btn, TweenInfo.new(0.3), {BackgroundColor3 = AppleTheme.ComponentBG}):Play()
+        end)
+        return Btn
+    end
+
+    function PanelAPI:CreateInput(placeholder, callback)
+        local InputFrame = Instance.new("Frame")
+        InputFrame.Size = UDim2.new(1, 0, 0, 40)
+        InputFrame.BackgroundColor3 = AppleTheme.ComponentBG
+        InputFrame.BackgroundTransparency = 0.6
+        InputFrame.Parent = ScrollFrame
+        Instance.new("UICorner", InputFrame).CornerRadius = UDim.new(0, 10)
+
+        local TextBox = Instance.new("TextBox")
+        TextBox.Size = UDim2.new(1, -20, 1, 0)
+        TextBox.Position = UDim2.new(0, 10, 0, 0)
+        TextBox.BackgroundTransparency = 1
+        TextBox.PlaceholderText = placeholder
+        TextBox.Text = ""
+        TextBox.TextColor3 = AppleTheme.TextPrimary
+        TextBox.PlaceholderColor3 = AppleTheme.TextSecondary
+        TextBox.Font = Enum.Font.GothamMedium
+        TextBox.TextSize = 13
+        TextBox.TextXAlignment = Enum.TextXAlignment.Left
+        TextBox.ClearTextOnFocus = false
+        TextBox.Parent = InputFrame
+
+        TextBox.FocusLost:Connect(function(enterPressed)
+            if enterPressed then pcall(callback, TextBox.Text) end
+        end)
+        return TextBox
+    end
+
+    function PanelAPI:CreateSubTab(subTitle)
+        local subOffset = currentHoloOffset * CFrame.new(2.8, 0, 0)
+        local SubPanel = CreateSpatialPanel(subTitle, subOffset, false)
+        
+        local Btn = Instance.new("TextButton")
+        Btn.Size = UDim2.new(1, 0, 0, 45)
+        Btn.BackgroundColor3 = AppleTheme.ComponentBG
+        Btn.BackgroundTransparency = 0.4
+        Btn.Text = subTitle .. "  ➡️"
+        Btn.TextColor3 = AppleTheme.TextPrimary
+        Btn.Font = Enum.Font.GothamMedium
+        Btn.TextSize = 14
+        Btn.Parent = ScrollFrame
+        Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 10)
+        
+        Btn.MouseButton1Click:Connect(function()
+            TweenService:Create(Btn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(80, 80, 90)}):Play()
+            SubPanel:ToggleVisible() 
+            task.wait(0.1)
+            TweenService:Create(Btn, TweenInfo.new(0.3), {BackgroundColor3 = AppleTheme.ComponentBG}):Play()
+        end)
+        return SubPanel
+    end
+
+    return PanelAPI
+end
+
+function HoloLib:CreateWindow(config)
+    local title = config.Title or "Vision UI"
+    local MainPanel = CreateSpatialPanel(title, CFrame.new(-1.2, -0.2, -3.2), true)
+
+    local MobileUI = Instance.new("ScreenGui")
+    MobileUI.ResetOnSpawn = false
+    MobileUI.Parent = secureParent
+    table.insert(UI_Instances, MobileUI)
+
+    local ToggleBtn = Instance.new("TextButton")
+    ToggleBtn.Size = UDim2.new(0, 45, 0, 45)
+    ToggleBtn.Position = UDim2.new(0.5, -22, 0.05, 0)
+    ToggleBtn.BackgroundColor3 = AppleTheme.GlassBG
+    ToggleBtn.BackgroundTransparency = 0.2
+    ToggleBtn.Text = "😂"
+    ToggleBtn.TextColor3 = AppleTheme.TextPrimary
+    ToggleBtn.TextSize = 20
+    ToggleBtn.Parent = MobileUI
+    Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(1, 0)
+    local stroke = Instance.new("UIStroke", ToggleBtn)
+    stroke.Color = AppleTheme.Stroke
+    stroke.Transparency = 0.5
+    stroke.Thickness = 1.5
+
+    local dragToggle, dragStart, startPos
+    ToggleBtn.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragToggle = true; dragStart = input.Position; startPos = ToggleBtn.Position
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if dragToggle and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStart
+            ToggleBtn.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragToggle = false end
+    end)
+
+    ToggleBtn.MouseButton1Click:Connect(function()
+        if AttachTarget then AttachTarget = nil end
+        MainPanel:ToggleVisible()
+    end)
+
+    return MainPanel
+end
+
+getgenv()._CleanHoloLib = function()
+    for _, item in ipairs(UI_Instances) do
+        if typeof(item) == "RBXScriptConnection" then item:Disconnect() else item:Destroy() end
+    end
+    UI_Instances = {}
+end
+
+local scriptCategories = {
+    {
+        GroupName = "各大脚本",
+        List = {
+            {Name = "秋容脚本复刻版", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%A7%8B%E5%AE%B9%E8%84%9A%E6%9C%AC%E5%A4%8D%E5%88%BB%E7%89%88"},
+            {Name = "叶脚本", Url = "https://raw.githubusercontent.com/roblox-ye/QQ515966991/refs/heads/main/ROBLOX-CNVIP-XIAOYE.lua"},
+            {Name = "xk脚本", Url = "https://raw.githubusercontent.com/devslopo/DVES/raw/main/XK%20Hub"},
+            {Name = "新版XA脚本", Url = "https://github.com/YunLua/Lua/raw/main/XA_Hub.lua"},
+            {Name = "皮脚本", Url = "https://raw.githubusercontent.com/xiaopi77/xiaopi77/main/QQ1002100032-Roblox-Pi-script.lua"},
+            {Name = "落叶脚本", Url = "https://raw.githubusercontent.com/krlpl/Deciduous-center-LS/main/%E8%90%BD%E5%8F%B6%E4%B8%AD%E5%BF%83%E6%B7%B7%E6%B7%86.txt"},
+            {Name = "Rb脚本中心＿汉化中心", Url = "https://raw.githubusercontent.com/358545698555/roblox-/refs/heads/main/%E5%8F%AF%E6%9D%80%E9%98%9F%E5%8F%8B99%E5%A4%9C"},
+            {Name = "NOL免费版", Url = "https://raw.githubusercontent.com/Syndromehsh/BETA2/refs/heads/main/NOL"},
+        }
+    },
+    {
+        GroupName = "99夜",
+        List = {
+            {Name = "虚空99夜脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/99%E5%A4%9C%E6%B1%89%E5%8C%96"},
+            {Name = "99夜脚本可杀队友", Url = "https://raw.githubusercontent.com/358545698555/roblox-/refs/heads/main/%E5%8F%AF%E6%9D%80%E9%98%9F%E5%8F%8B99%E5%A4%9C"},
+            {Name = "99夜汉化脚本(无敌有效果)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%A7%8B%E8%BE%9E99%E5%A4%9C%E6%B1%89%E5%8C%96"},
+        }
+    },
+    {
+        GroupName = "亡命速递",
+        List = {
+            {Name = "亡命速递脚本无法使用", Url = "https://raw.githubusercontent.com/JanseJYC/Script/refs/heads/main/Deadly-Deliver.lua"},
+            {Name = "亡命速递英文脚本", Url = "https://raw.githubusercontent.com/xxdaysheus01/RuneX/refs/heads/main/DeadlyDeliveryScript.lua"},
+            {Name = "亡命速递", Url = "https://api.luarmor.net/files/v3/loaders/4fe525637e43a1be8cb0cdf902d107c2.lua"},
+        }
+    },
+    {
+        GroupName = "死铁轨",
+        List = {
+            {Name = "仿红叶脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E4%BB%BF%E7%BA%A2%E5%8F%B6%E8%84%9A%E6%9C%AC%E6%B1%89%E5%8C%96"},
+            {Name = "红叶脚本", Url = "https://pandadevelopment.net/virtual/file/c96973c95ae3aaec"},
+            {Name = "速通脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%AD%BB%E9%93%81%E8%BD%A8%E6%B1%89%E5%8C%96%E8%84%9A%E6%9C%AC"},
+            {Name = "死铁轨脚本", Url = "https://raw.githubusercontent.com/gumanba/Scripts/refs/heads/main/DeadRails"},
+        }
+    },
+    {
+        GroupName = "墨水游戏",
+        List = {
+            {Name = "AX墨水脚本有芙同享秋辞汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/ax%E8%84%9A%E6%9C%AC%E7%A7%8B%E8%BE%9E%E6%B1%89%E5%8C%96"},
+            {Name = "墨水游戏人机汉化(里面有反作弊甩飞)", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/inkgame-ADEN-robot"},
+            {Name = "墨水Ringta汉化(无卡密)", Url = "https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/Ringta"},
+            {Name = "博伦墨水脚本", Url = "https://meting.qjqq.cn/"},
+            {Name = "Unm汉化，卡密ink50", Url = "https://github.com/youfutongxiang1145/unm-CN/releases/download/unm%E6%B1%89%E5%8C%96/unm.txt"},
+        }
+    },
+    {
+        GroupName = "doors",
+        List = {
+            {Name = "Doors脚本", Url = "https://raw.githubusercontent.com/atnew2025/Chinese-scripts/refs/heads/main/mshax(prohax).txt"},
+            {Name = "doors最新脚本", Url = "https://raw.githubusercontent.com/TheHunterSolo1/Scripts/refs/heads/main/Protected_2809220311826785.lua.txt"},
+            {Name = "doorsDP汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/doors-DP-robot"},
+        }
+    },
+    {
+        GroupName = "监狱生活",
+        List = {
+            {Name = "监狱生活汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%9B%91%E7%8B%B1%E7%94%9F%E6%B4%BB%E8%84%9A%E6%9C%AC"},
+        }
+    },
+    {
+        GroupName = "战争大亨",
+        List = {
+            {Name = "战争大亨最强脚本", Url = "https://raw.githubusercontent.com/MaxPikaa/PureLove/refs/heads/main/520"},
+            {Name = "战争大亨无卡密高级脚本", Url = "https://raw.githubusercontent.com/Macintosh1983/ChillHubMain/main/ChillHubOilWarfareTycoon.lua"},
+        }
+    },
+    {
+        GroupName = "被遗弃",
+        List = {
+            {Name = "被遗弃无卡密超好用", Url = "https://rawscripts.net/raw/G666-Forsaken-Keyless-auto-gen-reach-autoblock-+-more-63283"},
+            {Name = "被遗弃英文无卡密", Url = "https://github.com/shenxiuqi974/guesting-but-chinese/releases/download/hushwhw/default.txt"},
+        }
+    },
+    {
+        GroupName = "俄亥俄州",
+        List = {
+            {Name = "俄亥俄州英文脚本", Url = "https://raw.githubusercontent.com/PUSCRIPTS/V1sion/refs/heads/main/Pinguin"},
+            {Name = "晓辞俄亥俄州基础功能脚本", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%99%93%E8%BE%9E%E4%BF%84%E4%BA%A5%E4%BF%84%E5%B7%9E%E5%9F%BA%E7%A1%80%E5%8A%9F%E8%83%BD%E8%84%9A%E6%9C%AC"},
+            {Name = "俄亥俄州英文脚本", Url = "https://raw.githubusercontent.com/rxn-xyz/Ohio./main/Ohio.lua"},
+        }
+    },
+    {
+        GroupName = "画我",
+        List = {
+            {Name = "无卡密画我脚本", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/KENNY画我.lua"},
+        }
+    },
+    {
+        GroupName = "通缉脚本",
+        List = {
+            {Name = "SX HUB", Url = "https://api.luarmor.net/files/v3/loaders/87a8a4f4c2d2ef535ccd1bdb949218fe.lua"},
+            {Name = "KENNY", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/KENNY通缉换服.lua"},
+            {Name = "通缉", Url = "https://raw.githubusercontent.com/combatlegnd/combatlegnd/refs/heads/main/NH-Loader"},
+        }
+    },
+    {
+        GroupName = "闪光",
+        List = {
+            {Name = "闪光脚本", Url = "https://pastebin.com/raw/VRwdkSG3"},
+        }
+    },
+    {
+        GroupName = "最坚强的战场",
+        List = {
+            {Name = "最强战场Phantasm汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/thestongestbattlegrounds-Phantasm-robot"},
+            {Name = "最坚强的战场脚本2", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/phantasm.lua"},
+        }
+    },
+    {
+        GroupName = "偷走脑红",
+        List = {
+            {Name = "偷走脑红脚本", Url = "https://raw.githubusercontent.com/DynaFetchy/Scripts/refs/heads/main/Loader.lua"},
+            {Name = "偷走脑红脚本2", Url = "https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/偷走脑红"},
+            {Name = "偷走脑红KURD汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/Brainrot-KURD-robot"},
+        }
+    },
+    {
+        GroupName = "萨凡娜",
+        List = {
+            {Name = "萨凡娜-悔脚本", Url = "https://raw.githubusercontent.com/sdxs221/sd/main/萨凡娜"},
+        }
+    },
+    {
+        GroupName = "住宅大逃杀",
+        List = {
+            {Name = "住宅大逃杀-悔脚本", Url = "https://raw.githubusercontent.com/sdxs221/sd/main/住宅大屠杀"},
+        }
+    },
+    {
+        GroupName = "竞争对手",
+        List = {
+            {Name = "竞争对手脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/竞争对手汉化脚本"},
+        }
+    },
+    {
+        GroupName = "chain脚本",
+        List = {
+            {Name = "chain英文脚本", Url = "https://pastebin.com/raw/Q64rPkwu"},
+        }
+    },
+    {
+        GroupName = "跳跃对决",
+        List = {
+            {Name = "跳跃对决脚本", Url = "https://raw.githubusercontent.com/solarastuff/sorryjimpee/refs/heads/main/Jumper.lua"},
+        }
+    },
+    {
+        GroupName = "死亡球",
+        List = {
+            {Name = "死亡球Fluxin汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/deathball-Fluxin-robot"},
+            {Name = "死亡球stark汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/Deathballs-stark-robot"},
+        }
+    },
+    {
+        GroupName = "监狱人生",
+        List = {
+            {Name = "监狱人生Rayfield汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/prisonlife-Rayfield-robot"},
+            {Name = "监狱人生人机汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/PrisonLife-Serk4rx-robot"},
+        }
+    },
+    {
+        GroupName = "逃脱海啸",
+        List = {
+            {Name = "逃脱海啸并带走红Merqur汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/EscapeTsunamiForBrinrots-Merqury-robot"},
+            {Name = "逃脱海啸并拿走脑红Solix汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/EscapeTsunamiForBrinrots-Solix-robot"},
+        }
+    },
+    {
+        GroupName = "安静或者死亡",
+        List = {
+            {Name = "安静或者死亡candyz汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/quietordie-candyz-robo"},
+        }
+    },
+    {
+        GroupName = "盲射",
+        List = {
+            {Name = "盲射ToraIsMe汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/blindshot-ToraIsMe-robot"},
+        }
+    },
+    {
+        GroupName = "彩虹朋友",
+        List = {
+            {Name = "彩虹朋友二UB汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/RainbowFriends-UB-robot"},
+        }
+    },
+    {
+        GroupName = "撕咬之夜",
+        List = {
+            {Name = "撕咬之夜", Url = "https://raw.githubusercontent.com/Youfutongxiang1/Msploit-v2-CN/refs/heads/main/Msploit-v2-CN"},
+            {Name = "殺脚本撕咬之夜", Url = "https://raw.githubusercontent.com/FengYu-X/Max/refs/heads/X/BBN.lua"},
+            {Name = "撕咬之夜Kurby汉化", Url = "https://raw.githubusercontent.com/ojdoxbkvxosh/-lol/refs/heads/main/Kurby汉化"},
+        }
+    },
+    {
+        GroupName = "死刑",
+        List = {
+            {Name = "死刑脚本(无卡密)", Url = "https://api.luarmor.net/files/v3/loaders/8c08b8f2252eec7dbb77d253d269bb65.lua"},
+        }
+    },
+    {
+        GroupName = "活了7天",
+        List = {
+            {Name = "活了7天刷废料", Url = "https://raw.githubusercontent.com/rndmq/Serverlist/refs/heads/main/Server87"},
+            {Name = "活了7天汉化", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/%E4%B8%83%E6%97%A5%E7%94%9F%E6%88%90kkk.txt"},
+        }
+    },
+    {
+        GroupName = "破坏者谜团",
+        List = {
+            {Name = "破坏者谜团脚本", Url = "https://pastebin.com/raw/VRwdkSG3"},
+        }
+    },
+    {
+        GroupName = "驾驶帝国",
+        List = {
+            {Name = "驾驶帝国脚本", Url = "https://raw.githubusercontent.com/Marco8642/science/main/drivingempire"},
+        }
+    }
+}
+
+local function LoadScript(url, scriptName)
+    task.spawn(function()
+        local success, response = pcall(function()
+            return req({
+                Url = url,
+                Method = "GET",
+                Headers = {
+                    ["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+                }
+            })
+        end)
+        
+        if success and response.StatusCode == 200 then
+            local scriptContent = response.Body
+            if scriptContent and #scriptContent > 100 then
+                local loadFunc = loadstring or load
+                local func, err = loadFunc(scriptContent, scriptName or "加载的脚本")
+                
+                if func then
+                    pcall(func)
+                    warn("✅ 脚本加载成功: " .. (scriptName or "未知脚本"))
+                else
+                    warn("❌ 脚本编译失败: " .. tostring(err))
+                end
+            else
+                warn("❌ 获取到的脚本内容无效或过短")
+            end
+        else
+            warn("❌ 无法获取脚本: " .. url)
+        end
+    end)
+end
+
+local UI = HoloLib:CreateWindow({ Title = "🚀 秋辞脚本加载中心" })
+
+local StatusLabel = UI:CreateLabel("📁 选择要加载的脚本", true)
+StatusLabel.TextColor3 = AppleTheme.Accent
+StatusLabel.Font = Enum.Font.GothamBold
+
+local A2 = nil
+local A4 = game.Lighting
+local A8 = workspace.Gravity
+local A28 = false
+local WalkSpeedValue = 16
+local JumpPowerValue = 50
+local GravityValue = 196.2
+local TranslationActive = false
+local TranslationStats = {
+    TranslationCount = 0,
+    TranslationSpeed = 0,
+    LastUpdateTime = tick(),
+    TranslationsPerMinute = 0
+}
+
+UI:CreateInput("🎯 输入玩家名/缩写 粘在背后 (留空取消)", function(text)
+    if text == "" then
+        AttachTarget = nil
+        A2 = nil
+        StatusLabel.Text = "✅ 已解除吸附，UI已归位"
+        return
+    end
+    local target = GetPlayerFromString(text)
+    if target then
+        AttachTarget = target
+        A2 = target
+        StatusLabel.Text = "🎯 已成功粘在 [" .. target.DisplayName .. "] 背后!"
+    else
+        StatusLabel.Text = "❌ 找不到该玩家"
+    end
+end)
+
+local RefreshBtn = UI:CreateButton("🔄 刷新脚本列表", function()
+    StatusLabel.Text = "🔄 刷新中..."
+    task.wait(0.5)
+    StatusLabel.Text = "📁 脚本列表已刷新"
+end)
+
+for _, category in ipairs(scriptCategories) do
+    local categoryPanel = UI:CreateSubTab(category.GroupName)
+    
+    categoryPanel:CreateLabel("📂 " .. category.GroupName, true)
+    categoryPanel:CreateLabel("选择脚本加载:", false)
+    
+    for _, scriptInfo in ipairs(category.List) do
+        categoryPanel:CreateButton("▶ " .. scriptInfo.Name, function()
+            StatusLabel.Text = "📥 正在加载: " .. scriptInfo.Name
+            LoadScript(scriptInfo.Url, scriptInfo.Name)
+        end)
+    end
+end
+
+local AdvancedPanel = UI:CreateSubTab("玩家基础功能")
+AdvancedPanel:CreateLabel("🤔 玩家功能", true)
+
+local A2 = nil
+local A3 = game:GetService("RunService")
+local A4 = game.Lighting
+local A5 = game:GetService("UserInputService")
+local A6 = game:GetService("UserInputService")
+local A7 = game:GetService("Players")
+local A8 = workspace
+local A18 = false
+local A20 = false
+local A24 = nil
+local A25 = nil
+local A28 = false
+local QC_FlyUI = nil
+local FlyConfig = {MoveSpeed = 10, FreezeEnabled = false, FreezeY = nil}
+local FlyConnections = {}
+local FlyInitialized = false
+
+AdvancedPanel:CreateButton("🌙 夜视: 关闭", function()
+    NightVisionToggle = not NightVisionToggle
+    A28 = NightVisionToggle
+    
+    if NightVisionToggle then
+        StatusLabel.Text = "✅ 夜视已开启"
+        A4.Ambient = Color3.new(1, 1, 1)
+        A4.Brightness = 1
+        A4.OutdoorAmbient = Color3.new(1, 1, 1)
+        A4.FogEnd = 100000
+        A4.FogStart = 0
+        A4.GlobalShadows = false
+    else
+        StatusLabel.Text = "🌃 夜视已关闭"
+        A4.Ambient = Color3.new(0, 0, 0)
+        A4.Brightness = 1
+        A4.OutdoorAmbient = Color3.new(0.5, 0.5, 0.5)
+        A4.FogEnd = 100000
+        A4.FogStart = 0
+        A4.GlobalShadows = true
+    end
+end)
+
+AdvancedPanel:CreateInput("💻 直接输入Lua代码执行", function(code)
+    if code and code ~= "" then
+        StatusLabel.Text = "⚡ 正在执行代码..."
+        task.spawn(function()
+            local func, err = loadstring(code, "直接执行")
+            if func then
+                pcall(func)
+                StatusLabel.Text = "✅ 代码执行完成"
+            else
+                StatusLabel.Text = "❌ 代码错误: " .. tostring(err)
+            end
+        end)
+    end
+end)
+
+UI:CreateButton("🧹 清理所有UI", function()
+    getgenv()._CleanHoloLib()
+    StatusLabel.Text = "🧹 UI已清理，重新运行脚本以恢复"
+end)
+
+UI:CreateLabel("", true)
+UI:CreateLabel("📱 秋辞缝合脚本3Dui 2.0", true)
+UI:CreateLabel("🔒 安全脚本加载中心", true)
+UI:CreateLabel("", true)
+
+task.spawn(function()
+    while true do
+        task.wait(1)
+        if translationBtn then
+            translationBtn.Text = "🌐 自动翻译: " .. (translationActive and "开启" or "关闭")
+        end
+    end
+end)
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
 local scriptCategories = {
     {
         GroupName = "各大脚本",
@@ -1511,28 +1993,21 @@ local scriptCategories = {
     {
     GroupName = "死亡球",
         List = {
-            {Name = "死亡球Fluxin汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/deathball-Fluxin-robot"},
-            {Name = "死亡球stark汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/Deathballs-stark-robot"},
+            {Name = "死亡球Fluxin汉化脚本(要卡密)", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/deathball-Fluxin-robot"},
+            {Name = "死亡球stark汉化脚本(要卡密)", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/Deathballs-stark-robot"},
             }
     },
     {
     GroupName = "监狱人生",
         List = {
-            {Name = "监狱人生Rayfield汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/prisonlife-Rayfield-robot"},
             {Name = "监狱人生人机汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/PrisonLife-Serk4rx-robot"},
             }
     },
     {
     GroupName = "逃脱海啸",
         List = {
-            {Name = "逃脱海啸并带走红Merqur汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/EscapeTsunamiForBrinrots-Merqury-robot"},
-            {Name = "逃脱海啸并拿走脑红Solix汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/EscapeTsunamiForBrinrots-Solix-robot"},
-            }
-    },
-    {
-    GroupName = "安静或者死亡",
-        List = {
-            {Name = "安静或者死亡candyz汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/quietordie-candyz-robo"},
+            {Name = "逃脱海啸并带走红Merqur汉化脚本(要卡密)", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/EscapeTsunamiForBrinrots-Merqury-robot"},
+            {Name = "逃脱海啸并拿走脑红Solix汉化脚本(要卡密)", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/EscapeTsunamiForBrinrots-Solix-robot"},
             }
     },
     {
@@ -1544,7 +2019,7 @@ local scriptCategories = {
     {
     GroupName = "彩虹朋友",
         List = {
-            {Name = "彩虹朋友二UB汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/RainbowFriends-UB-robot"},
+            {Name = "彩虹朋友二UB汉化脚本(要卡密)", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/RainbowFriends-UB-robot"},
             }
     },
     {
@@ -1552,7 +2027,6 @@ local scriptCategories = {
         List = {
             {Name = "撕咬之夜", Url = "https://raw.githubusercontent.com/Youfutongxiang1/Msploit-v2-CN/refs/heads/main/Msploit-v2-CN"},
             {Name = "殺脚本撕咬之夜", Url = "https://raw.githubusercontent.com/FengYu-X/Max/refs/heads/X/BBN.lua"},
-            {Name = "撕咬之夜Kurby汉化", Url = "https://raw.githubusercontent.com/ojdoxbkvxosh/-lol/refs/heads/main/Kurby汉化"},
             }
     },
     {
@@ -1572,12 +2046,6 @@ local scriptCategories = {
     GroupName = "破坏者谜团",
         List = {
             {Name = "破坏者谜团脚本", Url = "https://pastebin.com/raw/VRwdkSG3"},
-            }
-    },
-    {
-            GroupName = "驾驶帝国",
-        List = {
-            {Name = "驾驶帝国脚本", Url = "https://raw.githubusercontent.com/Marco8642/science/main/drivingempire"},
         }
     }
 }
@@ -1770,7 +2238,7 @@ local YOffset = 0
 
 YOffset = YOffset + CreateUpdateItem("😂", "某些乐子", "觉得卡密傻就别用这个脚本免费给你好用的脚本又叫上了\n可能会说又不是只有我这一个缝合我用别的\n那就去用别人的我这里不欢迎没有素质和自大的人", YOffset)
 
-YOffset = YOffset + CreateUpdateItem("🆕", "新增功能", "这几天可能不会更新缝合因为在搞音乐播放器", YOffset)
+YOffset = YOffset + CreateUpdateItem("🆕", "新增功能", "删除了不能执行的脚本，增加了秋辞3DUI测试", YOffset)
 
 YOffset = YOffset + CreateUpdateItem("🏠", "主要公告介绍", "势必为大家找到好玩而且免费的脚本\n预计给大家添加100多种服务器的脚本，", YOffset)
 
