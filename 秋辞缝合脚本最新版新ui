@@ -110,6 +110,7 @@ local Window = Library:CreateWindow({
 local Tabs = {
     Universal = Window:AddTab("通用", "user"),
     ScriptCenter = Window:AddTab("脚本中心", "cat"),
+    Qcjbwd = Window:AddTab("娱乐脚本", "cat"),
     Settings = Window:AddTab("UI设置", "settings")
 }
 
@@ -1852,6 +1853,7 @@ local scriptCategories = {
             {Name = "落叶脚本", Url = "https://raw.githubusercontent.com/krlpl/Deciduous-center-LS/main/%E8%90%BD%E5%8F%B6%E4%B8%AD%E5%BF%83%E6%B7%B7%E6%B7%86.txt"},
             {Name = "Rb脚本中心＿汉化中心", Url = "https://api.luarmor.net/files/v3/loaders/4fe525637e43a1be8cb0cdf902d107c2.lua"},
             {Name = "NOL免费版", Url = "https://raw.githubusercontent.com/Syndromehsh/BETA2/refs/heads/main/NOL"},
+            {Name = "霖溺-通用", Url = "https://raw.githubusercontent.com/ShenJiaoBen/Partial-Server-Ribbon/refs/heads/main/obfuscated_script-1766982303563.lua.txt"},
         }
     },
     {
@@ -1868,6 +1870,7 @@ local scriptCategories = {
             {Name = "亡命速递脚本无法使用", Url = "https://raw.githubusercontent.com/JanseJYC/Script/refs/heads/main/Deadly-Deliver.lua"},
             {Name = "亡命速递英文脚本", Url = "https://raw.githubusercontent.com/xxdaysheus01/RuneX/refs/heads/main/DeadlyDeliveryScript.lua"},
             {Name = "亡命速递", Url = "https://pandadevelopment.net/virtual/file/c96973c95ae3aaec"},
+            {Name = "亡命速递汉化脚本", Url = "https://raw.githubusercontent.com/JanseJYC/Script/refs/heads/main/Deadly-Deliver.lua"},
             }
     },
     {
@@ -1877,6 +1880,7 @@ local scriptCategories = {
             {Name = "红叶脚本", Url = "https://getnative.cc/script/loader"},
             {Name = "速通脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%AD%BB%E9%93%81%E8%BD%A8%E6%B1%89%E5%8C%96%E8%84%9A%E6%9C%AC"},
             {Name = "死铁轨脚本", Url = "https://raw.githubusercontent.com/gumanba/Scripts/refs/heads/main/DeadRails"},
+            {Name = "死铁轨脚本(好用)", Url = "https://raw.githubusercontent.com/kiciahook/kiciahook/refs/heads/main/loader.lua"},
         }
     },
     {
@@ -1887,6 +1891,7 @@ local scriptCategories = {
             {Name = "墨水Ringta汉化(无卡密)", Url = "https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/Ringta"},
             {Name = "博伦墨水脚本", Url = "https://pastebin.com/raw/Q64rPkwu"},
             {Name = "Unm汉化，卡密ink50", Url = "https://github.com/youfutongxiang1145/unm-CN/releases/download/unm%E6%B1%89%E5%8C%96/unm.txt"},
+            {Name = "秋辞墨水游戏辅助(二改缝合)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/refs/heads/main/%E7%A7%8B%E8%BE%9E%E5%A2%A8%E6%B0%B4%E6%B8%B8%E6%88%8F%E8%BE%85%E5%8A%A9%E8%84%9A%E6%9C%AC%28%E4%BA%8C%E6%94%B9%29"},
         }
     },
     {
@@ -1950,6 +1955,7 @@ local scriptCategories = {
         List = {
             {Name = "最强战场Phantasm汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/thestongestbattlegrounds-Phantasm-robot"},
             {Name = "最坚强的战场脚本2", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/phantasm.lua"},
+            {Name = "最坚强的战场脚本(好用)", Url = "https://eltonshub-loader.netlify.app/UBG1.lua"},
         }
     },
     {
@@ -2027,6 +2033,7 @@ local scriptCategories = {
         List = {
             {Name = "撕咬之夜", Url = "https://raw.githubusercontent.com/Youfutongxiang1/Msploit-v2-CN/refs/heads/main/Msploit-v2-CN"},
             {Name = "殺脚本撕咬之夜", Url = "https://raw.githubusercontent.com/FengYu-X/Max/refs/heads/X/BBN.lua"},
+            {Name = "Ringta撕咬之夜", Url = "https://raw.githubusercontent.com/ergerg4/bitenights.github.io/refs/heads/main/ringta.lua"},
             }
     },
     {
@@ -2043,6 +2050,12 @@ local scriptCategories = {
             }
     },
     {
+    GroupName = "终极战场",
+        List = {
+            {Name = "终极战场脚本", Url = "https://raw.githubusercontent.com/YQANTGV3/YQANTGV3/refs/heads/main/antitamper.txt"},
+            }
+    },
+    {
     GroupName = "破坏者谜团",
         List = {
             {Name = "破坏者谜团脚本", Url = "https://pastebin.com/raw/VRwdkSG3"},
@@ -2050,6 +2063,37 @@ local scriptCategories = {
     }
 }
 
+local Qcjbwd = Tabs.Qcjbwd:AddLeftGroupbox("娱乐脚本");
+Qcjbwd:AddLabel("柳宗权同款撸屌脚本(不能在墨水使用)");
+Qcjbwd:AddButton({Text="撸屌R6",Func=function()
+        loadstring(game:HttpGet("https://pastefy.app/wa3v2Vgm/raw"))()
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
+Qcjbwd:AddButton({Text="撸屌R15",Func=function()
+        loadstring(game:HttpGet("https://pastefy.app/YZoglOyJ/raw"))()
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
+Qcjbwd:AddLabel("动作类");
+Qcjbwd:AddButton({Text="飞踢脚本",Func=function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Fe-DropKick-Script-165813"))()
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
+Qcjbwd:AddButton({Text="4000种动作脚本",Func=function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-7yd7-I-Emote-Script-48024"))()
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
 local ScriptCenterLeftGroup = Tabs.ScriptCenter:AddLeftGroupbox("脚本中心");
 local ScriptCenterRightGroup = Tabs.ScriptCenter:AddRightGroupbox("脚本中心");
 local leftIndex = 0;
@@ -2079,43 +2123,6 @@ for _, category in ipairs(scriptCategories) do
 end
 
 local SettingsGroup = Tabs.Settings:AddLeftGroupbox("系统设置");
-
-SettingsGroup:AddButton({Text="查看公告",Func=function()
-        Library:Notify("查看公告功能", 3);
-end});
-
-SettingsGroup:AddButton({Text="重新加载公告",Func=function()
-        local gui = A5:FindFirstChild("AnnouncementGui");
-        if gui then
-                gui:Destroy();
-        end
-        wait(0.1);
-        Library:Notify("公告已重新加载", 3);
-end});
-
-local function updateTimeButtonState()
-    local timeGui = game:GetService("CoreGui"):FindFirstChild("TimeDisplayGUI")
-    if timeGui then
-        local timeLabel = timeGui:FindFirstChild("TimeLabel")
-        if timeLabel then
-            return timeLabel.Visible
-        end
-    end
-    return false
-end
-
-local SettingsGroup = Tabs.Settings:AddLeftGroupbox("系统设置");
-SettingsGroup:AddButton({Text="查看公告",Func=function()
-        Library:Notify("查看公告功能", 3);
-end});
-SettingsGroup:AddButton({Text="重新加载公告",Func=function()
-        local gui = A5:FindFirstChild("AnnouncementGui");
-        if gui then
-                gui:Destroy();
-        end
-        wait(0.1);
-        Library:Notify("公告已重新加载", 3);
-end});
 
 local timeToggleBtn = SettingsGroup:AddButton("隐藏时间显示", function()
     local timeGui = game:GetService("CoreGui"):FindFirstChild("TimeDisplayGUI")
@@ -2238,7 +2245,7 @@ local YOffset = 0
 
 YOffset = YOffset + CreateUpdateItem("😂", "某些乐子", "觉得卡密傻就别用这个脚本免费给你好用的脚本又叫上了\n可能会说又不是只有我这一个缝合我用别的\n那就去用别人的我这里不欢迎没有素质和自大的人", YOffset)
 
-YOffset = YOffset + CreateUpdateItem("🆕", "新增功能", "删除了不能执行的脚本，增加了秋辞3DUI测试", YOffset)
+YOffset = YOffset + CreateUpdateItem("🆕", "新增功能", "删除了不能执行的脚本，增加了秋辞墨水游戏二改缝合", YOffset)
 
 YOffset = YOffset + CreateUpdateItem("🏠", "主要公告介绍", "势必为大家找到好玩而且免费的脚本\n预计给大家添加100多种服务器的脚本，", YOffset)
 
