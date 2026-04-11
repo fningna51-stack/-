@@ -995,18 +995,6 @@ UniversalLeftGroup:AddButton({Text="走路创人",Func=function()
                 end
         end
 end});
-UniversalLeftGroup:AddButton({Text="无敌少侠飞行脚本",Func=function()
-        if A2.Character then
-                local HRP = A2.Character:FindFirstChild("HumanoidRootPart");
-                if HRP then
-                        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Invinicible-Flight-R15-45414"))()
-                        local Func = loadstring(ScriptContent);
-                        if Func then
-                                Func();
-                        end
-                end
-        end
-end});
 UniversalLeftGroup:AddButton({Text="穿墙模式",Func=function()
         A19 = not A19;
         if A22 then
@@ -1078,21 +1066,6 @@ UniversalRightGroup:AddButton({Text="音乐播放器脚本",Func=function()
 end});
 UniversalRightGroup:AddButton({Text="秋辞音乐播放器(正在开发)",Func=function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%A7%8B%E8%BE%9E%E7%BA%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%84%9A%E6%9C%AC"))()
-        local Func = loadstring(ScriptContent);
-        if Func then
-                Func();
-        end
-end});
-UniversalRightGroup:AddLabel("柳宗权同款撸屌脚本(不能在墨水使用)");
-UniversalRightGroup:AddButton({Text="撸屌R6",Func=function()
-        loadstring(game:HttpGet("https://pastefy.app/wa3v2Vgm/raw"))()
-        local Func = loadstring(ScriptContent);
-        if Func then
-                Func();
-        end
-end});
-UniversalRightGroup:AddButton({Text="撸屌R15",Func=function()
-        loadstring(game:HttpGet("https://pastefy.app/YZoglOyJ/raw"))()
         local Func = loadstring(ScriptContent);
         if Func then
                 Func();
@@ -2033,7 +2006,7 @@ local scriptCategories = {
         List = {
             {Name = "撕咬之夜", Url = "https://raw.githubusercontent.com/Youfutongxiang1/Msploit-v2-CN/refs/heads/main/Msploit-v2-CN"},
             {Name = "殺脚本撕咬之夜", Url = "https://raw.githubusercontent.com/FengYu-X/Max/refs/heads/X/BBN.lua"},
-            {Name = "Ringta撕咬之夜", Url = "https://raw.githubusercontent.com/ergerg4/bitenights.github.io/refs/heads/main/ringta.lua"},
+            {Name = "Ringta撕咬之夜(汉化)", Url = "https://raw.githubusercontent.com/Youfutongxiang1/RINGTA-BitebyNight-CN/refs/heads/main/RINGTA/Bite%20by%20Night-CN"},
             }
     },
     {
@@ -2053,6 +2026,12 @@ local scriptCategories = {
     GroupName = "终极战场",
         List = {
             {Name = "终极战场脚本", Url = "https://raw.githubusercontent.com/YQANTGV3/YQANTGV3/refs/heads/main/antitamper.txt"},
+            }
+    },
+    {
+    GroupName = "餐厅大亨",
+        List = {
+            {Name = "餐厅大亨脚本(自动解卡无卡密)", Url = "https://rawscripts.net/raw/Universal-Script-Samuraa1-Hub-Best-Keyless-Script-For-EA-ByB-RT3-etc-88197"},
             }
     },
     {
@@ -2089,6 +2068,22 @@ Qcjbwd:AddButton({Text="飞踢脚本",Func=function()
 end});
 Qcjbwd:AddButton({Text="4000种动作脚本",Func=function()
         loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-7yd7-I-Emote-Script-48024"))()
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
+Qcjbwd:AddLabel("飞行类");
+Qcjbwd:AddButton({Text="无敌少侠飞行脚本",Func=function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Invinicible-Flight-R15-45414"))()
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
+Qcjbwd:AddLabel("武器类");
+Qcjbwd:AddButton({Text="AK47脚本(别人看不到)",Func=function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/sinret/rbxscript.com-scripts-reuploads-/main/ak47", true))()
         local Func = loadstring(ScriptContent);
         if Func then
                 Func();
@@ -2177,7 +2172,7 @@ end);
         
     else
         local player = cloneref(game:GetService("Players")).LocalPlayer
-        player:Kick("卡密错误你是废物吗？这都不知道去快手关注秋楓！")
+        player:Kick("少年看来你还没有门票哦(卡密错误)")
         if player then
             player:Destroy()
         end
@@ -2245,7 +2240,7 @@ local YOffset = 0
 
 YOffset = YOffset + CreateUpdateItem("😂", "某些乐子", "觉得卡密傻就别用这个脚本免费给你好用的脚本又叫上了\n可能会说又不是只有我这一个缝合我用别的\n那就去用别人的我这里不欢迎没有素质和自大的人", YOffset)
 
-YOffset = YOffset + CreateUpdateItem("🆕", "新增功能", "删除了不能执行的脚本，增加了秋辞墨水游戏二改缝合", YOffset)
+YOffset = YOffset + CreateUpdateItem("🆕", "新增功能", "娱乐脚本，不能在墨水中执行不然秒封", YOffset)
 
 YOffset = YOffset + CreateUpdateItem("🏠", "主要公告介绍", "势必为大家找到好玩而且免费的脚本\n预计给大家添加100多种服务器的脚本，", YOffset)
 
