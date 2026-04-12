@@ -1898,7 +1898,7 @@ local scriptCategories = {
     {
     GroupName = "俄亥俄州",
         List = {
-            {Name = "俄亥俄州自动捡灯笼脚本", Url = "https://pastebin.com/raw/TrPbSbkm"},
+            {Name = "俄亥俄州自动捡彩蛋脚本", Url = "https://pastebin.com/raw/TrPbSbkm"},
         }
     },
     {
