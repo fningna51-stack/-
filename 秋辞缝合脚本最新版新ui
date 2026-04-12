@@ -2087,6 +2087,187 @@ Qcjbwd:AddButton({Text="AK47脚本(别人看不到)",Func=function()
                 Func();
         end
 end});
+Qcjbwd:AddLabel("墨水类");
+Qcjbwd:AddButton({Text="柳叶碰飞(墨水可以使用)",Func=function()
+        local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local lp = Players.LocalPlayer
+
+local Enabled = false
+local targetPlayer = nil
+local originalCFrame = nil
+
+local function findPlayer(text)
+    text = text:lower()
+    for _, plr in pairs(Players:GetPlayers()) do
+        if string.find(plr.Name:lower(), text) or string.find(plr.DisplayName:lower(), text) then
+            return plr
+        end
+    end
+end
+
+lp.Chatted:Connect(function(msg)
+    if not Enabled then return end
+    if msg:sub(1,6):lower() == ";kill " then
+        local name = msg:sub(7)
+        local plr = findPlayer(name)
+        if plr and plr.Character and plr.Character:FindFirstChild("Humanoid") then
+            targetPlayer = plr
+            if lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") then
+                originalCFrame = lp.Character.HumanoidRootPart.CFrame
+            end
+            if statusLabel then
+                statusLabel.Text = "已锁定 " .. plr.Name
+            end
+        end
+    end
+end)
+
+task.spawn(function()
+    while task.wait(0.01) do
+        if not Enabled then continue end
+        if not targetPlayer then continue end
+
+        local char = targetPlayer.Character
+        if not char or not char:FindFirstChild("Humanoid") then
+            targetPlayer = nil
+            if statusLabel then statusLabel.Text = "开启 (未锁定)" end
+            continue
+        end
+
+        local hum = char.Humanoid
+        if hum.Health <= 0 then
+            targetPlayer = nil
+            if statusLabel then statusLabel.Text = "开启 (未锁定)" end
+            continue
+        end
+
+        local myChar = lp.Character
+        local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+        local targetHRP = char:FindFirstChild("HumanoidRootPart")
+
+        if myHRP and targetHRP then
+            local offset = targetHRP.Velocity.Magnitude < 0.1 and 0 or 7
+            local goal = targetHRP.CFrame * CFrame.new(0,0,-offset) * CFrame.Angles(0, math.rad(-3), 0)
+            myHRP.CFrame = myHRP.CFrame:Lerp(goal, 0.4)
+            myHRP.Velocity = Vector3.new(0,0,0)
+            myHRP.RotVelocity = Vector3.new(0,0,0)
+        end
+    end
+end)
+
+task.spawn(function()
+    while task.wait() do
+        if not Enabled then continue end
+        local hum = lp.Character and lp.Character:FindFirstChild("Humanoid")
+        if hum then
+            hum:Move(Vector3.one * 1e31)
+        end
+    end
+end)
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "FlyOffGUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = lp:WaitForChild("PlayerGui")
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 220, 0, 130)
+mainFrame.Position = UDim2.new(0.5, -110, 0.3, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+mainFrame.BackgroundTransparency = 0.25
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 12)
+corner.Parent = mainFrame
+
+local stroke = Instance.new("UIStroke")
+stroke.Color = Color3.fromRGB(255, 255, 255)
+stroke.Thickness = 1
+stroke.Transparency = 0.8
+stroke.Parent = mainFrame
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 28)
+title.BackgroundTransparency = 1
+title.Text = "碰飞"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextSize = 14
+title.Font = Enum.Font.GothamBold
+title.Parent = mainFrame
+
+local toggleBtn = Instance.new("TextButton")
+toggleBtn.Size = UDim2.new(0, 160, 0, 32)
+toggleBtn.Position = UDim2.new(0.5, -80, 0, 38)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+toggleBtn.Text = "开启碰飞"
+toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleBtn.Font = Enum.Font.GothamSemibold
+toggleBtn.TextSize = 12
+toggleBtn.Parent = mainFrame
+local btnCorner = Instance.new("UICorner")
+btnCorner.CornerRadius = UDim.new(0, 8)
+btnCorner.Parent = toggleBtn
+
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Size = UDim2.new(1, 0, 0, 20)
+statusLabel.Position = UDim2.new(0, 0, 0, 78)
+statusLabel.BackgroundTransparency = 1
+statusLabel.Text = "状态: 关闭"
+statusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+statusLabel.TextSize = 11
+statusLabel.Font = Enum.Font.Gotham
+statusLabel.Parent = mainFrame
+
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 80, 0, 24)
+closeBtn.Position = UDim2.new(0.5, -40, 0, 102)
+closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+closeBtn.Text = "销毁"
+closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeBtn.Font = Enum.Font.GothamSemibold
+closeBtn.TextSize = 10
+closeBtn.Parent = mainFrame
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 6)
+closeCorner.Parent = closeBtn
+
+toggleBtn.MouseButton1Click:Connect(function()
+    Enabled = not Enabled
+    if Enabled then
+        toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+        toggleBtn.Text = "关闭碰飞"
+        statusLabel.Text = "开启"
+        targetPlayer = nil
+    else
+        toggleBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+        toggleBtn.Text = "开启碰飞"
+        statusLabel.Text = "状态: 关闭"
+        targetPlayer = nil
+        originalCFrame = nil
+    end
+end)
+
+closeBtn.MouseButton1Click:Connect(function()
+    Enabled = false
+    targetPlayer = nil
+    originalCFrame = nil
+    screenGui:Destroy()
+end)
+
+Enabled = false
+targetPlayer = nil
+
+print("😝😝😝")
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
 local ScriptCenterLeftGroup = Tabs.ScriptCenter:AddLeftGroupbox("脚本中心");
 local ScriptCenterRightGroup = Tabs.ScriptCenter:AddRightGroupbox("脚本中心");
 local leftIndex = 0;
@@ -2238,7 +2419,7 @@ local YOffset = 0
 
 YOffset = YOffset + CreateUpdateItem("😂", "某些乐子", "觉得卡密傻就别用这个脚本免费给你好用的脚本又叫上了\n可能会说又不是只有我这一个缝合我用别的\n那就去用别人的我这里不欢迎没有素质和自大的人", YOffset)
 
-YOffset = YOffset + CreateUpdateItem("🆕", "新增功能", "娱乐脚本，不能在墨水中执行不然秒封", YOffset)
+YOffset = YOffset + CreateUpdateItem("🆕", "新增功能", "娱乐脚本区新增加一个柳叶的碰飞", YOffset)
 
 YOffset = YOffset + CreateUpdateItem("🏠", "主要公告介绍", "势必为大家找到好玩而且免费的脚本\n预计给大家添加100多种服务器的脚本，", YOffset)
 
