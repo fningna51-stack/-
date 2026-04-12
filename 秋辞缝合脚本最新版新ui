@@ -1049,6 +1049,15 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/JsYb666/Item/refs/hea
                 Func();
         end
 end});
+UniversalRightGroup:AddButton({Text="TX死铁轨全自动刷债券",Func=function()
+        TX = "TX Script"
+Script = "TX自动刷债券V4"
+loadstring(game:HttpGet("https://raw.githubusercontent.com/JsYb666/Item/refs/heads/main/Auto-Bond-V4"))()
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
 UniversalRightGroup:AddButton({Text="SX翻译",Func=function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/SQ182/y/refs/heads/main/翻译.lua"))()
         local Func = loadstring(ScriptContent);
@@ -2194,7 +2203,7 @@ stroke.Parent = mainFrame
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 28)
 title.BackgroundTransparency = 1
-title.Text = "碰飞"
+title.Text = "碰飞(碰到人就让对面甩飞)"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.TextSize = 14
 title.Font = Enum.Font.GothamBold
@@ -2227,7 +2236,7 @@ local closeBtn = Instance.new("TextButton")
 closeBtn.Size = UDim2.new(0, 80, 0, 24)
 closeBtn.Position = UDim2.new(0.5, -40, 0, 102)
 closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-closeBtn.Text = "销毁"
+closeBtn.Text = "关闭甩飞脚本(关了需要重新加载)"
 closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeBtn.Font = Enum.Font.GothamSemibold
 closeBtn.TextSize = 10
