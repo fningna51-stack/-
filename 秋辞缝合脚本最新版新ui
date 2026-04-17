@@ -98,7 +98,7 @@ local A8 = workspace
 local A9 = game:GetService("HttpService")
 
 local Window = Library:CreateWindow({
-    Title = "秋辞缝合脚本",
+    Title = "AF Hub脚本",
     Footer = "作者：秋辞 汉化者：有芙同享 汉化者：人机",
     Icon = 131153193945220,
     NotifySide = "Right",
@@ -110,7 +110,8 @@ local Window = Library:CreateWindow({
 local Tabs = {
     Universal = Window:AddTab("通用", "user"),
     ScriptCenter = Window:AddTab("脚本中心", "cat"),
-    Qcjbwd = Window:AddTab("娱乐脚本", "cat"),
+    Qcjbwd = Window:AddTab("娱乐脚本", "key"),
+    Jjdjryyds = Window:AddTab("特殊脚本", "dog"),
     Settings = Window:AddTab("UI设置", "settings")
 }
 
@@ -1835,7 +1836,8 @@ local scriptCategories = {
             {Name = "落叶脚本", Url = "https://raw.githubusercontent.com/krlpl/Deciduous-center-LS/main/%E8%90%BD%E5%8F%B6%E4%B8%AD%E5%BF%83%E6%B7%B7%E6%B7%86.txt"},
             {Name = "Rb脚本中心＿汉化中心", Url = "https://api.luarmor.net/files/v3/loaders/4fe525637e43a1be8cb0cdf902d107c2.lua"},
             {Name = "NOL免费版", Url = "https://raw.githubusercontent.com/Syndromehsh/BETA2/refs/heads/main/NOL"},
-            {Name = "霖溺-通用", Url = "https://raw.githubusercontent.com/ShenJiaoBen/Partial-Server-Ribbon/refs/heads/main/obfuscated_script-1766982303563.lua.txt"},
+            {Name = "BS中心", Url = "https://gitee.com/BS_script/script/raw/master/黑洞中心(BS).txt"},
+            {Name = "Rb脚本中心", Url = "https://raw.githubusercontent.com/Yungengxin/roblox/refs/heads/main/Rb-Hub"},
         }
     },
     {
@@ -1902,12 +1904,15 @@ local scriptCategories = {
         List = {
             {Name = "被遗弃无卡密超好用", Url = "https://rawscripts.net/raw/G666-Forsaken-Keyless-auto-gen-reach-autoblock-+-more-63283"},
             {Name = "被遗弃英文无卡密", Url = "https://github.com/shenxiuqi974/guesting-but-chinese/releases/download/hushwhw/default.txt"},
+            {Name = "被遗弃英文无卡密(好用)", Url = "https://pastebin.com/raw/zH9Extzk"},
+            {Name = "XA被遗弃脚本(无卡密中文)", Url = "https://raw.gitcode.com/XiaoYunUwU/XA/raw/main/Loader.lua"},
         }
     },
     {
     GroupName = "俄亥俄州",
         List = {
             {Name = "俄亥俄州自动捡彩蛋脚本", Url = "https://pastebin.com/raw/TrPbSbkm"},
+            {Name = "Rb脚本俄亥俄州", Url = "https://raw.githubusercontent.com/Yungengxin/roblox/refs/heads/main/RbHub-OHIO"},
         }
     },
     {
@@ -2014,6 +2019,7 @@ local scriptCategories = {
             {Name = "撕咬之夜", Url = "https://raw.githubusercontent.com/Youfutongxiang1/Msploit-v2-CN/refs/heads/main/Msploit-v2-CN"},
             {Name = "殺脚本撕咬之夜", Url = "https://raw.githubusercontent.com/FengYu-X/Max/refs/heads/X/BBN.lua"},
             {Name = "Ringta撕咬之夜(汉化)", Url = "https://raw.githubusercontent.com/Youfutongxiang1/RINGTA-BitebyNight-CN/refs/heads/main/RINGTA/Bite%20by%20Night-CN"},
+            {Name = "撕咬之夜新脚本(未汉化)", Url = "https://raw.githubusercontent.com/NexusSpoofer/scriptz/refs/heads/main/BiteeByNight"},
             }
     },
     {
@@ -2042,6 +2048,12 @@ local scriptCategories = {
             }
     },
     {
+    GroupName = "恐鬼症",
+        List = {
+            {Name = "恐鬼症脚本", Url = "https://raw.githubusercontent.com/longchneg/GAl/refs/heads/Dragon/%E6%81%90%E9%AC%BC%E7%97%87%20%E5%85%8D%E8%B4%B9%E7%89%88"},
+            }
+    },
+    {
     GroupName = "破坏者谜团",
         List = {
             {Name = "破坏者谜团脚本", Url = "https://pastebin.com/raw/VRwdkSG3"},
@@ -2049,6 +2061,7 @@ local scriptCategories = {
     }
 }
 
+--娱乐脚本左侧脚本区
 local Qcjbwd = Tabs.Qcjbwd:AddLeftGroupbox("娱乐脚本");
 Qcjbwd:AddLabel("柳宗权同款撸屌脚本(不能在墨水使用)");
 Qcjbwd:AddButton({Text="撸屌R6",Func=function()
@@ -2091,6 +2104,18 @@ end});
 Qcjbwd:AddLabel("武器类");
 Qcjbwd:AddButton({Text="AK47脚本(别人看不到)",Func=function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/sinret/rbxscript.com-scripts-reuploads-/main/ak47", true))()
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
+Qcjbwd:AddButton({Text="通用枪械脚本愤怒机器人",Func=function()
+        loadstring(string.char(
+    83,99,114,105,112,116,95,75,101,121,32,61,32,34,55,85,74,70,121,104,101,74,70,70,104,34,10,
+    108,111,97,100,115,116,114,105,110,103,40,103,97,109,101,58,72,116,116,112,71,101,116,40,34,
+    104,116,116,112,115,58,47,47,97,112,105,46,99,104,101,97,116,103,112,116,46,99,99,34,44,32,
+    116,114,117,101,41,41,40,41
+))()
         local Func = loadstring(ScriptContent);
         if Func then
                 Func();
@@ -2277,8 +2302,21 @@ print("😝😝😝")
                 Func();
         end
 end});
-local ScriptCenterLeftGroup = Tabs.ScriptCenter:AddLeftGroupbox("脚本中心");
-local ScriptCenterRightGroup = Tabs.ScriptCenter:AddRightGroupbox("脚本中心");
+
+--娱乐脚本脚本详情区
+local Qcjbwd = Tabs.Qcjbwd:AddRightGroupbox("脚本详情");
+Qcjbwd:AddLabel("墨水游戏🟢")
+Qcjbwd:AddLabel("九十九夜🟢")
+Qcjbwd:AddLabel("墨水游戏汉化情况：全部汉化🟢")
+Qcjbwd:AddLabel("其他脚本汉化情况：大多数已汉化🟡")
+Qcjbwd:AddLabel("AF缝合Hub🟢")
+
+local Jjdjryyds = Tabs.Jjdjryyds:AddLeftGroupbox("特殊脚本");
+Jjdjryyds:AddLabel("待添加尽请期待")
+Jjdjryyds:AddLabel("更多功能将在明天更新4月18号")
+
+local ScriptCenterLeftGroup = Tabs.ScriptCenter:AddLeftGroupbox("脚本中心1");
+local ScriptCenterRightGroup = Tabs.ScriptCenter:AddRightGroupbox("脚本中心2");
 local leftIndex = 0;
 local rightIndex = 0;
 for _, category in ipairs(scriptCategories) do
