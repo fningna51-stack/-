@@ -23,7 +23,185 @@ local SubmitButton = KeyWindow:AddButton("执行脚本", UDim2.new(0.1, 0, 0.65,
         end
         KeyWindow:Close()
         UpdateWindow:Close()
+
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+
+local function CreateCircleVisualizer(audioObject, targetPlayer)
+    local bars = {}
+    local numBars = 24
+    local radius = 3.0
+    local attachTarget = targetPlayer or game.Players.LocalPlayer
+    
+    for i = 1, numBars do
+        local bar = Instance.new("Part")
+        bar.Anchored = true
+        bar.CanCollide = false
+        bar.Material = Enum.Material.Neon
+        bar.Color = Color3.fromRGB(10, 132, 255)
+        bar.Size = Vector3.new(0.1, 0.1, 0.1)
+        Instance.new("BlockMesh", bar)
+        bar.Parent = workspace
+        table.insert(bars, bar)
+    end
+    
+    local connection = RunService.RenderStepped:Connect(function(dt)
+        if not audioObject or not audioObject.Parent then
+            for _, bar in ipairs(bars) do
+                bar.CFrame = CFrame.new(0, -9999, 0)
+            end
+            return
+        end
         
+        local loudness = audioObject.PlaybackLoudness
+        local normalized = math.clamp(loudness / 400, 0.05, 1)
+        
+        local centerCFrame = CFrame.new(0, -9999, 0)
+        local character = attachTarget and attachTarget.Character
+        
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            centerCFrame = character.HumanoidRootPart.CFrame * CFrame.new(0, -2, 0)
+        else
+            for _, bar in ipairs(bars) do
+                bar.CFrame = CFrame.new(0, -9999, 0)
+            end
+            return
+        end
+        
+        local globalRotation = tick() * 0.8
+        
+        for i, bar in ipairs(bars) do
+            local noise = math.noise(tick() * 4, i * 0.15, 0)
+            local scale = math.clamp(normalized + (noise * normalized * 0.6), 0.05, 1)
+            
+            local targetHeight = scale * 5.0
+            bar.Size = bar.Size:Lerp(Vector3.new(0.15, targetHeight, 0.15), 0.3)
+            
+            local angle = (i / numBars) * math.pi * 2 + globalRotation
+            local offsetX = math.cos(angle) * radius
+            local offsetZ = math.sin(angle) * radius
+            
+            local barPos = centerCFrame.Position + Vector3.new(offsetX, 0, offsetZ)
+            local lookAtPos = Vector3.new(centerCFrame.Position.X, barPos.Y, centerCFrame.Position.Z)
+            local targetCFrame = CFrame.lookAt(barPos, lookAtPos)
+            bar.CFrame = bar.CFrame:Lerp(targetCFrame, 0.4)
+            
+            local highlightColor = Color3.new(1, 1, 1)
+            bar.Color = Color3.fromRGB(10, 132, 255):Lerp(highlightColor, scale - 0.3)
+        end
+    end)
+    
+    local function Destroy()
+        connection:Disconnect()
+        for _, bar in ipairs(bars) do
+            bar:Destroy()
+        end
+    end
+    
+    local function SetTarget(player)
+        attachTarget = player
+    end
+    
+    return {
+        Connection = connection,
+        Destroy = Destroy,
+        SetTarget = SetTarget,
+        GetBars = function() return bars end
+    }
+end
+
+local Audio = Instance.new("Sound")
+Audio.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+Audio.Volume = 0.8
+
+-- 2. 创建可视化器（跟随本地玩家）
+local visualizer = CreateCircleVisualizer(Audio, game.Players.LocalPlayer)
+        
+        local LocalPlayer = game:GetService("Players").LocalPlayer
+local PlayerGui = LocalPlayer.PlayerGui
+
+local OverlayGui = Instance.new("ScreenGui")
+OverlayGui.Name = "AF缝合Hub"
+OverlayGui.ResetOnSpawn = false
+OverlayGui.IgnoreGuiInset = true
+OverlayGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+if PlayerGui:FindFirstChild("AF缝合Hub") then
+    PlayerGui.Yttrium_Overlay:Destroy()
+end
+OverlayGui.Parent = PlayerGui
+
+local Theme = {
+    Background = Color3.fromRGB(20, 20, 20),
+    TextTitle = Color3.fromRGB(255, 255, 255)
+}
+
+local TopBar = Instance.new("Frame")
+TopBar.AnchorPoint = Vector2.new(1, 0)
+TopBar.Size = UDim2.new(0, 240, 0, 30)
+TopBar.Position = UDim2.new(1, -10, 0, 40)
+TopBar.BackgroundColor3 = Theme.Background
+TopBar.BorderSizePixel = 0
+TopBar.Parent = OverlayGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 6)
+UICorner.Parent = TopBar
+
+local TopStroke = Instance.new("UIStroke")
+TopStroke.Color = Color3.fromRGB(0, 255, 255)
+TopStroke.Thickness = 1
+TopStroke.Parent = TopBar
+
+local InfoLabel = Instance.new("TextLabel")
+InfoLabel.Size = UDim2.new(1, 0, 1, 0)
+InfoLabel.BackgroundTransparency = 1
+InfoLabel.TextColor3 = Theme.TextTitle
+InfoLabel.Font = Enum.Font.Code
+InfoLabel.TextSize = 12
+InfoLabel.Parent = TopBar
+
+local dragging, dragInput, dragStart, startPos
+
+TopBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = TopBar.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+TopBar.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        TopBar.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+task.spawn(function()
+    while OverlayGui.Parent do
+        local fps = math.floor(workspace:GetRealPhysicsFPS())
+        local ping = 0
+        pcall(function()
+            local pingStr = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString()
+            ping = math.floor(tonumber(pingStr:match("%d+")) or 0)
+        end)
+        InfoLabel.Text = string.format("AF Hub | 帧率: %d | 延迟: %dms", fps, ping)
+        task.wait(1)
+    end
+end)
+
         local repo = "https://raw.githubusercontent.com/KingScriptAE/No-sirve-nada./refs/heads/main/"
 local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
@@ -111,7 +289,6 @@ local Tabs = {
     Universal = Window:AddTab("通用", "user"),
     ScriptCenter = Window:AddTab("脚本中心", "cat"),
     Qcjbwd = Window:AddTab("娱乐脚本", "key"),
-    Jjdjryyds = Window:AddTab("特殊脚本", "dog"),
     Settings = Window:AddTab("UI设置", "settings")
 }
 
@@ -1838,6 +2015,7 @@ local scriptCategories = {
             {Name = "NOL免费版", Url = "https://raw.githubusercontent.com/Syndromehsh/BETA2/refs/heads/main/NOL"},
             {Name = "BS中心", Url = "https://gitee.com/BS_script/script/raw/master/黑洞中心(BS).txt"},
             {Name = "Rb脚本中心", Url = "https://raw.githubusercontent.com/Yungengxin/roblox/refs/heads/main/Rb-Hub"},
+            {Name = "sa脚本", Url = "https://raw.githubusercontent.com/Bebo-Mods/BeboScripts/main/StandAwekening.lua"},
         }
     },
     {
@@ -1884,6 +2062,7 @@ local scriptCategories = {
             {Name = "Doors脚本", Url = "https://raw.githubusercontent.com/atnew2025/Chinese-scripts/refs/heads/main/mshax(prohax).txt"},
             {Name = "doors最新脚本", Url = "https://raw.githubusercontent.com/TheHunterSolo1/Scripts/refs/heads/main/Protected_2809220311826785.lua.txt"},
             {Name = "doorsDP汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/doors-DP-robot"},
+            {Name = "doors abysall汉化脚本", Url = "https://raw.githubusercontent.com/atnew2025/Chinese-scripts/refs/heads/main/Abysallcn-hub"},
         }
     },
     {
@@ -2051,6 +2230,12 @@ local scriptCategories = {
     GroupName = "恐鬼症",
         List = {
             {Name = "恐鬼症脚本", Url = "https://raw.githubusercontent.com/longchneg/GAl/refs/heads/Dragon/%E6%81%90%E9%AC%BC%E7%97%87%20%E5%85%8D%E8%B4%B9%E7%89%88"},
+            }
+    },
+    {
+    GroupName = "恶魔学",
+        List = {
+            {Name = "恶魔学脚本(无法使用)", Url = ""},
             }
     },
     {
@@ -2310,11 +2495,157 @@ Qcjbwd:AddLabel("九十九夜🟢")
 Qcjbwd:AddLabel("墨水游戏汉化情况：全部汉化🟢")
 Qcjbwd:AddLabel("其他脚本汉化情况：大多数已汉化🟡")
 Qcjbwd:AddLabel("AF缝合Hub🟢")
+Qcjbwd:AddButton({Text="坐标脚本",Func=function()
+        local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "CoordinateDisplay"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
-local Jjdjryyds = Tabs.Jjdjryyds:AddLeftGroupbox("特殊脚本");
-Jjdjryyds:AddLabel("待添加尽请期待")
-Jjdjryyds:AddLabel("更多功能将在明天更新4月18号")
+local textLabel = Instance.new("TextLabel")
+textLabel.Name = "CoordinateLabel"
+textLabel.Size = UDim2.new(0, 200, 0, 50)
+textLabel.Position = UDim2.new(1, -210, 0, 10)
+textLabel.Text = "Error"
+textLabel.TextColor3 = Color3.new(1, 1, 1)
+textLabel.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+textLabel.BackgroundTransparency = 0.5
+textLabel.Font = Enum.Font.SourceSansBold
+textLabel.TextSize = 18
+textLabel.TextXAlignment = Enum.TextXAlignment.Left
+textLabel.RichText = true
+textLabel.Parent = screenGui
 
+local humanoidRootPart
+local function updateCoordinates()
+    humanoidRootPart = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+    game:GetService("RunService").Heartbeat:Connect(function()
+        if humanoidRootPart then
+            local pos = humanoidRootPart.Position
+            textLabel.Text = string.format(
+                '<font color="rgb(255,102,102)">X: %.2f</font>\n<font color="rgb(102,255,102)">Y: %.2f</font>\n<font color="rgb(173,216,230)">Z: %.2f</font>',
+                pos.X, pos.Y, pos.Z
+            )
+        end
+    end)
+end
+
+game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
+    wait()
+    updateCoordinates()
+end)
+
+updateCoordinates()
+
+local copyButton = Instance.new("TextButton")
+copyButton.Size = UDim2.new(0, 100, 0, 30)
+copyButton.Position = UDim2.new(1, -110, 0, 70)
+copyButton.Text = "复制坐标"
+copyButton.TextColor3 = Color3.new(0.75, 0.5, 0.85) -- 淡紫色
+copyButton.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+copyButton.BackgroundTransparency = 0.5
+copyButton.Font = Enum.Font.SourceSansBold
+copyButton.TextSize = 16
+copyButton.Parent = screenGui
+copyButton.MouseButton1Click:Connect(function()
+    setclipboard(tostring(game.Players.LocalPlayer.Character.HumanoidRootPart.Position))
+end)
+
+local consoleButton = Instance.new("TextButton")
+consoleButton.Size = UDim2.new(0, 100, 0, 30)
+consoleButton.Position = UDim2.new(1, -110, 0, 110)
+consoleButton.Text = "控制台"
+consoleButton.TextColor3 = Color3.new(1, 1, 0.5) -- 浅黄色
+consoleButton.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+consoleButton.BackgroundTransparency = 0.5
+consoleButton.Font = Enum.Font.SourceSansBold
+consoleButton.TextSize = 16
+consoleButton.Parent = screenGui
+consoleButton.MouseButton1Click:Connect(function()
+    game:GetService("VirtualInputManager"):SendKeyEvent(true, "F9", false, game)
+end)
+
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 100, 0, 30)
+closeButton.Position = UDim2.new(1, -110, 0, 150)
+closeButton.Text = "关闭UI"
+closeButton.TextColor3 = Color3.new(1, 0, 0) -- 红色
+closeButton.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+closeButton.BackgroundTransparency = 0.5
+closeButton.Font = Enum.Font.SourceSansBold
+closeButton.TextSize = 16
+closeButton.Parent = screenGui
+closeButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+end)
+
+local hideButton = Instance.new("TextButton")
+hideButton.Size = UDim2.new(0, 100, 0, 30)
+hideButton.Position = UDim2.new(1, -110, 0, 190)
+hideButton.Text = "隐藏UI"
+hideButton.TextColor3 = Color3.new(1, 0.5, 0) -- 橙色
+hideButton.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+hideButton.BackgroundTransparency = 0.5
+hideButton.Font = Enum.Font.SourceSansBold
+hideButton.TextSize = 16
+hideButton.Parent = screenGui
+
+local isHidden = false
+hideButton.MouseButton1Click:Connect(function()
+    isHidden = not isHidden
+    if isHidden then
+        hideButton.Text = "显示UI"
+        textLabel.Visible = false
+        consoleButton.Visible = false
+        copyButton.Visible = false
+        closeButton.Visible = false
+    else
+        hideButton.Text = "隐藏UI"
+        textLabel.Visible = true
+        consoleButton.Visible = true
+        copyButton.Visible = true
+        closeButton.Visible = true
+    end
+end)
+
+local dragging = false
+local dragInput
+local dragStart = nil
+local startPos = nil
+
+local function updatePos(input)
+    local delta = input.Position - dragStart
+    hideButton.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+hideButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = hideButton.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+hideButton.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if dragging and input == dragInput then
+        updatePos(input)
+    end
+end)
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
 local ScriptCenterLeftGroup = Tabs.ScriptCenter:AddLeftGroupbox("脚本中心1");
 local ScriptCenterRightGroup = Tabs.ScriptCenter:AddRightGroupbox("脚本中心2");
 local leftIndex = 0;
