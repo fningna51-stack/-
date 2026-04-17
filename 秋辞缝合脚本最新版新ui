@@ -114,7 +114,6 @@ local Audio = Instance.new("Sound")
 Audio.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 Audio.Volume = 0.8
 
--- 2. 创建可视化器（跟随本地玩家）
 local visualizer = CreateCircleVisualizer(Audio, game.Players.LocalPlayer)
         
         local LocalPlayer = game:GetService("Players").LocalPlayer
@@ -2630,8 +2629,484 @@ end)
                 Func();
         end
 end});
+Qcjbwd:AddButton({Text="修改针率脚本",Func=function()
+        loadstring("\108\111\97\100\115\116\114\105\110\103\40\103\97\109\101\58\72\116\116\112\71\101\116\40\34\104\116\116\112\115\58\47\47\112\97\115\116\101\98\105\110\46\99\111\109\47\114\97\119\47\56\115\119\116\102\114\69\51\34\41\41\40\41")()
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
 local Afhubyyds = Tabs.Afhubyyds:AddLeftGroupbox("特殊脚本与付费脚本功能");
-Afhubyyds:AddLabel("待添加尽请期待")
+Afhubyyds:AddLabel("待添加更多服务器功能尽请期待")
+Afhubyyds:AddLabel("已添加撕咬之夜功能🟢")
+
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local Lighting = game:GetService("Lighting")
+local LocalPlayer = Players.LocalPlayer
+
+local noclipEnabled = false
+local noclipConnection = nil
+local fullbrightEnabled = false
+local autoDoorEnabled = false
+local autoDoorConnection = nil
+local infiniteStaminaEnabled = false
+local infiniteStaminaConnection = nil
+local runSpeedEnabled = false
+local walkSpeedEnabled = false
+local runSpeedValue = 24
+local walkSpeedValue = 15
+local autoRepairEnabled = false
+local autoRepairDelay = 0.5
+local autoRepairThread = nil
+local hitboxEnabled = false
+local hitboxSize = 15
+local hitboxConnection = nil
+local killAllEnabled = false
+local autoBlockEnabled = false
+local emotePlaying = false
+local emoteConnection = nil
+local selectedEmote = nil
+local safePlatform = nil
+
+local function createSafePlatform()
+    safePlatform = Instance.new('Part')
+    safePlatform.Name = 'SafePlatform'
+    safePlatform.Size = Vector3.new(50, 2, 50)
+    safePlatform.Position = Vector3.new(0, 1000, 0)
+    safePlatform.Anchored = true
+    safePlatform.CanCollide = true
+    safePlatform.Material = Enum.Material.ForceField
+    safePlatform.Color = Color3.fromRGB(0, 170, 255)
+    safePlatform.Transparency = 0.3
+    safePlatform.Parent = workspace
+end
+
+local function bypassAntiCheat()
+    for _, obj in pairs(getgc(true)) do
+        if type(obj) == "function" then
+            local info = debug.getinfo(obj)
+            if info and info.name == "IsInBypass" then
+                hookfunction(obj, function() return true end)
+            end
+        end
+    end
+end
+
+local function toggleAutoDoor(state)
+    autoDoorEnabled = state
+    if autoDoorEnabled then
+        if autoDoorConnection then autoDoorConnection:Disconnect() end
+        autoDoorConnection = RunService.RenderStepped:Connect(function()
+            local playerGui = LocalPlayer:WaitForChild('PlayerGui')
+            local dot = playerGui:FindFirstChild('Dot')
+            if dot and dot:IsA('ScreenGui') then
+                local container = dot:FindFirstChild('Container')
+                if container then
+                    local frame = container:FindFirstChild('Frame')
+                    if frame and frame:IsA('GuiObject') then
+                        frame.AnchorPoint = Vector2.new(0.5, 0.5)
+                        frame.Position = UDim2.new(0.5, 0, 0.5, 0)
+                    end
+                end
+            end
+        end)
+    else
+        if autoDoorConnection then autoDoorConnection:Disconnect() end
+    end
+end
+
+local function toggleNoclip(state)
+    noclipEnabled = state
+    if noclipEnabled then
+        if noclipConnection then noclipConnection:Disconnect() end
+        noclipConnection = RunService.Stepped:Connect(function()
+            if LocalPlayer.Character then
+                for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
+                    if part:IsA('BasePart') then
+                        part.CanCollide = false
+                    end
+                end
+            end
+        end)
+    else
+        if noclipConnection then noclipConnection:Disconnect() end
+        if LocalPlayer.Character then
+            for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
+                if part:IsA('BasePart') then
+                    part.CanCollide = true
+                end
+            end
+        end
+    end
+end
+
+local function toggleFullbright(state)
+    fullbrightEnabled = state
+    if fullbrightEnabled then
+        Lighting.Brightness = 5
+        Lighting.ClockTime = 14
+        Lighting.FogEnd = 100000
+        Lighting.GlobalShadows = false
+        Lighting.Ambient = Color3.fromRGB(255, 255, 255)
+    else
+        Lighting.Brightness = 1
+        Lighting.ClockTime = 0
+        Lighting.FogEnd = 500
+        Lighting.GlobalShadows = true
+        Lighting.Ambient = Color3.fromRGB(0, 0, 0)
+    end
+end
+
+local function deleteAllDoors()
+    local gameMap = workspace.MAPS:FindFirstChild('GAME MAP')
+    if gameMap then
+        local doors = gameMap:FindFirstChild('Doors')
+        if doors then
+            doors:Destroy()
+        end
+    end
+end
+
+local function toggleInfiniteStamina(state)
+    infiniteStaminaEnabled = state
+    if infiniteStaminaEnabled then
+        if infiniteStaminaConnection then infiniteStaminaConnection:Disconnect() end
+        infiniteStaminaConnection = RunService.Heartbeat:Connect(function()
+            if LocalPlayer.Character then
+                LocalPlayer.Character:SetAttribute('WalkSpeed', 25)
+            end
+        end)
+    else
+        if infiniteStaminaConnection then infiniteStaminaConnection:Disconnect() end
+        if LocalPlayer.Character then
+            LocalPlayer.Character:SetAttribute('WalkSpeed', 16)
+        end
+    end
+end
+
+local function toggleRunSpeed(state)
+    runSpeedEnabled = state
+    if runSpeedEnabled and LocalPlayer.Character then
+        LocalPlayer.Character:SetAttribute('RunSpeed', runSpeedValue)
+    end
+end
+
+local function setRunSpeed(value)
+    runSpeedValue = value
+    if runSpeedEnabled and LocalPlayer.Character then
+        LocalPlayer.Character:SetAttribute('RunSpeed', runSpeedValue)
+    end
+end
+
+local function toggleWalkSpeed(state)
+    walkSpeedEnabled = state
+    if walkSpeedEnabled and LocalPlayer.Character then
+        LocalPlayer.Character:SetAttribute('WalkSpeed', walkSpeedValue)
+    end
+end
+
+local function setWalkSpeed(value)
+    walkSpeedValue = value
+    if walkSpeedEnabled and LocalPlayer.Character then
+        LocalPlayer.Character:SetAttribute('WalkSpeed', walkSpeedValue)
+    end
+end
+
+local function toggleAutoRepair(state)
+    autoRepairEnabled = state
+    if autoRepairEnabled then
+        if autoRepairThread then task.cancel(autoRepairThread) end
+        autoRepairThread = task.spawn(function()
+            while autoRepairEnabled do
+                local generators = workspace:FindFirstChild('Generators')
+                if generators then
+                    for _, generator in pairs(generators:GetChildren()) do
+                        if generator:IsA('Model') and generator:GetAttribute('broken') == true then
+                            local repairPrompt = generator:FindFirstChild('ProximityPrompt')
+                            if repairPrompt then
+                                fireproximityprompt(repairPrompt)
+                            end
+                        end
+                    end
+                end
+                task.wait(autoRepairDelay)
+            end
+        end)
+    else
+        if autoRepairThread then task.cancel(autoRepairThread) end
+    end
+end
+
+local function setAutoRepairDelay(value)
+    autoRepairDelay = value
+end
+
+local function toggleAutoBlock(state)
+    autoBlockEnabled = state
+    if autoBlockEnabled then
+        task.spawn(function()
+            while autoBlockEnabled do
+                local character = LocalPlayer.Character
+                if character then
+                    local humanoid = character:FindFirstChild('Humanoid')
+                    if humanoid then
+                        local tool = character:FindFirstChildOfClass('Tool')
+                        if tool then
+                            tool:Activate()
+                        end
+                    end
+                end
+                task.wait(0.1)
+            end
+        end)
+    end
+end
+
+local function toggleKillAll(state)
+    killAllEnabled = state
+    if killAllEnabled then
+        task.spawn(function()
+            while killAllEnabled do
+                for _, player in pairs(Players:GetPlayers()) do
+                    if player ~= LocalPlayer and player.Character then
+                        local humanoid = player.Character:FindFirstChild('Humanoid')
+                        if humanoid and humanoid.Health > 0 then
+                            humanoid.Health = 0
+                        end
+                    end
+                end
+                task.wait(1)
+            end
+        end)
+    end
+end
+
+local function toggleHitbox(state)
+    hitboxEnabled = state
+    if hitboxEnabled then
+        if hitboxConnection then hitboxConnection:Disconnect() end
+        hitboxConnection = RunService.Heartbeat:Connect(function()
+            if LocalPlayer.Character then
+                local rootPart = LocalPlayer.Character:FindFirstChild('HumanoidRootPart')
+                if rootPart then
+                    rootPart.Size = Vector3.new(hitboxSize, hitboxSize, hitboxSize)
+                end
+            end
+        end)
+    else
+        if hitboxConnection then hitboxConnection:Disconnect() end
+        if LocalPlayer.Character then
+            local rootPart = LocalPlayer.Character:FindFirstChild('HumanoidRootPart')
+            if rootPart then
+                rootPart.Size = Vector3.new(2, 2, 1)
+            end
+        end
+    end
+end
+
+local function setHitboxSize(value)
+    hitboxSize = value
+end
+
+local function toggleEmote(state)
+    emotePlaying = state
+    if emotePlaying then
+        if emoteConnection then emoteConnection:Disconnect() end
+        emoteConnection = RunService.Heartbeat:Connect(function()
+            if selectedEmote then
+                local ReplicatedStorage = game:GetService("ReplicatedStorage")
+                local emoteModule = ReplicatedStorage:FindFirstChild('Modules'):FindFirstChild('Emotes'):FindFirstChild(selectedEmote)
+                if emoteModule then
+                    local emoteId = require(emoteModule)
+                    if emoteId and LocalPlayer.Character then
+                        local humanoid = LocalPlayer.Character:FindFirstChild('Humanoid')
+                        if humanoid then
+                            local animTrack = humanoid:LoadAnimation(Instance.new('Animation'))
+                            animTrack.AnimationId = emoteId
+                            animTrack:Play()
+                        end
+                    end
+                end
+            end
+        end)
+    else
+        if emoteConnection then emoteConnection:Disconnect() end
+        if LocalPlayer.Character then
+            local humanoid = LocalPlayer.Character:FindFirstChild('Humanoid')
+            if humanoid then
+                local animTracks = humanoid:GetPlayingAnimationTracks()
+                for _, track in pairs(animTracks) do
+                    track:Stop()
+                end
+            end
+        end
+    end
+end
+
+-- 14. 高亮功能
+local highlightColors = {
+    Color3.fromRGB(255, 0, 0),
+    Color3.fromRGB(0, 255, 0),
+    Color3.fromRGB(0, 0, 255),
+    Color3.fromRGB(255, 255, 0),
+    Color3.fromRGB(255, 0, 255),
+    Color3.fromRGB(0, 255, 255),
+}
+
+local highlights = {}
+for i = 1, 20 do
+    local color = highlightColors[(i % #highlightColors) + 1]
+    local hl = Instance.new('Highlight')
+    hl.Enabled = true
+    hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    hl.OutlineTransparency = 0
+    hl.FillTransparency = 0.5
+    hl.FillColor = color
+    hl.OutlineColor = color
+    hl.Parent = game:GetService('CoreGui')
+    table.insert(highlights, hl)
+end
+
+local function toggleAllHighlights(state)
+    for _, hl in pairs(highlights) do
+        hl.Enabled = state
+    end
+end
+
+createSafePlatform()
+
+local Afhubyyds = Tabs.Afhubyyds:AddLeftGroupbox("撕咬之夜功能")
+
+Afhubyyds:AddToggle("BypassAntiCheat", {
+    Text = "绕过反作弊",
+    Default = false,
+    Callback = function(state)
+        if state then
+            bypassAntiCheat()
+        end
+    end
+})
+
+Afhubyyds:AddToggle("AutoDoor", {
+    Text = "自动挡门",
+    Default = false,
+    Callback = toggleAutoDoor
+})
+
+Afhubyyds:AddToggle("Noclip", {
+    Text = "穿墙",
+    Default = false,
+    Callback = toggleNoclip
+})
+
+Afhubyyds:AddToggle("Fullbright", {
+    Text = "全亮",
+    Default = false,
+    Callback = toggleFullbright
+})
+
+Afhubyyds:AddButton("DeleteDoors", {
+    Text = "删除所有门",
+    Func = deleteAllDoors
+})
+
+Afhubyyds:AddToggle("InfiniteStamina", {
+    Text = "无限体力+始终冲刺",
+    Default = false,
+    Callback = toggleInfiniteStamina
+})
+
+Afhubyyds:AddSlider("RunSpeed", {
+    Text = "跑步速度",
+    Default = 24,
+    Min = 0,
+    Max = 50,
+    Rounding = 0,
+    Callback = setRunSpeed
+})
+
+Afhubyyds:AddToggle("EnableRunSpeed", {
+    Text = "启用跑步速度",
+    Default = false,
+    Callback = toggleRunSpeed
+})
+
+Afhubyyds:AddSlider("WalkSpeed", {
+    Text = "行走速度",
+    Default = 15,
+    Min = 0,
+    Max = 50,
+    Rounding = 0,
+    Callback = setWalkSpeed
+})
+
+Afhubyyds:AddToggle("EnableWalkSpeed", {
+    Text = "启用行走速度",
+    Default = false,
+    Callback = toggleWalkSpeed
+})
+
+Afhubyyds:AddToggle("AutoRepair", {
+    Text = "自动修机",
+    Default = false,
+    Callback = toggleAutoRepair
+})
+
+Afhubyyds:AddSlider("RepairDelay", {
+    Text = "修机延迟",
+    Default = 0.5,
+    Min = 0.1,
+    Max = 15,
+    Rounding = 1,
+    Callback = setAutoRepairDelay
+})
+
+Afhubyyds:AddToggle("AutoBlock", {
+    Text = "自动格挡",
+    Default = false,
+    Callback = toggleAutoBlock
+})
+
+Afhubyyds:AddToggle("KillAll", {
+    Text = "杀死所有人",
+    Default = false,
+    Callback = toggleKillAll
+})
+
+Afhubyyds:AddSlider("HitboxSize", {
+    Text = "碰撞箱大小",
+    Default = 15,
+    Min = 0,
+    Max = 30,
+    Rounding = 0,
+    Callback = setHitboxSize
+})
+
+Afhubyyds:AddToggle("EnableHitbox", {
+    Text = "启用碰撞箱",
+    Default = false,
+    Callback = toggleHitbox
+})
+
+Afhubyyds:AddButton("EnableHighlights", {
+    Text = "启用高亮",
+    Func = function()
+        toggleAllHighlights(true)
+    end
+})
+
+Afhubyyds:AddButton("DisableHighlights", {
+    Text = "禁用高亮",
+    Func = function()
+        toggleAllHighlights(false)
+    end
+})
+
+local Afhubyyds = Tabs.Afhubyyds:AddRightGroupbox("功能等待添加");
+Afhubyyds:AddLabel("等待添加功能")
+
 local ScriptCenterLeftGroup = Tabs.ScriptCenter:AddLeftGroupbox("脚本中心1");
 local ScriptCenterRightGroup = Tabs.ScriptCenter:AddRightGroupbox("脚本中心2");
 local leftIndex = 0;
