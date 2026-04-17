@@ -289,6 +289,7 @@ local Tabs = {
     Universal = Window:AddTab("通用", "user"),
     ScriptCenter = Window:AddTab("脚本中心", "cat"),
     Qcjbwd = Window:AddTab("娱乐脚本", "key"),
+    Afhubyyds = Window:AddTab("特殊脚本与付费脚本", "dog"),
     Settings = Window:AddTab("UI设置", "settings")
 }
 
@@ -2131,18 +2132,6 @@ local scriptCategories = {
         }
     },
     {
-    GroupName = "萨凡娜",
-        List = {
-            {Name = "萨凡娜-悔脚本", Url = "https://raw.githubusercontent.com/sdxs221/sd/main/萨凡娜"},
-            }
-    },
-    {
-     GroupName = "住宅大逃杀",
-        List = {
-            {Name = "住宅大逃杀-悔脚本", Url = "https://raw.githubusercontent.com/sdxs221/sd/main/住宅大屠杀"},
-            }
-    },
-    {
         GroupName = "竞争对手",
         List = {
             {Name = "竞争对手脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/竞争对手汉化脚本"},
@@ -2230,12 +2219,6 @@ local scriptCategories = {
     GroupName = "恐鬼症",
         List = {
             {Name = "恐鬼症脚本", Url = "https://raw.githubusercontent.com/longchneg/GAl/refs/heads/Dragon/%E6%81%90%E9%AC%BC%E7%97%87%20%E5%85%8D%E8%B4%B9%E7%89%88"},
-            }
-    },
-    {
-    GroupName = "恶魔学",
-        List = {
-            {Name = "恶魔学脚本(无法使用)", Url = ""},
             }
     },
     {
@@ -2495,6 +2478,7 @@ Qcjbwd:AddLabel("九十九夜🟢")
 Qcjbwd:AddLabel("墨水游戏汉化情况：全部汉化🟢")
 Qcjbwd:AddLabel("其他脚本汉化情况：大多数已汉化🟡")
 Qcjbwd:AddLabel("AF缝合Hub🟢")
+Qcjbwd:AddLabel("现在已支持服务器：31个服务器")
 Qcjbwd:AddButton({Text="坐标脚本",Func=function()
         local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "CoordinateDisplay"
@@ -2646,6 +2630,8 @@ end)
                 Func();
         end
 end});
+local Afhubyyds = Tabs.Afhubyyds:AddLeftGroupbox("特殊脚本与付费脚本功能");
+Afhubyyds:AddLabel("待添加尽请期待")
 local ScriptCenterLeftGroup = Tabs.ScriptCenter:AddLeftGroupbox("脚本中心1");
 local ScriptCenterRightGroup = Tabs.ScriptCenter:AddRightGroupbox("脚本中心2");
 local leftIndex = 0;
