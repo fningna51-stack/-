@@ -2531,10 +2531,8 @@ Afhubyyds:AddToggle("AutoPushToggle", {
                         local targetName = Options.AutoPushTarget.Value
                         local targetPlayer = game:GetService("Players"):FindFirstChild(targetName)
                         if targetPlayer and targetPlayer.Character and game.Players.LocalPlayer.Character then
-                            -- 移动到目标位置
                             game.Players.LocalPlayer.Character:MoveTo(targetPlayer.Character.HumanoidRootPart.Position)
                             
-                            -- 尝试使用推工具
                             local pushTool = game.Players.LocalPlayer.Backpack:FindFirstChild("Push")
                             if pushTool then
                                 local args = {
