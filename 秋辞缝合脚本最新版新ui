@@ -1258,749 +1258,6 @@ UniversalRightGroup:AddButton({Text="秋辞音乐播放器(正在开发)",Func=f
                 Func();
         end
 end});
-UniversalRightGroup:AddLabel("秋辞脚本测试区");
-UniversalRightGroup:AddButton({Text="秋辞缝合脚本1.0 3DUI测试脚本(只有脚本)",Func=function()
-        local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local CoreGui = game:GetService("CoreGui")
-local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
-local HttpService = game:GetService("HttpService")
-
-local LocalPlayer = Players.LocalPlayer
-local Camera = workspace.CurrentCamera
-
-local secureParent = pcall(function() return CoreGui end) and CoreGui or LocalPlayer:WaitForChild("PlayerGui")
-
-local req = (syn and syn.request) or (http and http.request) or http_request or request
-local getasset = getcustomasset or getsynasset
-
-if not req or not getasset or not writefile then
-    warn("环境缺失高级API！无法运行此脚本。") return
-end
-
-local ConfigFolder = "NeteaseData_Vision"
-if not isfolder(ConfigFolder) then makefolder(ConfigFolder) end
-
-if getgenv()._CleanHoloLib then getgenv()._CleanHoloLib() end
-
-local HoloLib = {}
-local UI_Instances = {}
-
-local AttachTarget = nil
-
-local function GetPlayerFromString(str)
-    if not str or str == "" then return nil end
-    str = string.lower(str)
-    if str == "me" then return LocalPlayer end
-    for _, p in ipairs(Players:GetPlayers()) do
-        if string.find(string.lower(p.Name), str) or string.find(string.lower(p.DisplayName), str) then
-            return p
-        end
-    end
-    return nil
-end
-
-local AppleTheme = {
-    GlassBG = Color3.fromRGB(15, 15, 18),
-    GlassTransparency = 0.35,
-    Stroke = Color3.fromRGB(255, 255, 255),
-    StrokeTransparency = 0.88,
-    Accent = Color3.fromRGB(10, 132, 255),
-    ComponentBG = Color3.fromRGB(45, 45, 50),
-    TextPrimary = Color3.fromRGB(245, 245, 245),
-    TextSecondary = Color3.fromRGB(150, 150, 155),
-    Corner = UDim.new(0, 16)
-}
-
-local function CreateSpatialPanel(title, initialOffset, isMain)
-    local isVisible = isMain 
-    local isPinned = false
-    local pinnedPosition = Vector3.new()
-    local currentHoloOffset = initialOffset
-    
-    local PanelPart = Instance.new("Part")
-    PanelPart.Size = Vector3.new(3.2, 4.0, 0.01)
-    PanelPart.Anchored = true
-    PanelPart.CanCollide = false
-    PanelPart.Transparency = 1 
-    PanelPart.Parent = workspace
-    table.insert(UI_Instances, PanelPart)
-
-    local SurfaceUI = Instance.new("SurfaceGui")
-    SurfaceUI.Adornee = PanelPart
-    SurfaceUI.Face = Enum.NormalId.Back 
-    SurfaceUI.AlwaysOnTop = true 
-    SurfaceUI.LightInfluence = 0 
-    SurfaceUI.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud 
-    SurfaceUI.PixelsPerStud = 100 
-    SurfaceUI.Enabled = isVisible
-    SurfaceUI.Parent = secureParent
-    table.insert(UI_Instances, SurfaceUI)
-
-    local MainFrame = Instance.new("Frame")
-    MainFrame.Size = UDim2.new(1, 0, 1, 0)
-    MainFrame.BackgroundColor3 = AppleTheme.GlassBG
-    MainFrame.BackgroundTransparency = AppleTheme.GlassTransparency
-    MainFrame.BorderSizePixel = 0
-    MainFrame.Parent = SurfaceUI
-    Instance.new("UICorner", MainFrame).CornerRadius = AppleTheme.Corner
-    local uiStroke = Instance.new("UIStroke", MainFrame)
-    uiStroke.Color = AppleTheme.Stroke
-    uiStroke.Transparency = AppleTheme.StrokeTransparency
-    uiStroke.Thickness = 1.5
-
-    local TopBar = Instance.new("Frame")
-    TopBar.Size = UDim2.new(1, 0, 0, 40)
-    TopBar.BackgroundTransparency = 1
-    TopBar.Parent = MainFrame
-
-    local DragBar = Instance.new("TextButton")
-    DragBar.Size = UDim2.new(1, -50, 1, 0)
-    DragBar.BackgroundTransparency = 1
-    DragBar.Text = "  " .. title
-    DragBar.TextColor3 = AppleTheme.TextPrimary
-    DragBar.Font = Enum.Font.GothamBold
-    DragBar.TextSize = 16
-    DragBar.TextXAlignment = Enum.TextXAlignment.Left
-    DragBar.Parent = TopBar
-
-    local PinBtn = Instance.new("TextButton")
-    PinBtn.Size = UDim2.new(0, 30, 0, 30)
-    PinBtn.Position = UDim2.new(1, -40, 0, 5)
-    PinBtn.BackgroundColor3 = AppleTheme.ComponentBG
-    PinBtn.BackgroundTransparency = 0.5
-    PinBtn.Text = "📍"
-    PinBtn.TextSize = 16
-    PinBtn.Parent = TopBar
-    Instance.new("UICorner", PinBtn).CornerRadius = UDim.new(1, 0)
-
-    PinBtn.MouseButton1Click:Connect(function()
-        isPinned = not isPinned
-        if isPinned then
-            pinnedPosition = PanelPart.Position
-            TweenService:Create(PinBtn, TweenInfo.new(0.3), {BackgroundColor3 = AppleTheme.Accent, BackgroundTransparency = 0}):Play()
-            PinBtn.Text = "📌"
-        else
-            TweenService:Create(PinBtn, TweenInfo.new(0.3), {BackgroundColor3 = AppleTheme.ComponentBG, BackgroundTransparency = 0.5}):Play()
-            PinBtn.Text = "📍"
-        end
-    end)
-
-    local isDraggingHolo, initTouch, initOffset = false, Vector2.new(), CFrame.new()
-    DragBar.InputBegan:Connect(function(input)
-        if not AttachTarget and not isPinned and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
-            isDraggingHolo = true; initTouch = input.Position; initOffset = currentHoloOffset
-        end
-    end)
-    UserInputService.InputChanged:Connect(function(input)
-        if isDraggingHolo and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-            local delta = input.Position - initTouch
-            currentHoloOffset = CFrame.new(
-                math.clamp(initOffset.X - (delta.X * 0.005), -6, 6),
-                math.clamp(initOffset.Y - (delta.Y * 0.005), -3, 4),
-                initOffset.Z
-            )
-        end
-    end)
-    UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then isDraggingHolo = false end
-    end)
-
-    local ScrollFrame = Instance.new("ScrollingFrame")
-    ScrollFrame.Size = UDim2.new(1, -30, 1, -55)
-    ScrollFrame.Position = UDim2.new(0, 15, 0, 40)
-    ScrollFrame.BackgroundTransparency = 1
-    ScrollFrame.ScrollBarThickness = 3
-    ScrollFrame.ScrollBarImageColor3 = AppleTheme.TextSecondary
-    ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-    ScrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
-    ScrollFrame.Parent = MainFrame
-
-    local UIListLayout = Instance.new("UIListLayout")
-    UIListLayout.Padding = UDim.new(0, 12)
-    UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    UIListLayout.Parent = ScrollFrame
-
-    local followConn = RunService.RenderStepped:Connect(function(dt)
-        if not isVisible then 
-            PanelPart.CFrame = CFrame.new(0, -9999, 0)
-            return 
-        end
-        
-        if AttachTarget and AttachTarget.Character and AttachTarget.Character:FindFirstChild("HumanoidRootPart") then
-            local hrp = AttachTarget.Character.HumanoidRootPart
-            local baseCFrame = hrp.CFrame * CFrame.new(0, 1.5, 3.5) 
-            if isMain then
-                PanelPart.CFrame = PanelPart.CFrame:Lerp(baseCFrame * CFrame.new(-1.8, 0, 0), dt * 10)
-            else
-                PanelPart.CFrame = PanelPart.CFrame:Lerp(baseCFrame * CFrame.new(-5.2, 0, 0), dt * 10)
-            end
-        elseif not isPinned then
-            PanelPart.CFrame = PanelPart.CFrame:Lerp(Camera.CFrame * currentHoloOffset, dt * 15)
-        else
-            local targetRot = CFrame.lookAt(pinnedPosition, Camera.CFrame.Position) * CFrame.Angles(0, math.pi, 0)
-            PanelPart.CFrame = PanelPart.CFrame:Lerp(targetRot, dt * 10)
-        end
-    end)
-    table.insert(UI_Instances, followConn)
-
-    local PanelAPI = {}
-    function PanelAPI:GetBasePart() return PanelPart end
-    function PanelAPI:IsVisible() return isVisible end
-
-    function PanelAPI:SetVisible(state)
-        isVisible = state; SurfaceUI.Enabled = state
-        if state and isPinned then
-            isPinned = false; PinBtn.Text = "📍"
-            TweenService:Create(PinBtn, TweenInfo.new(0.3), {BackgroundColor3 = AppleTheme.ComponentBG, BackgroundTransparency = 0.5}):Play()
-            PanelPart.CFrame = Camera.CFrame * currentHoloOffset
-        end
-    end
-
-    function PanelAPI:ToggleVisible() self:SetVisible(not isVisible) end
-
-    function PanelAPI:CreateLabel(text, center)
-        local Label = Instance.new("TextLabel")
-        Label.Size = UDim2.new(1, 0, 0, 20)
-        Label.BackgroundTransparency = 1
-        Label.Text = text
-        Label.TextColor3 = AppleTheme.TextSecondary
-        Label.Font = Enum.Font.GothamMedium
-        Label.TextSize = 13
-        Label.TextWrapped = true
-        Label.TextXAlignment = center and Enum.TextXAlignment.Center or Enum.TextXAlignment.Left
-        Label.Parent = ScrollFrame
-        return Label
-    end
-
-    function PanelAPI:CreateButton(text, callback)
-        local Btn = Instance.new("TextButton")
-        Btn.Size = UDim2.new(1, 0, 0, 40)
-        Btn.BackgroundColor3 = AppleTheme.ComponentBG
-        Btn.BackgroundTransparency = 0.4
-        Btn.Text = text
-        Btn.TextColor3 = AppleTheme.TextPrimary
-        Btn.Font = Enum.Font.GothamMedium
-        Btn.TextSize = 14
-        Btn.Parent = ScrollFrame
-        Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 10)
-        
-        Btn.MouseButton1Click:Connect(function()
-            TweenService:Create(Btn, TweenInfo.new(0.1), {BackgroundColor3 = AppleTheme.Accent}):Play()
-            pcall(callback)
-            task.wait(0.1)
-            TweenService:Create(Btn, TweenInfo.new(0.3), {BackgroundColor3 = AppleTheme.ComponentBG}):Play()
-        end)
-        return Btn
-    end
-
-    function PanelAPI:CreateInput(placeholder, callback)
-        local InputFrame = Instance.new("Frame")
-        InputFrame.Size = UDim2.new(1, 0, 0, 40)
-        InputFrame.BackgroundColor3 = AppleTheme.ComponentBG
-        InputFrame.BackgroundTransparency = 0.6
-        InputFrame.Parent = ScrollFrame
-        Instance.new("UICorner", InputFrame).CornerRadius = UDim.new(0, 10)
-
-        local TextBox = Instance.new("TextBox")
-        TextBox.Size = UDim2.new(1, -20, 1, 0)
-        TextBox.Position = UDim2.new(0, 10, 0, 0)
-        TextBox.BackgroundTransparency = 1
-        TextBox.PlaceholderText = placeholder
-        TextBox.Text = ""
-        TextBox.TextColor3 = AppleTheme.TextPrimary
-        TextBox.PlaceholderColor3 = AppleTheme.TextSecondary
-        TextBox.Font = Enum.Font.GothamMedium
-        TextBox.TextSize = 13
-        TextBox.TextXAlignment = Enum.TextXAlignment.Left
-        TextBox.ClearTextOnFocus = false
-        TextBox.Parent = InputFrame
-
-        TextBox.FocusLost:Connect(function(enterPressed)
-            if enterPressed then pcall(callback, TextBox.Text) end
-        end)
-        return TextBox
-    end
-
-    function PanelAPI:CreateSubTab(subTitle)
-        local subOffset = currentHoloOffset * CFrame.new(2.8, 0, 0)
-        local SubPanel = CreateSpatialPanel(subTitle, subOffset, false)
-        
-        local Btn = Instance.new("TextButton")
-        Btn.Size = UDim2.new(1, 0, 0, 45)
-        Btn.BackgroundColor3 = AppleTheme.ComponentBG
-        Btn.BackgroundTransparency = 0.4
-        Btn.Text = subTitle .. "  ➡️"
-        Btn.TextColor3 = AppleTheme.TextPrimary
-        Btn.Font = Enum.Font.GothamMedium
-        Btn.TextSize = 14
-        Btn.Parent = ScrollFrame
-        Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 10)
-        
-        Btn.MouseButton1Click:Connect(function()
-            TweenService:Create(Btn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(80, 80, 90)}):Play()
-            SubPanel:ToggleVisible() 
-            task.wait(0.1)
-            TweenService:Create(Btn, TweenInfo.new(0.3), {BackgroundColor3 = AppleTheme.ComponentBG}):Play()
-        end)
-        return SubPanel
-    end
-
-    return PanelAPI
-end
-
-function HoloLib:CreateWindow(config)
-    local title = config.Title or "Vision UI"
-    local MainPanel = CreateSpatialPanel(title, CFrame.new(-1.2, -0.2, -3.2), true)
-
-    local MobileUI = Instance.new("ScreenGui")
-    MobileUI.ResetOnSpawn = false
-    MobileUI.Parent = secureParent
-    table.insert(UI_Instances, MobileUI)
-
-    local ToggleBtn = Instance.new("TextButton")
-    ToggleBtn.Size = UDim2.new(0, 45, 0, 45)
-    ToggleBtn.Position = UDim2.new(0.5, -22, 0.05, 0)
-    ToggleBtn.BackgroundColor3 = AppleTheme.GlassBG
-    ToggleBtn.BackgroundTransparency = 0.2
-    ToggleBtn.Text = "😂"
-    ToggleBtn.TextColor3 = AppleTheme.TextPrimary
-    ToggleBtn.TextSize = 20
-    ToggleBtn.Parent = MobileUI
-    Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(1, 0)
-    local stroke = Instance.new("UIStroke", ToggleBtn)
-    stroke.Color = AppleTheme.Stroke
-    stroke.Transparency = 0.5
-    stroke.Thickness = 1.5
-
-    local dragToggle, dragStart, startPos
-    ToggleBtn.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragToggle = true; dragStart = input.Position; startPos = ToggleBtn.Position
-        end
-    end)
-    UserInputService.InputChanged:Connect(function(input)
-        if dragToggle and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-            local delta = input.Position - dragStart
-            ToggleBtn.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        end
-    end)
-    UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragToggle = false end
-    end)
-
-    ToggleBtn.MouseButton1Click:Connect(function()
-        if AttachTarget then AttachTarget = nil end
-        MainPanel:ToggleVisible()
-    end)
-
-    return MainPanel
-end
-
-getgenv()._CleanHoloLib = function()
-    for _, item in ipairs(UI_Instances) do
-        if typeof(item) == "RBXScriptConnection" then item:Disconnect() else item:Destroy() end
-    end
-    UI_Instances = {}
-end
-
-local scriptCategories = {
-    {
-        GroupName = "各大脚本",
-        List = {
-            {Name = "秋容脚本复刻版", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%A7%8B%E5%AE%B9%E8%84%9A%E6%9C%AC%E5%A4%8D%E5%88%BB%E7%89%88"},
-            {Name = "叶脚本", Url = "https://raw.githubusercontent.com/roblox-ye/QQ515966991/refs/heads/main/ROBLOX-CNVIP-XIAOYE.lua"},
-            {Name = "xk脚本", Url = "https://raw.githubusercontent.com/devslopo/DVES/raw/main/XK%20Hub"},
-            {Name = "新版XA脚本", Url = "https://github.com/YunLua/Lua/raw/main/XA_Hub.lua"},
-            {Name = "皮脚本", Url = "https://raw.githubusercontent.com/xiaopi77/xiaopi77/main/QQ1002100032-Roblox-Pi-script.lua"},
-            {Name = "落叶脚本", Url = "https://raw.githubusercontent.com/krlpl/Deciduous-center-LS/main/%E8%90%BD%E5%8F%B6%E4%B8%AD%E5%BF%83%E6%B7%B7%E6%B7%86.txt"},
-            {Name = "Rb脚本中心＿汉化中心", Url = "https://raw.githubusercontent.com/358545698555/roblox-/refs/heads/main/%E5%8F%AF%E6%9D%80%E9%98%9F%E5%8F%8B99%E5%A4%9C"},
-            {Name = "NOL免费版", Url = "https://raw.githubusercontent.com/Syndromehsh/BETA2/refs/heads/main/NOL"},
-        }
-    },
-    {
-        GroupName = "99夜",
-        List = {
-            {Name = "虚空99夜脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/99%E5%A4%9C%E6%B1%89%E5%8C%96"},
-            {Name = "99夜脚本可杀队友", Url = "https://raw.githubusercontent.com/358545698555/roblox-/refs/heads/main/%E5%8F%AF%E6%9D%80%E9%98%9F%E5%8F%8B99%E5%A4%9C"},
-            {Name = "99夜汉化脚本(无敌有效果)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%A7%8B%E8%BE%9E99%E5%A4%9C%E6%B1%89%E5%8C%96"},
-        }
-    },
-    {
-        GroupName = "亡命速递",
-        List = {
-            {Name = "亡命速递脚本无法使用", Url = "https://raw.githubusercontent.com/JanseJYC/Script/refs/heads/main/Deadly-Deliver.lua"},
-            {Name = "亡命速递英文脚本", Url = "https://raw.githubusercontent.com/xxdaysheus01/RuneX/refs/heads/main/DeadlyDeliveryScript.lua"},
-            {Name = "亡命速递", Url = "https://api.luarmor.net/files/v3/loaders/4fe525637e43a1be8cb0cdf902d107c2.lua"},
-        }
-    },
-    {
-        GroupName = "死铁轨",
-        List = {
-            {Name = "仿红叶脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E4%BB%BF%E7%BA%A2%E5%8F%B6%E8%84%9A%E6%9C%AC%E6%B1%89%E5%8C%96"},
-            {Name = "红叶脚本", Url = "https://pandadevelopment.net/virtual/file/c96973c95ae3aaec"},
-            {Name = "速通脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%AD%BB%E9%93%81%E8%BD%A8%E6%B1%89%E5%8C%96%E8%84%9A%E6%9C%AC"},
-            {Name = "死铁轨脚本", Url = "https://raw.githubusercontent.com/gumanba/Scripts/refs/heads/main/DeadRails"},
-        }
-    },
-    {
-        GroupName = "墨水游戏",
-        List = {
-            {Name = "AX墨水脚本有芙同享秋辞汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/ax%E8%84%9A%E6%9C%AC%E7%A7%8B%E8%BE%9E%E6%B1%89%E5%8C%96"},
-            {Name = "墨水游戏人机汉化(里面有反作弊甩飞)", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/inkgame-ADEN-robot"},
-            {Name = "墨水Ringta汉化(无卡密)", Url = "https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/Ringta"},
-            {Name = "博伦墨水脚本", Url = "https://meting.qjqq.cn/"},
-            {Name = "Unm汉化，卡密ink50", Url = "https://github.com/youfutongxiang1145/unm-CN/releases/download/unm%E6%B1%89%E5%8C%96/unm.txt"},
-        }
-    },
-    {
-        GroupName = "doors",
-        List = {
-            {Name = "Doors脚本", Url = "https://raw.githubusercontent.com/atnew2025/Chinese-scripts/refs/heads/main/mshax(prohax).txt"},
-            {Name = "doors最新脚本", Url = "https://raw.githubusercontent.com/TheHunterSolo1/Scripts/refs/heads/main/Protected_2809220311826785.lua.txt"},
-            {Name = "doorsDP汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/doors-DP-robot"},
-        }
-    },
-    {
-        GroupName = "监狱生活",
-        List = {
-            {Name = "监狱生活汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%9B%91%E7%8B%B1%E7%94%9F%E6%B4%BB%E8%84%9A%E6%9C%AC"},
-        }
-    },
-    {
-        GroupName = "战争大亨",
-        List = {
-            {Name = "战争大亨最强脚本", Url = "https://raw.githubusercontent.com/MaxPikaa/PureLove/refs/heads/main/520"},
-            {Name = "战争大亨无卡密高级脚本", Url = "https://raw.githubusercontent.com/Macintosh1983/ChillHubMain/main/ChillHubOilWarfareTycoon.lua"},
-        }
-    },
-    {
-        GroupName = "被遗弃",
-        List = {
-            {Name = "被遗弃无卡密超好用", Url = "https://rawscripts.net/raw/G666-Forsaken-Keyless-auto-gen-reach-autoblock-+-more-63283"},
-            {Name = "被遗弃英文无卡密", Url = "https://github.com/shenxiuqi974/guesting-but-chinese/releases/download/hushwhw/default.txt"},
-        }
-    },
-    {
-        GroupName = "俄亥俄州",
-        List = {
-            {Name = "俄亥俄州英文脚本", Url = "https://raw.githubusercontent.com/PUSCRIPTS/V1sion/refs/heads/main/Pinguin"},
-            {Name = "晓辞俄亥俄州基础功能脚本", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%99%93%E8%BE%9E%E4%BF%84%E4%BA%A5%E4%BF%84%E5%B7%9E%E5%9F%BA%E7%A1%80%E5%8A%9F%E8%83%BD%E8%84%9A%E6%9C%AC"},
-            {Name = "俄亥俄州英文脚本", Url = "https://raw.githubusercontent.com/rxn-xyz/Ohio./main/Ohio.lua"},
-        }
-    },
-    {
-        GroupName = "画我",
-        List = {
-            {Name = "无卡密画我脚本", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/KENNY画我.lua"},
-        }
-    },
-    {
-        GroupName = "通缉脚本",
-        List = {
-            {Name = "SX HUB", Url = "https://api.luarmor.net/files/v3/loaders/87a8a4f4c2d2ef535ccd1bdb949218fe.lua"},
-            {Name = "KENNY", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/KENNY通缉换服.lua"},
-            {Name = "通缉", Url = "https://raw.githubusercontent.com/combatlegnd/combatlegnd/refs/heads/main/NH-Loader"},
-        }
-    },
-    {
-        GroupName = "闪光",
-        List = {
-            {Name = "闪光脚本", Url = "https://pastebin.com/raw/VRwdkSG3"},
-        }
-    },
-    {
-        GroupName = "最坚强的战场",
-        List = {
-            {Name = "最强战场Phantasm汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/thestongestbattlegrounds-Phantasm-robot"},
-            {Name = "最坚强的战场脚本2", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/phantasm.lua"},
-        }
-    },
-    {
-        GroupName = "偷走脑红",
-        List = {
-            {Name = "偷走脑红脚本", Url = "https://raw.githubusercontent.com/DynaFetchy/Scripts/refs/heads/main/Loader.lua"},
-            {Name = "偷走脑红脚本2", Url = "https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/偷走脑红"},
-            {Name = "偷走脑红KURD汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/Brainrot-KURD-robot"},
-        }
-    },
-    {
-        GroupName = "萨凡娜",
-        List = {
-            {Name = "萨凡娜-悔脚本", Url = "https://raw.githubusercontent.com/sdxs221/sd/main/萨凡娜"},
-        }
-    },
-    {
-        GroupName = "住宅大逃杀",
-        List = {
-            {Name = "住宅大逃杀-悔脚本", Url = "https://raw.githubusercontent.com/sdxs221/sd/main/住宅大屠杀"},
-        }
-    },
-    {
-        GroupName = "竞争对手",
-        List = {
-            {Name = "竞争对手脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/竞争对手汉化脚本"},
-        }
-    },
-    {
-        GroupName = "chain脚本",
-        List = {
-            {Name = "chain英文脚本", Url = "https://pastebin.com/raw/Q64rPkwu"},
-        }
-    },
-    {
-        GroupName = "跳跃对决",
-        List = {
-            {Name = "跳跃对决脚本", Url = "https://raw.githubusercontent.com/solarastuff/sorryjimpee/refs/heads/main/Jumper.lua"},
-        }
-    },
-    {
-        GroupName = "死亡球",
-        List = {
-            {Name = "死亡球Fluxin汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/deathball-Fluxin-robot"},
-            {Name = "死亡球stark汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/Deathballs-stark-robot"},
-        }
-    },
-    {
-        GroupName = "监狱人生",
-        List = {
-            {Name = "监狱人生Rayfield汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/prisonlife-Rayfield-robot"},
-            {Name = "监狱人生人机汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/PrisonLife-Serk4rx-robot"},
-        }
-    },
-    {
-        GroupName = "逃脱海啸",
-        List = {
-            {Name = "逃脱海啸并带走红Merqur汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/EscapeTsunamiForBrinrots-Merqury-robot"},
-            {Name = "逃脱海啸并拿走脑红Solix汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/EscapeTsunamiForBrinrots-Solix-robot"},
-        }
-    },
-    {
-        GroupName = "安静或者死亡",
-        List = {
-            {Name = "安静或者死亡candyz汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/quietordie-candyz-robo"},
-        }
-    },
-    {
-        GroupName = "盲射",
-        List = {
-            {Name = "盲射ToraIsMe汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/blindshot-ToraIsMe-robot"},
-        }
-    },
-    {
-        GroupName = "彩虹朋友",
-        List = {
-            {Name = "彩虹朋友二UB汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/RainbowFriends-UB-robot"},
-        }
-    },
-    {
-        GroupName = "撕咬之夜",
-        List = {
-            {Name = "撕咬之夜", Url = "https://raw.githubusercontent.com/Youfutongxiang1/Msploit-v2-CN/refs/heads/main/Msploit-v2-CN"},
-            {Name = "殺脚本撕咬之夜", Url = "https://raw.githubusercontent.com/FengYu-X/Max/refs/heads/X/BBN.lua"},
-            {Name = "撕咬之夜Kurby汉化", Url = "https://raw.githubusercontent.com/ojdoxbkvxosh/-lol/refs/heads/main/Kurby汉化"},
-        }
-    },
-    {
-        GroupName = "死刑",
-        List = {
-            {Name = "死刑脚本(无卡密)", Url = "https://api.luarmor.net/files/v3/loaders/8c08b8f2252eec7dbb77d253d269bb65.lua"},
-        }
-    },
-    {
-        GroupName = "活了7天",
-        List = {
-            {Name = "活了7天刷废料", Url = "https://raw.githubusercontent.com/rndmq/Serverlist/refs/heads/main/Server87"},
-            {Name = "活了7天汉化", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/%E4%B8%83%E6%97%A5%E7%94%9F%E6%88%90kkk.txt"},
-        }
-    },
-    {
-        GroupName = "破坏者谜团",
-        List = {
-            {Name = "破坏者谜团脚本", Url = "https://pastebin.com/raw/VRwdkSG3"},
-        }
-    },
-    {
-        GroupName = "驾驶帝国",
-        List = {
-            {Name = "驾驶帝国脚本", Url = "https://raw.githubusercontent.com/Marco8642/science/main/drivingempire"},
-        }
-    }
-}
-
-local function LoadScript(url, scriptName)
-    task.spawn(function()
-        local success, response = pcall(function()
-            return req({
-                Url = url,
-                Method = "GET",
-                Headers = {
-                    ["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-                }
-            })
-        end)
-        
-        if success and response.StatusCode == 200 then
-            local scriptContent = response.Body
-            if scriptContent and #scriptContent > 100 then
-                local loadFunc = loadstring or load
-                local func, err = loadFunc(scriptContent, scriptName or "加载的脚本")
-                
-                if func then
-                    pcall(func)
-                    warn("✅ 脚本加载成功: " .. (scriptName or "未知脚本"))
-                else
-                    warn("❌ 脚本编译失败: " .. tostring(err))
-                end
-            else
-                warn("❌ 获取到的脚本内容无效或过短")
-            end
-        else
-            warn("❌ 无法获取脚本: " .. url)
-        end
-    end)
-end
-
-local UI = HoloLib:CreateWindow({ Title = "🚀 秋辞脚本加载中心" })
-
-local StatusLabel = UI:CreateLabel("📁 选择要加载的脚本", true)
-StatusLabel.TextColor3 = AppleTheme.Accent
-StatusLabel.Font = Enum.Font.GothamBold
-
-local A2 = nil
-local A4 = game.Lighting
-local A8 = workspace.Gravity
-local A28 = false
-local WalkSpeedValue = 16
-local JumpPowerValue = 50
-local GravityValue = 196.2
-local TranslationActive = false
-local TranslationStats = {
-    TranslationCount = 0,
-    TranslationSpeed = 0,
-    LastUpdateTime = tick(),
-    TranslationsPerMinute = 0
-}
-
-UI:CreateInput("🎯 输入玩家名/缩写 粘在背后 (留空取消)", function(text)
-    if text == "" then
-        AttachTarget = nil
-        A2 = nil
-        StatusLabel.Text = "✅ 已解除吸附，UI已归位"
-        return
-    end
-    local target = GetPlayerFromString(text)
-    if target then
-        AttachTarget = target
-        A2 = target
-        StatusLabel.Text = "🎯 已成功粘在 [" .. target.DisplayName .. "] 背后!"
-    else
-        StatusLabel.Text = "❌ 找不到该玩家"
-    end
-end)
-
-local RefreshBtn = UI:CreateButton("🔄 刷新脚本列表", function()
-    StatusLabel.Text = "🔄 刷新中..."
-    task.wait(0.5)
-    StatusLabel.Text = "📁 脚本列表已刷新"
-end)
-
-for _, category in ipairs(scriptCategories) do
-    local categoryPanel = UI:CreateSubTab(category.GroupName)
-    
-    categoryPanel:CreateLabel("📂 " .. category.GroupName, true)
-    categoryPanel:CreateLabel("选择脚本加载:", false)
-    
-    for _, scriptInfo in ipairs(category.List) do
-        categoryPanel:CreateButton("▶ " .. scriptInfo.Name, function()
-            StatusLabel.Text = "📥 正在加载: " .. scriptInfo.Name
-            LoadScript(scriptInfo.Url, scriptInfo.Name)
-        end)
-    end
-end
-
-local AdvancedPanel = UI:CreateSubTab("玩家基础功能")
-AdvancedPanel:CreateLabel("🤔 玩家功能", true)
-
-local A2 = nil
-local A3 = game:GetService("RunService")
-local A4 = game.Lighting
-local A5 = game:GetService("UserInputService")
-local A6 = game:GetService("UserInputService")
-local A7 = game:GetService("Players")
-local A8 = workspace
-local A18 = false
-local A20 = false
-local A24 = nil
-local A25 = nil
-local A28 = false
-local QC_FlyUI = nil
-local FlyConfig = {MoveSpeed = 10, FreezeEnabled = false, FreezeY = nil}
-local FlyConnections = {}
-local FlyInitialized = false
-
-AdvancedPanel:CreateButton("🌙 夜视: 关闭", function()
-    NightVisionToggle = not NightVisionToggle
-    A28 = NightVisionToggle
-    
-    if NightVisionToggle then
-        StatusLabel.Text = "✅ 夜视已开启"
-        A4.Ambient = Color3.new(1, 1, 1)
-        A4.Brightness = 1
-        A4.OutdoorAmbient = Color3.new(1, 1, 1)
-        A4.FogEnd = 100000
-        A4.FogStart = 0
-        A4.GlobalShadows = false
-    else
-        StatusLabel.Text = "🌃 夜视已关闭"
-        A4.Ambient = Color3.new(0, 0, 0)
-        A4.Brightness = 1
-        A4.OutdoorAmbient = Color3.new(0.5, 0.5, 0.5)
-        A4.FogEnd = 100000
-        A4.FogStart = 0
-        A4.GlobalShadows = true
-    end
-end)
-
-AdvancedPanel:CreateInput("💻 直接输入Lua代码执行", function(code)
-    if code and code ~= "" then
-        StatusLabel.Text = "⚡ 正在执行代码..."
-        task.spawn(function()
-            local func, err = loadstring(code, "直接执行")
-            if func then
-                pcall(func)
-                StatusLabel.Text = "✅ 代码执行完成"
-            else
-                StatusLabel.Text = "❌ 代码错误: " .. tostring(err)
-            end
-        end)
-    end
-end)
-
-UI:CreateButton("🧹 清理所有UI", function()
-    getgenv()._CleanHoloLib()
-    StatusLabel.Text = "🧹 UI已清理，重新运行脚本以恢复"
-end)
-
-UI:CreateLabel("", true)
-UI:CreateLabel("📱 秋辞缝合脚本3Dui 2.0", true)
-UI:CreateLabel("🔒 安全脚本加载中心", true)
-UI:CreateLabel("", true)
-
-task.spawn(function()
-    while true do
-        task.wait(1)
-        if translationBtn then
-            translationBtn.Text = "🌐 自动翻译: " .. (translationActive and "开启" or "关闭")
-        end
-    end
-end)
-        local Func = loadstring(ScriptContent);
-        if Func then
-                Func();
-        end
-end});
 local scriptCategories = {
     {
         GroupName = "各大脚本",
@@ -2639,6 +1896,7 @@ end});
 local Afhubyyds = Tabs.Afhubyyds:AddLeftGroupbox("特殊脚本与付费脚本功能");
 Afhubyyds:AddLabel("待添加更多服务器功能尽请期待")
 Afhubyyds:AddLabel("已添加撕咬之夜功能🟢")
+Afhubyyds:AddLabel("已添加墨水游戏功能🟡")
 
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
@@ -3106,6 +2364,592 @@ Afhubyyds:AddButton("DisableHighlights", {
 
 local Afhubyyds = Tabs.Afhubyyds:AddRightGroupbox("功能等待添加");
 Afhubyyds:AddLabel("等待添加功能")
+
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
+
+local Afhubyyds = Tabs.Afhubyyds:AddRightGroupbox("墨水游戏高级功能")
+Afhubyyds:AddLabel("⚠️注意⚠️：我可不保证账号没有封禁的危险！")
+
+Afhubyyds:AddToggle("HiderESPToggle", {
+    Text = "透视躲藏者",
+    Default = false,
+    Callback = function(state)
+        if state then
+            for _,v in pairs(game:GetService("Players"):GetPlayers()) do
+                if v ~= game.Players.LocalPlayer and v:GetAttribute("IsHider") then
+                    safeNotify("ESP", "透视躲藏者: " .. v.Name, 2)
+                end
+            end
+        else
+            safeNotify("ESP", "已关闭躲藏者透视", 2)
+        end
+    end
+})
+
+Afhubyyds:AddToggle("HunterESPToggle", {
+    Text = "透视搜查者",
+    Default = false,
+    Callback = function(state)
+        if state then
+            for _,v in pairs(game:GetService("Players"):GetPlayers()) do
+                if v ~= game.Players.LocalPlayer and v:GetAttribute("IsHunter") then
+                    safeNotify("ESP", "透视搜查者: " .. v.Name, 2)
+                end
+            end
+        else
+            safeNotify("ESP", "已关闭搜查者透视", 2)
+        end
+    end
+})
+
+Afhubyyds:AddToggle("GlassESPToggle", {
+    Text = "透视假玻璃板",
+    Default = false,
+    Callback = function(state)
+        if state then
+            pcall(function()
+                for _, v in next, workspace.GlassBridge.GlassHolder:GetChildren() do
+                    if v.Name:find("ClonedPanel") then
+                        for _, panelChild in next, v:GetChildren() do
+                            for _, glassPart in next, panelChild:GetChildren() do
+                                if glassPart.Name == "glasspart" and glassPart:FindFirstChild("TouchInterest") then
+                                    -- 高亮假玻璃
+                                    local highlight = Instance.new("BoxHandleAdornment")
+                                    highlight.Name = "GlassESP"
+                                    highlight.Adornee = glassPart
+                                    highlight.Size = glassPart.Size
+                                    highlight.Color3 = Color3.new(0, 1, 0)
+                                    highlight.Transparency = 0.5
+                                    highlight.ZIndex = 10
+                                    highlight.AlwaysOnTop = true
+                                    highlight.Parent = glassPart
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        else
+            pcall(function()
+                for _, v in next, workspace.GlassBridge.GlassHolder:GetChildren() do
+                    for _, panelChild in next, v:GetChildren() do
+                        for _, glassPart in next, panelChild:GetChildren() do
+                            local highlight = glassPart:FindFirstChild("GlassESP")
+                            if highlight then
+                                highlight:Destroy()
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    end
+})
+
+Afhubyyds:AddToggle("AimbotToggle", {
+    Text = "开启自瞄",
+    Default = false,
+    Callback = function(state)
+        local aimbotEnabled = state
+        if state then
+            spawn(function()
+                while aimbotEnabled and wait(0.1) do
+                    pcall(function()
+                        local character = game.Players.LocalPlayer.Character
+                        if not character or not character:FindFirstChild("HumanoidRootPart") then
+                            return
+                        end
+                        
+                        local nearestTarget = nil
+                        local nearestDistance = math.huge
+                        
+                        for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+                            if player ~= game.Players.LocalPlayer and player.Character then
+                                local humanoid = player.Character:FindFirstChild("Humanoid")
+                                if humanoid and humanoid.Health > 0 then
+                                    local distance = (player.Character.HumanoidRootPart.Position - character.HumanoidRootPart.Position).Magnitude
+                                    if distance < nearestDistance then
+                                        nearestTarget = player.Character
+                                        nearestDistance = distance
+                                    end
+                                end
+                            end
+                        end
+                        
+                        if nearestTarget then
+                            local camera = workspace.CurrentCamera
+                            if camera then
+                                camera.CFrame = CFrame.new(camera.CFrame.Position, nearestTarget.HumanoidRootPart.Position)
+                            end
+                        end
+                    end)
+                end
+            end)
+        end
+    end
+})
+
+Afhubyyds:AddSlider("AimbotSmoothness", {
+    Text = "自瞄平滑度",
+    Default = 0.1,
+    Min = 0.01,
+    Max = 1,
+    Rounding = 2,
+    Callback = function(value)
+        safeNotify("自瞄", "平滑度设置为: " .. value, 2)
+    end
+})
+
+local playerList = {}
+for _, v in pairs(game:GetService("Players"):GetPlayers()) do
+    if v ~= game.Players.LocalPlayer then
+        table.insert(playerList, v.Name)
+    end
+end
+
+Afhubyyds:AddDropdown("AutoPushTarget", {
+    Text = "选择推人目标",
+    Values = playerList,
+    Default = playerList[1] or "",
+    Callback = function(option)
+        safeNotify("自动推人", "已选择目标: " .. option, 2)
+    end
+})
+
+Afhubyyds:AddToggle("AutoPushToggle", {
+    Text = "自动推人",
+    Default = false,
+    Callback = function(state)
+        local autoPush = state
+        if state then
+            spawn(function()
+                while autoPush and wait(1) do
+                    pcall(function()
+                        local targetName = Options.AutoPushTarget.Value
+                        local targetPlayer = game:GetService("Players"):FindFirstChild(targetName)
+                        if targetPlayer and targetPlayer.Character and game.Players.LocalPlayer.Character then
+                            -- 移动到目标位置
+                            game.Players.LocalPlayer.Character:MoveTo(targetPlayer.Character.HumanoidRootPart.Position)
+                            
+                            -- 尝试使用推工具
+                            local pushTool = game.Players.LocalPlayer.Backpack:FindFirstChild("Push")
+                            if pushTool then
+                                local args = {
+                                    [1] = "UsingMoveCustom",
+                                    [2] = pushTool,
+                                    [4] = {["AutoUse"] = true}
+                                }
+                                ReplicatedStorage.Remotes.UsedTool:FireServer(unpack(args))
+                            end
+                        end
+                    end)
+                end
+            end)
+        end
+    end
+})
+
+Afhubyyds:AddToggle("AutoKnifeToggle", {
+    Text = "自动砍人(捉迷藏)",
+    Default = false,
+    Callback = function(state)
+        local autoKnife = state
+        if state then
+            spawn(function()
+                while autoKnife and wait(1) do
+                    pcall(function()
+                        local potentialTargets = {}
+                        for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+                            if player ~= game.Players.LocalPlayer and player.Character then
+                                local humanoid = player.Character:FindFirstChild("Humanoid")
+                                if humanoid and player.Character:GetAttribute("IsHunter") == true then
+                                    table.insert(potentialTargets, player)
+                                end
+                            end
+                        end
+                        
+                        if #potentialTargets > 0 then
+                            local targetPlayer = potentialTargets[math.random(1, #potentialTargets)]
+                            local localChar = game.Players.LocalPlayer.Character
+                            local targetChar = targetPlayer.Character
+                            
+                            if localChar and targetChar then
+                                localChar:MoveTo(targetChar.HumanoidRootPart.Position)
+                                
+                                local knifeTool = game.Players.LocalPlayer.Backpack:FindFirstChild("Knife")
+                                if knifeTool then
+                                    local args = {
+                                        [1] = "UsingMoveCustom",
+                                        [2] = knifeTool,
+                                        [4] = {["Clicked"] = true}
+                                    }
+                                    ReplicatedStorage.Remotes.UsedTool:FireServer(unpack(args))
+                                end
+                            end
+                        end
+                    end)
+                end
+            end)
+        end
+    end
+})
+
+Afhubyyds:AddSlider("WalkSpeedBoost", {
+    Text = "移动速度",
+    Default = 28,
+    Min = 16,
+    Max = 100,
+    Rounding = 0,
+    Callback = function(value)
+        local character = game.Players.LocalPlayer.Character
+        if character then
+            local humanoid = character:FindFirstChild("Humanoid")
+            if humanoid then
+                humanoid.WalkSpeed = value
+            end
+        end
+    end
+})
+
+Afhubyyds:AddToggle("InfiniteJumpToggle", {
+    Text = "无限跳跃",
+    Default = false,
+    Callback = function(state)
+        if state then
+            local connection
+            connection = UserInputService.JumpRequest:Connect(function()
+                local character = game.Players.LocalPlayer.Character
+                if character then
+                    local humanoid = character:FindFirstChild("Humanoid")
+                    if humanoid and humanoid.FloorMaterial ~= Enum.Material.Air then
+                        humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                    end
+                end
+            end)
+            
+            -- 存储连接以便后续断开
+            Toggles.InfiniteJumpToggle:SetStateCallback(function(newState)
+                if not newState and connection then
+                    connection:Disconnect()
+                end
+            end)
+        end
+    end
+})
+
+Afhubyyds:AddToggle("NoclipToggle", {
+    Text = "穿墙模式",
+    Default = false,
+    Callback = function(state)
+        local noclipEnabled = state
+        local noclipParts = {}
+        
+        if state then
+            spawn(function()
+                while noclipEnabled and wait(0.1) do
+                    pcall(function()
+                        local character = game.Players.LocalPlayer.Character
+                        if character then
+                            for _, part in ipairs(character:GetDescendants()) do
+                                if part:IsA("BasePart") and part.CanCollide then
+                                    noclipParts[part] = true
+                                    part.CanCollide = false
+                                end
+                            end
+                        end
+                    end)
+                end
+            end)
+        else
+            for part, _ in pairs(noclipParts) do
+                if part and part.Parent then
+                    part.CanCollide = true
+                end
+            end
+        end
+    end
+})
+
+Afhubyyds:AddToggle("RedLightGodToggle", {
+    Text = "红绿灯无敌模式",
+    Default = false,
+    Callback = function(state)
+        safeNotify("游戏作弊", "红绿灯无敌模式: " .. (state and "开启" or "关闭"), 2)
+    end
+})
+
+Afhubyyds:AddToggle("AutoDalgonaToggle", {
+    Text = "自动完成糖饼",
+    Default = false,
+    Callback = function(state)
+        if state then
+            pcall(function()
+                local DalgonaClientModule = ReplicatedStorage.Modules.Games.DalgonaClient
+                for _, Value in ipairs(getreg()) do
+                    if typeof(Value) == "function" and islclosure(Value) then
+                        if getfenv(Value).script == DalgonaClientModule then
+                            if getinfo(Value).nups == 73 then
+                                setupvalue(Value, 31, 9e9)
+                                safeNotify("糖饼作弊", "糖饼作弊已激活", 3)
+                                break
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    end
+})
+
+Afhubyyds:AddToggle("AutoTugOfWarToggle", {
+    Text = "自动拔河",
+    Default = false,
+    Callback = function(state)
+        local autoTug = state
+        if state then
+            spawn(function()
+                while autoTug and wait(0.025) do
+                    pcall(function()
+                        local VALID_PULL_DATA = {["PerfectQTE"] = true}
+                        ReplicatedStorage.Remotes.TemporaryReachedBindable:FireServer(VALID_PULL_DATA)
+                    end)
+                end
+            end)
+        end
+    end
+})
+
+Afhubyyds:AddToggle("GlassBridgeHighlightToggle", {
+    Text = "玻璃桥ESP高亮",
+    Default = false,
+    Callback = function(state)
+        pcall(function()
+            local GlassHolder = workspace.GlassBridge.GlassHolder
+            for _, PanelPair in ipairs(GlassHolder:GetChildren()) do
+                for _, Panel in ipairs(PanelPair:GetChildren()) do
+                    local GlassPart = Panel:FindFirstChild("glasspart")
+                    if GlassPart then
+                        if state then
+                            local Color = GlassPart:GetAttribute("exploitingisevil") and Color3.fromRGB(248, 87, 87) or Color3.fromRGB(28, 235, 87)
+                            GlassPart.Color = Color
+                            GlassPart.Transparency = 0
+                            GlassPart.Material = Enum.Material.Neon
+                        else
+                            GlassPart.Color = Color3.fromRGB(106, 106, 106)
+                            GlassPart.Transparency = 0.45
+                            GlassPart.Material = Enum.Material.SmoothPlastic
+                        end
+                    end
+                end
+            end
+        end)
+    end
+})
+
+Afhubyyds:AddToggle("AutoSocialToggle", {
+    Text = "自动完成社交游戏",
+    Default = false,
+    Callback = function(state)
+        local autoSocial = state
+        if state then
+            pcall(function()
+                local function OnCharacterAdded(Character)
+                    local function OnChildAdded(Object)
+                        if Object.ClassName == "RemoteEvent" and Object.Name == "RemoteForQTE" then
+                            while autoSocial and wait(0.5) do
+                                if not Object or not Object.Parent then break end
+                                pcall(function() Object:FireServer() end)
+                            end
+                        end
+                    end
+                    
+                    Character.ChildAdded:Connect(OnChildAdded)
+                    for _, Object in ipairs(Character:GetChildren()) do
+                        task.spawn(OnChildAdded, Object)
+                    end
+                end
+                
+                game.Players.LocalPlayer.CharacterAdded:Connect(OnCharacterAdded)
+                if game.Players.LocalPlayer.Character then
+                    task.spawn(OnCharacterAdded, game.Players.LocalPlayer.Character)
+                end
+            end)
+        end
+    end
+})
+
+Afhubyyds:AddButton({
+    Text = "帮助玩家到终点(木头人关)",
+    Func = function()
+        safeNotify("帮助玩家", "正在搜索可帮助的玩家...", 2)
+        
+        local polygon = {
+            Vector2.new(-52, -515),
+            Vector2.new(115, -515),
+            Vector2.new(115, 84),
+            Vector2.new(-216, 84)
+        }
+        
+        local function isPointInPolygon(point, poly)
+            local inside = false
+            local j = #poly
+            for i = 1, #poly do
+                local xi, zi = poly[i].X, poly[i].Y
+                local xj, zj = poly[j].X, poly[j].Y
+                if ((zi > point.Y) ~= (zj > point.Y)) and
+                    (point.X < (xj - xi) * (point.Y - zi) / (zj - zi + 1e-9) + xi) then
+                    inside = not inside
+                end
+                j = i
+            end
+            return inside
+        end
+        
+        local foundPlayer = false
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            if player ~= game.Players.LocalPlayer then
+                local liveChar = workspace:FindFirstChild("Live") and workspace.Live:FindFirstChild(player.Name)
+                local hrp = liveChar and liveChar:FindFirstChild("HumanoidRootPart")
+                
+                if hrp then
+                    local posXZ = Vector2.new(hrp.Position.X, hrp.Position.Z)
+                    if isPointInPolygon(posXZ, polygon) then
+                        local prompt = hrp:FindFirstChild("CarryPrompt")
+                        if prompt and prompt:IsA("ProximityPrompt") and prompt.Enabled then
+                            safeNotify("帮助玩家", "正在帮助: " .. player.Name, 2)
+                            
+                            local localHrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                            if localHrp then
+                                localHrp.CFrame = hrp.CFrame + Vector3.new(0, 2, 0)
+                                wait(0.4)
+                                
+                                if fireproximityprompt then
+                                    fireproximityprompt(prompt)
+                                elseif prompt:IsA("ProximityPrompt") then
+                                    prompt:InputHoldBegin()
+                                    wait(0.1)
+                                    prompt:InputHoldEnd()
+                                end
+                                
+                                wait(0.7)
+                                localHrp.CFrame = CFrame.new(-46, 1024, 110)
+                                safeNotify("帮助完成", "已完成帮助: " .. player.Name, 3)
+                                foundPlayer = true
+                                break
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        
+        if not foundPlayer then
+            safeNotify("帮助玩家", "没有可帮助的玩家", 2)
+        end
+    end
+})
+
+Afhubyyds:AddSlider("SpeedBoostSlider", {
+    Text = "速度提升加成",
+    Default = 16,
+    Min = 1,
+    Max = 500,
+    Rounding = 0,
+    Callback = function(value)
+        pcall(function()
+            local player = game.Players.LocalPlayer
+            if player.Boosts and player.Boosts["Faster Sprint"] then
+                player.Boosts["Faster Sprint"].Value = value
+                safeNotify("属性加成", "速度提升已设置为: " .. value, 2)
+            end
+        end)
+    end
+})
+
+Afhubyyds:AddSlider("WonBoostSlider", {
+    Text = "胜利加成",
+    Default = 16,
+    Min = 1,
+    Max = 500,
+    Rounding = 0,
+    Callback = function(value)
+        pcall(function()
+            local player = game.Players.LocalPlayer
+            if player.Boosts and player.Boosts["Won Boost"] then
+                player.Boosts["Won Boost"].Value = value
+                safeNotify("属性加成", "胜利加成已设置为: " .. value, 2)
+            end
+        end)
+    end
+})
+
+Afhubyyds:AddSlider("DamageBoostSlider", {
+    Text = "伤害加成",
+    Default = 16,
+    Min = 1,
+    Max = 500,
+    Rounding = 0,
+    Callback = function(value)
+        pcall(function()
+            local player = game.Players.LocalPlayer
+            if player.Boosts and player.Boosts["Damage Boost"] then
+                player.Boosts["Damage Boost"].Value = value
+                safeNotify("属性加成", "伤害加成已设置为: " .. value, 2)
+            end
+        end)
+    end
+})
+
+Afhubyyds:AddLabel("更多高级功能正在开发中...")
+Afhubyyds:AddLabel("敬请期待!")
+
+local function cleanup()
+    pcall(function()
+        for _, v in next, workspace.GlassBridge.GlassHolder:GetChildren() do
+            for _, panelChild in next, v:GetChildren() do
+                for _, glassPart in next, panelChild:GetChildren() do
+                    local highlight = glassPart:FindFirstChild("GlassESP")
+                    if highlight then
+                        highlight:Destroy()
+                    end
+                end
+            end
+        end
+    end)
+    
+    pcall(function()
+        local GlassHolder = workspace.GlassBridge.GlassHolder
+        for _, PanelPair in ipairs(GlassHolder:GetChildren()) do
+            for _, Panel in ipairs(PanelPair:GetChildren()) do
+                local GlassPart = Panel:FindFirstChild("glasspart")
+                if GlassPart then
+                    GlassPart.Color = Color3.fromRGB(106, 106, 106)
+                    GlassPart.Transparency = 0.45
+                    GlassPart.Material = Enum.Material.SmoothPlastic
+                end
+            end
+        end
+    end)
+    
+    pcall(function()
+        local character = game.Players.LocalPlayer.Character
+        if character then
+            local humanoid = character:FindFirstChild("Humanoid")
+            if humanoid then
+                humanoid.WalkSpeed = 16
+            end
+        end
+    end)
+end
+
+if game.BindToClose then
+    pcall(function()
+        game:BindToClose(cleanup)
+    end)
+end
 
 local ScriptCenterLeftGroup = Tabs.ScriptCenter:AddLeftGroupbox("脚本中心1");
 local ScriptCenterRightGroup = Tabs.ScriptCenter:AddRightGroupbox("脚本中心2");
