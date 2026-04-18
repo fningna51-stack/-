@@ -23,92 +23,99 @@ local SubmitButton = KeyWindow:AddButton("执行脚本", UDim2.new(0.1, 0, 0.65,
         end
         KeyWindow:Close()
         UpdateWindow:Close()
-        
-        local LocalPlayer = game:GetService("Players").LocalPlayer
-local PlayerGui = LocalPlayer.PlayerGui
 
-local OverlayGui = Instance.new("ScreenGui")
-OverlayGui.Name = "AF缝合Hub"
-OverlayGui.ResetOnSpawn = false
-OverlayGui.IgnoreGuiInset = true
-OverlayGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
 
-if PlayerGui:FindFirstChild("AF缝合Hub") then
-    PlayerGui.Yttrium_Overlay:Destroy()
-end
-OverlayGui.Parent = PlayerGui
-
-local Theme = {
-    Background = Color3.fromRGB(20, 20, 20),
-    TextTitle = Color3.fromRGB(255, 255, 255)
-}
-
-local TopBar = Instance.new("Frame")
-TopBar.AnchorPoint = Vector2.new(1, 0)
-TopBar.Size = UDim2.new(0, 240, 0, 30)
-TopBar.Position = UDim2.new(1, -10, 0, 40)
-TopBar.BackgroundColor3 = Theme.Background
-TopBar.BorderSizePixel = 0
-TopBar.Parent = OverlayGui
-
-local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 6)
-UICorner.Parent = TopBar
-
-local TopStroke = Instance.new("UIStroke")
-TopStroke.Color = Color3.fromRGB(0, 255, 255)
-TopStroke.Thickness = 1
-TopStroke.Parent = TopBar
-
-local InfoLabel = Instance.new("TextLabel")
-InfoLabel.Size = UDim2.new(1, 0, 1, 0)
-InfoLabel.BackgroundTransparency = 1
-InfoLabel.TextColor3 = Theme.TextTitle
-InfoLabel.Font = Enum.Font.Code
-InfoLabel.TextSize = 12
-InfoLabel.Parent = TopBar
-
-local dragging, dragInput, dragStart, startPos
-
-TopBar.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = TopBar.Position
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
+local function CreateCircleVisualizer(audioObject, targetPlayer)
+    local bars = {}
+    local numBars = 24
+    local radius = 3.0
+    local attachTarget = targetPlayer or game.Players.LocalPlayer
+    
+    for i = 1, numBars do
+        local bar = Instance.new("Part")
+        bar.Anchored = true
+        bar.CanCollide = false
+        bar.Material = Enum.Material.Neon
+        bar.Color = Color3.fromRGB(10, 132, 255)
+        bar.Size = Vector3.new(0.1, 0.1, 0.1)
+        Instance.new("BlockMesh", bar)
+        bar.Parent = workspace
+        table.insert(bars, bar)
+    end
+    
+    local connection = RunService.RenderStepped:Connect(function(dt)
+        if not audioObject or not audioObject.Parent then
+            for _, bar in ipairs(bars) do
+                bar.CFrame = CFrame.new(0, -9999, 0)
             end
-        end)
+            return
+        end
+        
+        local loudness = audioObject.PlaybackLoudness
+        local normalized = math.clamp(loudness / 400, 0.05, 1)
+        
+        local centerCFrame = CFrame.new(0, -9999, 0)
+        local character = attachTarget and attachTarget.Character
+        
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            centerCFrame = character.HumanoidRootPart.CFrame * CFrame.new(0, -2, 0)
+        else
+            for _, bar in ipairs(bars) do
+                bar.CFrame = CFrame.new(0, -9999, 0)
+            end
+            return
+        end
+        
+        local globalRotation = tick() * 0.8
+        
+        for i, bar in ipairs(bars) do
+            local noise = math.noise(tick() * 4, i * 0.15, 0)
+            local scale = math.clamp(normalized + (noise * normalized * 0.6), 0.05, 1)
+            
+            local targetHeight = scale * 5.0
+            bar.Size = bar.Size:Lerp(Vector3.new(0.15, targetHeight, 0.15), 0.3)
+            
+            local angle = (i / numBars) * math.pi * 2 + globalRotation
+            local offsetX = math.cos(angle) * radius
+            local offsetZ = math.sin(angle) * radius
+            
+            local barPos = centerCFrame.Position + Vector3.new(offsetX, 0, offsetZ)
+            local lookAtPos = Vector3.new(centerCFrame.Position.X, barPos.Y, centerCFrame.Position.Z)
+            local targetCFrame = CFrame.lookAt(barPos, lookAtPos)
+            bar.CFrame = bar.CFrame:Lerp(targetCFrame, 0.4)
+            
+            local highlightColor = Color3.new(1, 1, 1)
+            bar.Color = Color3.fromRGB(10, 132, 255):Lerp(highlightColor, scale - 0.3)
+        end
+    end)
+    
+    local function Destroy()
+        connection:Disconnect()
+        for _, bar in ipairs(bars) do
+            bar:Destroy()
+        end
     end
-end)
-
-TopBar.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-        dragInput = input
+    
+    local function SetTarget(player)
+        attachTarget = player
     end
-end)
+    
+    return {
+        Connection = connection,
+        Destroy = Destroy,
+        SetTarget = SetTarget,
+        GetBars = function() return bars end
+    }
+end
 
-game:GetService("UserInputService").InputChanged:Connect(function(input)
-    if input == dragInput and dragging then
-        local delta = input.Position - dragStart
-        TopBar.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
+local Audio = Instance.new("Sound")
+Audio.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+Audio.Volume = 0.8
 
-task.spawn(function()
-    while OverlayGui.Parent do
-        local fps = math.floor(workspace:GetRealPhysicsFPS())
-        local ping = 0
-        pcall(function()
-            local pingStr = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString()
-            ping = math.floor(tonumber(pingStr:match("%d+")) or 0)
-        end)
-        InfoLabel.Text = string.format("AF Hub | 帧率: %d | 延迟: %dms", fps, ping)
-        task.wait(1)
-    end
-end)
-
+local visualizer = CreateCircleVisualizer(Audio, game.Players.LocalPlayer)
+        
         local repo = "https://raw.githubusercontent.com/KingScriptAE/No-sirve-nada./refs/heads/main/"
 local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
@@ -1814,6 +1821,7 @@ Qcjbwd:AddButton({Text="修改针率脚本",Func=function()
         end
 end});
 local Afhubyyds = Tabs.Afhubyyds:AddLeftGroupbox("缝合脚本区(缝合功能)");
+
 
 local ScriptCenterLeftGroup = Tabs.ScriptCenter:AddLeftGroupbox("脚本中心1");
 local ScriptCenterRightGroup = Tabs.ScriptCenter:AddRightGroupbox("脚本中心2");
