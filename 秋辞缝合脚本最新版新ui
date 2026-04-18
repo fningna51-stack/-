@@ -2416,7 +2416,6 @@ Afhubyyds:AddToggle("GlassESPToggle", {
                         for _, panelChild in next, v:GetChildren() do
                             for _, glassPart in next, panelChild:GetChildren() do
                                 if glassPart.Name == "glasspart" and glassPart:FindFirstChild("TouchInterest") then
-                                    -- 高亮假玻璃
                                     local highlight = Instance.new("BoxHandleAdornment")
                                     highlight.Name = "GlassESP"
                                     highlight.Adornee = glassPart
@@ -2628,7 +2627,6 @@ Afhubyyds:AddToggle("InfiniteJumpToggle", {
                 end
             end)
             
-            -- 存储连接以便后续断开
             Toggles.InfiniteJumpToggle:SetStateCallback(function(newState)
                 if not newState and connection then
                     connection:Disconnect()
