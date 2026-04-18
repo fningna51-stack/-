@@ -1477,6 +1477,18 @@ local scriptCategories = {
             }
     },
     {
+    GroupName = "力量传奇",
+        List = {
+            {Name = "Yttrium力量传奇付费脚本(免费用)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E5%8A%9B%E9%87%8F%E4%BC%A0%E5%A5%87%E8%84%9A%E6%9C%AC"},
+            }
+    },
+    {
+    GroupName = "通缉",
+        List = {
+            {Name = "Yttrium力量传奇付费脚本(免费用)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E9%80%9A%E7%BC%89%E8%84%9A%E6%9C%AC%E5%85%8D%E8%B4%B9%E7%89%88"},
+            }
+    },
+    {
     GroupName = "破坏者谜团",
         List = {
             {Name = "破坏者谜团脚本", Url = "https://pastebin.com/raw/VRwdkSG3"},
@@ -1733,7 +1745,7 @@ Qcjbwd:AddLabel("九十九夜🟢")
 Qcjbwd:AddLabel("墨水游戏汉化情况：全部汉化🟢")
 Qcjbwd:AddLabel("其他脚本汉化情况：大多数已汉化🟡")
 Qcjbwd:AddLabel("AF缝合Hub🟢")
-Qcjbwd:AddLabel("现在已支持服务器：31个服务器")
+Qcjbwd:AddLabel("现在已支持服务器：33个服务器")
 Qcjbwd:AddButton({Text="坐标脚本",Func=function()
         local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "CoordinateDisplay"
@@ -1897,7 +1909,6 @@ Afhubyyds:AddLabel("服务器功能使用情况：")
 Afhubyyds:AddLabel("已添加撕咬之夜功能🟢")
 Afhubyyds:AddLabel("已添加墨水游戏功能🟡")
 Afhubyyds:AddLabel("已添加恐鬼症功能🟢")
-Afhubyyds:AddLabel("已添加力量传奇功能🟡")
 
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
