@@ -1,96 +1,29 @@
-local RunService = game:GetService("RunService")
-local TweenService = game:GetService("TweenService")
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/nfpw/Simple-KeySystem-Roblox/refs/heads/main/Library.lua"))()
 
-local function CreateCircleVisualizer(audioObject, targetPlayer)
-    local bars = {}
-    local numBars = 24
-    local radius = 3.0
-    local attachTarget = targetPlayer or game.Players.LocalPlayer
-    
-    for i = 1, numBars do
-        local bar = Instance.new("Part")
-        bar.Anchored = true
-        bar.CanCollide = false
-        bar.Material = Enum.Material.Neon
-        bar.Color = Color3.fromRGB(10, 132, 255)
-        bar.Size = Vector3.new(0.1, 0.1, 0.1)
-        Instance.new("BlockMesh", bar)
-        bar.Parent = workspace
-        table.insert(bars, bar)
-    end
-    
-    local connection = RunService.RenderStepped:Connect(function(dt)
-        if not audioObject or not audioObject.Parent then
-            for _, bar in ipairs(bars) do
-                bar.CFrame = CFrame.new(0, -9999, 0)
-            end
-            return
-        end
-        
-        local loudness = audioObject.PlaybackLoudness
-        local normalized = math.clamp(loudness / 400, 0.05, 1)
-        
-        local centerCFrame = CFrame.new(0, -9999, 0)
-        local character = attachTarget and attachTarget.Character
-        
-        if character and character:FindFirstChild("HumanoidRootPart") then
-            centerCFrame = character.HumanoidRootPart.CFrame * CFrame.new(0, -2, 0)
-        else
-            for _, bar in ipairs(bars) do
-                bar.CFrame = CFrame.new(0, -9999, 0)
-            end
-            return
-        end
-        
-        local globalRotation = tick() * 0.8
-        
-        for i, bar in ipairs(bars) do
-            local noise = math.noise(tick() * 4, i * 0.15, 0)
-            local scale = math.clamp(normalized + (noise * normalized * 0.6), 0.05, 1)
-            
-            local targetHeight = scale * 5.0
-            bar.Size = bar.Size:Lerp(Vector3.new(0.15, targetHeight, 0.15), 0.3)
-            
-            local angle = (i / numBars) * math.pi * 2 + globalRotation
-            local offsetX = math.cos(angle) * radius
-            local offsetZ = math.sin(angle) * radius
-            
-            local barPos = centerCFrame.Position + Vector3.new(offsetX, 0, offsetZ)
-            local lookAtPos = Vector3.new(centerCFrame.Position.X, barPos.Y, centerCFrame.Position.Z)
-            local targetCFrame = CFrame.lookAt(barPos, lookAtPos)
-            bar.CFrame = bar.CFrame:Lerp(targetCFrame, 0.4)
-            
-            local highlightColor = Color3.new(1, 1, 1)
-            bar.Color = Color3.fromRGB(10, 132, 255):Lerp(highlightColor, scale - 0.3)
-        end
-    end)
-    
-    local function Destroy()
-        connection:Disconnect()
-        for _, bar in ipairs(bars) do
-            bar:Destroy()
-        end
-    end
-    
-    local function SetTarget(player)
-        attachTarget = player
-    end
-    
-    return {
-        Connection = connection,
-        Destroy = Destroy,
-        SetTarget = SetTarget,
-        GetBars = function() return bars end
-    }
+local KeyWindow = Library:CreateWindow("卡密系统", UDim2.fromOffset(300, 180))
+local UpdateWindow = Library:CreateWindow("更新公告反正你们也不看", UDim2.fromOffset(300, 300))
+UpdateWindow.Outer.Position = UDim2.new(0.7, 0, 0.5, 0)
+
+local KeyBox = KeyWindow:AddTextBox("输入卡密…", UDim2.new(0.1, 0, 0.15, 0))
+local RememberToggle = KeyWindow:AddToggle("记住卡密(保存)", UDim2.new(0.1, 0, 0.36, 0), false)
+
+local KeyPath = "DisabledHubConfigs/Key"
+local FileName = "SavedKey.lua"
+
+local SavedKey = Library:LoadKey(KeyPath, FileName)
+if SavedKey then
+    KeyBox.Text = SavedKey
+    RememberToggle.SetState(true)
 end
 
-local Audio = Instance.new("Sound")
-Audio.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-Audio.Volume = 0.8
-
-local visualizer = CreateCircleVisualizer(Audio, game.Players.LocalPlayer)
-        
-        local repo = "https://raw.githubusercontent.com/KingScriptAE/No-sirve-nada./refs/heads/main/"
+local SubmitButton = KeyWindow:AddButton("执行AF脚本", UDim2.new(0.1, 0, 0.65, 0), function()
+    if KeyBox.Text == "AF20110501QCgui" then
+        if RememberToggle.GetState() then
+            Library:SaveKey(KeyPath, FileName, KeyBox.Text)
+        end
+        KeyWindow:Close()
+        UpdateWindow:Close()
+         local repo = "https://raw.githubusercontent.com/KingScriptAE/No-sirve-nada./refs/heads/main/"
 local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
 local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
@@ -1737,6 +1670,104 @@ Qcjbwd:AddButton({Text="修改针率脚本",Func=function()
                 Func();
         end
 end});
+local Qcjbwd = Tabs.Qcjbwd:AddRightGroupbox("AF作者最喜欢的功能");
+Qcjbwd:AddButton({Text="环绕光环",Func=function()
+        local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+
+local function CreateCircleVisualizer(audioObject, targetPlayer)
+    local bars = {}
+    local numBars = 24
+    local radius = 3.0
+    local attachTarget = targetPlayer or game.Players.LocalPlayer
+    
+    for i = 1, numBars do
+        local bar = Instance.new("Part")
+        bar.Anchored = true
+        bar.CanCollide = false
+        bar.Material = Enum.Material.Neon
+        bar.Color = Color3.fromRGB(10, 132, 255)
+        bar.Size = Vector3.new(0.1, 0.1, 0.1)
+        Instance.new("BlockMesh", bar)
+        bar.Parent = workspace
+        table.insert(bars, bar)
+    end
+    
+    local connection = RunService.RenderStepped:Connect(function(dt)
+        if not audioObject or not audioObject.Parent then
+            for _, bar in ipairs(bars) do
+                bar.CFrame = CFrame.new(0, -9999, 0)
+            end
+            return
+        end
+        
+        local loudness = audioObject.PlaybackLoudness
+        local normalized = math.clamp(loudness / 400, 0.05, 1)
+        
+        local centerCFrame = CFrame.new(0, -9999, 0)
+        local character = attachTarget and attachTarget.Character
+        
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            centerCFrame = character.HumanoidRootPart.CFrame * CFrame.new(0, -2, 0)
+        else
+            for _, bar in ipairs(bars) do
+                bar.CFrame = CFrame.new(0, -9999, 0)
+            end
+            return
+        end
+        
+        local globalRotation = tick() * 0.8
+        
+        for i, bar in ipairs(bars) do
+            local noise = math.noise(tick() * 4, i * 0.15, 0)
+            local scale = math.clamp(normalized + (noise * normalized * 0.6), 0.05, 1)
+            
+            local targetHeight = scale * 5.0
+            bar.Size = bar.Size:Lerp(Vector3.new(0.15, targetHeight, 0.15), 0.3)
+            
+            local angle = (i / numBars) * math.pi * 2 + globalRotation
+            local offsetX = math.cos(angle) * radius
+            local offsetZ = math.sin(angle) * radius
+            
+            local barPos = centerCFrame.Position + Vector3.new(offsetX, 0, offsetZ)
+            local lookAtPos = Vector3.new(centerCFrame.Position.X, barPos.Y, centerCFrame.Position.Z)
+            local targetCFrame = CFrame.lookAt(barPos, lookAtPos)
+            bar.CFrame = bar.CFrame:Lerp(targetCFrame, 0.4)
+            
+            local highlightColor = Color3.new(1, 1, 1)
+            bar.Color = Color3.fromRGB(10, 132, 255):Lerp(highlightColor, scale - 0.3)
+        end
+    end)
+    
+    local function Destroy()
+        connection:Disconnect()
+        for _, bar in ipairs(bars) do
+            bar:Destroy()
+        end
+    end
+    
+    local function SetTarget(player)
+        attachTarget = player
+    end
+    
+    return {
+        Connection = connection,
+        Destroy = Destroy,
+        SetTarget = SetTarget,
+        GetBars = function() return bars end
+    }
+end
+
+local Audio = Instance.new("Sound")
+Audio.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+Audio.Volume = 0.8
+
+local visualizer = CreateCircleVisualizer(Audio, game.Players.LocalPlayer)
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
 local Afhubyyds = Tabs.Afhubyyds:AddLeftGroupbox("缝合脚本区(缝合功能)");
 Afhubyyds:AddLabel("服务器功能使用情况：")
 Afhubyyds:AddLabel("已添加撕咬之夜功能🟢")
@@ -2586,3 +2617,75 @@ SaveManager:SetFolder("Obsidian/秋辞脚本");
 ThemeManager:ApplyToTab(Tabs.Settings);
 SaveManager:BuildConfigSection(Tabs.Settings);
 Library.KeybindFrame.Visible = true;
+    else
+        local player = cloneref(game:GetService("Players")).LocalPlayer
+        player:Kick("Invalid Key")
+        if player then
+            player:Destroy()
+        end
+    end
+end)
+
+local GetKeyButton = KeyWindow:AddButton("获取解卡链接", UDim2.new(0.55, 0, 0.65, 0), function()
+    if setclipboard then
+        setclipboard("https://qun.qq.com/universal-share/share?ac=1&authKey=3UmgBtrf9TEDRGpgBAeKOXuXC5wVFjUr3lSSXAWzOmiF%2BqeMaqZpav2TmoRvmScY&busi_data=eyJncm91cENvZGUiOiI5Mzg3MTQ0MjciLCJ0b2tlbiI6IjhHS2NPUFBlM211QzFKNVhjamZRMnQ0R2ZIeitJUWUzKzRHOUplcjZEY2ZaMzNOVlF4bjZmaGovSWNwRElobEwiLCJ1aW4iOiIzNDM1Mjg2MTc3In0%3D&data=wdrGmVan3rLPzXGZ8rlxTndGWdm_WrIxHdeUF3YHzjysDRw81ZsHgGjE3Ar28jwKT1wCKz9vMdQZzZmoViXJMA&svctype=4&tempid=h5_group_info")
+    else
+        warn("setclipboard is not available.")
+    end
+end)
+
+local ScrollFrame = Library:Create('ScrollingFrame', {
+    Position = UDim2.new(0.05, 0, 0.05, 0),
+    Size = UDim2.new(0.9, 0, 0.9, 0),
+    BackgroundTransparency = 1,
+    BorderSizePixel = 0,
+    ScrollBarThickness = 3,
+    ScrollBarImageColor3 = Library.AccentColor,
+    Parent = UpdateWindow.Outer.Frame.Frame
+})
+
+function CreateUpdateItem(Icon, Title, Content, YPosition)
+    local Container = Library:Create('Frame', {
+        Position = UDim2.new(0, 0, 0, YPosition),
+        Size = UDim2.new(1, 0, 0, 30),
+        BackgroundTransparency = 1,
+        Parent = ScrollFrame
+    })
+
+    local IconLabel = Library:CreateLabel({
+        Position = UDim2.new(0, 5, 0, 0),
+        Size = UDim2.new(0, 20, 0, 20),
+        Text = Icon,
+        TextSize = 16,
+        Parent = Container
+    })
+
+    local TitleLabel = Library:CreateLabel({
+        Position = UDim2.new(0, 30, 0, 0),
+        Size = UDim2.new(0.9, -30, 0, 20),
+        Text = Title,
+        TextColor3 = Library.AccentColor,
+        TextSize = 14,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Parent = Container
+    })
+
+    local ContentLabel = Library:CreateLabel({
+        Position = UDim2.new(0, 30, 0, 20),
+        Size = UDim2.new(0.9, -30, 0, 20),
+        Text = Content,
+        TextSize = 13,
+        TextColor3 = Color3.new(0.8, 0.8, 0.8),
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Parent = Container
+    })
+
+    return 45
+end
+
+local YOffset = 0
+
+YOffset = YOffset + CreateUpdateItem("🔧", "Bug修复", "修复了墨水执行不了的bug", YOffset)
+YOffset = YOffset + CreateUpdateItem("", "", "无", YOffset - 25)
+
+ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, YOffset + 20)
