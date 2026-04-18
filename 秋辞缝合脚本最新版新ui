@@ -1893,10 +1893,12 @@ Qcjbwd:AddButton({Text="修改针率脚本",Func=function()
                 Func();
         end
 end});
-local Afhubyyds = Tabs.Afhubyyds:AddLeftGroupbox("特殊脚本与付费脚本功能");
-Afhubyyds:AddLabel("待添加更多服务器功能尽请期待")
+local Afhubyyds = Tabs.Afhubyyds:AddLeftGroupbox("缝合脚本区(缝合功能)");
+Afhubyyds:AddLabel("服务器功能使用情况：")
 Afhubyyds:AddLabel("已添加撕咬之夜功能🟢")
 Afhubyyds:AddLabel("已添加墨水游戏功能🟡")
+Afhubyyds:AddLabel("已添加恐鬼症功能🟢")
+Afhubyyds:AddLabel("已添加力量传奇功能🟡")
 
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
@@ -2203,7 +2205,6 @@ local function toggleEmote(state)
     end
 end
 
--- 14. 高亮功能
 local highlightColors = {
     Color3.fromRGB(255, 0, 0),
     Color3.fromRGB(0, 255, 0),
@@ -2362,8 +2363,8 @@ Afhubyyds:AddButton("DisableHighlights", {
     end
 })
 
-local Afhubyyds = Tabs.Afhubyyds:AddRightGroupbox("功能等待添加");
-Afhubyyds:AddLabel("等待添加功能")
+local Afhubyyds = Tabs.Afhubyyds:AddRightGroupbox("预计下次更新功能(预告)");
+Afhubyyds:AddLabel("待添加99夜，俄亥俄州")
 
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
@@ -2902,6 +2903,258 @@ Afhubyyds:AddSlider("DamageBoostSlider", {
 Afhubyyds:AddLabel("更多高级功能正在开发中...")
 Afhubyyds:AddLabel("敬请期待!")
 
+local Afhubyyds = Tabs.Afhubyyds:AddLeftGroupbox("恐鬼症功能");
+Afhubyyds:AddButton({
+    Text = "透视/夜视",
+    Func = function()
+        Lighting.Brightness = 2
+        Lighting.ClockTime = 14
+        Lighting.FogEnd = 100000
+        Lighting.GlobalShadows = false
+        Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+        for _, v in pairs(Lighting:GetDescendants()) do
+            v:Destroy()
+        end
+    end
+})
+
+Afhubyyds:AddButton({
+    Text = "无限体力",
+    Func = function()
+        for i = 1, 10 do
+            if LocalPlayer:FindFirstChild("DoubleStamina") then
+                LocalPlayer.DoubleStamina.Value = true
+            end
+        end
+    end
+})
+
+Afhubyyds:AddToggle("DaylightChat", {
+    Text = "白天可见(聊天窗)",
+    Default = false,
+    Callback = function(Value)
+        local ChatConfig = TextChatService.ChatWindowConfiguration
+        if Value then
+            ChatConfig.Enabled = true
+            ChatWindowConn = ChatConfig:GetPropertyChangedSignal("Enabled"):Connect(function()
+                ChatConfig.Enabled = true
+            end)
+        elseif ChatWindowConn then
+            ChatWindowConn:Disconnect()
+            ChatWindowConn = nil
+            ChatConfig.Enabled = false
+        end
+    end
+})
+
+Afhubyyds:AddToggle("ShowTemp", {
+    Text = "区域温度",
+    Default = false,
+    Callback = function(Value)
+        if LocalPlayer.PlayerGui:FindFirstChild("TemperatureDisplay") then
+            LocalPlayer.PlayerGui.TemperatureDisplay.Enabled = Value
+        end
+    end
+})
+
+Afhubyyds:AddToggle("AutoSpiritBox", {
+    Text = "高频精灵盒对话",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Spirit Box") then
+                SpiritBoxConn = RunService.Stepped:Connect(function()
+                    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Spirit Box") then
+                        LocalPlayer.Character["Spirit Box"].AskQuestion:FireServer("ButtonA")
+                    end
+                end)
+            else
+                print("请确保角色手持了精灵盒")
+            end
+        elseif SpiritBoxConn then
+            SpiritBoxConn:Disconnect()
+            SpiritBoxConn = nil
+        end
+    end
+})
+
+Afhubyyds:AddToggle("IgnoreGhost", {
+    Text = "透视幽灵仇恨",
+    Tooltip = "使用该功能会让幽灵无视你(请不要在房子内开启)",
+    Default = false,
+    Callback = function(Value)
+        if LocalPlayer:FindFirstChild("Zone") and LocalPlayer.Zone.Value ~= "Outside" and Value == true then
+            firetouchinterest(LocalPlayer.Character.HumanoidRootPart, Workspace.Map.Zones.Outside, 0)
+            task.wait(0.1)
+            firetouchinterest(LocalPlayer.Character.HumanoidRootPart, Workspace.Map.Zones.Outside, 1)
+        end
+        for _, zone in ipairs(Workspace.Map.Zones:GetChildren()) do
+            if not zone:IsA("Folder") then
+                zone.CanTouch = not Value
+            end
+        end
+    end
+})
+
+Afhubyyds:AddToggle("RemoteInteract", {
+    Text = "远程互动",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            if fireproximityprompt then
+                ProximityConn = ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
+                    fireproximityprompt(prompt)
+                end)
+            else
+                print("你的注入器不支持此命令(fireproximityprompt)")
+            end
+        elseif ProximityConn then
+            ProximityConn:Disconnect()
+            ProximityConn = nil
+        end
+    end
+})
+
+Afhubyyds:AddInput("WalkSpeed", {
+    Text = "速度修改",
+    Default = "负数关闭,正数开启",
+    Numeric = true,
+    Finished = true,
+    Placeholder = "负数关闭,正数开启",
+    Callback = function(Value)
+        local num = tonumber(Value)
+        if num and num >= 0 and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            if SpeedConn then
+                TargetSpeed = num
+                LocalPlayer.Character.Humanoid.WalkSpeed = TargetSpeed
+            else
+                SpeedConn = LocalPlayer.Character.Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+                    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+                        LocalPlayer.Character.Humanoid.WalkSpeed = TargetSpeed
+                    end
+                end)
+                LocalPlayer.Character.Humanoid.WalkSpeed = num
+                TargetSpeed = num
+            end
+        elseif SpeedConn then
+            SpeedConn:Disconnect()
+            SpeedConn = nil
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+                LocalPlayer.Character.Humanoid.WalkSpeed = 16
+            end
+        end
+    end
+})
+
+Afhubyyds:AddButton({
+    Text = "删门",
+    Func = function()
+        if Workspace.Map:FindFirstChild("Doors") then
+            for _, door in ipairs(Workspace.Map.Doors:GetChildren()) do
+                door:Destroy()
+            end
+        end
+    end
+})
+
+Afhubyyds:AddButton({
+    Text = "收集所有照片",
+    Func = function()
+        local PhotoTypes = {
+            "Cursed Object", "Ghost", "Dirty Water", "Stepped In Salt",
+            "Written In Book", "Burning Crucifix", "Dead Body", "Boo-Boo Doll", "UV Print"
+        }
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Photo Camera") and LocalPlayer.Character:FindFirstChild("Head") then
+            for _, pType in pairs(PhotoTypes) do
+                LocalPlayer.Character["Photo Camera"].Remote.FireCameraEvent:FireServer(unpack({
+                    [1] = LocalPlayer.Character:FindFirstChild("Head").CFrame,
+                    [2] = { Type = pType },
+                }))
+            end
+        else
+            print("请确保角色手持了照相机")
+        end
+    end
+})
+
+Afhubyyds:AddButton({
+    Text = "凭空放盐",
+    Func = function()
+        if GhostRoomPart and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Salt") then
+            LocalPlayer.Character.Salt.Remote.Drop:FireServer(unpack({
+                [1] = GhostRoomPart.CFrame,
+                [2] = LocalPlayer.Character.Salt.Ammo.Capacity,
+            }))
+        else
+            print("请确保角色手持了盐，且已探测到鬼房(最低温度)")
+        end
+    end
+})
+
+Afhubyyds:AddButton({
+    Text = "血月加成",
+    Func = function()
+        if ReplicatedStorage.Remotes:FindFirstChild("BloodMoonEvent") then
+            ReplicatedStorage.Remotes.BloodMoonEvent:FireServer()
+        end
+    end
+})
+
+Afhubyyds:AddSlider("CandleDistance", {
+    Text = "蜡烛互动距离",
+    Default = 4,
+    Min = 4,
+    Max = 10,
+    Compact = false,
+    Callback = function(Value)
+        local Candles = Workspace.Map:FindFirstChild("Candles")
+        if Candles then
+            for _, v in ipairs(Candles:GetDescendants()) do
+                if v:IsA("ProximityPrompt") then
+                    v.MaxActivationDistance = Value
+                end
+            end
+        end
+    end
+})
+
+Afhubyyds:AddToggle("AdMsg", {
+    Text = "使用广告(炸对局发送消息)",
+    Tooltip = "高程度避免被视频录制举报",
+    Default = false,
+    Callback = function(Value)
+        EnableAdMsg = Value
+    end
+})
+
+Afhubyyds:AddToggle("CrashMatch", {
+    Text = "炸对局",
+    Tooltip = "该功能会致使对局中所有人卡顿掉线(设备好则不会崩退)",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            if LoadedCrashBot then
+                LoadedCrashBot = false
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/longchneg/GAl/refs/heads/main/%E6%9C%BA%E5%99%A8%E4%BA%BA"))()
+            end
+            if EnableAdMsg then
+                TextChatService.TextChannels.RBXGeneral:SendAsync("Yttrium Hub[炸对局]功能开启:" .. RandomString(10))
+            end
+            ClearPictures()
+            task.wait(2)
+            CrashConn = RunService.Stepped:Connect(function()
+                local camera = Workspace.Map.Items:FindFirstChild("Photo Camera")
+                if camera and camera:FindFirstChild("Remote") then
+                    camera.Remote.FireCameraEvent:FireServer(LocalPlayer.Character and LocalPlayer.Character.HumanoidRootPart.CFrame or CFrame.new(), {})
+                end
+            end)
+        elseif CrashConn then
+            CrashConn:Disconnect()
+            CrashConn = nil
+        end
+    end
+})
+
 local function cleanup()
     pcall(function()
         for _, v in next, workspace.GlassBridge.GlassHolder:GetChildren() do
@@ -2946,6 +3199,487 @@ if game.BindToClose then
         game:BindToClose(cleanup)
     end)
 end
+
+local Afhubyyds = Tabs.Afhubyyds:AddRightGroupbox("力量传奇")
+Afhubyyds:AddToggle('MyToggle', {
+    Text = '自动击杀',
+    Default = false,
+    Tooltip = '无',
+    Callback = function(Value)
+        _G.airStrike = Value
+        if Value then
+            if autoKillConnection then
+                autoKillConnection:Disconnect()
+            end
+            autoKillConnection = RunService.Heartbeat:Connect(function()
+                if _G.airStrike then
+                    autoKill()
+                end
+            end)
+        else
+            if autoKillConnection then
+                autoKillConnection:Disconnect()
+                autoKillConnection = nil
+            end
+        end
+    end
+})
+
+Afhubyyds:AddToggle('MyToggle', {
+    Text = '自动挥拳',
+    Default = false,
+    Tooltip = '无',
+    Callback = function(Value)
+        if Value then
+            if autoPunchConnection then
+                autoPunchConnection:Disconnect()
+            end
+            autoPunchConnection = RunService.Heartbeat:Connect(function()
+                autoPunch()
+            end)
+        else
+            if autoPunchConnection then
+                autoPunchConnection:Disconnect()
+                autoPunchConnection = nil
+            end
+        end
+    end
+})
+
+Afhubyyds:AddToggle('MyToggle', {
+    Text = '锁定坐标(位置)',
+    Default = false,
+    Tooltip = '无',
+    Callback = function(Value)
+        _G.positionLock = Value
+        if Value then
+            startPositionLock()
+        else
+            if positionLockConnection then
+                positionLockConnection:Disconnect()
+                positionLockConnection = nil
+            end
+        end
+    end
+})
+
+Afhubyyds:AddToggle('MyToggle', {
+    Text = '自动换服',
+    Default = false,
+    Tooltip = '无',
+    Callback = function(Value)
+        _G.switchServers = Value
+        if Value then
+            LocalPlayer.CharacterAdded:Connect(function(character)
+                local humanoid = character:WaitForChild("Humanoid")
+                humanoid.Died:Connect(function()
+                    if _G.switchServers then
+                        WindUI:Notify({
+                            Title = "自动换服",
+                            Content = "玩家死亡，正在执行换服...",
+                            Duration = 3,
+                        })
+                        serverHop()
+                    end
+                end)
+            end)
+            RunService.Heartbeat:Connect(function()
+                if _G.switchServers then
+                    if tick() - startTime >= 180 then
+                        WindUI:Notify({
+                            Title = "自动换服",
+                            Content = "180秒时间到，正在执行换服...",
+                            Duration = 3,
+                        })
+                        serverHop()
+                    end
+                end
+            end)
+        end
+    end
+})
+
+Afhubyyds:AddInput('MyInput', {
+    Text = '修改力量',
+    Tooltip = '请输入数值',
+    Default = '',
+    Callback = function(Value)
+        game:GetService("Players").LocalPlayer.leaderstats.Strength.Value = Value
+    end
+})
+
+Afhubyyds:AddInput('MyInput', {
+    Text = '修改重生数',
+    Tooltip = '请输入数值',
+    Default = '',
+    Callback = function(Value)
+        game:GetService("Players").LocalPlayer.leaderstats.Rebirths.Value = Value
+    end
+})
+
+Afhubyyds:AddInput('MyInput', {
+    Text = '修改击杀数',
+    Tooltip = '请输入数值',
+    Default = '',
+    Callback = function(Value)
+        game:GetService("Players").LocalPlayer.leaderstats.Kills.Value = Value
+    end
+})
+
+Afhubyyds:AddInput('MyInput', {
+    Text = '修改获胜数',
+    Tooltip = '请输入数值',
+    Default = '',
+    Callback = function(Value)
+        game:GetService("Players").LocalPlayer.leaderstats.Brawls.Value = Value
+    end
+})
+
+Afhubyyds:AddToggle('MyToggle', {
+    Text = '自动重生',
+    Default = false,
+    Tooltip = '无',
+    Callback = function(Value)
+        if Value then
+            spawn(function()
+                while Value do
+                    game:GetService("ReplicatedStorage").rEvents.rebirthRemote:InvokeServer("rebirthRequest")
+                    wait()
+                end
+            end)
+        end
+    end
+})
+
+Afhubyyds:AddButton('MyButton', {
+    Text = '调整体积为2',
+    Func = function()
+        game:GetService("ReplicatedStorage").rEvents.changeSpeedSizeRemote:InvokeServer("changeSize", 2)
+    end
+})
+
+Afhubyyds:AddToggle('MyToggle', {
+    Text = '自动传送肌肉大王',
+    Default = false,
+    Tooltip = '无',
+    Callback = function(Value)
+        if Value then
+            spawn(function()
+                while Value do
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-8625.9296875, 13.566278457641602, -5730.4736328125)
+                    wait()
+                end
+            end)
+        end
+    end
+})
+
+Afhubyyds:AddToggle('MyToggle', {
+    Text = '自动执行所有锻炼',
+    Default = false,
+    Tooltip = '无',
+    Callback = function(Value)
+        if getgenv() then
+            getgenv().AutoTrainTriple = Value
+        end
+        local oldPos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+        local part = Instance.new('Part', workspace)
+        part.Size = Vector3.new(500, 20, 530.1)
+        part.Position = Vector3.new(0, 100000, 133.15)
+        part.CanCollide = true
+        part.Anchored = true
+        spawn(function()
+            while Value do
+                wait()
+                local char = game.Players.LocalPlayer.Character
+                if not char then wait(1) continue end
+                char.HumanoidRootPart.CFrame = part.CFrame + Vector3.new(0, 50, 0)
+                for i, v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                    if v.ClassName == "Tool" and (v.Name == "Handstands" or v.Name == "Situps" or v.Name == "Pushups" or v.Name == "Weight") then
+                        if v:FindFirstChildOfClass("NumberValue") then
+                            v:FindFirstChildOfClass("NumberValue").Value = 0
+                        end
+                        repeat wait() until game.Players.LocalPlayer.Backpack:FindFirstChildOfClass("Tool")
+                        char:WaitForChild("Humanoid"):EquipTool(v)
+                        game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep")
+                    end
+                end
+            end
+            part:Destroy()
+            local char = game.Players.LocalPlayer.Character
+            if char then
+                char.HumanoidRootPart.CFrame = oldPos
+                char:WaitForChild("Humanoid"):UnequipTools()
+            end
+        end)
+    end
+})
+
+Afhubyyds:AddToggle('MyToggle', {
+    Text = '自动举哑铃',
+    Default = false,
+    Tooltip = '无',
+    Callback = function(Value)
+        if getgenv() then
+            getgenv().AutoWeight = Value
+        end
+        local oldPos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+        local part = Instance.new('Part', workspace)
+        part.Size = Vector3.new(500, 20, 530.1)
+        part.Position = Vector3.new(0, 100000, 133.15)
+        part.CanCollide = true
+        part.Anchored = true
+        spawn(function()
+            while Value do
+                wait()
+                local char = game.Players.LocalPlayer.Character
+                if not char then wait(1) continue end
+                char.HumanoidRootPart.CFrame = part.CFrame + Vector3.new(0, 50, 0)
+                for i, v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                    if v.ClassName == "Tool" and v.Name == "Weight" then
+                        v.Parent = char
+                    end
+                end
+                game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep")
+            end
+            part:Destroy()
+            local char = game.Players.LocalPlayer.Character
+            if char then
+                char.HumanoidRootPart.CFrame = oldPos
+                char:WaitForChild("Humanoid"):UnequipTools()
+            end
+        end)
+    end
+})
+
+Afhubyyds:AddToggle('MyToggle', {
+    Text = '自动俯卧撑',
+    Default = false,
+    Tooltip = '无',
+    Callback = function(Value)
+        if getgenv() then
+            getgenv().AutoPushup = Value
+        end
+        local oldPos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+        local part = Instance.new('Part', workspace)
+        part.Size = Vector3.new(500, 20, 530.1)
+        part.Position = Vector3.new(0, 100000, 133.15)
+        part.CanCollide = true
+        part.Anchored = true
+        spawn(function()
+            while Value do
+                wait()
+                local char = game.Players.LocalPlayer.Character
+                if not char then wait(1) continue end
+                char.HumanoidRootPart.CFrame = part.CFrame + Vector3.new(0, 50, 0)
+                for i, v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                    if v.ClassName == "Tool" and v.Name == "Pushups" then
+                        v.Parent = char
+                    end
+                end
+                game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep")
+            end
+            part:Destroy()
+            local char = game.Players.LocalPlayer.Character
+            if char then
+                char.HumanoidRootPart.CFrame = oldPos
+                char:WaitForChild("Humanoid"):UnequipTools()
+            end
+        end)
+    end
+})
+
+Afhubyyds:AddToggle('MyToggle', {
+    Text = '自动仰卧起坐',
+    Default = false,
+    Tooltip = '无',
+    Callback = function(Value)
+        if getgenv() then
+            getgenv().AutoSitup = Value
+        end
+        local oldPos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+        local part = Instance.new('Part', workspace)
+        part.Size = Vector3.new(500, 20, 530.1)
+        part.Position = Vector3.new(0, 100000, 133.15)
+        part.CanCollide = true
+        part.Anchored = true
+        spawn(function()
+            while Value do
+                wait()
+                local char = game.Players.LocalPlayer.Character
+                if not char then wait(1) continue end
+                char.HumanoidRootPart.CFrame = part.CFrame + Vector3.new(0, 50, 0)
+                for i, v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                    if v.ClassName == "Tool" and v.Name == "Situps" then
+                        v.Parent = char
+                    end
+                end
+                game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep")
+            end
+            part:Destroy()
+            local char = game.Players.LocalPlayer.Character
+            if char then
+                char.HumanoidRootPart.CFrame = oldPos
+                char:WaitForChild("Humanoid"):UnequipTools()
+            end
+        end)
+    end
+})
+
+Afhubyyds:AddToggle('MyToggle', {
+    Text = '自动倒立',
+    Default = false,
+    Tooltip = '无',
+    Callback = function(Value)
+        if getgenv() then
+            getgenv().AutoHandstand = Value
+        end
+        local oldPos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+        local part = Instance.new('Part', workspace)
+        part.Size = Vector3.new(500, 20, 530.1)
+        part.Position = Vector3.new(0, 100000, 133.15)
+        part.CanCollide = true
+        part.Anchored = true
+        spawn(function()
+            while Value do
+                wait()
+                local char = game.Players.LocalPlayer.Character
+                if not char then wait(1) continue end
+                char.HumanoidRootPart.CFrame = part.CFrame + Vector3.new(0, 50, 0)
+                for i, v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                    if v.ClassName == "Tool" and v.Name == "Handstands" then
+                        v.Parent = char
+                    end
+                end
+                game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep")
+            end
+            part:Destroy()
+            local char = game.Players.LocalPlayer.Character
+            if char then
+                char.HumanoidRootPart.CFrame = oldPos
+                char:WaitForChild("Humanoid"):UnequipTools()
+            end
+        end)
+    end
+})
+
+Afhubyyds:AddSlider('MySlider', {
+    Text = '飞行速度',
+    Default = 5,
+    Min = 1,
+    Max = 20,
+    Rounding = 1,
+    Callback = function(Value)
+        flyMultiplier = Value
+    end
+})
+
+Afhubyyds:AddToggle('MyToggle', {
+    Text = '飞行开关',
+    Default = false,
+    Tooltip = '无',
+    Callback = function(Value)
+        if getgenv() then
+            getgenv().fly = Value
+        end
+        if Value then
+            local controlModule = require(game.Players.LocalPlayer.PlayerScripts:WaitForChild('PlayerModule'):WaitForChild("ControlModule"))
+            local character = game.Players.LocalPlayer.Character
+            if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+            local function setupFlight(character)
+                local hrp = character:FindFirstChild("HumanoidRootPart")
+                if not hrp then return end
+                if hrp:FindFirstChild("VelocityHandler") then hrp.VelocityHandler:Destroy() end
+                if hrp:FindFirstChild("GyroHandler") then hrp.GyroHandler:Destroy() end
+                local bv = Instance.new("BodyVelocity")
+                bv.Name = "VelocityHandler"
+                bv.Parent = hrp
+                bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+                bv.Velocity = Vector3.new(0, 0, 0)
+                local bg = Instance.new("BodyGyro")
+                bg.Name = "GyroHandler"
+                bg.Parent = hrp
+                bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+                bg.P = 1000
+                bg.D = 50
+                return bv, bg
+            end
+            local bv, bg = setupFlight(character)
+            local camera = game.Workspace.CurrentCamera
+            if getgenv() then
+                getgenv().FlyLoop = game:GetService("RunService").RenderStepped:Connect(function()
+                    local currentCharacter = game.Players.LocalPlayer.Character
+                    local hrp = currentCharacter and currentCharacter:FindFirstChild("HumanoidRootPart")
+                    if currentCharacter and hrp and hrp:FindFirstChild("VelocityHandler") and hrp:FindFirstChild("GyroHandler") and getgenv().fly then
+                        currentCharacter.Humanoid.PlatformStand = true
+                        hrp.GyroHandler.CFrame = camera.CFrame
+                        local direction = controlModule:GetMoveVector()
+                        local actualSpeed = flySpeed * flyMultiplier
+                        hrp.VelocityHandler.Velocity = Vector3.new()
+                        if direction.X ~= 0 then
+                            hrp.VelocityHandler.Velocity = hrp.VelocityHandler.Velocity + camera.CFrame.RightVector * (direction.X * actualSpeed)
+                        end
+                        if direction.Z ~= 0 then
+                            hrp.VelocityHandler.Velocity = hrp.VelocityHandler.Velocity - camera.CFrame.LookVector * (direction.Z * actualSpeed)
+                        end
+                        if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.Space) then
+                            hrp.VelocityHandler.Velocity = hrp.VelocityHandler.Velocity + Vector3.new(0, actualSpeed/2, 0)
+                        end
+                        if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.LeftShift) then
+                            hrp.VelocityHandler.Velocity = hrp.VelocityHandler.Velocity - Vector3.new(0, actualSpeed/2, 0)
+                        end
+                    end
+                end)
+            end
+        else
+            if getgenv() and getgenv().FlyLoop then
+                getgenv().FlyLoop:Disconnect()
+            end
+            local character = game.Players.LocalPlayer.Character
+            if character and character:FindFirstChild("HumanoidRootPart") then
+                local hrp = character.HumanoidRootPart
+                if hrp:FindFirstChild("VelocityHandler") then hrp.VelocityHandler:Destroy() end
+                if hrp:FindFirstChild("GyroHandler") then hrp.GyroHandler:Destroy() end
+                character.Humanoid.PlatformStand = false
+            end
+        end
+    end
+})
+
+Afhubyyds:AddToggle('MyToggle', {
+    Text = '穿墙',
+    Default = false,
+    Tooltip = '无',
+    Callback = function(Value)
+        if Value then
+            if getgenv() then
+                getgenv().noclipConnection = game:GetService("RunService").Stepped:Connect(function()
+                    local LocalPlayer = game:GetService("Players").LocalPlayer
+                    if LocalPlayer.Character then
+                        for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+                            if part:IsA("BasePart") then
+                                part.CanCollide = false
+                            end
+                        end
+                    end
+                end)
+            end
+        else
+            if getgenv() and getgenv().noclipConnection then
+                getgenv().noclipConnection:Disconnect()
+                getgenv().noclipConnection = nil
+            end
+            local LocalPlayer = game:GetService("Players").LocalPlayer
+            if LocalPlayer.Character then
+                for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = true
+                    end
+                end
+            end
+        end
+    end
+})
 
 local ScriptCenterLeftGroup = Tabs.ScriptCenter:AddLeftGroupbox("脚本中心1");
 local ScriptCenterRightGroup = Tabs.ScriptCenter:AddRightGroupbox("脚本中心2");
@@ -3098,7 +3832,7 @@ local YOffset = 0
 
 YOffset = YOffset + CreateUpdateItem("😂", "某些乐子", "觉得卡密傻就别用这个脚本免费给你好用的脚本又叫上了\n可能会说又不是只有我这一个缝合我用别的\n那就去用别人的我这里不欢迎没有素质和自大的人", YOffset)
 
-YOffset = YOffset + CreateUpdateItem("🆕", "新增功能", "娱乐脚本区新增加一个柳叶的碰飞", YOffset)
+YOffset = YOffset + CreateUpdateItem("🆕", "新增功能", "更新日志下次更新99夜和俄亥俄州", YOffset)
 
 YOffset = YOffset + CreateUpdateItem("🏠", "主要公告介绍", "势必为大家找到好玩而且免费的脚本\n预计给大家添加100多种服务器的脚本，", YOffset)
 
