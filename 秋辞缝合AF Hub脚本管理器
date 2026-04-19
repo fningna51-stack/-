@@ -1,0 +1,165 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+if LocalPlayer.Name == "91vip78tangxin" then
+    LocalPlayer:Kick("[Yttrium你被禁止使用原因:Roblox服饰装扮辱华")
+else
+    local CurrentPlaceId = tostring(game.PlaceId)
+    local Scripts = {
+        ["126509999114328"] = {
+            url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%A7%8B%E8%BE%9E99%E5%A4%9C%E6%B1%89%E5%8C%96",
+            name = "在森林里的99夜"
+        },
+        ["99567941238278"] = {
+            url = "https://raw.githubusercontent.com/fningna51-stack/-/main/ax%E8%84%9A%E6%9C%AC%E7%A7%8B%E8%BE%9E%E6%B1%89%E5%8C%96",
+            name = "AX秋辞有芙同享汉化"
+            },
+            ["119099244949868"] = {
+            url = "https://raw.githubusercontent.com/fningna51-stack/-/main/ax%E8%84%9A%E6%9C%AC%E7%A7%8B%E8%BE%9E%E6%B1%89%E5%8C%96",
+            name = "墨水游戏新手大厅加载"
+            },
+            ["125009265613167"] = {
+            url = "https://raw.githubusercontent.com/fningna51-stack/-/main/ax%E8%84%9A%E6%9C%AC%E7%A7%8B%E8%BE%9E%E6%B1%89%E5%8C%96",
+            name = "墨水游戏新局内"
+        }
+    }
+
+    local repo = 'https://raw.githubusercontent.com/KingScriptAE/No-sirve-nada./refs/heads/main/'
+    local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
+    local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
+    local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
+
+    local Options = Library.Options
+    local Toggles = Library.Toggles
+
+    local Window = Library:CreateWindow({
+        Title = "AF Hub脚本管理器",
+        Footer = "By Linni",
+        Icon = 131153193945220,
+        NotifySide = "Right",
+        ShowCustomCursor = true,
+    })
+
+    local Tabs = {
+        ScriptsTab = Window:AddTab("脚本", "info"),
+        Settings = Window:AddTab("设置", "settings"),
+    }
+
+    local ScriptsGroup = Tabs.ScriptsTab:AddLeftGroupbox("脚本列表")
+
+    ScriptsGroup:AddLabel("当前游戏ID: " .. CurrentPlaceId)
+    ScriptsGroup:AddDivider()
+
+    if Scripts[CurrentPlaceId] then
+        ScriptsGroup:AddLabel("✅ 已支持: " .. Scripts[CurrentPlaceId].name)
+        ScriptsGroup:AddButton({
+            Text = '执行脚本',
+            Func = function()
+                loadstring(game:HttpGet(Scripts[CurrentPlaceId].url))()
+                Library:Notify("已执行: " .. Scripts[CurrentPlaceId].name, 3)
+            end
+        })
+        
+        ScriptsGroup:AddToggle('AutoExecute', {
+            Text = '自动执行',
+            Default = false,
+            Tooltip = '进入游戏时自动执行对应脚本',
+        })
+        
+        if Toggles.AutoExecute.Value then
+            loadstring(game:HttpGet(Scripts[CurrentPlaceId].url))()
+            Library:Notify("自动执行: " .. Scripts[CurrentPlaceId].name, 3)
+        end
+    else
+        ScriptsGroup:AddLabel("❌ 当前游戏不支持")
+        ScriptsGroup:AddLabel("游戏ID: " .. CurrentPlaceId)
+        ScriptsGroup:AddLabel("可以提供游戏ID我们会选择是否更新")
+        
+        ScriptsGroup:AddButton({
+            Text = '复制游戏ID',
+            Func = function()
+                setclipboard(CurrentPlaceId)
+                Library:Notify("已复制游戏ID到剪贴板", 3)
+            end
+        })
+    end
+    
+    local gameList = {}
+    for id, info in pairs(Scripts) do
+        table.insert(gameList, id .. " - " .. info.name)
+    end
+    
+    if #gameList > 0 then
+        ScriptsGroup:AddDivider()
+        ScriptsGroup:AddDropdown('SupportedGames', {
+            Values = gameList,
+            Default = 1,
+            Multi = false,
+            Text = '支持的游戏列表',
+            Tooltip = '查看所有支持的游戏',
+            Callback = function(Value)
+                Library:Notify("选中: " .. Value, 2)
+            end
+        })
+    end
+
+    local FunctionsGroup = Tabs.ScriptsTab:AddRightGroupbox("额外功能")
+    
+    FunctionsGroup:AddButton({
+        Text = '重新加载脚本',
+        Func = function()
+            Library:Notify("重新加载中...", 2)
+            wait(1)
+        end
+    })
+    
+    FunctionsGroup:AddButton({
+        Text = '检查更新',
+        Func = function()
+            Library:Notify("检查更新功能开发中", 2)
+        end
+    })
+    
+    FunctionsGroup:AddToggle('RainbowUI', {
+        Text = '彩虹UI效果',
+        Default = false,
+        Tooltip = '启用彩虹颜色效果',
+    }):AddColorPicker('RainbowColor', {
+        Default = Color3.fromRGB(255, 0, 0),
+        Title = '彩虹基础色',
+    })
+    
+    local MenuGroup = Tabs.Settings:AddLeftGroupbox('菜单')
+    MenuGroup:AddButton('卸载脚本', function() 
+        Library:Unload() 
+    end)
+    MenuGroup:AddLabel('菜单快捷键'):AddKeyPicker('MenuKeybind', { 
+        Default = 'RightShift', 
+        NoUI = true, 
+        Text = '显示/隐藏菜单' 
+    })
+    
+    local ThemeGroup = Tabs.Settings:AddRightGroupbox('主题')
+    
+    Library.ToggleKeybind = Options.MenuKeybind
+    
+    ThemeManager:SetLibrary(Library)
+    SaveManager:SetLibrary(Library)
+    SaveManager:IgnoreThemeSettings()
+    ThemeManager:SetFolder("ScriptManagerTheme")
+    SaveManager:SetFolder("ScriptManagerConfig")
+    SaveManager:BuildConfigSection(Tabs.Settings)
+    ThemeManager:ApplyToTab(Tabs.Settings)
+    
+    local RunService = game:GetService("RunService")
+    local t = 0
+    RunService.Heartbeat:Connect(function(dt)
+        if Toggles.RainbowUI.Value then
+            t = t + 0.012
+            local r = math.sin(t*1.1)*0.45+0.55
+            local g = math.sin(t*1.3)*0.45+0.55
+            local b = math.sin(t*1.6)*0.45+0.55
+            Options.RainbowColor:SetValue(Color3.new(r,g,b))
+        end
+    end)
+end
