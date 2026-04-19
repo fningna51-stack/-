@@ -1,0 +1,856 @@
+local repo = 'https://raw.githubusercontent.com/KingScriptAE/No-sirve-nada./refs/heads/main/'
+
+local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
+local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
+local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
+
+local Options = Library.Options
+local Toggles = Library.Toggles
+
+local Window = Library:CreateWindow({
+    Title = "AF Hub - 森林中的99夜",
+    Footer = "尊贵的" .. game.Players.LocalPlayer.Name,
+    Icon = 131153193945220,
+    NotifySide = "Right",
+    ShowCustomCursor = true,
+})
+
+local Tabs = {
+    Main = Window:AddTab("主要功能", "sword"),
+    Other = Window:AddTab("其他功能", "package"),
+    Settings = Window:AddTab("设置", "settings"),
+}
+
+local CombatGroup = Tabs.Main:AddLeftGroupbox("战斗系统")
+local SurvivalGroup = Tabs.Main:AddRightGroupbox("生存系统")
+local FarmingGroup = Tabs.Main:AddLeftGroupbox("种植系统")
+local TeleportGroup = Tabs.Main:AddRightGroupbox("传送系统")
+
+local AutoGroup = Tabs.Other:AddLeftGroupbox("自动收集/传送")
+local ChestGroup = Tabs.Other:AddRightGroupbox("宝箱功能")
+local HitboxGroup = Tabs.Other:AddLeftGroupbox("打击盒")
+local PlayerGroup = Tabs.Other:AddRightGroupbox("玩家功能")
+local MiscGroup = Tabs.Other:AddLeftGroupbox("其他功能")
+
+CombatGroup:AddLabel("生体系统", true)
+
+CombatGroup:AddButton({
+    Text = "无限血",
+    Func = function()
+        local args = { [1] = -math.huge }
+        game:GetService("ReplicatedStorage").RemoteEvents.DamagePlayer:FireServer(unpack(args))
+        Library:Notify("无限血已激活", 2)
+    end
+})
+
+CombatGroup:AddButton({
+    Text = "无限耐力",
+    Func = function()
+        local LocalPlayer = game:GetService("Players").LocalPlayer
+        local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+                hum.WalkSpeed = 20
+            end)
+            hum.WalkSpeed = 20
+        end
+        Library:Notify("无限耐力已激活", 2)
+    end
+})
+
+CombatGroup:AddLabel("武器系统", true)
+
+local attackMethod = "范围"
+CombatGroup:AddDropdown("AttackMethod", {
+    Values = {"范围", "全图"},
+    Default = 1,
+    Text = "攻击方式",
+    Callback = function(Value)
+        attackMethod = Value
+    end
+})
+
+local killAuraEnabled = false
+CombatGroup:AddToggle("KillAura", {
+    Text = "杀戮光环",
+    Default = false,
+    Callback = function(Value)
+        killAuraEnabled = Value
+        if Value then
+            task.spawn(function()
+                while killAuraEnabled do
+                    local currentTool = nil
+                    local LocalPlayer = game:GetService("Players").LocalPlayer
+                    
+                    if LocalPlayer.Character then
+                        for _, item in pairs(LocalPlayer.Character:GetChildren()) do
+                            if item:IsA("Tool") then
+                                currentTool = item
+                                break
+                            end
+                        end
+                    end
+                    
+                    if not currentTool then
+                        for _, item in pairs(LocalPlayer.Backpack:GetChildren()) do
+                            if item:IsA("Tool") then
+                                currentTool = item
+                                break
+                            end
+                        end
+                    end
+                    
+                    if currentTool then
+                        for _, enemy in next, workspace.Characters:GetChildren() do
+                            if enemy:IsA("Model") and enemy:FindFirstChild("HumanoidRootPart") and enemy ~= LocalPlayer.Character then
+                                local shouldAttack = false
+                                if attackMethod == "范围" then
+                                    local distance = (LocalPlayer.Character.HumanoidRootPart.Position - enemy.HumanoidRootPart.Position).Magnitude
+                                    if distance <= 35 then shouldAttack = true end
+                                else
+                                    shouldAttack = true
+                                end
+                                if shouldAttack then
+                                    pcall(function()
+                                        game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("ToolDamageObject"):InvokeServer(enemy, currentTool, true, LocalPlayer.Character.HumanoidRootPart.CFrame)
+                                    end)
+                                end
+                            end
+                        end
+                    end
+                    task.wait(0)
+                end
+            end)
+        end
+    end
+})
+
+CombatGroup:AddButton({
+    Text = "显示当前武器",
+    Func = function()
+        local LocalPlayer = game:GetService("Players").LocalPlayer
+        local toolName = "无"
+        if LocalPlayer.Character then
+            for _, item in pairs(LocalPlayer.Character:GetChildren()) do
+                if item:IsA("Tool") then
+                    toolName = item.Name
+                    break
+                end
+            end
+        end
+        Library:Notify("当前武器: " .. toolName, 3)
+    end
+})
+
+SurvivalGroup:AddLabel("树木砍伐", true)
+
+local DistanceForAutoChopTree = 500
+SurvivalGroup:AddInput("ChopRange", {
+    Default = "500",
+    Numeric = true,
+    Text = "砍树范围 [500最佳]",
+    Callback = function(Value)
+        DistanceForAutoChopTree = tonumber(Value) or 500
+    end
+})
+
+local ActiveAutoChopTree = false
+SurvivalGroup:AddToggle("AutoChop", {
+    Text = "自动砍树",
+    Default = false,
+    Callback = function(Value)
+        ActiveAutoChopTree = Value
+        task.spawn(function()
+            while ActiveAutoChopTree do
+                local player = game:GetService("Players").LocalPlayer
+                local character = player.Character or player.CharacterAdded:Wait()
+                local hrp = character:WaitForChild("HumanoidRootPart")
+                
+                local weapon = nil
+                for _, item in pairs(player.Inventory:GetChildren()) do
+                    if item:IsA("Tool") then weapon = item; break end
+                end
+                if not weapon then
+                    weapon = (player.Inventory:FindFirstChild("Old Axe") or player.Inventory:FindFirstChild("Good Axe") or player.Inventory:FindFirstChild("Strong Axe") or player.Inventory:FindFirstChild("Chainsaw"))
+                end
+                
+                for _, tree in pairs(workspace.Map.Foliage:GetChildren()) do
+                    if tree:IsA("Model") and (tree.Name == "Small Tree" or tree.Name == "TreeBig1" or tree.Name == "TreeBig2") and tree.PrimaryPart then
+                        local distance = (tree.PrimaryPart.Position - hrp.Position).Magnitude
+                        if distance <= DistanceForAutoChopTree and weapon then
+                            game:GetService("ReplicatedStorage").RemoteEvents.ToolDamageObject:InvokeServer(tree, weapon, 999, hrp.CFrame)
+                        end
+                    end
+                end
+                task.wait(0.1)
+            end
+        end)
+    end
+})
+
+SurvivalGroup:AddLabel("小孩救援", true)
+
+local teleportingEnabled = false
+SurvivalGroup:AddToggle("SaveChildren", {
+    Text = "自动救所有小孩",
+    Default = false,
+    Callback = function(Value)
+        teleportingEnabled = Value
+        if Value then
+            task.spawn(function()
+                while teleportingEnabled and task.wait(1) do
+                    for _, kid in pairs(workspace:GetDescendants()) do
+                        if kid:IsA("Model") and kid.Name:lower():find("kid") then
+                            game:GetService("Players").LocalPlayer.Character:PivotTo(kid:GetPivot())
+                            task.wait(20)
+                        end
+                    end
+                end
+            end)
+        end
+    end
+})
+
+SurvivalGroup:AddLabel("钓鱼系统", true)
+
+local autoFishingEnabled = false
+SurvivalGroup:AddToggle("AutoFish", {
+    Text = "自动钓鱼",
+    Default = false,
+    Callback = function(Value)
+        autoFishingEnabled = Value
+        if Value then
+            task.spawn(function()
+                local player = game:GetService("Players").LocalPlayer
+                local playerGui = player:WaitForChild("PlayerGui")
+                local fishingCatchFrame = playerGui.Interface.FishingCatchFrame
+                local timingBar = fishingCatchFrame.TimingBar
+                local successArea = timingBar.SuccessArea
+                local bar = timingBar.Bar
+                local button = playerGui.MobileButtons.Frame.Button3
+                local canClick = true
+                
+                local function checkOverlap(f1, f2)
+                    local p1 = f1.AbsolutePosition
+                    local s1 = f1.AbsoluteSize
+                    local p2 = f2.AbsolutePosition
+                    local s2 = f2.AbsoluteSize
+                    return not (p1.X + s1.X < p2.X or p2.X + s2.X < p1.X or p1.Y + s1.Y < p2.Y or p2.Y + s2.Y < p1.Y)
+                end
+                
+                while autoFishingEnabled do
+                    if fishingCatchFrame.Visible and timingBar.Visible and checkOverlap(successArea, bar) and canClick then
+                        canClick = false
+                        for _, connection in pairs(getconnections(button.MouseButton1Down)) do
+                            connection:Fire()
+                        end
+                        task.wait(0.1)
+                        canClick = true
+                    end
+                    task.wait()
+                end
+            end)
+        end
+    end
+})
+
+SurvivalGroup:AddToggle("NoDelayFish", {
+    Text = "无延迟钓鱼",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            task.spawn(function()
+                local player = game:GetService("Players").LocalPlayer
+                local button = player.PlayerGui.MobileButtons.Frame.Button3
+                while Value do
+                    if player.PlayerGui.Interface.FishingCatchFrame.Visible then
+                        for _, connection in pairs(getconnections(button.MouseButton1Down)) do
+                            connection:Fire()
+                        end
+                    end
+                    task.wait()
+                end
+            end)
+        end
+    end
+})
+
+FarmingGroup:AddLabel("种植设置", true)
+
+local plantingConfig = { shape = "square", size = 80, height = 3, spacing = 1, delay = 1 }
+
+FarmingGroup:AddDropdown("PlantShape", {
+    Values = {"正方形", "圆形", "原地"},
+    Default = 1,
+    Text = "种植形状",
+    Callback = function(Value)
+        local shapes = { ["正方形"] = "square", ["圆形"] = "circle", ["原地"] = "original" }
+        plantingConfig.shape = shapes[Value]
+    end
+})
+
+FarmingGroup:AddInput("PlantRange", {
+    Default = "80",
+    Numeric = true,
+    Text = "种植范围(米)",
+    Callback = function(Value)
+        plantingConfig.size = tonumber(Value) or 80
+    end
+})
+
+FarmingGroup:AddInput("PlantHeight", {
+    Default = "3",
+    Numeric = true,
+    Text = "种植高度",
+    Callback = function(Value)
+        plantingConfig.height = tonumber(Value) or 3
+    end
+})
+
+FarmingGroup:AddInput("PlantSpacing", {
+    Default = "1",
+    Numeric = true,
+    Text = "树苗间隔(米)",
+    Callback = function(Value)
+        plantingConfig.spacing = tonumber(Value) or 1
+    end
+})
+
+FarmingGroup:AddInput("PlantDelay", {
+    Default = "1",
+    Numeric = true,
+    Text = "种植延迟(秒)",
+    Callback = function(Value)
+        plantingConfig.delay = tonumber(Value) or 1
+    end
+})
+
+local isPlanting = false
+local currentSaplingIndex = 1
+local saplingPositions = {}
+
+local function generatePlantPositions()
+    local positions = {}
+    local halfSize = plantingConfig.size / 2
+    local playerPosition = Vector3.new(0.649, plantingConfig.height, -3.8)
+    
+    if plantingConfig.shape == "square" then
+        for x = -halfSize, halfSize, plantingConfig.spacing do
+            table.insert(positions, Vector3.new(playerPosition.X + x, playerPosition.Y, playerPosition.Z + halfSize))
+        end
+        for z = halfSize, -halfSize, -plantingConfig.spacing do
+            table.insert(positions, Vector3.new(playerPosition.X + halfSize, playerPosition.Y, playerPosition.Z + z))
+        end
+        for x = halfSize, -halfSize, -plantingConfig.spacing do
+            table.insert(positions, Vector3.new(playerPosition.X + x, playerPosition.Y, playerPosition.Z - halfSize))
+        end
+        for z = -halfSize, halfSize, plantingConfig.spacing do
+            table.insert(positions, Vector3.new(playerPosition.X - halfSize, playerPosition.Y, playerPosition.Z + z))
+        end
+    elseif plantingConfig.shape == "circle" then
+        local radius = halfSize
+        local pointCount = math.floor(2 * math.pi * radius / plantingConfig.spacing)
+        for i = 1, pointCount do
+            local angle = (i / pointCount) * 2 * math.pi
+            table.insert(positions, Vector3.new(playerPosition.X + radius * math.cos(angle), playerPosition.Y, playerPosition.Z + radius * math.sin(angle)))
+        end
+    else
+        table.insert(positions, playerPosition)
+    end
+    return positions
+end
+
+FarmingGroup:AddToggle("AutoPlant", {
+    Text = "自动种植",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            saplingPositions = generatePlantPositions()
+            currentSaplingIndex = 1
+            task.spawn(function()
+                while Value do
+                    if not isPlanting then
+                        isPlanting = true
+                        local remoteEvents = game:GetService("ReplicatedStorage").RemoteEvents
+                        local tempStorage = game:GetService("ReplicatedStorage").TempStorage
+                        local sapling = tempStorage:FindFirstChild("Sapling") or workspace.Items:FindFirstChild("Sapling")
+                        
+                        if sapling and saplingPositions[currentSaplingIndex] then
+                            pcall(function()
+                                remoteEvents.StopDraggingItem:FireServer(sapling)
+                                task.wait(0.1)
+                                remoteEvents.RequestPlantItem:InvokeServer(sapling, saplingPositions[currentSaplingIndex])
+                            end)
+                            currentSaplingIndex = currentSaplingIndex + 1
+                            if currentSaplingIndex > #saplingPositions then currentSaplingIndex = 1 end
+                        end
+                        isPlanting = false
+                    end
+                    task.wait(plantingConfig.delay)
+                end
+            end)
+        end
+    end
+})
+
+TeleportGroup:AddLabel("基础传送点", true)
+
+TeleportGroup:AddButton({
+    Text = "传送到营火",
+    Func = function()
+        game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0.431, 15.776, -1.886)
+    end
+})
+
+TeleportGroup:AddButton({
+    Text = "传送到要塞",
+    Func = function()
+        local targetPart = workspace.Map.Landmarks.Stronghold.Functional.EntryDoors.DoorRight.Model
+        if targetPart then
+            local destination = targetPart:GetChildren()[5]
+            if destination then
+                game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = destination.CFrame + Vector3.new(0, 5, 0)
+            end
+        end
+    end
+})
+
+TeleportGroup:AddButton({
+    Text = "传送到安全区",
+    Func = function()
+        if not workspace:FindFirstChild("SafeZonePart") then
+            local part = Instance.new("Part")
+            part.Name = "SafeZonePart"
+            part.Size = Vector3.new(30, 3, 30)
+            part.Position = Vector3.new(0, 350, 0)
+            part.Anchored = true
+            part.Parent = workspace
+        end
+        game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, 360, 0)
+    end
+})
+
+TeleportGroup:AddButton({
+    Text = "传送到商人",
+    Func = function()
+        game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-37.08, 3.98, -16.33)
+    end
+})
+
+TeleportGroup:AddButton({
+    Text = "传送回火旁",
+    Func = function()
+        game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-0.0967, 7.937, -0.1782)
+    end
+})
+
+AutoGroup:AddLabel("自动传送物品", true)
+
+local autoBringItems = false
+AutoGroup:AddToggle("BringItems", {
+    Text = "自动传送所有物品",
+    Default = false,
+    Callback = function(Value)
+        autoBringItems = Value
+        task.spawn(function()
+            while autoBringItems do
+                local root = game:GetService("Players").LocalPlayer.Character and game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                if root then
+                    for _, item in ipairs(workspace.Items:GetChildren()) do
+                        local part = item:FindFirstChildWhichIsA("BasePart") or (item:IsA("BasePart") and item)
+                        if part then
+                            part.CFrame = root.CFrame + Vector3.new(math.random(-44,44), 0, math.random(-44,44))
+                        end
+                    end
+                end
+                task.wait()
+            end
+        end)
+    end
+})
+
+AutoGroup:AddToggle("BringLogs", {
+    Text = "自动传送木头",
+    Default = false,
+    Callback = function(Value)
+        task.spawn(function()
+            while Value do
+                local root = game:GetService("Players").LocalPlayer.Character and game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                if root then
+                    for _, item in pairs(workspace.Items:GetChildren()) do
+                        if item.Name:lower():find("log") and item:IsA("Model") then
+                            local main = item:FindFirstChildWhichIsA("BasePart")
+                            if main then main.CFrame = root.CFrame * CFrame.new(math.random(-5,5), 0, math.random(-5,5)) end
+                        end
+                    end
+                end
+                task.wait()
+            end
+        end)
+    end
+})
+
+AutoGroup:AddToggle("BringScrap", {
+    Text = "自动传送所有废料",
+    Default = false,
+    Callback = function(Value)
+        local scrapNames = { tyre = true, ["sheet metal"] = true, ["broken fan"] = true, bolt = true, ["old radio"] = true }
+        task.spawn(function()
+            while Value do
+                local root = game:GetService("Players").LocalPlayer.Character and game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                if root then
+                    for _, item in pairs(workspace.Items:GetChildren()) do
+                        if item:IsA("Model") then
+                            local itemName = item.Name:lower()
+                            for scrapName in pairs(scrapNames) do
+                                if itemName:find(scrapName) then
+                                    local main = item:FindFirstChildWhichIsA("BasePart")
+                                    if main then main.CFrame = root.CFrame * CFrame.new(math.random(-5,5), 0, math.random(-5,5)) end
+                                    break
+                                end
+                            end
+                        end
+                    end
+                end
+                task.wait()
+            end
+        end)
+    end
+})
+
+ChestGroup:AddLabel("宝箱系统", true)
+
+local chestSettings = { autoChestEnabled = false, chestRange = 50 }
+
+ChestGroup:AddToggle("AutoOpenChests", {
+    Text = "自动开全部宝箱",
+    Default = false,
+    Callback = function(Value)
+        chestSettings.autoChestEnabled = Value
+        if Value then
+            task.spawn(function()
+                local player = game:GetService("Players").LocalPlayer
+                local character = player.Character or player.CharacterAdded:Wait()
+                local hrp = character:WaitForChild("HumanoidRootPart")
+                local originalCFrame = hrp.CFrame
+                
+                while chestSettings.autoChestEnabled do
+                    for _, chest in ipairs(workspace:GetDescendants()) do
+                        if chest:IsA("Model") and string.find(chest.Name, "Item Chest") then
+                            local part = chest.PrimaryPart or chest:FindFirstChildWhichIsA("BasePart")
+                            if part then
+                                hrp.CFrame = part.CFrame + Vector3.new(0, 6, 0)
+                                for _, prompt in ipairs(chest:GetDescendants()) do
+                                    if prompt:IsA("ProximityPrompt") then
+                                        fireproximityprompt(prompt, math.huge)
+                                    end
+                                end
+                                task.wait(4)
+                            end
+                        end
+                    end
+                    task.wait(0.1)
+                end
+                hrp.CFrame = originalCFrame
+            end)
+        end
+    end
+})
+
+ChestGroup:AddToggle("ChestAura", {
+    Text = "宝箱光环",
+    Default = false,
+    Callback = function(Value)
+        task.spawn(function()
+            while Value do
+                local player = game:GetService("Players").LocalPlayer
+                local character = player.Character
+                if character and character:FindFirstChild("HumanoidRootPart") then
+                    local hrp = character.HumanoidRootPart
+                    for _, obj in ipairs(workspace:GetDescendants()) do
+                        if obj:IsA("Model") and string.find(obj.Name, "Item Chest") then
+                            local part = obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")
+                            if part and (hrp.Position - part.Position).Magnitude <= chestSettings.chestRange then
+                                for _, prompt in ipairs(obj:GetDescendants()) do
+                                    if prompt:IsA("ProximityPrompt") then
+                                        fireproximityprompt(prompt, math.huge)
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+                task.wait(0.5)
+            end
+        end)
+    end
+})
+
+ChestGroup:AddSlider("ChestRange", {
+    Text = "宝箱光环范围",
+    Default = 50,
+    Min = 1,
+    Max = 100,
+    Callback = function(Value)
+        chestSettings.chestRange = Value
+    end
+})
+
+ChestGroup:AddButton({
+    Text = "传送到最近宝箱",
+    Func = function()
+        local player = game:GetService("Players").LocalPlayer
+        local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            local nearestDist, targetPart
+            for _, obj in ipairs(workspace:GetDescendants()) do
+                if obj:IsA("Model") and string.find(obj.Name, "Item Chest") then
+                    local part = obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")
+                    if part then
+                        local dist = (hrp.Position - part.Position).Magnitude
+                        if not nearestDist or dist < nearestDist then
+                            nearestDist = dist
+                            targetPart = part
+                        end
+                    end
+                end
+            end
+            if targetPart then
+                hrp.CFrame = targetPart.CFrame + Vector3.new(0, 6, 0)
+                Library:Notify("已传送到最近宝箱", 2)
+            else
+                Library:Notify("未找到宝箱", 2)
+            end
+        end
+    end
+})
+
+HitboxGroup:AddLabel("打击盒设置", true)
+
+local hitboxSettings = { Show = false, Wolf = false, Bunny = false, Cultist = false, All = false, Size = 10 }
+local originalSizes = {}
+
+local function updateHitboxForModel(model)
+    local root = model:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+    local name = model.Name:lower()
+    if not originalSizes[model] then originalSizes[model] = root.Size end
+    
+    local shouldResize = hitboxSettings.All or (hitboxSettings.Wolf and (name:find("wolf") or name:find("alpha"))) or (hitboxSettings.Bunny and name:find("bunny")) or (hitboxSettings.Cultist and (name:find("cultist") or name:find("cross")))
+    
+    if shouldResize and hitboxSettings.Show then
+        root.Size = Vector3.new(hitboxSettings.Size, hitboxSettings.Size, hitboxSettings.Size)
+        root.Transparency = 0.5
+        root.Material = Enum.Material.Neon
+    else
+        if originalSizes[model] then root.Size = originalSizes[model] end
+        root.Transparency = 1
+    end
+end
+
+task.spawn(function()
+    while true do
+        for _, model in ipairs(workspace:GetDescendants()) do
+            if model:IsA("Model") and model:FindFirstChild("HumanoidRootPart") then
+                updateHitboxForModel(model)
+            end
+        end
+        task.wait(1)
+    end
+end)
+
+HitboxGroup:AddToggle("ShowHitbox", {
+    Text = "显示打击盒",
+    Default = false,
+    Callback = function(v) hitboxSettings.Show = v end
+})
+
+HitboxGroup:AddToggle("WolfHitbox", {
+    Text = "狼打击盒",
+    Default = false,
+    Callback = function(v) hitboxSettings.Wolf = v end
+})
+
+HitboxGroup:AddToggle("BunnyHitbox", {
+    Text = "兔子打击盒",
+    Default = false,
+    Callback = function(v) hitboxSettings.Bunny = v end
+})
+
+HitboxGroup:AddToggle("CultistHitbox", {
+    Text = "邪教徒打击盒",
+    Default = false,
+    Callback = function(v) hitboxSettings.Cultist = v end
+})
+
+HitboxGroup:AddToggle("AllHitbox", {
+    Text = "所有东西打击盒",
+    Default = false,
+    Callback = function(v) hitboxSettings.All = v end
+})
+
+HitboxGroup:AddSlider("HitboxSize", {
+    Text = "范围大小",
+    Default = 10,
+    Min = 2,
+    Max = 250,
+    Callback = function(v) hitboxSettings.Size = v end
+})
+
+PlayerGroup:AddLabel("玩家增强", true)
+
+local Speed = 50
+PlayerGroup:AddToggle("SpeedToggle", {
+    Text = "速度增强",
+    Default = false,
+    Callback = function(v)
+        if v then
+            task.spawn(function()
+                while v do
+                    local player = game:GetService("Players").LocalPlayer
+                    if player.Character and player.Character.Humanoid and player.Character.Humanoid.MoveDirection.Magnitude > 0 then
+                        player.Character:TranslateBy(player.Character.Humanoid.MoveDirection * Speed / 10)
+                    end
+                    task.wait()
+                end
+            end)
+        end
+    end
+})
+
+PlayerGroup:AddSlider("SpeedSlider", {
+    Text = "速度设置",
+    Default = 50,
+    Min = 1,
+    Max = 150,
+    Callback = function(v) Speed = v end
+})
+
+PlayerGroup:AddToggle("InfiniteJump", {
+    Text = "无限跳",
+    Default = false,
+    Callback = function(Value)
+        local jumpConn
+        if Value then
+            jumpConn = game:GetService("UserInputService").JumpRequest:Connect(function()
+                local humanoid = game:GetService("Players").LocalPlayer.Character and game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+                if humanoid then humanoid:ChangeState(Enum.HumanoidStateType.Jumping) end
+            end)
+        elseif jumpConn then
+            jumpConn:Disconnect()
+        end
+    end
+})
+
+PlayerGroup:AddToggle("InstantInteract", {
+    Text = "秒互动",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            for _, prompt in ipairs(workspace:GetDescendants()) do
+                if prompt:IsA("ProximityPrompt") then
+                    prompt.HoldDuration = 0
+                end
+            end
+            workspace.DescendantAdded:Connect(function(instance)
+                if instance:IsA("ProximityPrompt") then
+                    instance.HoldDuration = 0
+                end
+            end)
+        end
+    end
+})
+
+MiscGroup:AddLabel("趣味玩法", true)
+
+local teleportConfig = { pattern = "sphere", speed = 5, radius = 75 }
+local centerPosition = Vector3.new(0.649, 100, -3.8)
+local rotationAngle = 0
+
+local function generatePatternPositions(itemCount)
+    local positions = {}
+    rotationAngle = rotationAngle + teleportConfig.speed * 0.01
+    
+    if teleportConfig.pattern == "sphere" then
+        for i = 1, itemCount do
+            local phi = math.acos(-1 + (2 * i - 1) / itemCount)
+            local theta = math.sqrt(itemCount * math.pi) * phi
+            local x = teleportConfig.radius * math.cos(theta + rotationAngle) * math.sin(phi)
+            local y = teleportConfig.radius * math.sin(theta + rotationAngle) * math.sin(phi)
+            local z = teleportConfig.radius * math.cos(phi)
+            table.insert(positions, centerPosition + Vector3.new(x, y, z))
+        end
+    end
+    return positions
+end
+
+MiscGroup:AddDropdown("PatternSelect", {
+    Values = {"球形", "项链", "流星"},
+    Default = 1,
+    Text = "选择图案",
+    Callback = function(Value)
+        local patterns = { ["球形"] = "sphere", ["项链"] = "star", ["流星"] = "meteor" }
+        teleportConfig.pattern = patterns[Value]
+    end
+})
+
+MiscGroup:AddInput("PatternSpeed", {
+    Default = "5",
+    Numeric = true,
+    Text = "旋转速度",
+    Callback = function(v) teleportConfig.speed = tonumber(v) or 5 end
+})
+
+MiscGroup:AddInput("PatternSize", {
+    Default = "75",
+    Numeric = true,
+    Text = "图案大小",
+    Callback = function(v) teleportConfig.radius = tonumber(v) or 75 end
+})
+
+MiscGroup:AddToggle("AutoPattern", {
+    Text = "自动形成图案",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            task.spawn(function()
+                while Value do
+                    local logs = {}
+                    for _, item in pairs(workspace.Items:GetChildren()) do
+                        if item.Name:lower():find("log") and item:IsA("Model") then
+                            table.insert(logs, item)
+                        end
+                    end
+                    if #logs > 0 then
+                        local positions = generatePatternPositions(#logs)
+                        for i, log in ipairs(logs) do
+                            local main = log:FindFirstChildWhichIsA("BasePart")
+                            if main and positions[i] then
+                                main.CFrame = CFrame.new(positions[i])
+                                main.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                            end
+                        end
+                    end
+                    task.wait()
+                end
+            end)
+        end
+    end
+})
+
+local MenuGroup = Tabs.Settings:AddLeftGroupbox("菜单设置")
+MenuGroup:AddButton("卸载脚本", function() Library:Unload() end)
+MenuGroup:AddLabel("菜单快捷键"):AddKeyPicker('MenuKeybind', { Default = 'RightShift', NoUI = true, Text = '菜单快捷键' })
+
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+ThemeManager:SetFolder("YttriumForest")
+SaveManager:SetFolder("YttriumForestConfig")
+SaveManager:BuildConfigSection(Tabs.Settings)
+ThemeManager:ApplyToTab(Tabs.Settings)
+
+Library.ToggleKeybind = Options.MenuKeybind
+
+Library:Notify("AF Hub - 森林中的99夜 已加载", 3)
+Library:Notify("尊贵的 " .. game.Players.LocalPlayer.Name .. " 欢迎使用", 3)
