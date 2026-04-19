@@ -1046,6 +1046,7 @@ local scriptCategories = {
             {Name = "虚空99夜脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/99%E5%A4%9C%E6%B1%89%E5%8C%96"},
             {Name = "99夜脚本可杀队友", Url = "https://raw.githubusercontent.com/358545698555/roblox-/refs/heads/main/%E5%8F%AF%E6%9D%80%E9%98%9F%E5%8F%8B99%E5%A4%9C"},
             {Name = "99夜汉化脚本(无敌有效果)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%A7%8B%E8%BE%9E99%E5%A4%9C%E6%B1%89%E5%8C%96"},
+            {Name = "AF Hub 99夜", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/99%E5%A4%9C%E8%84%9A%E6%9C%AC"},
         }
     },
     {
@@ -1134,6 +1135,7 @@ local scriptCategories = {
     GroupName = "闪光",
         List = {
             {Name = "闪光脚本", Url = "https://apigetunx.vercel.app/UNX.lua"},
+            {Name = "闪光脚本(英文)", Url = "https://raw.githubusercontent.com/Jager-Hub/Scripts/refs/heads/main/loader.lua"},
         }
     },
     {
@@ -1251,7 +1253,13 @@ local scriptCategories = {
     {
     GroupName = "通缉",
         List = {
-            {Name = "Yttrium力量传奇付费脚本(免费用)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E9%80%9A%E7%BC%89%E8%84%9A%E6%9C%AC%E5%85%8D%E8%B4%B9%E7%89%88"},
+            {Name = "Yttrium通缉付费脚本(免费用)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E9%80%9A%E7%BC%89%E8%84%9A%E6%9C%AC%E5%85%8D%E8%B4%B9%E7%89%88"},
+            }
+    },
+    {
+    GroupName = "攻击泰坦革命",
+        List = {
+            {Name = "攻击泰坦革命脚本(英文版)", Url = "https://api.luarmor.net/files/v4/loaders/705e7fe7aa288f0fe86900cedb1119b1.lua"},
             }
     },
     {
@@ -1511,7 +1519,7 @@ Qcjbwd:AddLabel("九十九夜🟢")
 Qcjbwd:AddLabel("墨水游戏汉化情况：全部汉化🟢")
 Qcjbwd:AddLabel("其他脚本汉化情况：大多数已汉化🟡")
 Qcjbwd:AddLabel("AF缝合Hub🟢")
-Qcjbwd:AddLabel("现在已支持服务器：33个服务器")
+Qcjbwd:AddLabel("现在已支持服务器：34个服务器")
 Qcjbwd:AddButton({Text="坐标脚本",Func=function()
         local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "CoordinateDisplay"
@@ -2541,6 +2549,7 @@ if game.BindToClose then
         game:BindToClose(cleanup)
     end)
 end
+local Afhubyyds = Tabs.Afhubyyds:AddRightGroupbox("99夜脚本功能");
 
 local ScriptCenterLeftGroup = Tabs.ScriptCenter:AddLeftGroupbox("脚本中心1");
 local ScriptCenterRightGroup = Tabs.ScriptCenter:AddRightGroupbox("脚本中心2");
