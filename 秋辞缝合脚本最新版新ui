@@ -2628,7 +2628,7 @@ SaveManager:BuildConfigSection(Tabs.Settings);
 Library.KeybindFrame.Visible = true;
     else
         local player = cloneref(game:GetService("Players")).LocalPlayer
-        player:Kick("Invalid Key")
+        player:Kick("卡密错误，少年你还没有门票哦")
         if player then
             player:Destroy()
         end
