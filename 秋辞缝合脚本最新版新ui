@@ -2549,8 +2549,22 @@ if game.BindToClose then
         game:BindToClose(cleanup)
     end)
 end
-local Afhubyyds = Tabs.Afhubyyds:AddRightGroupbox("99夜脚本功能");
-
+local Afhubyyds = Tabs.Afhubyyds:AddRightGroupbox("悔脚本专区(和付费脚本差不多)");
+Afhubyyds:AddButton({Text="悔脚本",Func=function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/sdxs221/sd/main/NewWorld"))()
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
+Afhubyyds:AddLabel("支持服务器如下：")
+Afhubyyds:AddLabel("草原生活(萨凡纳)-应该是国内最强")
+Afhubyyds:AddLabel("钩中啦！(盗用老外)")
+Afhubyyds:AddLabel("住宅大屠杀(第一夜)")
+Afhubyyds:AddLabel("摊位世界不会做这个服务器所以挺垃圾的")
+Afhubyyds:AddLabel("99夜")
+Afhubyyds:AddLabel("手枪竟技")
+Afhubyyds:AddLabel("沉默的剑客")
 local ScriptCenterLeftGroup = Tabs.ScriptCenter:AddLeftGroupbox("脚本中心1");
 local ScriptCenterRightGroup = Tabs.ScriptCenter:AddRightGroupbox("脚本中心2");
 local leftIndex = 0;
