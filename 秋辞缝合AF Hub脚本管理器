@@ -21,6 +21,30 @@ else
             ["125009265613167"] = {
             url = "https://raw.githubusercontent.com/fningna51-stack/-/main/ax%E8%84%9A%E6%9C%AC%E7%A7%8B%E8%BE%9E%E6%B1%89%E5%8C%96",
             name = "墨水游戏新局内"
+            },
+            ["6516141723"] = {
+            url = "https://raw.githubusercontent.com/atnew2025/Chinese-scripts/refs/heads/main/mshax(prohax).txt",
+            name = "doors大厅加载"
+            },
+            ["6839171747"] = {
+            url = "https://raw.githubusercontent.com/atnew2025/Chinese-scripts/refs/heads/main/mshax(prohax).txt",
+            name = "doors局内加载"
+            },
+            ["189707"] = {
+            url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%A7%8B%E8%BE%9E%E7%BC%9D%E5%90%88%E8%84%9A%E6%9C%AC%E6%9C%80%E6%96%B0%E7%89%88%E6%96%B0ui",
+            name = "通用加载"
+            },
+            ["136801880565837"] = {
+            url = "https://apigetunx.vercel.app/UNX.lua",
+            name = "闪光"
+            },
+            ["17625359962"] = {
+            url = "https://raw.githubusercontent.com/fningna51-stack/-/main/竞争对手汉化脚本",
+            name = "竞争对手"
+            },
+            ["117398147513099"] = {
+            url = "https://raw.githubusercontent.com/fningna51-stack/-/main/竞争对手汉化脚本",
+            name = "竞争对手局内加载"
         }
     }
 
@@ -128,7 +152,13 @@ else
         Default = Color3.fromRGB(255, 0, 0),
         Title = '彩虹基础色',
     })
-    
+    FunctionsGroup:AddLabel("支持服务器如下：")
+    FunctionsGroup:AddLabel("森林中的九十九夜🟢")
+    FunctionsGroup:AddLabel("墨水游戏🟢")
+    FunctionsGroup:AddLabel("doors🟢")
+    FunctionsGroup:AddLabel("通用🟢")
+    FunctionsGroup:AddLabel("闪光🟢")
+    FunctionsGroup:AddLabel("竞争对手🟢")
     local MenuGroup = Tabs.Settings:AddLeftGroupbox('菜单')
     MenuGroup:AddButton('卸载脚本', function() 
         Library:Unload() 
