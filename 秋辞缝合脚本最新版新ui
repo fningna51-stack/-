@@ -2640,6 +2640,9 @@ SaveManager:SetFolder("Obsidian/秋辞脚本");
 ThemeManager:ApplyToTab(Tabs.Settings);
 SaveManager:BuildConfigSection(Tabs.Settings);
 Library.KeybindFrame.Visible = true;
+
+Library:Notify("AF Hub - AF Hub中心 已加载", 3)
+Library:Notify("尊贵的 " .. game.Players.LocalPlayer.Name .. " 欢迎使用", 3)
     else
         local player = cloneref(game:GetService("Players")).LocalPlayer
         player:Kick("卡密错误，少年你还没有门票哦")
