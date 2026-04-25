@@ -1,3 +1,8 @@
+--老实说我搞这个意义究竟是什么呢？
+--为了这款游戏？还是为了朋友？
+--我自己也分不清了
+--不过我只知道你们支持我那我就会做下去
+--AF Hub l 秋辞
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/nfpw/Simple-KeySystem-Roblox/refs/heads/main/Library.lua"))()
 
 local KeyWindow = Library:CreateWindow("卡密系统", UDim2.fromOffset(300, 180))
@@ -40,7 +45,7 @@ local A8 = workspace
 local A9 = game:GetService("HttpService")
 
 local Window = Library:CreateWindow({
-    Title = "AF Hub脚本",
+    Title = "AF Hub(🇨🇳 专门为公益而出)",
     Footer = "作者：秋辞 汉化者：有芙同享 汉化者：人机",
     Icon = 131153193945220,
     NotifySide = "Right",
@@ -1260,6 +1265,12 @@ local scriptCategories = {
     GroupName = "攻击泰坦革命",
         List = {
             {Name = "攻击泰坦革命脚本(英文版)", Url = "https://api.luarmor.net/files/v4/loaders/705e7fe7aa288f0fe86900cedb1119b1.lua"},
+            }
+    },
+    {
+    GroupName = "犯罪",
+        List = {
+            {Name = "犯罪脚本付费版(免费用)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%8A%AF%E7%BD%AA"},
             }
     },
     {
