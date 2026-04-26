@@ -1,0 +1,444 @@
+do
+    local Translations = {
+        ["Toggle"] = "切换",
+        ["Search"]="搜索",
+        ["ANGELWINGS"]="秋辞汉化 丨 AFHub",
+        ["AW"]="警告",
+["Secure Access"]="安全访问",
+["ACCESSKEY"]="访问密钥",
+["12/50"]="12/50",
+["Remember钥匙"]="记住密钥",
+["Authenticate"]="验证",
+["Get钥匙"]="获取密钥",
+["关闭"]="关闭",
+["Lock"]="锁定",
+["Main"]="主要",
+["Combat"]="战斗",
+["Misc"]="杂项",
+["Player Info"]="玩家信息",
+["Visuals"]="视觉效果",
+["Avatar Changer"]="形象修改器",
+["UI Settings"]="界面设置",
+["by Angelwings Team"]="由 Angelwings 团队制作",
+["Version Beta"]="测试版",
+["AngelWings"]="天使之翼",
+["Autowin"]="自动胜利",
+["Welcome to AngelWings!"]="欢迎使用天使之翼！",
+["Ghost Mode"]="幽灵模式",
+["This is - VoidWare Rework."]="这是 - VoidWare 重制版。",
+["Dash Effect"]="冲刺特效",
+["Auto Collect Bandage"]="自动收集绷带",
+["Auto Collect Flashbang"]="自动收集闪光弹",
+["Red Light / Green Light"]="红灯/绿灯",
+["Auto Execute"]="自动处决",
+["Complete Red Light / Green Light"]="完成红灯/绿灯",
+["Remove Injured Walking"]="移除受伤行走",
+["Guards"]="守卫",
+["Bring Injured Player"]="拖拽受伤玩家",
+["★Auto Win (Beta)"]="★自动胜利（测试版）",
+["Dalgona Game"]="糖饼游戏",
+["Auto Win is only made for guards and for hardcore! this feature will not work on normal servers."]="自动胜利仅适用于守卫和硬核模式！此功能在普通服务器上无效。",
+["Complete Dalgona Game"]="完成糖饼游戏",
+["Auto PingPong"]="自动乒乓球",
+["Give Lighter"]="给予打火机",
+["Auto Shoot Marked Players"]="自动射击标记玩家",
+["Expander Hitbox Cookie"]="扩大糖饼判定框",
+["Ragdoll Check"]="布娃娃检查",
+["Tug Of War"]="拔河",
+["Shoot Call Delay"]="射击指令延迟",
+["0.5s/2s"]="0.5秒/2秒",
+["Anti Miss"]="防止失误",
+["Distance Check"]="距离检查",
+["Auto Pull"]="自动拉",
+["100 studs/3000 studs"]="100单位/3000单位",
+["Auto Pull disabled on mobile"]="移动端禁用自动拉",
+["Mode"]="模式",
+["Dinner"]="晚宴",
+["Legit"]="合法模式",
+["Zone Kill"]="区域击杀",
+["Jump Rope"]="跳绳",
+["Auto Balance"]="自动平衡",
+["Zone Barrier"]="区域屏障",
+["None"]="无",
+["Auto Balance is temporarily disabled, on mobile devices."]="自动平衡在移动设备上暂时禁用。",
+["Final Fight"]="最终决战",
+["Auto Jump"]="自动跳跃",
+["Auto Give Rock"]="自动给石头",
+["Infinite Last Chance"]="无限最后机会",
+["Safe Zone"]="安全区",
+["Anti Fall Platform"]="防止掉落平台",
+["Mingle"]="混合模式",
+["Delete Rope"]="删除绳子",
+["Complete Jump Rope"]="完成跳绳",
+["Safe Power Hold"]="安全蓄力",
+["Bypass Rope"]="绕过绳子",
+["Delete Collision Zone"]="删除碰撞区域",
+["Glass Bridge"]="玻璃桥",
+["Delete Doors"]="删除门",
+["Complete Glass Bridge Game"]="完成玻璃桥游戏",
+["Auto QTE Is Located Misc Tab!"]="自动QTE位于杂项标签页！",
+["Anti Break Glass Bridge"]="防止玻璃桥破碎",
+["Hide And Seek"]="捉迷藏",
+["Reveal Glass Bridge"]="显示玻璃桥",
+["Delete Spikes"]="删除尖刺",
+["Sky Squid Game"]="天空 squid 游戏",
+["Spikes Kill"]="尖刺击杀",
+["Infinite Stamina"]="无限体力",
+["Teleport To Hider"]="传送至躲藏者",
+["Anti Fall (Platform)"]="防止掉落（平台）",
+["Auto Dodge (Only PC)"]="自动闪避（仅限电脑）",
+["Dodge Distance"]="闪避距离",
+["Anti Fall (Walls)"]="防止掉落（墙）",
+["10/10"]="10/10",
+["Void Kill"]="虚空击杀",
+["Auto Pickup Key"]="自动捡钥匙",
+["Auto Press Button"]="自动按按钮",
+["Teleport To Random Escape Door"]="传送至随机逃生门",
+["Pentathlon"]="五项全能",
+["Teleport to Safe Hiding Spot"]="传送至安全藏身处",
+["Active games:0"]="活跃游戏数：0",
+["Win Ddakji (1 game)"]="赢 Ddakji（第1局）",
+["Win Biseokchigi (2 game)"]="赢 Biseokchigi（第2局）",
+["Win Gonggi (3 game)"]="赢 Gonggi（第3局）",
+["Win Spinning Top (4 game)"]="赢 打陀螺（第4局）",
+["Win Jegi (5 game)"]="赢 Jegi（第5局）",
+["Auto Pickup Pole"]="自动捡杆",
+["Show Game List"]="显示游戏列表",
+["Rebel"]="叛乱者",
+["Friendly + Guards Fire Targets"]="友方 + 守卫射击目标",
+["Auto Friendly + Guards Fire"]="自动友方 + 守卫射击",
+["Expand Guard Hitbox"]="扩大守卫判定框",
+["Hitbox Size"]="判定框大小",
+["4/15"]="4/15",
+["Instant Rebel"]="立即成为叛乱者",
+["Security"]="安保",
+["Anti AFK"]="防挂机",
+["Staff Detector"]="工作人员检测器",
+["Aimbot"]="自瞄",
+["Gun Mods"]="枪支修改",
+["Guard Aimbot"]="守卫自瞄",
+["Player Aimbot"]="玩家自瞄",
+["RapidFire (Instant)"]="快速射击（瞬间）",
+["Custom RapidFire"]="自定义快速射击",
+["Wallcheck"]="穿墙检测",
+["Custom Bullets Per Fire"]="自定义每次射击子弹数",
+["Aim Speed"]="瞄准速度",
+["0.2/1"]="0.2/1",
+["No Spread"]="无散布",
+["Custom Spread"]="自定义散布",
+["Aim FOV"]="瞄准视野",
+["90px/360px"]="90像素/360像素",
+["No Recoil"]="无后坐力",
+["Custom Recoil"]="自定义后坐力",
+["Target Lock"]="目标锁定",
+["Infinite Ammo"]="无限弹药",
+["Custom Ammo"]="自定义弹药",
+["Player Attach (Beta)"]="玩家附着（测试版）",
+["Custom Fire Rate"]="自定义射速",
+["Attach Range"]="附着范围",
+["50/150"]="50/150",
+["Movement Type"]="移动类型",
+["Teleport"]="传送",
+["Attach Distance"]="附着距离",
+["4/10"]="4/10",
+["Custom Spread Value"]="自定义散布值",
+["0/100"]="0/100",
+["Predict Multiplier"]="预测倍数",
+["0.15/0.5"]="0.15/0.5",
+["Custom Ammo Value"]="自定义弹药值",
+["999"]="999",
+["Auto Shoot"]="自动射击",
+["Target Mode"]="目标模式",
+["Closest"]="最近目标",
+["Enable Auto QTE"]="启用自动QTE",
+["Unlock Dash"]="解锁冲刺",
+["QTE Method"]="QTE方式",
+["Unlock Phantom Step"]="解锁幻影步",
+["Unlock Parkour Artist Jump"]="解锁跑酷高手跳跃",
+["Ultra Rage: click effect is hidden but QTEs are completed automatically"]="超级狂暴：点击效果已隐藏，但QTE会自动完成",
+["Quicksilver Animation Run"]="快银动画奔跑",
+["Give Quicksilver power"]="给予快银能力",
+["Infinite Jump"]="无限跳跃",
+["Enable Spectator Mode"]="启用观战模式",
+["Walk Speed"]="行走速度",
+["80/100"]="80/100",
+["Fix Camera"]="修复相机",
+["Skip Cutscene"]="跳过过场动画",
+["Speed"]="速度",
+["Fly Speed"]="飞行速度",
+["350<1000s"]="350<1000秒",
+["Teleport To Safe Place"]="传送至安全地点",
+["Anti Void"]="防虚空",
+["Fly"]="飞行",
+["Fix Players Visibility"]="修复玩家可见性",
+["Superman Emote Fly"]="超人表情飞行",
+["Noclip"]="穿墙模式",
+["Select Vote"]="选择投票",
+["KeepPlaying"]="继续游玩",
+["Anti Ragdoll"]="防布娃娃",
+["Enable Auto Vote"]="启用自动投票",
+["No Stun"]="无眩晕",
+["Remove Ragdoll Effect"]="移除布娃娃效果",
+["Cooldown Item Tracker"]="冷却物品追踪器",
+["Enable Cooldown Tracker"]="启用冷却追踪器",
+["Player Tags"]="玩家标签",
+["Display Mode"]="显示模式",
+["Hide Name Tag"]="隐藏名称标签",
+["Only My"]="仅我的",
+["Target"]="目标",
+["Max Distance: 100"]="最大距离：100",
+["Local"]="本地",
+["Select Players"]="选择玩家",
+["Gamepasses (NOT FE)"]="游戏通行证（非FE）",
+["VIP"]="VIP",
+["GUI Size: 100"]="界面大小：100",
+["Permanent Guard"]="永久守卫",
+["Emote Pages"]="表情页面",
+["Interaction"]="交互",
+["Private Server+"]="私人服务器+",
+["Instant Interact"]="即时交互",
+["Glass Manufacturer Vision"]="玻璃制造商视野",
+["Interaction Reach Multiplier"]="交互范围倍数",
+["1.5/5"]="1.5/5",
+["Interaction Reach"]="交互范围",
+["2x Vote Count"]="双倍投票数",
+["Custom Player Tag"]="自定义玩家标签",
+["Tag Value (1-999)"]="标签值（1-999）",
+["Stats Changer"]="数据修改器",
+["Wins Changer"]="胜利次数修改器",
+["Set Wins"]="设置胜利次数",
+["67"]="67",
+["Win Streak Changer"]="连胜次数修改器",
+["Set Win Streak"]="设置连胜次数",
+["999"]="999",
+["Level Changer"]="等级修改器",
+["New Level"]="新等级",
+["100"]="100",
+["Custom Title"]="自定义称号",
+["Enable Custom Title"]="启用自定义称号",
+["Select Title"]="选择称号",
+["Rich Millionaire"]="富有的百万富翁",
+["Random Title"]="随机称号",
+["Custom Title Text"]="自定义称号文本",
+["Or enter any custom title..."]="或输入任何自定义称号...",
+["Select Color"]="选择颜色",
+["Gold"]="金色",
+["Random Color"]="随机颜色",
+["Select Font"]="选择字体",
+["Default"]="默认",
+["Random Font"]="随机字体",
+["Random All"]="全部随机",
+["Useful Stuff"]="实用功能",
+["Auto Skip Dialogue"]="自动跳过对话",
+["Fullbright"]="全亮",
+["Anti Death"]="防死亡",
+["Health Threshold"]="生命值阈值",
+["30/90"]="30/90",
+["Return Health Threshold"]="恢复生命值阈值",
+["70/100"]="70/100",
+["Emotes List"]="表情列表",
+["Play Emote"]="播放表情",
+["Stop Emoting"]="停止表情",
+["Performance"]="性能",
+["Low GFX"]="低画质",
+["Disable Effects"]="禁用特效",
+["Clear Effects Cache"]="清除特效缓存",
+["Player Selector"]="玩家选择器",
+["Player Statistics"]="玩家统计",
+["Select Player"]="选择玩家",
+["sjisjejek5"]="sjisjejek5",
+["Refresh Player List"]="刷新玩家列表",
+["Load Player Info"]="加载玩家信息",
+["No player selected"]="未选择玩家",
+["AFK Coins: N/A"]="AFK金币：无数据",
+["Game Wins:N/A"]="游戏胜利：无数据",
+["Won: N/A"]="胜利：无数据",
+["LVL: N/A"]="等级：无数据",
+["Power Equipped: N/A"]="装备的能力：无数据",
+["Revive Amount: N/A"]="复活次数：无数据",
+["Roll Exchanges: N/A"]="抽奖兑换：无数据",
+["Total Guard Power Roll: N/A"]="守卫能力总抽数：无数据",
+["Total Power Roll: N/A"]="能力总抽数：无数据",
+["Pity Counter: N/A"]="保底计数：无数据",
+["Pity Locked: N/A"]="保底锁定：无数据",
+["Total Cosmetic Roll: N/A"]="外观总抽数：无数据",
+["Guard Credits: N/A"]="守卫积分：无数据",
+["Custom Tag: N/A"]="自定义标签：无数据",
+["Gingerbread: N/A"]="姜饼人：无数据",
+["Candy: N/A"]="糖果：无数据",
+["Total Robux Donated: N/A"]="捐赠Robux总数：无数据",
+["Backpack Items: N/A"]="背包物品：无数据",
+["Equipped Costume: N/A"]="装备的服装：无数据",
+["Equipped Costume Guard: N/A"]="装备的守卫服装：无数据",
+["Has Lighter: N/A"]="是否有打火机：无数据",
+["Square Guard Bought:N/A"]="已购买方形守卫：无数据",
+["Triangle Guard Bought:N/A"]="已购买三角形守卫：无数据",
+["Is Guard:N/A"]="是否是守卫：无数据",
+["Daily Quests:N/A"]="每日任务：无数据",
+["Player Powers:N/A"]="玩家能力：无数据",
+["Guard Powers:N/A"]="守卫能力：无数据",
+["Guard Guns:N/A"]="守卫枪支：无数据",
+["Fav Guard Powers:N/A"]="收藏的守卫能力：无数据",
+["Fav Powers:N/A"]="收藏的能力：无数据",
+["Titles: N/A"]="称号：无数据",
+["Title Colors: N/A"]="称号颜色：无数据",
+["Title Fonts: N/A"]="称号字体：无数据",
+["Damage Boost: N/A"]="伤害加成：无数据",
+["Faster Sprint: N/A"]="更快的冲刺：无数据",
+["Won Boost: N/A"]="胜利加成：无数据",
+["Main ESP"]="主要透视",
+["Player"]="玩家",
+["Guard"]="守卫",
+["Hide and Seek ESP"]="捉迷藏透视",
+["ESP Settings"]="透视设置",
+["Enable Highlight"]="启用高亮",
+["Show Distance"]="显示距离",
+["Fill Transparency"]="填充透明度",
+["0.75/1"]="0.75/1",
+["Outline Transparency"]="轮廓透明度",
+["0/1"]="0/1",
+["Text Size"]="文字大小",
+["22/26"]="22/26",
+["Key"]="钥匙",
+["Door"]="门",
+["Escape Door"]="逃生门",
+["Opened Door"]="已打开的门",
+["Hider"]="躲藏者",
+["Seeker"]="寻找者",
+["Self"]="自己",
+["FOV Changer"]="视野修改器",
+["Field of View"]="视野角度",
+["80°/120°"]="80度/120度",
+["Reset Fov"]="重置视野",
+["Client Changer"]="客户端修改器",
+["Avatar ID / Username"]="形象ID/用户名",
+["Target Player"]="目标玩家",
+["Enter ID or username."]="输入ID或用户名。",
+["Username..."]="用户名...",
+["Apply"]="应用",
+["Avatar ID"]="形象ID",
+["Enter avatar ID.."]="输入形象ID..",
+["Reset to Original"]="重置为原始",
+["Apply to Player"]="应用到玩家",
+["Undo"]="撤销",
+["Reset Player"]="重置玩家",
+["Redo"]="重做",
+["Add to Favorites"]="添加到收藏",
+["Random"]="随机",
+["Favorites"]="收藏夹",
+        ["Random Avatar"] = "随机形象",
+    }
+
+    local function translateText(text)
+        if not text or type(text) ~= "string" then
+            return text
+        end
+
+        if Translations[text] then
+            return Translations[text]
+        end
+
+        for en, cn in pairs(Translations) do
+            if text:find(en) then
+                return text:gsub(en, cn)
+            end
+        end
+
+        return text
+    end
+
+    local function setupTranslationEngine()
+        local success, err = pcall(function()
+            local oldIndex = getrawmetatable(game).__newindex
+            setreadonly(getrawmetatable(game), false)
+
+            getrawmetatable(game).__newindex = newcclosure(function(t, k, v)
+                if (t:IsA("TextLabel") or t:IsA("TextButton") or t:IsA("TextBox")) and k == "Text" then
+                    v = translateText(tostring(v))
+                end
+                return oldIndex(t, k, v)
+            end)
+
+            setreadonly(getrawmetatable(game), true)
+        end)
+
+        if not success then
+            warn("元表劫持失败:", err)
+
+            local translated = {}
+            local function scanAndTranslate()
+                for _, gui in ipairs(game:GetService("CoreGui"):GetDescendants()) do
+                    if (gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox")) and not translated[gui] then
+                        pcall(function()
+                            local text = gui.Text
+                            if text and text ~= "" then
+                                local translatedText = translateText(text)
+                                if translatedText ~= text then
+                                    gui.Text = translatedText
+                                    translated[gui] = true
+                                end
+                            end
+                        end)
+                    end
+                end
+
+                local player = game:GetService("Players").LocalPlayer
+                if player and player:FindFirstChild("PlayerGui") then
+                    for _, gui in ipairs(player.PlayerGui:GetDescendants()) do
+                        if (gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox")) and not translated[gui] then
+                            pcall(function()
+                                local text = gui.Text
+                                if text and text ~= "" then
+                                    local translatedText = translateText(text)
+                                    if translatedText ~= text then
+                                        gui.Text = translatedText
+                                        translated[gui] = true
+                                    end
+                                end
+                            end)
+                        end
+                    end
+                end
+            end
+
+            local function setupDescendantListener(parent)
+                parent.DescendantAdded:Connect(function(descendant)
+                    if descendant:IsA("TextLabel") or descendant:IsA("TextButton") or descendant:IsA("TextBox") then
+                        task.wait(0.1)
+                        pcall(function()
+                            local text = descendant.Text
+                            if text and text ~= "" then
+                                local translatedText = translateText(text)
+                                if translatedText ~= text then
+                                    descendant.Text = translatedText
+                                end
+                            end
+                        end)
+                    end
+                end)
+            end
+
+            pcall(setupDescendantListener, game:GetService("CoreGui"))
+            local player = game:GetService("Players").LocalPlayer
+            if player and player:FindFirstChild("PlayerGui") then
+                pcall(setupDescendantListener, player.PlayerGui)
+            end
+
+            while true do
+                scanAndTranslate()
+                task.wait(3)
+            end
+        end
+    end
+
+    task.wait(2)
+    setupTranslationEngine()
+    
+    local success, err = pcall(function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/NotSkaneexx/InkGame/refs/heads/main/inkgame.lua'))()
+    end)
+
+    if not success then
+        warn("加载失败:", err)
+    end
+end
