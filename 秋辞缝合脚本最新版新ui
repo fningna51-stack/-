@@ -55,10 +55,10 @@ local Window = Library:CreateWindow({
 })
 
 local Tabs = {
-    Universal = Window:AddTab("通用", "user"),
+    Universal = Window:AddTab("通用功能", "user"),
     ScriptCenter = Window:AddTab("脚本中心", "cat"),
     Qcjbwd = Window:AddTab("娱乐脚本", "key"),
-    Afhubyyds = Window:AddTab("特殊脚本与付费脚本", "dog"),
+    Afhubyyds = Window:AddTab("付费功能", "dog"),
     Settings = Window:AddTab("UI设置", "settings")
 }
 
@@ -987,6 +987,9 @@ UniversalRightGroup:AddLabel("快手号");
 UniversalRightGroup:AddButton({Text="点击复制快手号",Func=function()
         setclipboard("XQWANYYDS");
 end});
+UniversalRightGroup:AddButton({Text="点击复制墨水脚本天使之翼卡密",Func=function()
+        setclipboard("8J2X1A2-Skan");
+end});
 UniversalRightGroup:AddLabel("TX全自动翻译");
 UniversalRightGroup:AddButton({Text="TX全自动翻译",Func=function()
         TX = "TX Script"
@@ -1077,6 +1080,7 @@ local scriptCategories = {
         GroupName = "墨水游戏",
         List = {
             {Name = "AX墨水脚本有芙同享秋辞汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/ax%E8%84%9A%E6%9C%AC%E7%A7%8B%E8%BE%9E%E6%B1%89%E5%8C%96"},
+            {Name = "墨水游戏天使之翼汉化(卡密在通用功能复制)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E5%A2%A8%E6%B0%B4inkgame%E6%B1%89%E5%8C%96"},
             {Name = "墨水游戏人机汉化(里面有反作弊甩飞)", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/inkgame-ADEN-robot"},
             {Name = "墨水Ringta汉化(无卡密)", Url = "https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/Ringta"},
             {Name = "博伦墨水脚本", Url = "https://pastebin.com/raw/Q64rPkwu"},
