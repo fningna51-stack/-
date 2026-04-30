@@ -59,6 +59,7 @@ local Tabs = {
     ScriptCenter = Window:AddTab("脚本中心", "cat"),
     Qcjbwd = Window:AddTab("娱乐脚本", "key"),
     Afhubyyds = Window:AddTab("付费功能", "dog"),
+    Ksqcswbb = Window:AddTab("传送功能", "tree"),
     Settings = Window:AddTab("UI设置", "settings")
 }
 
@@ -100,6 +101,115 @@ UniversalLeftGroup:AddInput("WalkSpeedInput", {Text="移动速度设置",Default
                 end
         end
 end});
+UniversalLeftGroup:AddToggle("MotionBlurToggle", {
+	Text = "动态模糊",
+	Default = false,
+	Callback = function(Value)
+		if Value then
+			local camera = workspace.CurrentCamera
+			local blurAmount = 10
+			local blurAmplifier = 5
+			local lastVector = camera.CFrame.LookVector
+
+			local motionBlur = Instance.new("BlurEffect")
+			motionBlur.Size = 0
+			motionBlur.Parent = camera
+
+			local runService = game:GetService("RunService")
+
+			workspace.Changed:Connect(function(property)
+				if property == "CurrentCamera" then
+					if motionBlur and motionBlur.Parent then
+						motionBlur.Parent = workspace.CurrentCamera
+					else
+						motionBlur = Instance.new("BlurEffect", workspace.CurrentCamera)
+					end
+				end
+			end)
+
+			runService.Heartbeat:Connect(function()
+				if not motionBlur or motionBlur.Parent == nil then
+					motionBlur = Instance.new("BlurEffect", camera)
+				end
+
+				local magnitude = (camera.CFrame.LookVector - lastVector).Magnitude
+				motionBlur.Size = math.abs(magnitude) * blurAmount * blurAmplifier / 2
+				lastVector = camera.CFrame.LookVector
+			end)
+		else
+			for _, v in pairs(workspace.CurrentCamera:GetDescendants()) do
+				if v:IsA("BlurEffect") then
+					v:Destroy()
+				end
+			end
+		end
+	end
+})
+UniversalLeftGroup:AddToggle("AntiVoidToggle", {
+    Text = "防虚空掉落",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            if antivoidloop then antivoidloop:Disconnect() end
+            local OrgDestroyHeight = Workspace.FallenPartsDestroyHeight
+            antivoidloop = RunService.Stepped:Connect(function()
+                local char = LocalPlayer.Character
+                if char then
+                    local root = getRoot(char)
+                    if root and root.Position.Y <= OrgDestroyHeight + 25 then
+                        root.Velocity = root.Velocity + Vector3.new(0, 250, 0)
+                    end
+                end
+            end)
+        else
+            if antivoidloop then
+                antivoidloop:Disconnect()
+                antivoidloop = nil
+            end
+        end
+    end
+})
+UniversalLeftGroup:AddButton({
+    Text = "点击传送工具",
+    Callback = function()
+        local player = game.Players.LocalPlayer
+        local mouse = player:GetMouse()
+
+        local tool = Instance.new("Tool")
+        tool.RequiresHandle = false
+        tool.Name = "[FE] TELEPORT TOOL"
+
+        tool.Activated:Connect(function()
+            local pos = mouse.Hit + Vector3.new(0, 2.5, 0)
+            player.Character.HumanoidRootPart.CFrame = CFrame.new(pos.Position)
+        end)
+
+        tool.Parent = player.Backpack
+    end
+});
+UniversalLeftGroup:AddToggle("AntiAfkToggle", {
+    Text = "防止掉线（反挂机）",
+    Default = false,
+    Callback = function(Value)
+        _G.AntiAfkEnabled = Value
+
+        if Value then
+            local vu = game:GetService("VirtualUser")
+            _G.AntiAfkConnection = game:GetService("Players").LocalPlayer.Idled:Connect(function()
+                vu:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+                wait(1)
+                vu:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+            end)
+            print("Anti Afk On")
+        else
+            if _G.AntiAfkConnection then
+                _G.AntiAfkConnection:Disconnect()
+                _G.AntiAfkConnection = nil
+            end
+            print("Anti Afk Off")
+        end
+    end
+});
 UniversalLeftGroup:AddToggle("NightVisionToggle", {Text="夜视",Default=false,Callback=function(Value)
         A28 = Value;
         if Value then
@@ -1079,7 +1189,7 @@ local scriptCategories = {
     {
         GroupName = "墨水游戏",
         List = {
-            {Name = "AX墨水脚本有芙同享秋辞汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/ax%E8%84%9A%E6%9C%AC%E7%A7%8B%E8%BE%9E%E6%B1%89%E5%8C%96"},
+            {Name = "AX-inggame 有芙同享汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/ax%E8%84%9A%E6%9C%AC%E7%A7%8B%E8%BE%9E%E6%B1%89%E5%8C%96"},
             {Name = "墨水游戏天使之翼汉化(卡密在通用功能复制)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E5%A2%A8%E6%B0%B4inkgame%E6%B1%89%E5%8C%96"},
             {Name = "墨水游戏人机汉化(里面有反作弊甩飞)", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/inkgame-ADEN-robot"},
             {Name = "墨水Ringta汉化(无卡密)", Url = "https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/Ringta"},
@@ -1153,6 +1263,7 @@ local scriptCategories = {
             {Name = "最强战场Phantasm汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/thestongestbattlegrounds-Phantasm-robot"},
             {Name = "最坚强的战场脚本2", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/phantasm.lua"},
             {Name = "最坚强的战场脚本(好用)", Url = "https://eltonshub-loader.netlify.app/UBG1.lua"},
+            {Name = "最坚强的战场open脚本", Url = "https://api.luarmor.net/files/v3/loaders/6f502e252308fb97855295005faa73a0.lua"},
         }
     },
     {
@@ -2580,6 +2691,166 @@ Afhubyyds:AddLabel("摊位世界不会做这个服务器所以挺垃圾的")
 Afhubyyds:AddLabel("99夜")
 Afhubyyds:AddLabel("手枪竟技")
 Afhubyyds:AddLabel("沉默的剑客")
+
+local Afhubyyds = Tabs.Afhubyyds:AddRightGroupbox("俄亥俄州功能页");
+Afhubyyds:AddLabel("过几天更新")
+Afhubyyds:AddLabel("我先销声匿迹5天")
+local Ksqcswbb = Tabs.Ksqcswbb:AddLeftGroupbox("保存位置传送功能")
+Ksqcswbb:AddLabel("保存位置后才可以传送")
+local player = game.Players.LocalPlayer
+local savedCFrame = nil
+Ksqcswbb:AddButton({
+	Text = "保存位置",
+	Func = function()
+		local char = player.Character or player.CharacterAdded:Wait()
+		local hrp = char:WaitForChild("HumanoidRootPart")
+
+		savedCFrame = hrp.CFrame
+		Library:Notify("已保存当前位置！", 3)
+		print("保存位置:", savedCFrame.Position)
+	end,
+	DoubleClick = false
+})
+Ksqcswbb:AddButton({
+	Text = "点击传送",
+	Func = function()
+		if savedCFrame then
+			local char = player.Character or player.CharacterAdded:Wait()
+			local hrp = char:WaitForChild("HumanoidRootPart")
+
+			hrp.CFrame = savedCFrame
+			Library:Notify("已传送到保存的位置！", 3)
+		else
+			Library:Notify("你还没有保存位置！", 3)
+		end
+	end,
+	DoubleClick = false
+})
+local Ksqcswbb = Tabs.Ksqcswbb:AddRightGroupbox("选择玩家传送");
+local selectedPlayer = nil
+
+Ksqcswbb:AddDropdown('PlayerList', {
+    SpecialType = 'Player',
+    Text = '玩家列表',
+    Tooltip = '自动获取当前服务器玩家',
+    Callback = function(Value)
+        selectedPlayer = Value
+        if Value then
+            print('[回调] 选中玩家:', Value.Name)
+        else
+            print('[回调] 未选中任何玩家')
+        end
+    end
+})
+
+Ksqcswbb:AddButton({
+    Text = "选择玩家传送",
+    Func = function()
+        if not selectedPlayer then
+            Library:Notify("请先在下拉列表中选择一个玩家！", 3)
+            return
+        end
+
+        local Players = game:GetService("Players")
+        local localPlayer = Players.LocalPlayer
+
+        if not selectedPlayer.Parent then
+            Library:Notify("目标玩家已退出游戏！", 3)
+            selectedPlayer = nil
+            return
+        end
+
+        if selectedPlayer == localPlayer then
+            Library:Notify("不能传送到自己！", 3)
+            return
+        end
+
+        local targetChar = selectedPlayer.Character
+        if not targetChar or not targetChar.Parent then
+            Library:Notify("目标玩家尚未加载角色！", 3)
+            return
+        end
+
+        local targetHRP = targetChar:FindFirstChild("HumanoidRootPart")
+        if not targetHRP then
+            targetHRP = targetChar:WaitForChild("HumanoidRootPart", 2)
+            if not targetHRP then
+                Library:Notify("无法获取目标玩家位置！", 3)
+                return
+            end
+        end
+
+        local myChar = localPlayer.Character
+        if not myChar or not myChar.Parent then
+            local charAdded = localPlayer.CharacterAdded:Wait(3)
+            if not charAdded then
+                Library:Notify("等待角色加载超时！", 3)
+                return
+            end
+            myChar = charAdded
+        end
+        
+        local myHRP = myChar:FindFirstChild("HumanoidRootPart")
+        if not myHRP then
+            myHRP = myChar:WaitForChild("HumanoidRootPart", 2)
+            if not myHRP then
+                Library:Notify("无法获取你的位置！", 3)
+                return
+            end
+        end
+
+        local offset = Vector3.new(0, 0, 3)
+        myHRP.CFrame = targetHRP.CFrame + targetHRP.CFrame:VectorToWorldSpace(offset)
+        
+        Library:Notify("已传送到玩家：" .. selectedPlayer.Name, 3)
+    end,
+    DoubleClick = false
+})
+local Ksqcswbb = Tabs.Ksqcswbb:AddLeftGroupbox("自然灾害传送点传送功能")
+Ksqcswbb:AddButton({
+	Text = "点击传送到游戏内",
+	Func = function()
+		local player = game.Players.LocalPlayer
+		local char = player.Character or player.CharacterAdded:Wait()
+		local hrp = char:WaitForChild("HumanoidRootPart")
+
+		hrp.CFrame = CFrame.new(
+			-92.5771637,
+			52.5528679,
+			-13.7131166,
+			0.964399517,
+			0.0721923783,
+			-0.254404902,
+			0,
+			0.962016582,
+			0.272991061,
+			0.264449596,
+			-0.263272434,
+			0.92776835
+		)
+
+		Library:Notify("已传送到指定位置！", 3)
+	end,
+	DoubleClick = false
+})
+Ksqcswbb:AddButton({
+	Text = "点击传送到高塔大厅",
+	Func = function()
+		local player = game.Players.LocalPlayer
+		local char = player.Character or player.CharacterAdded:Wait()
+		local hrp = char:WaitForChild("HumanoidRootPart")
+
+		hrp.CFrame = CFrame.new(
+			-307.063873, 183.806534, 383.497711, 0.944399297, 0.0674978048, -0.321797878, 0, 0.978702188, 0.205284923, 0.328800589, -0.193870932, 0.924285769
+		)
+
+		Library:Notify("已传送到指定位置！", 3)
+	end,
+	DoubleClick = false
+})
+local Ksqcswbb = Tabs.Ksqcswbb:AddRightGroupbox("墨水游戏局内传送功能");
+Ksqcswbb:AddLabel("后续进行更新")
+
 local ScriptCenterLeftGroup = Tabs.ScriptCenter:AddLeftGroupbox("脚本中心1");
 local ScriptCenterRightGroup = Tabs.ScriptCenter:AddRightGroupbox("脚本中心2");
 local leftIndex = 0;
@@ -2727,6 +2998,7 @@ end
 local YOffset = 0
 
 YOffset = YOffset + CreateUpdateItem("🔧", "Bug修复", "修复了墨水执行不了的bug", YOffset)
+YOffset = YOffset + CreateUpdateItem("🟢", "功能更新", "更新了传送功能标签页", YOffset)
 YOffset = YOffset + CreateUpdateItem("", "", "无", YOffset - 25)
 
-ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, YOffset + 20)
+ScrollFrame.CanvasSize = UDim2.new(0, 5, 5, YOffset + 20)
