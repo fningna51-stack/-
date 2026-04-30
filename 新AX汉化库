@@ -1,6 +1,8 @@
+local RunScriptFirst = false
+
 local Translations = {
-["Toggle"]="开关",
-        ["AX-SCRIPTS"]="Ax <font color='#7FC8F0'>有</font><font color='#74C0EB'>芙</font><font color='#69B8E6'>同</font><font color='#5EB0E1'>享</font><font color='#53A8DC'>秋</font><font color='#48A0D7'>辞</font><font color='#3D98D2'>汉</font><font color='#3290CD'>化</font>", 
+        ["Toggle"]="开关",
+        ["AX-SCRIPTS"]="<font color=\"#7FC8F0\">A</font><font color=\"#74C0EB\">X</font><font color=\"#69B8E6\">-</font><font color=\"#5EB0E1\">i</font><font color=\"#53A8DC\">n</font><font color=\"#48A0D7\">k</font><font color=\"#3D98D2\"> </font><font color=\"#3290CD\">G</font><font color=\"#2788C8\">a</font><font color=\"#1C80C3\">m</font><font color=\"#1178BE\">e</font>", 
         ["Games"]="游戏",
         ["Combat"]="攻击",
         ["Miscs"]="杂项",
@@ -243,14 +245,14 @@ local Translations = {
         ["Show Only My Team"]="仅显示自己的队伍",
         ["Show Only Enemy Team"]="仅显示敌方队伍",
         ["Trail"]="跟踪",
-        ["Ink Game | by AlexScriptX"]="<font color='#7FC8F0'>有</font><font color='#74C0EB'>芙</font><font color='#69B8E6'>同</font><font color='#5EB0E1'>享</font><font color='#53A8DC'>汉</font><font color='#48A0D7'>化</font><font color='#3D98D2'>（</font><font color='#3290CD'>感</font><font color='#2788C8'>谢</font><font color='#2280C3'>k</font><font color='#1D78BE'>s</font><font color='#1870B9'>秋</font><font color='#1368B4'>辞</font><font color='#0E60AF'>帮</font><font color='#0958AA'>助</font><font color='#0450A5'>）</font>",
+        ["Ink Game | by AlexScriptX"]="ink game | by<font color=\"#7FC8F0\">有</font><font color=\"#74C0EB\">芙</font><font color=\"#69B8E6\">同</font><font color=\"#5EB0E1\">享</font>",
         ["Manual"]="有失误",
         ["Perfect"]="完美",
         ["Keep Playing"]="继续游戏",
         ["Stop Playing"]="反叛",
         ["PARKOUR ARTIST"]="泊车艺术家",
         ["PHANTOM STEP"]="幽灵步（五级速度可使用）",
-        ["透视 Elements"]="透视方式",
+        ["ESP Elements"]="透视方式",
         ["Spread"]="散步范围",
         ["Walk Speed"]="行走速度",
         ["Barriers"]="防坠落",
@@ -510,7 +512,7 @@ local Translations = {
         ["Game Administrator"]="游戏管理员",
         ["Game Animator"]="游戏动画师",
         ["Game Artist"]="游戏美术师",
-        ["Game Builder"]="游戏建造者",
+        ["游戏建造者"]="游戏建造者",
         ["Game Contributor"]="游戏贡献者",
         ["Game Developer"]="游戏开发者",
         ["Game Modeller"]="游戏建模师",
@@ -587,7 +589,7 @@ local Translations = {
         ["Lava"]="熔岩色",
         ["Chrome"]="铬色",
         ["Gold"]="金色",
-        ["Matter"]="物质色",
+        ["物质色"]="物质色",
         ["Custom Title Font"]="自定义称号字体",
         ["Mulish"]="穆利什体",
         ["Silkscreen"]="丝网体",
@@ -645,120 +647,175 @@ local Translations = {
         ["Faster Sprint"]="速度",
         ["Enter value (1-6)"]="输入数值（1-6）(改了之后不会给你冲刺)",
         ["Dash Cooldown"]="冲刺冷却",
-        ["Loader | AX-SCRIPTS"]="<font color='#7FC8F0'>有</font><font color='#74C0EB'>芙</font><font color='#69B8E6'>同</font><font color='#5EB0E1'>享</font><font color='#53A8DC'>汉</font><font color='#48A0D7'>化</font><font color='#3D98D2'>（</font><font color='#3290CD'>感</font><font color='#2788C8'>谢</font><font color='#2280C3'>k</font><font color='#1D78BE'>s</font><font color='#1870B9'>秋</font><font color='#1368B4'>辞</font><font color='#0E60AF'>帮</font><font color='#0958AA'>助</font><font color='#0450A5'>）</font>",
-        ["Auto-load"]="自动加载（加载出来不是汉化）"
+        ["Loader | AX-SCRIPTS"]="<font color=\"#7FC8F0\">有</font><font color=\"#74C0EB\">芙</font><font color=\"#69B8E6\">同</font><font color=\"#5EB0E1\">享</font><font color=\"#53A8DC\">汉</font><font color=\"#48A0D7\">化</font>",
+        ["Auto-load"]="自动加载（加载出来不是汉化）",
+        ["Box Type"] = "方框样式",
+        ["Dynamic Box Sizing"] = "动态方框大小",
+        ["Follow Mode"] = "跟踪模式",
+        ["Name Type"] = "名字类型",
+        ["Display Name"] = "显示名字",
+        ["Font"] = "字体",
+        ["Custom Shoot Speed "] = "自定义射击延迟",
+        ["Leave on Low Life"] = "低血量时离开",
+        ["Head"] = "头部",
+        ["Torso"] = "躯干",
+        ["Re-Hook"] = "重试注入",
+        ["The following remote features require a manual Re-Hook if the automatic one fails to get the necessary minigame information for the remotes to work"] = "如果自动注入失败，需手动重新注入才能让远程小游戏功能正常",
+        ["Auto Marbles (Doesn't work)"] = "自动打弹珠(无效)",
+        ["Auto Tiles"] = "自动打石子",
+        ["Auto Grab Tiles"] = "自动抓石子",
+        ["Auto Spin Top"] = "自动陀螺",
+        ["Auto Jegi (Works)"] = "自动踢毽子(有效)",
+        ["Input Mode"] = "输入模式",
+        ["KeyPress"] = "按键输入",
+        ["Anti Stun"] = "防眩晕",
+        ["Change Sprint Cooldown"] = "修改冲刺冷却时间",
+        ["Spectate Mode"] = "观战模式",
+        ["Movement Mode"] = "移动模式",
+        ["MoveDirection"] = "移动方向",
+        ["Direct"] = "直接",
+        ["Click TP"] = "点击传送",
+        ["No Void"] = "防虚空",
+        ["Hide Title"] = "隐藏称号",
+        ["Hide Other Tags"] = "隐藏其他标签",
+        ["Select Title"] = "选择称号",
+        ["Enter custom number"] = "输入自定义数值",
+        ["Anti AFK"] = "防挂机",
+        ["Detect Mods"] = "检测管理员",
+        ["Private Server Unlocker"] = "解锁私人服务器",
+        ["Permanent Guard Unlocker"] = "解锁永久守卫",
+        ["RGB Mode"] = "RGB模式",
+        ["Team Colors"] = "队伍颜色",
+        ["Show Dead Players"] = "显示死亡玩家",
+        ["Show Local Players"] = "显示本地玩家",
+        ["Wall Check"] = "墙壁检测",
+        ["UI"] = "UI",
+        ["Plex"] = "Plex",
+        ["Monospace"] = "等宽字体",
+        ["Fly Up"] = "上升",
+        ["Fly Down"] = "下降",
+        ["Disable Fly"] = "关闭飞行",
+        ["Ignore My Team"] = "忽略自己的队伍",
+        ["Ignore Enemy Team"] = "忽略敌方队伍",
+        ["Username"] = "用户名",
+        ["ESP Font"] = "透视字体",
+        ["System"] = "系统",
+        ["Show Local Player"] = "显示本地玩家",
+        ["Square"] = "方形",
+        ["Corner"] = "角形",
+        ["Fly Speed"] = "飞行速度",
+        ["Fly Movement Mode"] = "飞行移动模式",
+        ["ControlModule"] = "控制模块",
+        ["Fly Up/Down Keys"] = "上升/下降",
+        ["Space/LeftControl"] = "空格/左Ctrl",
+        ["Space/LeftShift"] = "空格/左Shift",
+        ["E/Q"] = "E/Q",
+        ["Space/Q"] = "空格/Q",
+        ["VirtualInputManager"] = "按键管理器",
+        ["Break Fake Glass"] = "破坏假玻璃",
+        ["Select Target"] = "选择目标",
+        ["Target Part"] = "目标部位",
+        ["Custom Shoot Speed:"] = "射击间隔",
+        ["Highlight"] = "高亮",
+        ["Chams"] = "透视颜色",
+        ["Anti Injury"] = "移除受伤"
 }
+
+local function processTextComponent(gui, newText)
+    if gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox") then
+        pcall(function()
+            gui.RichText = true
+            if gui:FindFirstChildOfClass("UITextSizeConstraint") then
+                gui.UITextSizeConstraint.MaxTextSize = gui.TextSize
+            end
+        end)
+    end
+    return newText
+end
 
 local function translateText(text)
     if not text or type(text) ~= "string" then return text end
-    
-    if Translations[text] then
-        return Translations[text]
-    end
-    
+    if Translations[text] then return Translations[text] end
     for en, cn in pairs(Translations) do
-        if text:find(en) then
-            return text:gsub(en, cn)
-        end
+        if text:find(en) then return text:gsub(en, cn) end
     end
-    
     return text
 end
 
-local function setupTranslationEngine()
-    local success, err = pcall(function()
-        local oldIndex = getrawmetatable(game).__newindex
-        setreadonly(getrawmetatable(game), false)
-        
-        getrawmetatable(game).__newindex = newcclosure(function(t, k, v)
-            if (t:IsA("TextLabel") or t:IsA("TextButton") or t:IsA("TextBox")) and k == "Text" then
-                v = translateText(tostring(v))
-            end
-            return oldIndex(t, k, v)
-        end)
-        
-        setreadonly(getrawmetatable(game), true)
-    end)
-    
-    if not success then
-        warn("元表劫持失败:", err)
-       
-        local translated = {}
-        local function scanAndTranslate()
-            for _, gui in ipairs(game:GetService("CoreGui"):GetDescendants()) do
-                if (gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox")) and not translated[gui] then
-                    pcall(function()
-                        local text = gui.Text
-                        if text and text ~= "" then
-                            local translatedText = translateText(text)
-                            if translatedText ~= text then
-                                gui.Text = translatedText
-                                translated[gui] = true
-                            end
-                        end
-                    end)
-                end
-            end
-            
-            local player = game:GetService("Players").LocalPlayer
-            if player and player:FindFirstChild("PlayerGui") then
-                for _, gui in ipairs(player.PlayerGui:GetDescendants()) do
-                    if (gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox")) and not translated[gui] then
-                        pcall(function()
-                            local text = gui.Text
-                            if text and text ~= "" then
-                                local translatedText = translateText(text)
-                                if translatedText ~= text then
-                                    gui.Text = translatedText
-                                    translated[gui] = true
-                                end
-                            end
-                        end)
+local function translateAllElements()
+    local function translateGui(gui)
+        for _, element in ipairs(gui:GetDescendants()) do
+            if element:IsA("TextLabel") or element:IsA("TextButton") or element:IsA("TextBox") then
+                local currentText = element.Text
+                if currentText and currentText ~= "" then
+                    local translatedText = translateText(currentText)
+                    if translatedText ~= currentText then
+                        element.Text = processTextComponent(element, translatedText)
                     end
                 end
             end
         end
-        
-        local function setupDescendantListener(parent)
-            parent.DescendantAdded:Connect(function(descendant)
-                if descendant:IsA("TextLabel") or descendant:IsA("TextButton") or descendant:IsA("TextBox") then
-                    task.wait(0.1)
-                    pcall(function()
-                        local text = descendant.Text
-                        if text and text ~= "" then
-                            local translatedText = translateText(text)
-                            if translatedText ~= text then
-                                descendant.Text = translatedText
-                            end
-                        end
-                    end)
-                end
-            end)
-        end
-        
-        pcall(setupDescendantListener, game:GetService("CoreGui"))
-        local player = game:GetService("Players").LocalPlayer
-        if player and player:FindFirstChild("PlayerGui") then
-            pcall(setupDescendantListener, player.PlayerGui)
-        end
-        
-        while true do
-            scanAndTranslate()
-            task.wait(3)
-        end
+    end
+    
+    pcall(translateGui, game:GetService("CoreGui"))
+    
+    local player = game:GetService("Players").LocalPlayer
+    if player and player:FindFirstChild("PlayerGui") then
+        pcall(translateGui, player.PlayerGui)
     end
 end
 
-task.wait(2)
+local function setupListener()
+    local function connectToGui(gui)
+        gui.DescendantAdded:Connect(function(descendant)
+            if descendant:IsA("TextLabel") or descendant:IsA("TextButton") or descendant:IsA("TextBox") then
+                local currentText = descendant.Text
+                if currentText and currentText ~= "" then
+                    local translatedText = translateText(currentText)
+                    if translatedText ~= currentText then
+                        descendant.Text = processTextComponent(descendant, translatedText)
+                    end
+                end
+                
+                descendant:GetPropertyChangedSignal("Text"):Connect(function()
+                    local newText = descendant.Text
+                    if newText and newText ~= "" then
+                        local translatedText = translateText(newText)
+                        if translatedText ~= newText then
+                            descendant.Text = processTextComponent(descendant, translatedText)
+                        end
+                    end
+                end)
+            end
+        end)
+    end
+    
+    pcall(connectToGui, game:GetService("CoreGui"))
+    
+    local player = game:GetService("Players").LocalPlayer
+    if player and player:FindFirstChild("PlayerGui") then
+        pcall(connectToGui, player.PlayerGui)
+    end
+end
 
-setupTranslationEngine()
+local function startTranslation()
+    translateAllElements()
+    setupListener()
+end
 
-local success, err = pcall(function()
-loadstring(game:HttpGet("https://officialaxscripts.vercel.app/scripts/AX-Loader.lua"))()
+local function loadScript()
+    local success, err = pcall(function()
+        loadstring(game:HttpGet("https://officialaxscripts.vercel.app/scripts/AX-Loader.lua"))()
+    end)
+    if not success then
+        warn("加载失败:", err)
+    end
+end
 
-
-end)
-
-if not success then
-    warn("加载失败:", err)
+if RunScriptFirst then
+    loadScript()
+    startTranslation()
+else
+    startTranslation()
+    loadScript()
 end
