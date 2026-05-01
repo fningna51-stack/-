@@ -3008,6 +3008,30 @@ Afhubyyds:AddLabel("99夜")
 Afhubyyds:AddLabel("手枪竟技")
 Afhubyyds:AddLabel("沉默的剑客")
 
+local Afhubyyds = Tabs.Afhubyyds:AddRightGroupbox("联邦免费脚本YI＿Hub");
+Afhubyyds:AddButton({Text="YI Hub(联邦)",Func=function()
+        getgenv().YI_HUB="YI_HUB群979312897"
+loadstring(game:HttpGet('https://raw.githubusercontent.com/YI-HUB-TEAM/YIscript/refs/heads/main/YI_HUB'))("")
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
+Afhubyyds:AddLabel("作者：灰 QQ群：979312897")
+Afhubyyds:AddLabel("支持服务器如下：")
+Afhubyyds:AddLabel("力量传奇")
+Afhubyyds:AddLabel("Stands Awakening")
+Afhubyyds:AddLabel("战争大亨")
+Afhubyyds:AddLabel("黑暗欺骗")
+Afhubyyds:AddLabel("画我")
+Afhubyyds:AddLabel("忍者传奇")
+Afhubyyds:AddLabel("极速传奇")
+Afhubyyds:AddLabel("自然灾害")
+Afhubyyds:AddLabel("幸运方块战场")
+Afhubyyds:AddLabel("渴求的吸血鬼")
+Afhubyyds:AddLabel("8个球池经典")
+Afhubyyds:AddLabel("伐木大亨")
+Afhubyyds:AddLabel("通用")
 local Ksqcswbb = Tabs.Ksqcswbb:AddLeftGroupbox("选择玩家传送功能")
 
 local selectedPlayer = nil
