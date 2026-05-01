@@ -1330,6 +1330,7 @@ local scriptCategories = {
             {Name = "撕咬之夜", Url = "https://raw.githubusercontent.com/Youfutongxiang1/Msploit-v2-CN/refs/heads/main/Msploit-v2-CN"},
             {Name = "殺脚本撕咬之夜", Url = "https://raw.githubusercontent.com/FengYu-X/Max/refs/heads/X/BBN.lua"},
             {Name = "Ringta撕咬之夜(汉化)", Url = "https://raw.githubusercontent.com/Youfutongxiang1/RINGTA-BitebyNight-CN/refs/heads/main/RINGTA/Bite%20by%20Night-CN"},
+            {Name = "撕咬之夜", Url = "https://raw.githubusercontent.com/YIRDEX/China/refs/heads/main/Cerberus"},
             }
     },
     {
@@ -1637,7 +1638,322 @@ print("😝😝😝")
                 Func();
         end
 end});
+Qcjbwd:AddButton({Text="有福同享超飞",Func=function()
+        local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local lp = Players.LocalPlayer
 
+local FLING_OFFSET = 0
+local LERP_ALPHA = 1
+local VELOCITY_BOOST = 200
+
+local flingEnabled = false
+local manualEnabled = false
+local autoCycleActive = false
+local previousFlingEnabled = false
+local targetPlayer = nil
+local originalCFrame = nil
+
+local function findPlayer(text)
+    text = text:lower()
+    for _, plr in pairs(Players:GetPlayers()) do
+        if string.find(plr.Name:lower(), text) or string.find(plr.DisplayName:lower(), text) then
+            return plr
+        end
+    end
+end
+
+lp.Chatted:Connect(function(msg)
+    if not manualEnabled then return end
+    if msg:sub(1,6):lower() == ";kill " then
+        local name = msg:sub(7)
+        local plr = findPlayer(name)
+        if plr and plr.Character and plr.Character:FindFirstChild("Humanoid") then
+            targetPlayer = plr
+            if lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") then
+                originalCFrame = lp.Character.HumanoidRootPart.CFrame
+            end
+            if statusLabel then
+                statusLabel.Text = "已锁定 " .. plr.Name
+            end
+        end
+    end
+end)
+
+task.spawn(function()
+    while task.wait(0.01) do
+        if not flingEnabled then continue end
+        if not targetPlayer then continue end
+
+        local char = targetPlayer.Character
+        if not char or not char:FindFirstChild("Humanoid") then
+            targetPlayer = nil
+            if statusLabel then statusLabel.Text = "开启 (未锁定)" end
+            continue
+        end
+
+        local hum = char.Humanoid
+        if hum.Health <= 0 then
+            targetPlayer = nil
+            if statusLabel then statusLabel.Text = "开启" end
+            continue
+        end
+
+        local myChar = lp.Character
+        local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+        local targetHRP = char:FindFirstChild("HumanoidRootPart")
+
+        if myHRP and targetHRP then
+            local offset = FLING_OFFSET
+            local goal = targetHRP.CFrame * CFrame.new(0,0,-offset) * CFrame.Angles(0, math.rad(-3), 0)
+
+            if LERP_ALPHA >= 1 then
+                myHRP.CFrame = goal
+            else
+                myHRP.CFrame = myHRP.CFrame:Lerp(goal, LERP_ALPHA)
+            end
+
+            local dist = (targetHRP.Position - myHRP.Position).Magnitude
+            if dist < 5 then
+                local dir = (targetHRP.Position - myHRP.Position).Unit
+                myHRP.Velocity = dir * VELOCITY_BOOST
+            else
+                myHRP.Velocity = Vector3.zero
+            end
+            myHRP.RotVelocity = Vector3.zero
+        end
+    end
+end)
+
+task.spawn(function()
+    while task.wait() do
+        if not flingEnabled then continue end
+        local hum = lp.Character and lp.Character:FindFirstChild("Humanoid")
+        if hum then
+            hum:Move(Vector3.one * 1e31)
+        end
+    end
+end)
+
+local function startAutoCycle()
+    previousFlingEnabled = flingEnabled
+    flingEnabled = true
+    autoCycleActive = true
+
+    task.spawn(function()
+        while autoCycleActive do
+            local players = Players:GetPlayers()
+            for _, plr in ipairs(players) do
+                if plr == lp then continue end
+                if not autoCycleActive then break end
+
+                targetPlayer = plr
+                if statusLabel then
+                    statusLabel.Text = "自动: " .. plr.Name
+                end
+
+                local cam = workspace.CurrentCamera
+                local hum = plr.Character and plr.Character:FindFirstChild("Humanoid")
+                if hum then
+                    cam.CameraSubject = hum
+                    cam.CameraType = Enum.CameraType.Custom
+                end
+
+                local waited = 0
+                while waited < 2 and autoCycleActive do
+                    task.wait(0.1)
+                    waited = waited + 0.1
+                    if not plr.Character or not plr.Character:FindFirstChild("Humanoid") or plr.Character.Humanoid.Health <= 0 then
+                        break
+                    end
+                end
+            end
+        end
+        local cam = workspace.CurrentCamera
+        if lp.Character and lp.Character:FindFirstChild("Humanoid") then
+            cam.CameraSubject = lp.Character.Humanoid
+            cam.CameraType = Enum.CameraType.Custom
+        end
+        targetPlayer = nil
+        if statusLabel then statusLabel.Text = "开启" end
+    end)
+end
+
+local function stopAutoCycle()
+    autoCycleActive = false
+    flingEnabled = previousFlingEnabled
+    if not flingEnabled then
+        targetPlayer = nil
+        if statusLabel then statusLabel.Text = "状态: 关闭" end
+    end
+end
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "FlyOffGUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = lp:WaitForChild("PlayerGui")
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 220, 0, 180)
+mainFrame.Position = UDim2.new(0.5, -110, 0.3, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+mainFrame.BackgroundTransparency = 0
+mainFrame.BorderSizePixel = 1
+mainFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -30, 0, 28)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "超飞"
+title.TextColor3 = Color3.fromRGB(0, 0, 0)
+title.TextSize = 14
+title.Font = Enum.Font.GothamBold
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = mainFrame
+
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 30, 0, 28)
+closeBtn.Position = UDim2.new(1, -30, 0, 0)
+closeBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+closeBtn.Text = "X"
+closeBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+closeBtn.TextSize = 18
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.BorderSizePixel = 1
+closeBtn.BorderColor3 = Color3.fromRGB(0, 0, 0)
+closeBtn.Parent = mainFrame
+
+local toggleBtn = Instance.new("TextButton")
+toggleBtn.Size = UDim2.new(0, 160, 0, 32)
+toggleBtn.Position = UDim2.new(0.5, -80, 0, 38)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+toggleBtn.Text = "开启触碰甩飞"
+toggleBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+toggleBtn.Font = Enum.Font.GothamSemibold
+toggleBtn.TextSize = 12
+toggleBtn.BorderSizePixel = 1
+toggleBtn.BorderColor3 = Color3.fromRGB(0, 0, 0)
+toggleBtn.Parent = mainFrame
+
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Size = UDim2.new(1, 0, 0, 20)
+statusLabel.Position = UDim2.new(0, 0, 0, 78)
+statusLabel.BackgroundTransparency = 1
+statusLabel.Text = "状态: 关闭"
+statusLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+statusLabel.TextSize = 11
+statusLabel.Font = Enum.Font.Gotham
+statusLabel.Parent = mainFrame
+
+local autoCycleBtn = Instance.new("TextButton")
+autoCycleBtn.Size = UDim2.new(0, 160, 0, 32)
+autoCycleBtn.Position = UDim2.new(0.5, -80, 0, 105)
+autoCycleBtn.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+autoCycleBtn.Text = "自动超飞别人"
+autoCycleBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+autoCycleBtn.Font = Enum.Font.GothamSemibold
+autoCycleBtn.TextSize = 12
+autoCycleBtn.BorderSizePixel = 1
+autoCycleBtn.BorderColor3 = Color3.fromRGB(0, 0, 0)
+autoCycleBtn.Parent = mainFrame
+
+local surpriseBtn = Instance.new("TextButton")
+surpriseBtn.Size = UDim2.new(0, 80, 0, 24)
+surpriseBtn.Position = UDim2.new(0.5, -40, 0, 145)
+surpriseBtn.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+surpriseBtn.Text = "点我有惊喜"
+surpriseBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+surpriseBtn.Font = Enum.Font.GothamSemibold
+surpriseBtn.TextSize = 10
+surpriseBtn.BorderSizePixel = 1
+surpriseBtn.BorderColor3 = Color3.fromRGB(0, 0, 0)
+surpriseBtn.Parent = mainFrame
+
+toggleBtn.MouseButton1Click:Connect(function()
+    if autoCycleActive then
+        stopAutoCycle()
+        autoCycleBtn.Text = "循环超飞"
+        autoCycleBtn.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+        flingEnabled = false
+        manualEnabled = false
+        toggleBtn.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+        toggleBtn.Text = "开启触碰甩飞"
+        statusLabel.Text = "状态: 关闭"
+        targetPlayer = nil
+        local cam = workspace.CurrentCamera
+        if lp.Character and lp.Character:FindFirstChild("Humanoid") then
+            cam.CameraSubject = lp.Character.Humanoid
+            cam.CameraType = Enum.CameraType.Custom
+        end
+        return
+    end
+
+    manualEnabled = not manualEnabled
+    flingEnabled = manualEnabled
+    if manualEnabled then
+        toggleBtn.BackgroundColor3 = Color3.fromRGB(100, 200, 100)
+        toggleBtn.Text = "关闭触碰甩飞"
+        statusLabel.Text = "开启"
+        targetPlayer = nil
+    else
+        toggleBtn.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+        toggleBtn.Text = "开启触碰甩飞"
+        statusLabel.Text = "状态: 关闭"
+        targetPlayer = nil
+        originalCFrame = nil
+    end
+end)
+
+autoCycleBtn.MouseButton1Click:Connect(function()
+    if autoCycleActive then
+        stopAutoCycle()
+        autoCycleBtn.Text = "自动超飞"
+        autoCycleBtn.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+        local cam = workspace.CurrentCamera
+        if lp.Character and lp.Character:FindFirstChild("Humanoid") then
+            cam.CameraSubject = lp.Character.Humanoid
+            cam.CameraType = Enum.CameraType.Custom
+        end
+    else
+        autoCycleBtn.Text = "停止超飞"
+        autoCycleBtn.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+        startAutoCycle()
+    end
+end)
+
+surpriseBtn.MouseButton1Click:Connect(function()
+    lp:Kick("嘿嘿")
+end)
+
+closeBtn.MouseButton1Click:Connect(function()
+    flingEnabled = false
+    manualEnabled = false
+    autoCycleActive = false
+    targetPlayer = nil
+    originalCFrame = nil
+    local cam = workspace.CurrentCamera
+    if lp.Character and lp.Character:FindFirstChild("Humanoid") then
+        cam.CameraSubject = lp.Character.Humanoid
+        cam.CameraType = Enum.CameraType.Custom
+    end
+    screenGui:Destroy()
+end)
+
+flingEnabled = false
+manualEnabled = false
+autoCycleActive = false
+targetPlayer = nil
+
+print(" Hi pig god I am dream")
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
 --娱乐脚本脚本详情区
 local Qcjbwd = Tabs.Qcjbwd:AddRightGroupbox("脚本详情");
 Qcjbwd:AddLabel("墨水游戏🟢")
