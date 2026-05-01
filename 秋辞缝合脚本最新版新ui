@@ -59,7 +59,7 @@ local Tabs = {
     ScriptCenter = Window:AddTab("脚本中心", "cat"),
     Qcjbwd = Window:AddTab("娱乐脚本", "key"),
     Afhubyyds = Window:AddTab("付费功能", "dog"),
-    Ksqcswbb = Window:AddTab("传送功能", "tree"),
+    Ksqcswbb = Window:AddTab("传送功能", "cat"),
     Settings = Window:AddTab("UI设置", "settings")
 }
 
@@ -2692,41 +2692,8 @@ Afhubyyds:AddLabel("99夜")
 Afhubyyds:AddLabel("手枪竟技")
 Afhubyyds:AddLabel("沉默的剑客")
 
-local Afhubyyds = Tabs.Afhubyyds:AddRightGroupbox("俄亥俄州功能页");
-Afhubyyds:AddLabel("过几天更新")
-Afhubyyds:AddLabel("我先销声匿迹5天")
-local Ksqcswbb = Tabs.Ksqcswbb:AddLeftGroupbox("保存位置传送功能")
-Ksqcswbb:AddLabel("保存位置后才可以传送")
-local player = game.Players.LocalPlayer
-local savedCFrame = nil
-Ksqcswbb:AddButton({
-	Text = "保存位置",
-	Func = function()
-		local char = player.Character or player.CharacterAdded:Wait()
-		local hrp = char:WaitForChild("HumanoidRootPart")
+local Ksqcswbb = Tabs.Ksqcswbb:AddLeftGroupbox("选择玩家传送功能")
 
-		savedCFrame = hrp.CFrame
-		Library:Notify("已保存当前位置！", 3)
-		print("保存位置:", savedCFrame.Position)
-	end,
-	DoubleClick = false
-})
-Ksqcswbb:AddButton({
-	Text = "点击传送",
-	Func = function()
-		if savedCFrame then
-			local char = player.Character or player.CharacterAdded:Wait()
-			local hrp = char:WaitForChild("HumanoidRootPart")
-
-			hrp.CFrame = savedCFrame
-			Library:Notify("已传送到保存的位置！", 3)
-		else
-			Library:Notify("你还没有保存位置！", 3)
-		end
-	end,
-	DoubleClick = false
-})
-local Ksqcswbb = Tabs.Ksqcswbb:AddRightGroupbox("选择玩家传送");
 local selectedPlayer = nil
 
 Ksqcswbb:AddDropdown('PlayerList', {
@@ -3001,4 +2968,4 @@ YOffset = YOffset + CreateUpdateItem("🔧", "Bug修复", "修复了墨水执行
 YOffset = YOffset + CreateUpdateItem("🟢", "功能更新", "更新了传送功能标签页", YOffset)
 YOffset = YOffset + CreateUpdateItem("", "", "无", YOffset - 25)
 
-ScrollFrame.CanvasSize = UDim2.new(0, 5, 5, YOffset + 20)
+ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, YOffset + 20)
