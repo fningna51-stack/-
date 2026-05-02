@@ -22,7 +22,7 @@ if SavedKey then
 end
 
 local SubmitButton = KeyWindow:AddButton("执行AF脚本", UDim2.new(0.1, 0, 0.65, 0), function()
-    if KeyBox.Text == "AF20110501QCgui" then
+    if KeyBox.Text == "e7e49c0a-0609-459f-acd5-9e0318d17592" then
         if RememberToggle.GetState() then
             Library:SaveKey(KeyPath, FileName, KeyBox.Text)
         end
