@@ -2,7 +2,7 @@ local RunScriptFirst = false
 
 local Translations = {
         ["Toggle"]="开关",
-        ["AX-SCRIPTS"]="<font color=\"#7FC8F0\">A</font><font color=\"#74C0EB\">X</font><font color=\"#69B8E6\">-</font><font color=\"#5EB0E1\">i</font><font color=\"#53A8DC\">n</font><font color=\"#48A0D7\">k</font><font color=\"#3D98D2\"> </font><font color=\"#3290CD\">G</font><font color=\"#2788C8\">a</font><font color=\"#1C80C3\">m</font><font color=\"#1178BE\">e</font>", 
+        ["AX-SCRIPTS"]="<font color=\"#7FC8F0\">A</font><font color=\"#74C0EB\">X</font><font color=\"#69B8E6\">-</font><font color=\"#5EB0E1\">S</font><font color=\"#53A8DC\">C</font><font color=\"#48A0D7\">R</font><font color=\"#3D98D2\">I</font><font color=\"#3290CD\">P</font><font color=\"#2788C8\">T</font><font color=\"#1C80C3\">S</font>", 
         ["Games"]="游戏",
         ["Combat"]="攻击",
         ["Miscs"]="杂项",
@@ -245,7 +245,7 @@ local Translations = {
         ["Show Only My Team"]="仅显示自己的队伍",
         ["Show Only Enemy Team"]="仅显示敌方队伍",
         ["Trail"]="跟踪",
-        ["Ink Game | by AlexScriptX"]="ink Game | by Alex CN:<font color=\"#7FC8F0\">Y</font><font color=\"#74C0EB\">F</font><font color=\"#69B8E6\">T</font><font color=\"#5EB0E1\">X</font>",
+        ["Ink Game | by AlexScriptX"]="ink Game | by AlexScriptX CN:<font color=\"#7FC8F0\">Y</font><font color=\"#74C0EB\">F</font><font color=\"#69B8E6\">T</font><font color=\"#5EB0E1\">X</font>",
         ["Manual"]="有失误",
         ["Perfect"]="完美",
         ["Keep Playing"]="继续游戏",
@@ -647,7 +647,7 @@ local Translations = {
         ["Faster Sprint"]="速度",
         ["Enter value (1-6)"]="输入数值（1-6）(改了之后不会给你冲刺)",
         ["Dash Cooldown"]="冲刺冷却",
-        ["Loader | AX-SCRIPTS"]="AX | by   Alex CN:<font color=\"#7FC8F0\">Y</font><font color=\"#74C0EB\">F</font><font color=\"#69B8E6\">T</font><font color=\"#5EB0E1\">X</font>",
+        ["Loader | AX-SCRIPTS"]="AX-SCRIPTS | by AlexScriptX CN:<font color=\"#7FC8F0\">Y</font><font color=\"#74C0EB\">F</font><font color=\"#69B8E6\">T</font><font color=\"#5EB0E1\">X</font>",
         ["Auto-load"]="自动加载（加载出来不是汉化）",
         ["Box Type"] = "方框样式",
         ["Dynamic Box Sizing"] = "动态方框大小",
