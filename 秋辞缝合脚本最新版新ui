@@ -177,6 +177,362 @@ UniversalLeftGroup:AddInput("WalkSpeedInput", {Text="移动速度设置",Default
         end
 end});
 
+local FlyingEnabled = false
+local SpinningEnabled = false
+local FlightSpeed = 50
+local SpinSpeed = 5
+
+local CurrentAO, CurrentLV, CurrentMoverAttachment
+local FlightConnection
+local Control = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
+
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+local function getControlModule()
+    local PlayerModule = LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")
+    return require(PlayerModule:WaitForChild("ControlModule"))
+end
+
+local function setupBodyMovers(character)
+    local hrp = character:WaitForChild("HumanoidRootPart")
+    local humanoid = character:WaitForChild("Humanoid")
+    local moverParent = workspace:FindFirstChildOfClass("Terrain") or workspace
+
+    local moverAttachment = Instance.new("Attachment", hrp)
+    moverAttachment.Name = "FlightAttachment"
+
+    local alignOrientation = Instance.new("AlignOrientation")
+    alignOrientation.Mode = Enum.OrientationAlignmentMode.OneAttachment
+    alignOrientation.RigidityEnabled = true
+    alignOrientation.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+    alignOrientation.CFrame = hrp.CFrame
+    alignOrientation.Attachment0 = moverAttachment
+    alignOrientation.Parent = moverParent
+
+    local linearVelocity = Instance.new("LinearVelocity")
+    linearVelocity.VectorVelocity = Vector3.zero
+    linearVelocity.MaxForce = 9e9
+    linearVelocity.Attachment0 = moverAttachment
+    linearVelocity.Parent = moverParent
+
+    return alignOrientation, linearVelocity, humanoid, moverAttachment
+end
+
+local function getFlightVector(controlModule)
+    local moveVector = controlModule:GetMoveVector()
+
+    Control.F = -moveVector.Z
+    Control.B = moveVector.Z
+    Control.L = -moveVector.X
+    Control.R = moveVector.X
+    Control.Q = moveVector.Y
+    Control.E = -moveVector.Y
+
+    if UserInputService:IsKeyDown(Enum.KeyCode.W) then Control.F = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.S) then Control.B = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.A) then Control.L = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.D) then Control.R = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.Space) then Control.Q = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then Control.E = 1 end
+
+    local flightVector =
+        Camera.CFrame.LookVector * (Control.F - Control.B) +
+        Camera.CFrame.RightVector * (Control.R - Control.L) +
+        Vector3.new(0, 1, 0) * (Control.Q - Control.E)
+
+    return flightVector.Magnitude > 0 and flightVector.Unit or flightVector
+end
+
+local function startFlying()
+    if FlyingEnabled then return end
+
+    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    if not character then return end
+
+    FlyingEnabled = true
+    SpinningEnabled = false
+
+    if CurrentAO then CurrentAO:Destroy() end
+    if CurrentLV then CurrentLV:Destroy() end
+    if CurrentMoverAttachment then CurrentMoverAttachment:Destroy() end
+
+    CurrentAO, CurrentLV, humanoid, CurrentMoverAttachment = setupBodyMovers(character)
+
+    local controlModule = getControlModule()
+
+    FlightConnection = RunService.Heartbeat:Connect(function()
+        if not FlyingEnabled or not CurrentLV or not CurrentAO then return end
+
+        local flightVector = getFlightVector(controlModule)
+
+        if flightVector.Magnitude > 0 then
+            CurrentLV.VelocityConstraintMode = Enum.VelocityConstraintMode.Vector
+            CurrentLV.VectorVelocity = flightVector * FlightSpeed
+        else
+            CurrentLV.VectorVelocity = Vector3.zero
+        end
+
+        if SpinningEnabled then
+            local targetPart = humanoid.SeatPart or character.HumanoidRootPart
+            CurrentAO.CFrame = targetPart.CFrame * CFrame.Angles(0, math.rad(SpinSpeed), 0)
+        else
+            CurrentAO.CFrame = Camera.CFrame
+        end
+
+        humanoid.PlatformStand = true
+    end)
+
+    character.AncestryChanged:Connect(function(_, parent)
+        if not parent and FlyingEnabled then
+            stopFlying()
+        end
+    end)
+end
+
+local function stopFlying()
+    if not FlyingEnabled then return end
+
+    FlyingEnabled = false
+    SpinningEnabled = false
+
+    if FlightConnection then
+        FlightConnection:Disconnect()
+        FlightConnection = nil
+    end
+
+    if CurrentAO then CurrentAO:Destroy() end
+    if CurrentLV then CurrentLV:Destroy() end
+    if CurrentMoverAttachment then CurrentMoverAttachment:Destroy() end
+
+    local character = LocalPlayer.Character
+    if character and character:FindFirstChild("Humanoid") then
+        character.Humanoid.PlatformStand = false
+    end
+end
+
+UniversalLeftGroup:AddToggle('MyToggle', {
+    Text = '飞行模式(能在墨水使用可能会被反作弊击杀)',
+    Default = false,
+    Tooltip = '开启 / 关闭飞行功能',
+    Callback = function(Value)
+        if Value then
+            startFlying()
+        else
+            stopFlying()
+        end
+    end
+})
+
+UniversalLeftGroup:AddSlider('MyIntSlider', {
+    Text = '飞行速度',
+    Default = 50,
+    Min = 1,
+    Max = 200,
+    Rounding = 0,
+    Suffix = '',
+    Compact = false,
+    Callback = function(Value)
+        FlightSpeed = Value
+    end
+})
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+
+local lp = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+
+local isWarpFlying = false
+local flySpeed = 50
+
+local MICRO_STEP_INTERVAL = 0.001
+local MAX_STEP_SIZE = 10
+
+local hrp, hum
+local ControlModule = require(
+    lp.PlayerScripts:WaitForChild("PlayerModule")
+):GetControls()
+
+local microStepConn, healthLockConn, diedConn
+local originalCanCollide = {}
+local descendantConnection
+
+local function clearFlyRes()
+    pcall(function()
+        for part, state in pairs(originalCanCollide) do
+            if part and part.Parent then
+                part.CanCollide = state
+            end
+        end
+        table.clear(originalCanCollide)
+
+        if descendantConnection then descendantConnection:Disconnect() end
+        if microStepConn then microStepConn:Cancel() end
+        if healthLockConn then healthLockConn:Disconnect() end
+        if diedConn then diedConn:Disconnect() end
+
+        if hrp and hum then
+            hum:ChangeState(Enum.HumanoidStateType.Running)
+        end
+    end)
+end
+
+local function microStepLoop()
+    local targetPos = hrp.Position
+    local lastTime = tick()
+
+    while isWarpFlying do
+        local now = tick()
+        local dt = now - lastTime
+        lastTime = now
+
+        local mv = ControlModule:GetMoveVector()
+        local cf = camera.CFrame
+
+        local moveDir =
+            (cf.LookVector * -mv.Z) +
+            (cf.RightVector * mv.X)
+
+        local vertical = 0
+        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+            vertical = 1
+        elseif UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+            vertical = -1
+        end
+
+        local totalDelta =
+            (moveDir + Vector3.new(0, vertical, 0)) *
+            flySpeed * dt
+
+        targetPos += totalDelta
+
+        local currentPos = hrp.Position
+        local remaining = targetPos - currentPos
+        local distance = remaining.Magnitude
+
+        if distance > 0 then
+            local steps = math.ceil(distance / MAX_STEP_SIZE)
+            local stepVec = remaining / steps
+
+            for i = 1, steps do
+                if not isWarpFlying then break end
+                currentPos += stepVec
+                hrp.CFrame =
+                    CFrame.new(currentPos) * hrp.CFrame.Rotation
+                hrp.Velocity = Vector3.zero
+            end
+        else
+            hrp.CFrame =
+                CFrame.new(targetPos) * hrp.CFrame.Rotation
+            hrp.Velocity = Vector3.zero
+        end
+
+        hum:ChangeState(Enum.HumanoidStateType.Climbing)
+        task.wait(MICRO_STEP_INTERVAL)
+    end
+end
+
+local function healthLockLoop()
+    while isWarpFlying do
+        if hum and hum.Health < hum.MaxHealth then
+            hum.Health = hum.MaxHealth
+        end
+        RunService.Heartbeat:Wait()
+    end
+end
+
+local function onDied()
+    if hum and isWarpFlying then
+        hum.Health = hum.MaxHealth
+        hum:ChangeState(Enum.HumanoidStateType.Running)
+    end
+end
+
+local function startWarpFly()
+    if isWarpFlying then return end
+
+    local char = lp.Character
+    if not char then return end
+
+    hrp = char:FindFirstChild("HumanoidRootPart")
+    hum = char:FindFirstChild("Humanoid")
+    if not hrp or not hum then return end
+
+    for _, part in ipairs(char:GetDescendants()) do
+        if part:IsA("BasePart") then
+            originalCanCollide[part] = part.CanCollide
+            part.CanCollide = false
+        end
+    end
+
+    descendantConnection = char.DescendantAdded:Connect(function(desc)
+        if desc:IsA("BasePart") then
+            originalCanCollide[desc] = desc.CanCollide
+            desc.CanCollide = false
+        end
+    end)
+
+    isWarpFlying = true
+    hum:ChangeState(Enum.HumanoidStateType.Climbing)
+
+    microStepConn = task.spawn(microStepLoop)
+    healthLockConn = task.spawn(healthLockLoop)
+    diedConn = hum.Died:Connect(onDied)
+end
+
+local function stopWarpFly()
+    isWarpFlying = false
+    clearFlyRes()
+end
+
+UniversalLeftGroup:AddToggle('FlyToggle', {
+    Text = '平滑飞行(无视墙体，不会死亡，不能在墨水使用)',
+    Default = false,
+    Tooltip = '开启 / 关闭硬核不死飞行',
+    Callback = function(Value)
+        if Value then
+            startWarpFly()
+        else
+            stopWarpFly()
+        end
+    end
+})
+
+UniversalLeftGroup:AddSlider('FlySpeedSlider', {
+    Text = '飞行速度',
+    Default = 50,
+    Min = 10,
+    Max = 200,
+    Rounding = 0,
+    Suffix = '',
+    Callback = function(Value)
+        flySpeed = Value
+    end
+})
+
+local function bindCharacter()
+    local char = lp.Character or lp.CharacterAdded:Wait()
+    hrp = char:WaitForChild("HumanoidRootPart")
+    hum = char:WaitForChild("Humanoid")
+
+    char.AncestryChanged:Connect(function(_, parent)
+        if not parent then
+            stopWarpFly()
+            bindCharacter()
+        end
+    end)
+end
+
+bindCharacter()
+
+print("✅ 战旗飞行（硬核不死版）已加载")
+
 local CurrentCamera = workspace.CurrentCamera
 if not CurrentCamera then
     warn("未找到 CurrentCamera")
@@ -1404,6 +1760,7 @@ local scriptCategories = {
             {Name = "BS中心", Url = "https://gitee.com/BS_script/script/raw/master/黑洞中心(BS).txt"},
             {Name = "Rb脚本中心", Url = "https://raw.githubusercontent.com/Yungengxin/roblox/refs/heads/main/Rb-Hub"},
             {Name = "sa脚本", Url = "https://raw.githubusercontent.com/Bebo-Mods/BeboScripts/main/StandAwekening.lua"},
+            {Name = "霖溺通用", Url = "https://raw.githubusercontent.com/ShenJiaoBen/Partial-Server-Ribbon/refs/heads/main/Linni_Universal.txt"},
         }
     },
     {
@@ -5051,7 +5408,7 @@ end)
 
 local GetKeyButton = KeyWindow:AddButton("获取解卡链接", UDim2.new(0.55, 0, 0.65, 0), function()
     if setclipboard then
-        setclipboard("https://qun.qq.com/universal-share/share?ac=1&authKey=3UmgBtrf9TEDRGpgBAeKOXuXC5wVFjUr3lSSXAWzOmiF%2BqeMaqZpav2TmoRvmScY&busi_data=eyJncm91cENvZGUiOiI5Mzg3MTQ0MjciLCJ0b2tlbiI6IjhHS2NPUFBlM211QzFKNVhjamZRMnQ0R2ZIeitJUWUzKzRHOUplcjZEY2ZaMzNOVlF4bjZmaGovSWNwRElobEwiLCJ1aW4iOiIzNDM1Mjg2MTc3In0%3D&data=wdrGmVan3rLPzXGZ8rlxTndGWdm_WrIxHdeUF3YHzjysDRw81ZsHgGjE3Ar28jwKT1wCKz9vMdQZzZmoViXJMA&svctype=4&tempid=h5_group_info")
+        setclipboard("https://desirable-violet-jgq9pbeaal.edgeone.app/?eo_token=c291bba6c9a528927047ecf53e15a0cd&eo_time=1777812263")
     else
         warn("setclipboard is not available.")
     end
