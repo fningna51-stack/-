@@ -135,7 +135,6 @@ local Tabs = {
     Qcjbwd = Window:AddTab("娱乐脚本", "key"),
     Afhubyyds = Window:AddTab("付费功能", "dog"),
     Ksqcswbb = Window:AddTab("传送与播放", "music"),
-    Ksqcncnm = Window:AddTab("自瞄功能", "aim"),
     Settings = Window:AddTab("UI设置", "settings")
 }
 
@@ -5527,7 +5526,24 @@ Afhubyyds:AddToggle('AutoHandstand', {
         end)
     end
 })
-
+local Afhubyyds = Tabs.Afhubyyds:AddRightGroupbox("AX-SCRIPTS[AX脚本]");
+Afhubyyds:AddButton({Text="AX-SCRIPTS[AX脚本]",Func=function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%96%B0AX%E6%B1%89%E5%8C%96%E5%BA%93"))()
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
+Afhubyyds:AddButton({Text="点击复制AXdc频道",Func=function()
+        setclipboard("https://discord.gg/ax-scripts");
+end});
+Afhubyyds:AddButton({Text="点击复制解卡链接",Func=function()
+        setclipboard("https://jnkie.com/flow/4783dbb3-271c-416e-9d40-4ddfe79b7484");
+end});
+Afhubyyds:AddLabel("支持服务器如下：")
+Afhubyyds:AddLabel("闪光(已汉化)")
+Afhubyyds:AddLabel("墨水游戏(已汉化)")
+Afhubyyds:AddLabel("鱿鱼游戏(已汉化)")
 local Afhubyyds = Tabs.Afhubyyds:AddRightGroupbox("悔脚本专区(和付费脚本差不多)");
 Afhubyyds:AddButton({Text="悔脚本",Func=function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/sdxs221/sd/main/NewWorld"))()
@@ -5833,6 +5849,7 @@ Ksqcswbb:AddButton({
 	end,
 	DoubleClick = false
 })
+
 local ScriptCenterLeftGroup = Tabs.ScriptCenter:AddLeftGroupbox("脚本中心1");
 local ScriptCenterRightGroup = Tabs.ScriptCenter:AddRightGroupbox("脚本中心2");
 local leftIndex = 0;
