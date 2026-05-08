@@ -134,7 +134,8 @@ local Tabs = {
     ScriptCenter = Window:AddTab("脚本中心", "cat"),
     Qcjbwd = Window:AddTab("娱乐脚本", "key"),
     Afhubyyds = Window:AddTab("付费功能", "dog"),
-    Ksqcswbb = Window:AddTab("传送功能", "music"),
+    Ksqcswbb = Window:AddTab("传送与播放", "music"),
+    Ksqcncnm = Window:AddTab("自瞄功能", "aim"),
     Settings = Window:AddTab("UI设置", "settings")
 }
 
@@ -714,6 +715,226 @@ UniversalLeftGroup:AddToggle("TouchKillToggle", {
         else
             warn("碰飞已关闭")
         end
+    end
+})
+UniversalLeftGroup:AddToggle('AntiFlingToggle', {
+    Text = '防甩飞(可在墨水使用)',
+    Default = false,
+    Tooltip = '开启后防止玩家被甩飞',
+
+    Callback = function(state)
+        if state then
+            local Players = game:GetService("Players")
+            local RunService = game:GetService("RunService")
+            local LocalPlayer = Players.LocalPlayer
+
+            local ANTI_FLING_FORCE = 1e6
+            local UPDATE_RATE = 0.01
+
+            _G.ActiveHandles = {
+                Connections = {},
+                Constraints = {},
+                Alignments = {}
+            }
+
+            local function CreateSuperConstraint(part)
+                local bodyPos = Instance.new("BodyPosition")
+                bodyPos.P = ANTI_FLING_FORCE
+                bodyPos.D = ANTI_FLING_FORCE / 10
+                bodyPos.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                bodyPos.Position = part.Position
+                bodyPos.Parent = part
+
+                local bodyGyro = Instance.new("BodyGyro")
+                bodyGyro.P = ANTI_FLING_FORCE
+                bodyGyro.D = ANTI_FLING_FORCE / 10
+                bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+                bodyGyro.CFrame = part.CFrame
+                bodyGyro.Parent = part
+
+                local alignPos = Instance.new("AlignPosition")
+                alignPos.RigidityEnabled = true
+                alignPos.MaxForce = ANTI_FLING_FORCE
+                alignPos.Responsiveness = ANTI_FLING_FORCE
+                alignPos.Parent = part
+
+                local alignOri = Instance.new("AlignOrientation")
+                alignOri.RigidityEnabled = true
+                alignOri.MaxTorque = ANTI_FLING_FORCE
+                alignOri.Responsiveness = ANTI_FLING_FORCE
+                alignOri.Parent = part
+
+                table.insert(_G.ActiveHandles.Constraints, bodyPos)
+                table.insert(_G.ActiveHandles.Constraints, bodyGyro)
+                table.insert(_G.ActiveHandles.Alignments, alignPos)
+                table.insert(_G.ActiveHandles.Alignments, alignOri)
+
+                return bodyPos, bodyGyro, alignPos, alignOri
+            end
+
+            local function ApplyUltimateProtection(character)
+                if not character then return end
+
+                local rootPart = character:FindFirstChild("HumanoidRootPart")
+                    or character:FindFirstChild("Torso")
+
+                if not rootPart then return end
+
+                local bodyPos, bodyGyro, alignPos, alignOri =
+                    CreateSuperConstraint(rootPart)
+
+                local updateConn = RunService.Heartbeat:Connect(function()
+                    if not character:IsDescendantOf(workspace) then return end
+
+                    bodyPos.Position = rootPart.Position
+                    bodyGyro.CFrame = rootPart.CFrame
+
+                    for _, part in ipairs(character:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = false
+                            part.CustomPhysicalProperties =
+                                PhysicalProperties.new(0, 0, 0)
+                            part.AssemblyAngularVelocity = Vector3.new()
+                            part.AssemblyLinearVelocity = Vector3.new()
+                            part.Velocity = Vector3.new()
+                            part.RotVelocity = Vector3.new()
+                            part:SetAttribute("LastPosition", part.Position)
+                        end
+                    end
+                end)
+
+                table.insert(_G.ActiveHandles.Connections, updateConn)
+
+                local velConn =
+                    rootPart:GetPropertyChangedSignal("AssemblyLinearVelocity")
+                        :Connect(function()
+                            rootPart.AssemblyLinearVelocity = Vector3.new()
+                            rootPart.Velocity = Vector3.new()
+                        end)
+
+                table.insert(_G.ActiveHandles.Connections, velConn)
+
+                local rotConn =
+                    rootPart:GetPropertyChangedSignal("AssemblyAngularVelocity")
+                        :Connect(function()
+                            rootPart.AssemblyAngularVelocity = Vector3.new()
+                            rootPart.RotVelocity = Vector3.new()
+                        end)
+
+                table.insert(_G.ActiveHandles.Connections, rotConn)
+
+                local posCheck = RunService.Heartbeat:Connect(function()
+                    if not character:IsDescendantOf(workspace) then return end
+
+                    local lastPos = rootPart:GetAttribute("LastPosition")
+                    if lastPos then
+                        local dist =
+                            (rootPart.Position - lastPos).Magnitude
+                        if dist > 5 then
+                            rootPart.CFrame = CFrame.new(lastPos)
+                        end
+                    end
+                    rootPart:SetAttribute("LastPosition", rootPart.Position)
+                end)
+
+                table.insert(_G.ActiveHandles.Connections, posCheck)
+            end
+
+            local function MonitorPlayer(player)
+                if player == LocalPlayer then return end
+
+                local function HandleCharacter(character)
+                    if not character then return end
+                    repeat task.wait() until
+                        character:FindFirstChild("HumanoidRootPart")
+                        or character:FindFirstChild("Torso")
+
+                    ApplyUltimateProtection(character)
+                end
+
+                if player.Character then
+                    HandleCharacter(player.Character)
+                end
+
+                local charConn =
+                    player.CharacterAdded:Connect(HandleCharacter)
+                table.insert(_G.ActiveHandles.Connections, charConn)
+            end
+
+            for _, player in ipairs(Players:GetPlayers()) do
+                MonitorPlayer(player)
+            end
+
+            local playerConn =
+                Players.PlayerAdded:Connect(MonitorPlayer)
+            table.insert(_G.ActiveHandles.Connections, playerConn)
+
+        else
+            -- 关闭防甩飞
+            for _, conn in ipairs(_G.ActiveHandles.Connections or {}) do
+                if conn.Connected then
+                    conn:Disconnect()
+                end
+            end
+
+            for _, constraint in ipairs(
+                _G.ActiveHandles.Constraints or {}
+            ) do
+                if constraint and constraint.Parent then
+                    constraint:Destroy()
+                end
+            end
+
+            for _, align in ipairs(
+                _G.ActiveHandles.Alignments or {}
+            ) do
+                if align and align.Parent then
+                    align:Destroy()
+                end
+            end
+
+            for _, player in ipairs(
+                game:GetService("Players"):GetPlayers()
+            ) do
+                if player ~= LocalPlayer and player.Character then
+                    for _, part in ipairs(
+                        player.Character:GetDescendants()
+                    ) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = true
+                            part.CustomPhysicalProperties = nil
+                            part.AssemblyAngularVelocity = Vector3.new()
+                            part.AssemblyLinearVelocity = Vector3.new()
+                            part:SetAttribute("LastPosition", nil)
+                        end
+                    end
+                end
+            end
+
+            _G.ActiveHandles = {
+                Connections = {},
+                Constraints = {},
+                Alignments = {}
+            }
+        end
+    end
+})
+UniversalLeftGroup:AddToggle('FastInteractToggle', {
+    Text = '快速交互',
+    Default = false,
+    Tooltip = '开启后所有 ProximityPrompt 无需长按',
+    Callback = function(Value)
+        if Value then
+            game.ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
+                prompt.HoldDuration = 0
+            end)
+        else
+            game.ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
+                prompt.HoldDuration = 3
+            end)
+        end
+
+        print('[回调] 快速交互状态:', Value)
     end
 })
 UniversalLeftGroup:AddToggle("MotionBlurToggle", {
@@ -2033,6 +2254,13 @@ Qcjbwd:AddButton({Text="飞踢脚本",Func=function()
                 Func();
         end
 end});
+Qcjbwd:AddButton({Text="VR脚本",Func=function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/randomstring0/Qwerty/refs/heads/main/qwerty45.lua"))()
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
 Qcjbwd:AddButton({Text="4000种动作脚本",Func=function()
         loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-7yd7-I-Emote-Script-48024"))()
         local Func = loadstring(ScriptContent);
@@ -2043,6 +2271,294 @@ end});
 Qcjbwd:AddLabel("飞行类");
 Qcjbwd:AddButton({Text="无敌少侠飞行脚本",Func=function()
         loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Invinicible-Flight-R15-45414"))()
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
+Qcjbwd:AddButton({Text="联邦GUI飞行脚本",Func=function()
+        local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local old = LocalPlayer.PlayerGui:FindFirstChild("ClimateV11_Fixed")
+if old then old:Destroy() end
+
+local sg = Instance.new("ScreenGui")
+sg.Name = "ClimateV11_Fixed"
+sg.Parent = LocalPlayer:WaitForChild("PlayerGui")
+sg.ZIndexBehavior = Enum.ZIndexBehavior.Global
+sg.ResetOnSpawn = false
+
+local isFlying = false
+local flySpeed = 1
+local walkSpeedMult = 1
+local bg, bv
+
+local Logo = Instance.new("TextButton")
+Logo.Parent = sg
+Logo.Size = UDim2.new(0, 45, 0, 45)
+Logo.Position = UDim2.new(0.05, 0, 0.4, 0)
+Logo.BackgroundColor3 = Color3.fromRGB(0, 255, 127)
+Logo.Text = "Fly"
+Logo.TextColor3 = Color3.new(0,0,0)
+Logo.Font = Enum.Font.GothamBold
+Logo.TextSize = 20
+Logo.Visible = false
+Logo.ZIndex = 50
+Instance.new("UICorner", Logo).CornerRadius = UDim.new(1, 0)
+Logo.Draggable = true
+Logo.Active = true
+Logo.Selectable = true
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Parent = sg
+MainFrame.Size = UDim2.new(0, 190, 0, 260)
+MainFrame.Position = UDim2.new(0.5, -95, 0.4, -130)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+MainFrame.BorderSizePixel = 1
+MainFrame.BorderColor3 = Color3.fromRGB(0, 255, 127)
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Selectable = true
+MainFrame.ZIndex = 5
+MainFrame.ClipsDescendants = true
+
+local TopBar = Instance.new("Frame")
+TopBar.Parent = MainFrame
+TopBar.Size = UDim2.new(1, 0, 0, 35)
+TopBar.Position = UDim2.new(0, 0, 0, 0)
+TopBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+TopBar.BorderSizePixel = 0
+TopBar.ZIndex = 15
+TopBar.Active = true
+TopBar.Selectable = true
+
+local function makeDraggable(dragBar, targetFrame)
+    local dragging = false
+    local dragInput
+    local dragStart
+    local startPos
+
+    local function update(input)
+        local delta = input.Position - dragStart
+        targetFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+
+    dragBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = targetFrame.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    dragBar.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+
+    RunService.RenderStepped:Connect(function()
+        if dragging and dragInput then
+            update(dragInput)
+        end
+    end)
+end
+
+makeDraggable(TopBar, MainFrame)
+makeDraggable(Logo, Logo)
+
+local Watermark = Instance.new("TextLabel")
+Watermark.Parent = MainFrame
+Watermark.Size = UDim2.new(1, 0, 0, 20)
+Watermark.Position = UDim2.new(0, 0, 0, 35)
+Watermark.BackgroundTransparency = 1
+Watermark.Text = "FLY GUI by Trash"
+Watermark.TextColor3 = Color3.fromRGB(0, 255, 127)
+Watermark.TextSize = 14
+Watermark.Font = Enum.Font.GothamBold
+Watermark.ZIndex = 10
+
+local QQGroup = Instance.new("TextLabel")
+QQGroup.Parent = MainFrame
+QQGroup.Size = UDim2.new(1, 0, 0, 16)
+QQGroup.Position = UDim2.new(0, 0, 0, 52)
+QQGroup.BackgroundTransparency = 1
+QQGroup.Text = "QQ群: 1082973754"
+QQGroup.TextColor3 = Color3.fromRGB(255, 255, 255)
+QQGroup.TextSize = 10
+QQGroup.Font = Enum.Font.Gotham
+QQGroup.ZIndex = 10
+
+local function createTab(name, pos, txt)
+    local t = Instance.new("TextButton")
+    t.Size = UDim2.new(0.4, 0, 0, 35)
+    t.Position = pos
+    t.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    t.Text = txt
+    t.TextColor3 = Color3.new(1,1,1)
+    t.Font = Enum.Font.GothamBold
+    t.Parent = MainFrame
+    t.ZIndex = 20 
+    t.Active = true
+    t.Selectable = true
+    return t
+end
+
+local TabFly = createTab("T1", UDim2.new(0,0,0,0), "飞行")
+local TabPlayer = createTab("T2", UDim2.new(0.4,0,0,0), "玩家")
+local Mini = Instance.new("TextButton", MainFrame)
+Mini.Size = UDim2.new(0, 38, 0, 35)
+Mini.Position = UDim2.new(0.8, 0, 0, 0)
+Mini.BackgroundTransparency = 1
+Mini.Text = "_"
+Mini.TextColor3 = Color3.new(1,1,1)
+Mini.TextSize = 20
+Mini.ZIndex = 20
+Mini.Active = true
+Mini.Selectable = true
+
+local function createScrollPage(name)
+    local s = Instance.new("ScrollingFrame")
+    s.Name = name
+    s.Size = UDim2.new(1, 0, 1, -75)
+    s.Position = UDim2.new(0, 0, 0, 75)
+    s.BackgroundTransparency = 1
+    s.BorderSizePixel = 0
+    s.ScrollBarThickness = 2
+    s.ScrollBarImageColor3 = Color3.fromRGB(0, 255, 127)
+    s.CanvasSize = UDim2.new(0, 0, 0, 280)
+    s.ZIndex = 6
+    s.Visible = false
+    s.Parent = MainFrame
+    s.Active = true
+    s.Selectable = true
+    return s
+end
+
+local PageFly = createScrollPage("PageFly")
+PageFly.Visible = true
+local PagePlayer = createScrollPage("PagePlayer")
+
+local function addBtn(parent, txt, y, color)
+    local b = Instance.new("TextButton")
+    b.Size = UDim2.new(0.9, 0, 0, 35)
+    b.Position = UDim2.new(0.05, 0, 0, y)
+    b.BackgroundColor3 = color or Color3.fromRGB(45, 45, 45)
+    b.Text = txt
+    b.TextColor3 = Color3.new(1,1,1)
+    b.Font = Enum.Font.GothamBold
+    b.TextSize = 13
+    b.Parent = parent
+    b.ZIndex = 8
+    b.Active = true
+    b.Selectable = true
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 5)
+    return b
+end
+
+local FlyBtn = addBtn(PageFly, "开启飞行", 10, Color3.fromRGB(0, 100, 50))
+local SpeedLab = Instance.new("TextLabel", PageFly)
+SpeedLab.Size = UDim2.new(1, 0, 0, 20)
+SpeedLab.Position = UDim2.new(0, 0, 0, 50)
+SpeedLab.Text = "飞行速度: 1"
+SpeedLab.TextColor3 = Color3.new(1,1,0)
+SpeedLab.BackgroundTransparency = 1
+SpeedLab.ZIndex = 8
+SpeedLab.Active = false
+
+local FlyPlus = addBtn(PageFly, "增加速度 (+)", 75)
+local FlyMinus = addBtn(PageFly, "减少速度 (-)", 115)
+
+local SpeedLab2 = Instance.new("TextLabel", PagePlayer)
+SpeedLab2.Size = UDim2.new(1, 0, 0, 25)
+SpeedLab2.Position = UDim2.new(0, 0, 0, 10)
+SpeedLab2.Text = "跑步加速倍率: 1"
+SpeedLab2.TextColor3 = Color3.new(1,1,0)
+SpeedLab2.BackgroundTransparency = 1
+SpeedLab2.ZIndex = 8
+SpeedLab2.Active = false
+
+local WSPlus = addBtn(PagePlayer, "增加跑步速度", 40)
+local WSMinus = addBtn(PagePlayer, "减少跑步速度", 80)
+local ResetWS = addBtn(PagePlayer, "重置人物速度", 120, Color3.fromRGB(100, 100, 100))
+local Unload = addBtn(PagePlayer, "卸载脚本", 165, Color3.fromRGB(150, 0, 0))
+
+local function switchTab(isFly)
+    PageFly.Visible = isFly
+    PagePlayer.Visible = not isFly
+    TabFly.BackgroundColor3 = isFly and Color3.fromRGB(45, 45, 45) or Color3.fromRGB(25, 25, 25)
+    TabPlayer.BackgroundColor3 = not isFly and Color3.fromRGB(45, 45, 45) or Color3.fromRGB(25, 25, 25)
+    TabFly.TextColor3 = isFly and Color3.fromRGB(0, 255, 127) or Color3.new(1,1,1)
+    TabPlayer.TextColor3 = not isFly and Color3.fromRGB(0, 255, 127) or Color3.new(1,1,1)
+end
+
+TabFly.MouseButton1Click:Connect(function() switchTab(true) end)
+TabPlayer.MouseButton1Click:Connect(function() switchTab(false) end)
+
+Mini.MouseButton1Click:Connect(function() MainFrame.Visible = false Logo.Visible = true end)
+Logo.MouseButton1Click:Connect(function() Logo.Visible = false MainFrame.Visible = true end)
+
+local function stopFly()
+    isFlying = false
+    if bg then bg:Destroy() bg = nil end
+    if bv then bv:Destroy() bv = nil end
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.PlatformStand = false
+    end
+end
+
+FlyBtn.MouseButton1Click:Connect(function()
+    if isFlying then
+        stopFly()
+        FlyBtn.Text = "开启飞行"
+        FlyBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 50)
+    else
+        isFlying = true
+        FlyBtn.Text = "关闭飞行"
+        FlyBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+        local char = LocalPlayer.Character
+        local root = char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso")
+        local hum = char:FindFirstChild("Humanoid")
+        
+        if root and hum then
+            bg = Instance.new("BodyGyro", root); bg.maxTorque = Vector3.new(9e9, 9e9, 9e9); bg.P = 9e4; bg.cframe = root.CFrame
+            bv = Instance.new("BodyVelocity", root); bv.maxForce = Vector3.new(9e9, 9e9, 9e9); bv.velocity = Vector3.new(0, 0, 0)
+            hum.PlatformStand = true
+            spawn(function()
+                while isFlying do
+                    RunService.RenderStepped:Wait()
+                    if hum.MoveDirection.Magnitude > 0 then
+                        bv.velocity = workspace.CurrentCamera.CFrame.LookVector * (flySpeed * 50)
+                    else
+                        bv.velocity = Vector3.new(0, 0, 0)
+                    end
+                    bg.cframe = workspace.CurrentCamera.CFrame
+                end
+            end)
+        end
+    end
+end)
+
+FlyPlus.MouseButton1Click:Connect(function() flySpeed = flySpeed + 1 SpeedLab.Text = "飞行速度: "..flySpeed end)
+FlyMinus.MouseButton1Click:Connect(function() if flySpeed > 1 then flySpeed = flySpeed - 1 SpeedLab.Text = "飞行速度: "..flySpeed end end)
+WSPlus.MouseButton1Click:Connect(function() walkSpeedMult = walkSpeedMult + 1 SpeedLab2.Text = "跑步加速倍率: "..walkSpeedMult end)
+WSMinus.MouseButton1Click:Connect(function() if walkSpeedMult > 1 then walkSpeedMult = walkSpeedMult - 1 SpeedLab2.Text = "跑步加速倍率: "..walkSpeedMult end end)
+ResetWS.MouseButton1Click:Connect(function() walkSpeedMult = 1 SpeedLab2.Text = "跑步加速倍率: 1" end)
+Unload.MouseButton1Click:Connect(function() stopFly() sg:Destroy() end)
+
+RunService.Stepped:Connect(function()
+    if walkSpeedMult > 1 and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.WalkSpeed = 16 * walkSpeedMult
+    end
+end)
         local Func = loadstring(ScriptContent);
         if Func then
                 Func();
@@ -5317,7 +5833,6 @@ Ksqcswbb:AddButton({
 	end,
 	DoubleClick = false
 })
-Afhubyyds:AddLabel("将军")
 local ScriptCenterLeftGroup = Tabs.ScriptCenter:AddLeftGroupbox("脚本中心1");
 local ScriptCenterRightGroup = Tabs.ScriptCenter:AddRightGroupbox("脚本中心2");
 local leftIndex = 0;
