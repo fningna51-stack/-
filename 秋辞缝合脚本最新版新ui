@@ -918,6 +918,405 @@ UniversalLeftGroup:AddToggle('AntiFlingToggle', {
         end
     end
 })
+local AimbotFOV = 150
+
+UniversalLeftGroup:AddSlider('AimbotFOVSlider', {
+    Text = "自瞄范围 FOV",
+    Default = 150,
+    Min = 50,
+    Max = 400,
+    Rounding = 0,
+    Suffix = "px",
+    Compact = false,
+
+    Callback = function(Value)
+        AimbotFOV = tonumber(Value)
+    end
+})
+
+UniversalLeftGroup:AddToggle('AimbotToggle', {
+    Text = '强制自瞄[无法关闭，带墙壁检测]',
+    Default = false,
+    Tooltip = 'FOV模式 + 墙壁检测',
+    Callback = function(Value)
+        local Cam = workspace.CurrentCamera
+        local RunService = game:GetService("RunService")
+        local Players = game:GetService("Players")
+
+        local MAX_DISTANCE = 800
+        local connection
+        local fovCircle
+
+        if Value then
+            fovCircle = Drawing.new("Circle")
+            fovCircle.Color = Color3.fromRGB(255, 0, 0)
+            fovCircle.Thickness = 1.5
+            fovCircle.Filled = false
+            fovCircle.Visible = true
+
+            connection = RunService.RenderStepped:Connect(function()
+                fovCircle.Position = Vector2.new(
+                    Cam.ViewportSize.X / 2,
+                    Cam.ViewportSize.Y / 2
+                )
+                fovCircle.Radius = AimbotFOV
+
+                local nearest = nil
+                local last = math.huge
+
+                for _, v in pairs(Players:GetPlayers()) do
+                    if v ~= Players.LocalPlayer
+                        and v.Character
+                        and v.Character:FindFirstChild("Head") then
+
+                        local head = v.Character.Head
+                        local pos, visible =
+                            Cam:WorldToViewportPoint(head.Position)
+
+                        if visible then
+                            local accPos = Vector2.new(pos.X, pos.Y)
+                            local center = Vector2.new(
+                                Cam.ViewportSize.X / 2,
+                                Cam.ViewportSize.Y / 2
+                            )
+
+                            local dist = (accPos - center).Magnitude
+
+                            if dist < last and dist <= AimbotFOV then
+                                local rayParams = RaycastParams.new()
+                                rayParams.FilterDescendantsInstances = {
+                                    Players.LocalPlayer.Character
+                                }
+                                rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+
+                                local origin = Cam.CFrame.Position
+                                local direction =
+                                    (head.Position - origin).Unit * MAX_DISTANCE
+
+                                local result =
+                                    workspace:Raycast(origin, direction, rayParams)
+
+                                if not result or result.Instance:IsDescendantOf(v.Character) then
+                                    last = dist
+                                    nearest = v
+                                end
+                            end
+                        end
+                    end
+                end
+
+                if nearest and nearest.Character and nearest.Character:FindFirstChild("Head") then
+                    Cam.CFrame = CFrame.new(
+                        Cam.CFrame.Position,
+                        nearest.Character.Head.Position
+                    )
+                end
+            end)
+
+        else
+            if connection then
+                connection:Disconnect()
+                connection = nil
+            end
+            if fovCircle then
+                fovCircle:Remove()
+                fovCircle = nil
+            end
+        end
+    end
+})
+UniversalLeftGroup:AddToggle('CircleESPToggle', {
+    Text = '透视 ESP',
+    Default = false,
+    Tooltip = '显示玩家圆圈 + 名字',
+    Callback = function(Value)
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer then
+                if Value then
+                    local highlight = Instance.new("Highlight")
+                    highlight.Parent = player.Character
+                    highlight.Adornee = player.Character
+                    highlight.FillTransparency = 0.5
+                    highlight.OutlineTransparency = 0
+                    local billboard = Instance.new("BillboardGui")
+                    billboard.Parent = player.Character
+                    billboard.Adornee = player.Character
+                    billboard.Size = UDim2.new(0, 100, 0, 100)
+                    billboard.StudsOffset = Vector3.new(0, 3, 0)
+                    billboard.AlwaysOnTop = true
+
+                    local nameLabel = Instance.new("TextLabel")
+                    nameLabel.Parent = billboard
+                    nameLabel.Size = UDim2.new(1, 0, 1, 0)
+                    nameLabel.BackgroundTransparency = 1
+                    nameLabel.Text = player.Name
+                    nameLabel.TextColor3 = Color3.new(1, 1, 1)
+                    nameLabel.TextStrokeTransparency = 0.5
+                    nameLabel.TextScaled = true
+
+                    local circle = Instance.new("ImageLabel")
+                    circle.Parent = billboard
+                    circle.Size = UDim2.new(0, 50, 0, 50)
+                    circle.Position = UDim2.new(0.5, 0, 0.5, 0)
+                    circle.AnchorPoint = Vector2.new(0.5, 0.5)
+                    circle.BackgroundTransparency = 1
+                    circle.Image = "rbxassetid://2200552246"
+                else
+                    if player.Character then
+                        local highlight = player.Character:FindFirstChildOfClass("Highlight")
+                        local billboard = player.Character:FindFirstChildOfClass("BillboardGui")
+
+                        if highlight then highlight:Destroy() end
+                        if billboard then billboard:Destroy() end
+                    end
+                end
+            end
+        end
+    end
+})
+UniversalLeftGroup:AddToggle('BoxESPToggle', {
+    Text = '3D 方框 + 追踪线[无法关闭]',
+    Default = false,
+    Tooltip = '显示玩家3D方框与追踪线',
+
+    Callback = function(Value)
+        local Enabled = Value
+        local Connections = {}
+
+        local function NewLine(color)
+            local line = Drawing.new("Line")
+            line.Thickness = 1.4
+            line.Color = color or Color3.fromRGB(0, 255, 50)
+            line.Visible = false
+            return line
+        end
+
+        if Enabled then
+            for _, player in pairs(game.Players:GetPlayers()) do
+                if player ~= game.Players.LocalPlayer then
+                    Connections[player] = {}
+
+                    local lines = {}
+                    for i = 1, 12 do
+                        local line = NewLine()
+                        table.insert(lines, line)
+                        table.insert(Connections[player], line)
+                    end
+
+                    local tracer = NewLine()
+                    table.insert(Connections[player], tracer)
+
+                    local conn = game:GetService("RunService").RenderStepped:Connect(function()
+                        if not Enabled or not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then
+                            for _, line in pairs(lines) do line.Visible = false end
+                            tracer.Visible = false
+                            return
+                        end
+
+                        local char = player.Character
+                        local hrp = char.HumanoidRootPart
+                        local cam = workspace.CurrentCamera
+
+                        local scale = char.Head.Size.Y / 2
+                        local size = Vector3.new(2, 3, 1.5) * (scale * 2)
+
+                        local function wp(cf)
+                            local v, on = cam:WorldToViewportPoint(cf.p)
+                            return Vector2.new(v.X, v.Y), on
+                        end
+
+                        local top1, v1 = wp(hrp.CFrame * CFrame.new(-size.X, size.Y, -size.Z))
+                        local top2, v2 = wp(hrp.CFrame * CFrame.new(-size.X, size.Y, size.Z))
+                        local top3, v3 = wp(hrp.CFrame * CFrame.new(size.X, size.Y, size.Z))
+                        local top4, v4 = wp(hrp.CFrame * CFrame.new(size.X, size.Y, -size.Z))
+
+                        local bot1, v5 = wp(hrp.CFrame * CFrame.new(-size.X, -size.Y, -size.Z))
+                        local bot2, v6 = wp(hrp.CFrame * CFrame.new(-size.X, -size.Y, size.Z))
+                        local bot3, v7 = wp(hrp.CFrame * CFrame.new(size.X, -size.Y, size.Z))
+                        local bot4, v8 = wp(hrp.CFrame * CFrame.new(size.X, -size.Y, -size.Z))
+
+                        local visible = v1 and v2 and v3 and v4 and v5 and v6 and v7 and v8
+
+                        lines[1].From, lines[1].To = top1, top2
+                        lines[2].From, lines[2].To = top2, top3
+                        lines[3].From, lines[3].To = top3, top4
+                        lines[4].From, lines[4].To = top4, top1
+
+                        lines[5].From, lines[5].To = bot1, bot2
+                        lines[6].From, lines[6].To = bot2, bot3
+                        lines[7].From, lines[7].To = bot3, bot4
+                        lines[8].From, lines[8].To = bot4, bot1
+
+                        lines[9].From, lines[9].To = bot1, top1
+                        lines[10].From, lines[10].To = bot2, top2
+                        lines[11].From, lines[11].To = bot3, top3
+                        lines[12].From, lines[12].To = bot4, top4
+
+                        for _, line in pairs(lines) do
+                            line.Visible = visible
+                        end
+
+                        if visible then
+                            local tracePos = cam:WorldToViewportPoint((hrp.CFrame * CFrame.new(0, -size.Y, 0)).p)
+                            tracer.From = Vector2.new(cam.ViewportSize.X / 2, cam.ViewportSize.Y)
+                            tracer.To = Vector2.new(tracePos.X, tracePos.Y)
+                            tracer.Visible = true
+                        else
+                            tracer.Visible = false
+                        end
+                    end)
+
+                    table.insert(Connections[player], conn)
+
+                    player.CharacterAdded:Connect(function(char)
+                        -- 重新绑定逻辑可在这里扩展
+                    end)
+                end
+            end
+        else
+            for player, objects in pairs(Connections) do
+                for _, obj in pairs(objects) do
+                    if typeof(obj) == "RBXScriptConnection" then
+                        obj:Disconnect()
+                    else
+                        obj:Remove()
+                    end
+                end
+            end
+            Connections = {}
+        end
+    end
+})
+UniversalLeftGroup:AddToggle('SkeletonESPToggle', {
+    Text = '骨骼 ESP[无法关闭]',
+    Default = false,
+    Tooltip = '显示玩家骨架线条',
+
+    Callback = function(Value)
+        local Enabled = Value
+        local Connections = {}
+
+        local function NewLine(color)
+            local line = Drawing.new("Line")
+            line.Thickness = 2
+            line.Color = color or Color3.fromRGB(0, 255, 0)
+            line.Visible = false
+            return line
+        end
+
+        if Enabled then
+            for _, player in pairs(game.Players:GetPlayers()) do
+                if player ~= game.Players.LocalPlayer then
+                    Connections[player] = {}
+
+                    local lines = {
+                        Head = NewLine(),
+                        Torso = NewLine(),
+                        LeftArm = NewLine(),
+                        RightArm = NewLine(),
+                        LeftLeg = NewLine(),
+                        RightLeg = NewLine(),
+                    }
+
+                    for _, line in pairs(lines) do
+                        table.insert(Connections[player], line)
+                    end
+
+                    local function Draw(character)
+                        local conn = game:GetService("RunService").RenderStepped:Connect(function()
+                            if not Enabled or not character or not character:FindFirstChild("HumanoidRootPart") then
+                                for _, line in pairs(lines) do
+                                    line.Visible = false
+                                end
+                                return
+                            end
+
+                            local hum = character:FindFirstChild("Humanoid")
+                            if not hum or hum.Health <= 0 then
+                                for _, line in pairs(lines) do
+                                    line.Visible = false
+                                end
+                                return
+                            end
+
+                            local cam = workspace.CurrentCamera
+
+                            local function wp(pos)
+                                local v, on = cam:WorldToViewportPoint(pos)
+                                return Vector2.new(v.X, v.Y), on
+                            end
+
+                            local head, torsoU, torsoL, larm, rarm, lleg, rleg
+
+                            if hum.RigType == Enum.HumanoidRigType.R6 then
+                                head = character.Head
+                                torsoU = character.Torso
+                                torsoL = torsoU
+                                larm = character["Left Arm"]
+                                rarm = character["Right Arm"]
+                                lleg = character["Left Leg"]
+                                rleg = character["Right Leg"]
+                            else
+                                head = character.Head
+                                torsoU = character.UpperTorso
+                                torsoL = character.LowerTorso
+                                larm = character.LeftUpperArm
+                                rarm = character.RightUpperArm
+                                lleg = character.LeftUpperLeg
+                                rleg = character.RightUpperLeg
+                            end
+
+                            if head and torsoU and torsoL and larm and rarm and lleg and rleg then
+                                local h2d, hvis = wp(head.Position)
+                                local tU2d, tUvis = wp(torsoU.Position + Vector3.new(0, 1.1, 0))
+                                local tL2d, tLvis = wp(torsoL.Position + Vector3.new(0, -1.1, 0))
+                                local la2d, lavis = wp(larm.Position + Vector3.new(0, -1.1, 0))
+                                local ra2d, ravis = wp(rarm.Position + Vector3.new(0, -1.1, 0))
+                                local ll2d, llvis = wp(lleg.Position + Vector3.new(0, -1.3, 0))
+                                local rl2d, rlvis = wp(rleg.Position + Vector3.new(0, -1.3, 0))
+
+                                local visible =
+                                    hvis and tUvis and tLvis and lavis and ravis and llvis and rlvis
+
+                                lines.Head.From, lines.Head.To = h2d, tU2d
+                                lines.Torso.From, lines.Torso.To = tU2d, tL2d
+                                lines.LeftArm.From, lines.LeftArm.To = tU2d, la2d
+                                lines.RightArm.From, lines.RightArm.To = tU2d, ra2d
+                                lines.LeftLeg.From, lines.LeftLeg.To = tL2d, ll2d
+                                lines.RightLeg.From, lines.RightLeg.To = tL2d, rl2d
+
+                                for _, line in pairs(lines) do
+                                    line.Visible = visible
+                                end
+                            end
+                        end)
+
+                        table.insert(Connections[player], conn)
+                    end
+
+                    if player.Character then
+                        Draw(player.Character)
+                    end
+
+                    player.CharacterAdded:Connect(function(char)
+                        Draw(char)
+                    end)
+                end
+            end
+        else
+            for player, objects in pairs(Connections) do
+                for _, obj in pairs(objects) do
+                    if typeof(obj) == "RBXScriptConnection" then
+                        obj:Disconnect()
+                    else
+                        obj:Remove()
+                    end
+                end
+            end
+            Connections = {}
+        end
+    end
+})
 UniversalLeftGroup:AddToggle('FastInteractToggle', {
     Text = '快速交互',
     Default = false,
@@ -2016,11 +2415,8 @@ local scriptCategories = {
         List = {
             {Name = "AX-inggame 有芙同享汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/ax%E8%84%9A%E6%9C%AC%E7%A7%8B%E8%BE%9E%E6%B1%89%E5%8C%96"},
             {Name = "墨水游戏天使之翼汉化(卡密在通用功能复制)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E5%A2%A8%E6%B0%B4inkgame%E6%B1%89%E5%8C%96"},
-            {Name = "墨水游戏人机汉化(里面有反作弊甩飞)", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/inkgame-ADEN-robot"},
             {Name = "墨水Ringta汉化(无卡密)", Url = "https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/Ringta"},
-            {Name = "博伦墨水脚本", Url = "https://pastebin.com/raw/Q64rPkwu"},
             {Name = "Unm汉化，卡密ink50", Url = "https://raw.githubusercontent.com/Youfutongxiang1/unm-CN/refs/heads/main/README.md"},
-            {Name = "秋辞墨水游戏辅助(二改缝合)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/refs/heads/main/%E7%A7%8B%E8%BE%9E%E5%A2%A8%E6%B0%B4%E6%B8%B8%E6%88%8F%E8%BE%85%E5%8A%A9%E8%84%9A%E6%9C%AC%28%E4%BA%8C%E6%94%B9%29"},
         }
     },
     {
