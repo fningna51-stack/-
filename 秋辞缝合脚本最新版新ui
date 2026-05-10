@@ -918,6 +918,201 @@ UniversalLeftGroup:AddToggle('AntiFlingToggle', {
         end
     end
 })
+
+UniversalLeftGroup:AddCheckbox("ESP", {
+    Text = "透视[墨水可用]",
+    Default = false,
+    Callback = function(enabled)
+        local Players = game:GetService("Players")
+        local RunService = game:GetService("RunService")
+
+        local highlights = {}
+        local connections = {}
+
+        local function clearHighlights()
+            for _, plr in pairs(Players:GetPlayers()) do
+                if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                    local hl = plr.Character.HumanoidRootPart:FindFirstChild("Highlight")
+                    if hl then
+                        hl:Destroy()
+                    end
+                end
+            end
+            for _, conn in pairs(connections) do
+                if typeof(conn) == "RBXScriptConnection" then
+                    conn:Disconnect()
+                end
+            end
+            table.clear(highlights)
+            table.clear(connections)
+        end
+
+        if enabled then
+            for _, plr in pairs(Players:GetPlayers()) do
+                task.spawn(function()
+                    repeat task.wait() until plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+                    if not plr.Character.HumanoidRootPart:FindFirstChild("Highlight") then
+                        local highlight = Instance.new("Highlight")
+                        highlight.Name = "Highlight"
+                        highlight.Adornee = plr.Character
+                        highlight.Parent = plr.Character.HumanoidRootPart
+                        highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                        highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+                        highlights[plr] = highlight
+                    end
+                end)
+            end
+
+            connections["PlayerAdded"] = Players.PlayerAdded:Connect(function(plr)
+                task.spawn(function()
+                    repeat task.wait() until plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+                    if not plr.Character.HumanoidRootPart:FindFirstChild("Highlight") then
+                        local highlight = Instance.new("Highlight")
+                        highlight.Name = "Highlight"
+                        highlight.Adornee = plr.Character
+                        highlight.Parent = plr.Character.HumanoidRootPart
+                        highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                        highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+                        highlights[plr] = highlight
+                    end
+                end)
+            end)
+
+            connections["PlayerRemoving"] = Players.PlayerRemoving:Connect(function(plr)
+                if highlights[plr] then
+                    highlights[plr]:Destroy()
+                    highlights[plr] = nil
+                end
+            end)
+
+        else
+            clearHighlights()
+        end
+    end
+})
+
+UniversalLeftGroup:AddCheckbox("No Shadows", {
+    Text = "无阴影",
+    Default = false,
+    Callback = function(v)
+        _env.GlobalShadows = v
+    end
+})
+
+UniversalLeftGroup:AddCheckbox("Demisting", {
+    Text = "去雾",
+    Default = false,
+    Callback = function(v)
+        _env.NoFog = v
+    end
+})
+
+UniversalLeftGroup:AddToggle("TopInfoDisplay", {
+    Text = "北京时间显示[源码二改;]",
+    Default = true,
+    Callback = function(v)
+        _G.TopInfo_Enabled = v
+
+        if v then
+            if not _G.TopInfoGuiInstance then
+                local TopInfoGui = Instance.new("ScreenGui")
+                TopInfoGui.Name = "VZHubTopInfo"
+                TopInfoGui.Parent = game.CoreGui
+                TopInfoGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+                TopInfoGui.IgnoreGuiInset = true
+
+                local MainPanel = Instance.new("Frame")
+                MainPanel.Parent = TopInfoGui
+                MainPanel.AnchorPoint = Vector2.new(1, 0)
+                MainPanel.Position = UDim2.new(0.97, 0, 0.03, 0)
+                MainPanel.Size = UDim2.new(0, 220, 0, 34)
+                MainPanel.BackgroundColor3 = Color3.fromRGB(10, 12, 18)
+                MainPanel.BackgroundTransparency = 0.65
+                MainPanel.BorderSizePixel = 0
+
+                local UICorner = Instance.new("UICorner", MainPanel)
+                UICorner.CornerRadius = UDim.new(0, 10)
+
+                local UIStroke = Instance.new("UIStroke", MainPanel)
+                UIStroke.Color = Color3.fromRGB(80, 160, 255)
+                UIStroke.Thickness = 1.5
+                UIStroke.Transparency = 0.25
+
+                local InfoText = Instance.new("TextLabel", MainPanel)
+                InfoText.Size = UDim2.new(1, -12, 1, 0)
+                InfoText.Position = UDim2.new(0, 6, 0, 0)
+                InfoText.BackgroundTransparency = 1
+                InfoText.Font = Enum.Font.GothamSemibold
+                InfoText.Text = "AF Hub时间: --:--:-- | FPS: --"
+                InfoText.TextSize = 13
+                InfoText.TextXAlignment = Enum.TextXAlignment.Center
+                InfoText.TextColor3 = Color3.fromRGB(80, 160, 255)
+
+                task.spawn(function()
+                    local frames = 0
+                    local lastTime = tick()
+
+                    game:GetService("RunService").RenderStepped:Connect(function()
+                        if not _G.TopInfo_Enabled then return end
+
+                        frames += 1
+                        local now = tick()
+
+                        if now - lastTime >= 1 then
+                            local fps = frames / (now - lastTime)
+                            frames = 0
+                            lastTime = now
+
+                            local t = os.date("*t")
+                            local timeStr = string.format(
+                                "%02d:%02d:%02d",
+                                t.hour, t.min, t.sec
+                            )
+
+                            InfoText.Text = string.format(
+                                "AF Hub时间: %s | FPS: %d",
+                                timeStr,
+                                math.floor(fps)
+                            )
+                        end
+                    end)
+                end)
+
+                task.spawn(function()
+                    local hue = 0
+                    while task.wait(0.03) do
+                        if not _G.TopInfo_Enabled then continue end
+
+                        hue = (hue + 0.015) % 1
+                        InfoText.TextColor3 =
+                            _G.RainbowFPS_Enabled
+                            and Color3.fromHSV(hue, 1, 1)
+                            or Color3.fromRGB(80, 160, 255)
+                    end
+                end)
+
+                _G.TopInfoGuiInstance = TopInfoGui
+            end
+
+            _G.TopInfoGuiInstance.Enabled = true
+        else
+            if _G.TopInfoGuiInstance then
+                _G.TopInfoGuiInstance.Enabled = false
+            end
+        end
+    end
+})
+
+UniversalLeftGroup:AddToggle("RainbowFPS", {
+    Text = "彩虹FPS",
+    Default = false,
+    Callback = function(v)
+        _G.RainbowFPS_Enabled = v
+    end
+})
+
 local AimbotFOV = 150
 
 UniversalLeftGroup:AddSlider('AimbotFOVSlider', {
@@ -2199,7 +2394,7 @@ UniversalLeftGroup:AddButton({Text="重新加载角色",Func=function()
                 A2.Character:BreakJoints();
         end
 end});
-UniversalLeftGroup:AddButton({Text="通用甩飞",Func=function()
+UniversalLeftGroup:AddButton({Text="通用甩飞[不能在墨水使用，秒封]",Func=function()
         local ScriptContent = game:HttpGet("https://pastebin.com/raw/zqyDSUWX");
         local Func = loadstring(ScriptContent);
         if Func then
