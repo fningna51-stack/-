@@ -718,7 +718,9 @@ local Translations = {
         ["Custom Shoot Speed:"] = "射击间隔",
         ["Highlight"] = "高亮",
         ["Chams"] = "透视颜色",
-        ["Swing Speed"] = "挥动速度",
+        ["Swing Speed"] = "移动速度",
+        ["Guard"] = "守卫",
+        ["Exclude"] = "不透视",
         ["Anti Injury"] = "移除受伤"
 }
 
