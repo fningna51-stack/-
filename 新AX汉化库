@@ -719,6 +719,7 @@ local Translations = {
         ["Highlight"] = "高亮",
         ["Chams"] = "透视颜色",
         ["Anti Injury"] = "移除受伤"
+        ["Swing Speed"] = "挥动速度"
 }
 
 local function processTextComponent(gui, newText)
@@ -756,9 +757,9 @@ local function translateAllElements()
             end
         end
     end
-    
+
     pcall(translateGui, game:GetService("CoreGui"))
-    
+
     local player = game:GetService("Players").LocalPlayer
     if player and player:FindFirstChild("PlayerGui") then
         pcall(translateGui, player.PlayerGui)
@@ -776,7 +777,7 @@ local function setupListener()
                         descendant.Text = processTextComponent(descendant, translatedText)
                     end
                 end
-                
+
                 descendant:GetPropertyChangedSignal("Text"):Connect(function()
                     local newText = descendant.Text
                     if newText and newText ~= "" then
@@ -789,9 +790,9 @@ local function setupListener()
             end
         end)
     end
-    
+
     pcall(connectToGui, game:GetService("CoreGui"))
-    
+
     local player = game:GetService("Players").LocalPlayer
     if player and player:FindFirstChild("PlayerGui") then
         pcall(connectToGui, player.PlayerGui)
