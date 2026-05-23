@@ -556,7 +556,7 @@ UniversalLeftGroup:AddSlider('UltraWideSlider', {
     end
 })
 UniversalLeftGroup:AddToggle('MyToggle', {
-    Text = '极速旋转',
+    Text = '极速旋转（不能在墨水使用）',
     Default = false,
     Tooltip = '开启将会快速旋转',
     Callback = function(Value)
@@ -3678,7 +3678,7 @@ Qcjbwd:AddLabel("九十九夜🟢")
 Qcjbwd:AddLabel("墨水游戏汉化情况：全部汉化🟢")
 Qcjbwd:AddLabel("其他脚本汉化情况：大多数已汉化🟡")
 Qcjbwd:AddLabel("AF缝合Hub🟢")
-Qcjbwd:AddLabel("现在已支持服务器：34个服务器")
+Qcjbwd:AddLabel("现在已支持服务器：35个服务器")
 Qcjbwd:AddButton({Text="坐标脚本",Func=function()
         local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "CoordinateDisplay"
