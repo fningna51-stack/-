@@ -6469,56 +6469,44 @@ for _, category in ipairs(scriptCategories) do
         end
 end
 
-local SettingsGroup = Tabs.Settings:AddLeftGroupbox("系统设置");
-
-local timeToggleBtn = SettingsGroup:AddButton("隐藏时间显示", function()
-    local timeGui = game:GetService("CoreGui"):FindFirstChild("TimeDisplayGUI")
-    
-    if timeGui then
-        local timeLabel = timeGui:FindFirstChild("TimeLabel")
-        local toggleButton = timeGui:FindFirstChild("ToggleButton")
-        
-        if timeLabel then
-            if timeLabel.Visible then
-                timeLabel.Visible = false
-                if toggleButton then
-                    toggleButton.Text = "显示"
-                    toggleButton.BackgroundColor3 = Color3.fromRGB(40, 160, 40)
-                end
-                
-                timeToggleBtn:SetText("显示时间显示")
-                Library:Notify("时间显示已隐藏", 3)
-            else
-                timeLabel.Visible = true
-                if toggleButton then
-                    toggleButton.Text = "隐藏"
-                    toggleButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
-                end
-                
-                timeToggleBtn:SetText("隐藏时间显示")
-                Library:Notify("时间显示已显示", 3)
-            end
-        else
-            Library:Notify("未找到时间标签", 3)
-        end
-    else
-        Library:Notify("时间显示GUI未找到", 3)
-    end
+local MenuGroup = Tabs.Settings:AddLeftGroupbox("菜单")
+MenuGroup:AddButton("卸载脚本", function()
+    Library:Unload()
 end)
 
-SettingsGroup:AddButton('卸载脚本', function() Library:Unload() end)
+Library.Theme = "LightGreen"
+Library.AccentColor = Color3.fromRGB(144, 238, 144)
+Library.BackgroundColor = Color3.fromRGB(30, 30, 30)
 
-ThemeManager:SetLibrary(Library);
-SaveManager:SetLibrary(Library);
-SaveManager:IgnoreThemeSettings();
-SaveManager:SetIgnoreIndexes({"MenuKeybind"});
-SaveManager:SetFolder("Obsidian/秋辞脚本");
-ThemeManager:ApplyToTab(Tabs.Settings);
-SaveManager:BuildConfigSection(Tabs.Settings);
-Library.KeybindFrame.Visible = true;
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({"MenuKeybind"})
+SaveManager:SetFolder("Obsidian/秋辞脚本")
+
+ThemeManager:ApplyToTab(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
+
+Library.KeybindFrame.Visible = true
 
 Library:Notify("AF Hub - AF Hub中心 已加载", 3)
 Library:Notify("尊贵的 " .. game.Players.LocalPlayer.Name .. " 欢迎使用", 3)
+task.spawn(function()
+    task.wait(1.5)
+    for _, obj in ipairs(game:GetService("CoreGui"):GetDescendants()) do
+        if obj:IsA("TextButton") and not obj:FindFirstChildOfClass("UICorner") then
+            local c = Instance.new("UICorner")
+            c.CornerRadius = UDim.new(0, 20)
+            c.Parent = obj
+        elseif obj:IsA("ImageButton") and not obj:FindFirstChildOfClass("UICorner") then
+            local c = Instance.new("UICorner")
+            c.CornerRadius = UDim.new(0, 20)
+            c.Parent = obj
+        end
+    end
+end)
+
 Window:SetBackgroundImage("rbxasset://content://media/external/downloads/21522")
     else
         local player = cloneref(game:GetService("Players")).LocalPlayer
