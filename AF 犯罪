@@ -12,8 +12,8 @@ WindUI:AddTheme({
 })
 
 local Window = WindUI:CreateWindow({
-    Title = "AF Hub[公益]      ",
-    Folder = "AF",
+    Title = "AF Hub      ",
+    Folder = "AF Hub",
     SideBarWidth = 180,
     Background = "https://chaton-images.s3.us-east-2.amazonaws.com/GHn9L9UJLf0XcVNyCpbG72D0rmNmBEWndPkh6CjJNya8GLnWzz1vImvt8wlJSBwv_2700x1519x1393696.jpeg", -- video 
     BackgroundImageTransparency = 0.5,
@@ -152,1597 +152,2971 @@ task.spawn(function()
         end
     end
 end)
-local Tabs = {}
 
-do
-    Tabs.World = Window:Tab({ Title = "基本功能", })
-    Tabs.Player = Window:Tab({ Title = "玩家功能", })
-    Tabs.Combat = Window:Tab({ Title = "暴力功能", })
-    Tabs.Visual = Window:Tab({ Title = "绘制功能", })
+local LockSection = Window:Section({
+    Title = "主功能",
+    Opened = true,
+})
+
+local function AddTab(section, title, icon)
+    return section:Tab({Title = title, Icon = icon})
 end
-Window:SelectTab(1)
-local plrs = game:GetService("Players")
-local me = plrs.LocalPlayer
-local input = game:GetService("UserInputService")
-local run = game:GetService("RunService")
-local camera = workspace.CurrentCamera
-local tween = game:GetService("TweenService")
-local light = game:GetService("Lighting")
-local rp = game:GetService("ReplicatedStorage")
 
-local functions = {
-    Fullbright = false,
-    AutoOpenDoors = false,
-    NoBarriers = false,
-    NoGrinder = false,
-    FastPickup = false,
-    AutoPickupScraps = false,
-    AutoPickupTools = false,
-    AutopickupCrates = false,
-    AutoPickupMoney = false,
-    Infstamina = false,
-    Nofalldamage = false,
-    Noclip = false,
-    FakeDown = false,
-    Stopneckmove = false,
-    Unbreaklimbs = false,
-    SilentAim = false,
-    Instantreload = false,
-    Meleeaura = false,
-    RageBot = false,
-    TrigerBot = false,
-    RocketControl = false,
-    ESP = false,
-    ArmsChams = false,
-    ToolsChams = false,
-}
+local A = AddTab(LockSection, "主要", "rbxassetid://7734068321")  
+local B = AddTab(LockSection, "打石头", "rbxassetid://7734068321")  
+local C = AddTab(LockSection, "刷业报", "rbxassetid://7734068321")  
+local D = AddTab(LockSection, "其他器材", "rbxassetid://7734068321")  
+local E = AddTab(LockSection, "重生", "rbxassetid://7734068321")  
+local F = AddTab(LockSection, "修改", "rbxassetid://7734068321")  
+local G = AddTab(LockSection, "传送", "rbxassetid://7734068321")  
+local H = AddTab(LockSection, "收集", "rbxassetid://7734068321")  
+local I = AddTab(LockSection, "宠物蛋", "rbxassetid://7734068321")  
+local J = AddTab(LockSection, "画质+通用", "rbxassetid://7734068321")  
+local K = AddTab(LockSection, "关于包类和训练", "rbxassetid://4483362458")
 
-local SectionSettings = {
-    SilentAim = {
-        Draw = false,
-        DrawSize = 50,
-        DrawColor = Color3.new(1, 1, 1),
-        TargetParts = {"Head"},
-        CheckDowned = false,
-        CheckWall = false,
-        CheckTeam = false,
-        CheckWhiteList = false,
-    },
-    Aimbot = {
-        Draw = false,
-        DrawSize = 50,
-        DrawColor = Color3.new(1, 1, 1),
-        TargetParts = {"Head"},
-        CheckDowned = false,
-        CheckWall = false,
-        CheckTeam = false,
-        CheckWhiteList = false,
-        Velocity = false,
-        Smooth = false,
-        SmoothSize = 0.5
-    },
-    MeleeAura = {
-        ShowAnim = false,
-        TargetParts = {"Head"},
-        CheckDowned = false,
-        CheckTeam = false,
-        CheckWhiteList = false,
-        Distance = 15,
-    },
-    RageBot = {
-        CheckDowned = false,
-        CheckWhiteList = false
-    },
-    ESP = {
-        Name = false,
-        Box = false,
-        Weapon = false,
-        Highlight = false,
-    }
-}
+local otherSection = A:Section({Title = "比赛类", Opened = true})
 
-local Methods = {
-    Fly = "Bypass",
-    Infstamina = "Getgc"
-}
-
-local cockie = {
-    SilentAimCircle = nil,
-    SilentAim_body = nil,
-    ESPHighlight = nil,
-    AimBotCircle = nil,
-    aimbot_button = nil,
-    Aimbot_body = nil,
-    MeleeAura_body = nil,
-}
-
-local RUNS = {
-    cameraFOV = nil,
-    JumpHeight = nil,
-    AutoOpenDoors = nil,
-    AutopickupScraps = nil,
-    AutopickupTools = nil,
-    AutopickupCrates = nil,
-    AutopickupMoney = nil,
-    Infstamina = nil,
-    Fly = nil,
-    Noclip = nil,
-    Meleeaura = nil,
-    ESP = nil,
-}
-
-local funcindex = {
-    Fullbright = {
-        oldClockTime = nil,
-        oldBrightness = nil,
-    }
-}
-
-local WhiteList = {}
-
-function CharStats(plr)
-    local folder = rp.CharStats[plr.Name]
-    return folder
-end
-Tabs.World:Toggle({
-    Title = "夜视",
-    Desc = "地图变亮",
-    Value = functions.Fullbright,
-    Callback = function(Value)
-        functions.Fullbright = Value
-        local Folder
-        if Value then
-            if #light:GetChildren() ~= 0 then
-                Folder = Instance.new("Folder")
-                Folder.Parent = rp
-                Folder.Name = "Index"
-                for _, a in pairs(light:GetChildren()) do
-                    a.Parent = Folder
-                end
-            end
-            funcindex.Fullbright.oldClockTime = light.ClockTime
-            light.ClockTime = 14
-            funcindex.Fullbright.oldBrightness = light.Brightness
-            light.Brightness = 4
-            light.ExposureCompensation = .7
-        else
-            Folder = rp:FindFirstChild("Index")
-            if Folder ~= nil then
-                for _, a in pairs(Folder:GetChildren()) do
-                    a.Parent = light
-                end
-                Folder:Destroy()
-                Folder = nil
-            end
-            light.ClockTime = funcindex.Fullbright.oldClockTime or 14
-            light.Brightness = funcindex.Fullbright.oldBrightness or 1
-            light.ExposureCompensation = 0
+A:Toggle({
+    Title = "自动比赛开关",
+    Default = false,
+    Callback = function(state)
+        getgenv().AutoBrawl = state
+        while getgenv().AutoBrawl do
+            wait(2)
+            game:GetService("ReplicatedStorage").rEvents.brawlEvent:FireServer("joinBrawl")
+            wait()
         end
     end
 })
 
-Tabs.World:Toggle({
-    Title = "自动开门",
-    Desc = "自动打开附近的门",
-    Value = functions.AutoOpenDoors,
-    Callback = function(Value)
-        functions.AutoOpenDoors = Value
-        if Value then
-            RUNS.AutoOpenDoors = run.RenderStepped:Connect(function()
-                local function GetDoor()
-                    local mapFolder = workspace:FindFirstChild("Map")
-                    if not mapFolder then return nil end
-                    local folderDoors = mapFolder:FindFirstChild("Doors")
-                    if not folderDoors then return nil end
-                    local closestDoor, dist = nil, 15
-                    for _, door in pairs(folderDoors:GetChildren()) do
-                        local doorBase = door:FindFirstChild("DoorBase")
-                        if doorBase and me.Character and me.Character:FindFirstChild("HumanoidRootPart") then
-                            local distance = (me.Character.HumanoidRootPart.Position - doorBase.Position).Magnitude
-                            if distance < dist then
-                                dist = distance
-                                closestDoor = door
-                            end
-                        end
-                    end
-                    return closestDoor
-                end
-                local door = GetDoor()
-                if door then
-                    local values = door:FindFirstChild("Values")
-                    local events = door:FindFirstChild("Events")
-                    if values and events then
-                        local locked = values:FindFirstChild("Locked")
-                        local openValue = values:FindFirstChild("Open")
-                        local toggleEvent = events:FindFirstChild("Toggle")
-                        if locked and openValue and toggleEvent then
-                            if locked.Value == true then
-                                toggleEvent:FireServer("Unlock", door.Lock)
-                            elseif locked.Value == false and openValue.Value == false then
-                                local knob1 = door:FindFirstChild("Knob1")
-                                local knob2 = door:FindFirstChild("Knob2")
-                                if knob1 and knob2 then
-                                    local knob1pos = (me.Character.HumanoidRootPart.Position - knob1.Position).Magnitude
-                                    local knob2pos = (me.Character.HumanoidRootPart.Position - knob2.Position).Magnitude
-                                    local chosenKnob = (knob1pos < knob2pos) and knob1 or knob2
-                                    toggleEvent:FireServer("Open", chosenKnob)
-                                end
-                            end
-                        end
-                    end
-                end
+local otherSection = A:Section({Title = "防打自动训练", Opened = true})
+
+A:Paragraph({
+    Title = "关于防打自动锻炼",
+    Desc = "死亡后不会继续\n因为继续会失去道具\n所以我就没弄\n我建议的是不防打和安全点循环传送即可",
+    ThumbnailSize = 190,
+})
+
+A:Toggle({
+    Title = "AFK(必开)",
+    Value = false,
+    Callback = function(state)
+        if state then
+            bypassCount = 0
+            afkConnection = game.Players.LocalPlayer.Idled:Connect(function()
+                game:GetService("VirtualUser"):CaptureController()
+                game:GetService("VirtualUser"):ClickButton2(Vector2.new(0, 0))
+                bypassCount = bypassCount + 1
             end)
         else
-            if RUNS.AutoOpenDoors then
-                RUNS.AutoOpenDoors:Disconnect()
-                RUNS.AutoOpenDoors = nil
-            end
+            if afkConnection then afkConnection:Disconnect() afkConnection = nil end
         end
     end
 })
 
-Tabs.World:Toggle({
-    Title = "无屏障",
-    Desc = "移除地图屏障",
-    Value = functions.NoBarriers,
-    Callback = function(Value)
-        functions.NoBarriers = Value
-        for _, a in pairs(workspace.Filter.Parts["F_Parts"]:GetDescendants()) do
-            if a:IsA("Part") or a:IsA("MeshPart") then
-                a.CanTouch = not a.CanTouch
+A:Toggle({
+    Title = "自动锻炼全部",
+    Default = false,
+    Callback = function(state)
+        getgenv().AutoTrainTriple = state
+        local oldPos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+        local part = Instance.new('Part', workspace)
+        part.Size = Vector3.new(500, 20, 530.1)
+        part.Position = Vector3.new(0, 100000, 133.15)
+        part.CanCollide = true
+        part.Anchored = true
+        while getgenv().AutoTrainTriple do
+            wait()
+            local char = game.Players.LocalPlayer.Character
+            if not char then wait(1) continue end
+            char.HumanoidRootPart.CFrame = part.CFrame + Vector3.new(0, 50, 0)
+            for i, v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                if v.ClassName == "Tool" and (v.Name == "Handstands" or v.Name == "Situps" or v.Name == "Pushups" or v.Name == "Weight") then
+                    if v:FindFirstChildOfClass("NumberValue") then
+                        v:FindFirstChildOfClass("NumberValue").Value = 0
+                    end
+                    repeat wait() until game.Players.LocalPlayer.Backpack:FindFirstChildOfClass("Tool")
+                    char:WaitForChild("Humanoid"):EquipTool(v)
+                    game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep")
+                end
             end
+        end
+        part:Destroy()
+        local char = game.Players.LocalPlayer.Character
+        if char then
+            char.HumanoidRootPart.CFrame = oldPos
+            char:WaitForChild("Humanoid"):UnequipTools()
         end
     end
 })
 
-Tabs.World:Toggle({
-    Title = "防研磨机",
-    Desc = "防止研磨机伤害",
-    Value = functions.NoGrinder,
-    Callback = function(Value)
-        functions.NoGrinder = Value
-        for _, a in pairs(workspace.Map.Parts.Grinders:GetDescendants()) do
-            if a:IsA("Part") or a:IsA("MeshPart") then
-                a.CanTouch = not a.CanTouch
+A:Toggle({
+    Title = "自动举哑铃",
+    Default = false,
+    Callback = function(state)
+        getgenv().AutoWeight = state
+        local oldPos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+        local part = Instance.new('Part', workspace)
+        part.Size = Vector3.new(500, 20, 530.1)
+        part.Position = Vector3.new(0, 100000, 133.15)
+        part.CanCollide = true
+        part.Anchored = true
+        while getgenv().AutoWeight do
+            wait()
+            local char = game.Players.LocalPlayer.Character
+            if not char then wait(1) continue end
+            char.HumanoidRootPart.CFrame = part.CFrame + Vector3.new(0, 50, 0)
+            for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                if v.ClassName == "Tool" and v.Name == "Weight" then
+                    v.Parent = char
+                end
             end
+            game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep")
         end
-        for _, a in pairs(workspace.Map.Parts.M_Parts:GetDescendants()) do
-            if a:IsA("Part") and a.Name == "FirePart" then
-                a.CanTouch = not a.CanTouch
-            end
+        part:Destroy()
+        local char = game.Players.LocalPlayer.Character
+        if char then
+            char.HumanoidRootPart.CFrame = oldPos
+            char:WaitForChild("Humanoid"):UnequipTools()
         end
     end
 })
 
-Tabs.World:Toggle({
-    Title = "快速拾取",
-    Desc = "瞬间拾取物品",
-    Value = functions.FastPickup,
-    Callback = function(Value)
-        functions.FastPickup = Value
-        if Value then
-            game.DescendantAdded:Connect(function(obj)
-                if obj:IsA("ProximityPrompt") then
-                    obj.HoldDuration = 0
-                    obj:GetPropertyChangedSignal("HoldDuration"):Connect(function()
-                        if functions.FastPickup then
-                            obj.HoldDuration = 0
+A:Toggle({
+    Title = "自动俯卧撑",
+    Default = false,
+    Callback = function(state)
+        getgenv().AutoPushup = state
+        local oldPos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+        local part = Instance.new('Part', workspace)
+        part.Size = Vector3.new(500, 20, 530.1)
+        part.Position = Vector3.new(0, 100000, 133.15)
+        part.CanCollide = true
+        part.Anchored = true
+        while getgenv().AutoPushup do
+            wait()
+            local char = game.Players.LocalPlayer.Character
+            if not char then wait(1) continue end
+            char.HumanoidRootPart.CFrame = part.CFrame + Vector3.new(0, 50, 0)
+            for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                if v.ClassName == "Tool" and v.Name == "Pushups" then
+                    v.Parent = char
+                end
+            end
+            game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep")
+        end
+        part:Destroy()
+        local char = game.Players.LocalPlayer.Character
+        if char then
+            char.HumanoidRootPart.CFrame = oldPos
+            char:WaitForChild("Humanoid"):UnequipTools()
+        end
+    end
+})
+
+A:Toggle({
+    Title = "自动仰卧起坐",
+    Default = false,
+    Callback = function(state)
+        getgenv().AutoSitup = state
+        local oldPos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+        local part = Instance.new('Part', workspace)
+        part.Size = Vector3.new(500, 20, 530.1)
+        part.Position = Vector3.new(0, 100000, 133.15)
+        part.CanCollide = true
+        part.Anchored = true
+        while getgenv().AutoSitup do
+            wait()
+            local char = game.Players.LocalPlayer.Character
+            if not char then wait(1) continue end
+            char.HumanoidRootPart.CFrame = part.CFrame + Vector3.new(0, 50, 0)
+            for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                if v.ClassName == "Tool" and v.Name == "Situps" then
+                    v.Parent = char
+                end
+            end
+            game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep")
+        end
+        part:Destroy()
+        local char = game.Players.LocalPlayer.Character
+        if char then
+            char.HumanoidRootPart.CFrame = oldPos
+            char:WaitForChild("Humanoid"):UnequipTools()
+        end
+    end
+})
+
+A:Toggle({
+    Title = "自动倒立",
+    Default = false,
+    Callback = function(state)
+        getgenv().AutoHandstand = state
+        local oldPos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+        local part = Instance.new('Part', workspace)
+        part.Size = Vector3.new(500, 20, 530.1)
+        part.Position = Vector3.new(0, 100000, 133.15)
+        part.CanCollide = true
+        part.Anchored = true
+        while getgenv().AutoHandstand do
+            wait()
+            local char = game.Players.LocalPlayer.Character
+            if not char then wait(1) continue end
+            char.HumanoidRootPart.CFrame = part.CFrame + Vector3.new(0, 50, 0)
+            for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                if v.ClassName == "Tool" and v.Name == "Handstands" then
+                    v.Parent = char
+                end
+            end
+            game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep")
+        end
+        part:Destroy()
+        local char = game.Players.LocalPlayer.Character
+        if char then
+            char.HumanoidRootPart.CFrame = oldPos
+            char:WaitForChild("Humanoid"):UnequipTools()
+        end
+    end
+})
+
+local otherSection2 = A:Section({Title = "不防打可移动自动训练", Opened = true})
+
+A:Toggle({
+    Title = "自动举哑铃",
+    Default = false,
+    Callback = function(state)
+        getgenv().AutoWeight=state
+        spawn(function()
+            while getgenv().AutoWeight do
+                pcall(function()
+                    local char=game.Players.LocalPlayer.Character
+                    if not char then wait(2)
+                    else
+                        for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                            if v.ClassName=="Tool" and v.Name=="Weight" then
+                                v.Parent=char
+                                game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep")
+                                wait(0.03)
+                                v.Parent=game.Players.LocalPlayer.Backpack
+                                wait(0.2)
+                            end
                         end
+                    end
+                end)
+                wait()
+            end
+            if not getgenv().AutoWeight then
+                for i,v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+                    if v:IsA("Tool") and v.Name=="Weight" then
+                        v.Parent=game.Players.LocalPlayer.Backpack
+                    end
+                end
+            end
+        end)
+    end
+})
+
+A:Toggle({
+    Title = "自动俯卧撑",
+    Default = false,
+    Callback = function(state)
+        getgenv().AutoPushups=state
+        spawn(function()
+            while getgenv().AutoPushups do
+                pcall(function()
+                    local char=game.Players.LocalPlayer.Character
+                    if not char then wait(2)
+                    else
+                        for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                            if v.ClassName=="Tool" and v.Name=="Pushups" then
+                                v.Parent=char
+                                game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep")
+                                wait(0.03)
+                                v.Parent=game.Players.LocalPlayer.Backpack
+                                wait(0.2)
+                            end
+                        end
+                    end
+                end)
+                wait()
+            end
+            if not getgenv().AutoPushups then
+                for i,v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+                    if v:IsA("Tool") and v.Name=="Pushups" then
+                        v.Parent=game.Players.LocalPlayer.Backpack
+                    end
+                end
+            end
+        end)
+    end
+})
+
+A:Toggle({
+    Title = "自动仰卧起坐",
+    Default = false,
+    Callback = function(state)
+        getgenv().AutoSitups=state
+        spawn(function()
+            while getgenv().AutoSitups do
+                pcall(function()
+                    local char=game.Players.LocalPlayer.Character
+                    if not char then wait(2)
+                    else
+                        for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                            if v.ClassName=="Tool" and v.Name=="Situps" then
+                                v.Parent=char
+                                game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep")
+                                wait(0.03)
+                                v.Parent=game.Players.LocalPlayer.Backpack
+                                wait(0.2)
+                            end
+                        end
+                    end
+                end)
+                wait()
+            end
+            if not getgenv().AutoSitups then
+                for i,v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+                    if v:IsA("Tool") and v.Name=="Situps" then
+                        v.Parent=game.Players.LocalPlayer.Backpack
+                    end
+                end
+            end
+        end)
+    end
+})
+
+A:Toggle({
+    Title = "自动倒立",
+    Default = false,
+    Callback = function(state)
+        getgenv().AutoHandstands=state
+        spawn(function()
+            while getgenv().AutoHandstands do
+                pcall(function()
+                    local char=game.Players.LocalPlayer.Character
+                    if not char then wait(2)
+                    else
+                        for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                            if v.ClassName=="Tool" and v.Name=="Handstands" then
+                                v.Parent=char
+                                game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep")
+                                wait(0.03)
+                                v.Parent=game.Players.LocalPlayer.Backpack
+                                wait(0.2)
+                            end
+                        end
+                    end
+                end)
+                wait()
+            end
+            if not getgenv().AutoHandstands then
+                for i,v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+                    if v:IsA("Tool") and v.Name=="Handstands" then
+                        v.Parent=game.Players.LocalPlayer.Backpack
+                    end
+                end
+            end
+        end)
+    end
+})
+
+A:Toggle({
+    Title = "自全锻炼全部",
+    Default = false,
+    Callback = function(state)
+        getgenv().AutoAllTrain=state
+        spawn(function()
+            while getgenv().AutoAllTrain do
+                pcall(function()
+                    local char=game.Players.LocalPlayer.Character
+                    if not char then wait(2)
+                    else
+                        for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                            if v.ClassName=="Tool" and (v.Name=="Weight" or v.Name=="Handstands" or v.Name=="Pushups" or v.Name=="Situps") then
+                                v.Parent=char
+                                game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep")
+                                wait(0.02)
+                                v.Parent=game.Players.LocalPlayer.Backpack
+                                wait(0.2)
+                            end
+                        end
+                    end
+                end)
+                wait()
+            end
+            if not getgenv().AutoAllTrain then
+                for i,v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+                    if v:IsA("Tool") and (v.Name=="Weight" or v.Name=="Handstands" or v.Name=="Pushups" or v.Name=="Situps") then
+                        v.Parent=game.Players.LocalPlayer.Backpack
+                    end
+                end
+            end
+        end)
+    end
+})
+
+local rockSection = B:Section({Title = "石头对照表", Opened = true})
+
+B:Paragraph({
+    Title = "因为列表汉化有问题",
+    Desc = "Tiny Rock = 10耐力\nInferno Rock = 100耐力\nPunching Rock = 5000耐力\nRock Of Legends = 150000耐力\nMuscle King Mountain = 400000耐力\nAncient Jungle Rock = 750000耐力\nMuscle King Mountain = 100万耐力\nAncient Jungle Rock = 500万耐力\nAncient Jungle Rock = 1000万耐力",
+    ThumbnailSize = 200,
+})
+
+local rockSection = B:Section({Title = "远程打石头v1", Opened = true})
+
+local rockshow1 = {"Tiny Rock", "Inferno Rock", "Punching Rock", "Rock Of Legends", "Muscle King Mountain", "Ancient Jungle Rock"}
+local rockNames = {
+    ["Tiny Rock"] = "小石头",
+    ["Inferno Rock"] = "地狱石头", 
+    ["Punching Rock"] = "拳击石头",
+    ["Rock Of Legends"] = "传奇石头",
+    ["Muscle King Mountain"] = "肌肉王石头",
+    ["Ancient Jungle Rock"] = "丛林石头"
+}
+
+local AutoStates = {
+    rock = false,
+    rocks = false,
+    RK0 = false,
+    RK10 = false,
+    RK100 = false,
+    RK5000 = false,
+    RK150000 = false,
+    RK400000 = false,
+    RK750000 = false,
+    RK1M = false,
+    RK5M = false,
+    JungleRock10M = false
+}
+
+B:Dropdown({
+    Title = "选择石头", 
+    Values = rockshow1, 
+    Value = "空", 
+    Callback = function(Value) 
+        Interstellar.Rocks = Value
+    end
+})
+
+B:Toggle({
+    Title = "自动打石头",
+    Description = "把石头传送过来打",
+    Default = false,
+    Callback = function(state)
+        AutoStates.rock = state
+        spawn(function()
+            local OldPOS = game:GetService("Workspace").machinesFolder[Interstellar.Rocks].Rock.CFrame
+            while AutoStates.rock do
+                wait()
+                pcall(function()
+                    for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                        if v:IsA("Tool") and v.Name == "Punch" then
+                            game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):EquipTool(v)
+                        end
+                    end
+                    for i,h in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+                        if h:IsA("Tool") and h.Name == "Punch" then
+                            h:Activate()
+                        end
+                    end
+                    game:GetService("Workspace").machinesFolder[Interstellar.Rocks].Rock.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,-3)
+                    game:GetService("Workspace").machinesFolder[Interstellar.Rocks].Rock.CanCollide = false
+                    game:GetService("Workspace").machinesFolder[Interstellar.Rocks].Rock.Transparency = 100
+                    game:GetService("Workspace").machinesFolder[Interstellar.Rocks].Rock.rockGui.rockName.Visible = false
+                    game:GetService("Workspace").machinesFolder[Interstellar.Rocks].Rock.rockGui.statLabel.Visible = false
+                end)
+            end
+            if not AutoStates.rock then
+                pcall(function()
+                    game:GetService("Workspace").machinesFolder[Interstellar.Rocks].Rock.CFrame = CFrame.new(OldPOS)
+                    game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):UnequipTools()
+                    game:GetService("Workspace").machinesFolder[Interstellar.Rocks].Rock.CanCollide = true
+                    game:GetService("Workspace").machinesFolder[Interstellar.Rocks].Rock.Transparency = 0
+                    game:GetService("Workspace").machinesFolder[Interstellar.Rocks].Rock.rockGui.rockName.Visible = true
+                    game:GetService("Workspace").machinesFolder[Interstellar.Rocks].Rock.rockGui.statLabel.Visible = true
+                end)
+            end
+        end)
+    end
+})
+
+local rockSection2 = B:Section({Title = "远程打石头v2", Opened = true})
+
+local rockshow2 = {"Tiny Rock", "Inferno Rock", "Punching Rock", "Rock Of Legends", "Muscle King Mountain", "Ancient Jungle Rock"}
+local rockNames2 = {
+    ["Tiny Rock"] = "小石头",
+    ["Inferno Rock"] = "地狱石头", 
+    ["Punching Rock"] = "拳击石头",
+    ["Rock Of Legends"] = "传奇石头",
+    ["Muscle King Mountain"] = "肌肉王石头",
+    ["Ancient Jungle Rock"] = "丛林石头"
+}
+
+B:Dropdown({
+    Title = "选择石头", 
+    Values = rockshow2, 
+    Value = "空", 
+    Callback = function(Value) 
+        Interstellar.Rock = Value
+    end
+})
+
+B:Toggle({
+    Title = "自动打石头",
+    Description = "远程隔空",
+    Default = false,
+    Callback = function(state)
+        AutoStates.rocks = state
+        spawn(function()
+            while AutoStates.rocks do
+                wait()
+                pcall(function()
+                    for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                        if v:IsA("Tool") and v.Name == "Punch" then
+                            game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):EquipTool(v)
+                        end
+                    end
+                    for i,h in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+                        if h:IsA("Tool") and h.Name == "Punch" then
+                            h:Activate()
+                        end
+                    end
+                    firetouchinterest(game.workspace.machinesFolder[Interstellar.Rock].Rock, game.Players.LocalPlayer.Character.LeftHand, 0)
+                    firetouchinterest(game.workspace.machinesFolder[Interstellar.Rock].Rock, game.Players.LocalPlayer.Character.LeftHand, 1)
+                end)
+            end
+            if not AutoStates.rocks then
+                pcall(function()
+                    game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):UnequipTools()
+                end)
+            end
+        end)
+    end
+})
+
+local rockSection3 = B:Section({Title = "打石头(传送过去)", Opened = true})
+
+B:Toggle({
+    Title = "石头0",
+    Default = false,
+    Callback = function(state)
+        getgenv().RK0 = state
+        spawn(function()
+            while getgenv().RK0 do
+                wait()
+                pcall(function()
+                    for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                        if v:IsA("Tool") and v.Name == "Punch" then
+                            game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):EquipTool(v)
+                        end
+                    end
+                    for i,h in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+                        if h:IsA("Tool") and h.Name == "Punch" then
+                            h:Activate()
+                        end
+                    end
+                    game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(7.60643005, 4.02632904, 2104.54004, -0.23040159, -8.53662385e-08, -0.973095655, -4.68743764e-08, 1, -7.66279342e-08, 0.973095655, 2.79580536e-08, -0.23040159)
+                end)
+            end
+            if not getgenv().RK0 then
+                pcall(function()
+                    game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):UnequipTools()
+                end)
+            end
+        end)
+    end
+})
+
+B:Toggle({
+    Title = "石头10",
+    Default = false,
+    Callback = function(state)
+        getgenv().RK10 = state
+        spawn(function()
+            if game.Players.LocalPlayer.Durability.Value >= 10 then
+                while getgenv().RK10 do
+                    wait()
+                    pcall(function()
+                        for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                            if v:IsA("Tool") and v.Name == "Punch" then
+                                game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):EquipTool(v)
+                            end
+                        end
+                        for i,h in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+                            if h:IsA("Tool") and h.Name == "Punch" then
+                                h:Activate()
+                            end
+                        end
+                        game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-157.680908, 3.72453046, 434.871185, 0.923298299, -1.81774684e-09, -0.384083599, 3.45247031e-09, 1, 3.56670582e-09, 0.384083599, -4.61917082e-09, 0.923298299)
                     end)
                 end
-            end)
-        end
-    end
-})
-
-Tabs.World:Toggle({
-    Title = "自动拾取废料",
-    Desc = "自动拾取附近的废料",
-    Value = functions.AutoPickupScraps,
-    Callback = function(Value)
-        functions.AutoPickupScraps = Value
-        local remote = rp.Events.PIC_PU
-        local scrapsfolder = workspace.Filter.SpawnedPiles
-        local canPickup = true
-        local startTick = tick()
-        if Value then
-            RUNS.AutopickupScraps = run.RenderStepped:Connect(function()
-                local function GetClosestScrap()
-                    local maxdist = 15
-                    local closest = nil
-                    for _, a in pairs(scrapsfolder:GetChildren()) do
-                        if a and (a.Name == "S1" or a.Name == "S2") then
-                            if me.Character and me.Character.HumanoidRootPart then
-                                local getdist = (me.Character.HumanoidRootPart.Position - a.MeshPart.Position).Magnitude
-                                if getdist < maxdist then
-                                    maxdist = getdist
-                                    closest = a
-                                end
-                            end
-                        end
-                    end
-                    return closest
-                end
-                local getscrap = GetClosestScrap()
-                if getscrap then
-                    if canPickup then
-                        remote:FireServer(string.reverse(getscrap:GetAttribute("jzu")))
-                        canPickup = false
-                    end
-                end
-                if canPickup == false and tick() - startTick >= 4.5 then
-                    canPickup = true
-                    startTick = tick()
-                end
-            end)
-        else
-            if RUNS.AutopickupScraps then
-                RUNS.AutopickupScraps:Disconnect()
-                RUNS.AutopickupScraps = nil
             end
-        end
-    end
-})
-
-Tabs.World:Toggle({
-    Title = "自动拾取工具",
-    Desc = "自动拾取附近的工具",
-    Value = functions.AutoPickupTools,
-    Callback = function(Value)
-        functions.AutoPickupTools = Value
-        local remote = rp.Events.PIC_TLO
-        local toolsfolder = workspace.Filter.SpawnedTools
-        local canPickup = true
-        local startTick = tick()
-        if Value then
-            RUNS.AutopickupTools = run.RenderStepped:Connect(function()
-                local function GetClosestTool()
-                    local maxdist = 15
-                    local closest = nil
-                    for _, a in pairs(toolsfolder:GetChildren()) do
-                        if a and me.Character and me.Character.HumanoidRootPart then
-                            local handle = a:FindFirstChild("Handle") or a:FindFirstChild("WeaponHandle")
-                            if handle and (handle:IsA("Part") or handle:IsA("MeshPart")) then
-                                if me.Character and me.Character:FindFirstChild("HumanoidRootPart") then
-                                    local getdist = (me.Character.HumanoidRootPart.Position - handle.Position).Magnitude
-                                    if getdist < maxdist then
-                                        maxdist = getdist
-                                        closest = a
-                                    end
-                                end
-                            end
-                        end
-                    end
-                    return closest
-                end
-                local tool = GetClosestTool()
-                if tool then
-                    local Handle = tool:FindFirstChild("Handle") or tool:FindFirstChild("WeaponHandle")
-                    if Handle then
-                        if canPickup then
-                            remote:FireServer(Handle)
-                            canPickup = false
-                        end
-                    end
-                end
-                if canPickup == false and tick() - startTick >= 1.5 then
-                    canPickup = true
-                    startTick = tick()
-                end
-            end)
-        else
-            if RUNS.AutopickupTools then
-                RUNS.AutopickupTools:Disconnect()
-                RUNS.AutopickupTools = nil
-            end
-        end
-    end
-})
-
-Tabs.World:Toggle({
-    Title = "自动拾取金钱",
-    Desc = "自动拾取附近的金钱",
-    Value = functions.AutoPickupMoney,
-    Callback = function(Value)
-        functions.AutoPickupMoney = Value
-        local remote = rp.Events:FindFirstChild("CZDPZUS")
-        local moneyfolder = workspace.Filter.SpawnedBread
-        local canPickup = true
-        local startTick = tick()
-        if Value then
-            RUNS.AutopickupMoney = run.RenderStepped:Connect(function()
-                local function GetMoney()
-                    local maxdist = 15
-                    local closest = nil
-                    for _, a in pairs(moneyfolder:GetChildren()) do
-                        if a and me.Character and me.Character.HumanoidRootPart then
-                            local getdist = (me.Character.HumanoidRootPart.Position - a.Position).Magnitude
-                            if getdist < maxdist then
-                                maxdist = getdist
-                                closest = a
-                            end
-                        end
-                    end
-                    return closest
-                end
-                local foundmoney = GetMoney()
-                if foundmoney then
-                    if canPickup then
-                        remote:FireServer(foundmoney)
-                        canPickup = false
-                    end
-                end
-                if canPickup == false and tick() - startTick >= 1 then
-                    canPickup = true
-                    startTick = tick()
-                end
-            end)
-        else
-            if RUNS.AutopickupMoney then
-                RUNS.AutopickupMoney:Disconnect()
-                RUNS.AutopickupMoney = nil
-            end
-        end
-    end
-})
-Tabs.Player:Slider({
-    Title = "FOV",
-    Desc = "调整相机视野",
-    Value = {
-        Min = 70,
-        Max = 120,
-        Default = camera.FieldOfView
-    },
-    Callback = function(Value)
-        if RUNS.cameraFOV then RUNS.cameraFOV:Disconnect() end
-        RUNS.cameraFOV = run.RenderStepped:Connect(function()
-            camera.FieldOfView = Value
-        end)
-    end
-})
-
-Tabs.Player:Slider({
-    Title = "相机距离",
-    Desc = "调整相机最大距离",
-    Value = {
-        Min = 10,
-        Max = 500,
-        Default = me.CameraMaxZoomDistance
-    },
-    Callback = function(Value)
-        me.CameraMaxZoomDistance = Value
-    end
-})
-
-Tabs.Player:Slider({
-    Title = "跳跃高度",
-    Desc = "调整跳跃高度",
-    Value = {
-        Min = 7.1,
-        Max = 25,
-        Default = 7.1
-    },
-    Callback = function(Value)
-        if RUNS.JumpHeight then RUNS.JumpHeight:Disconnect() end
-        RUNS.JumpHeight = run.RenderStepped:Connect(function()
-            if me.Character and me.Character:FindFirstChild("Humanoid") then
-                me.Character.Humanoid.UseJumpPower = false
-                me.Character.Humanoid.JumpHeight = Value
+            if not getgenv().RK10 then
+                pcall(function()
+                    game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):UnequipTools()
+                end)
             end
         end)
     end
 })
 
-Tabs.Player:Toggle({
-    Title = "无限体力",
-    Desc = "字面意思",
-    Value = functions.Infstamina,
-    Callback = function(Value)
-        functions.Infstamina = Value
-        if Value then
+B:Toggle({
+    Title = "石头100",
+    Default = false,
+    Callback = function(state)
+        getgenv().RK100 = state
+        spawn(function()
+            if game.Players.LocalPlayer.Durability.Value >= 100 then
+                while getgenv().RK100 do
+                    wait()
+                    pcall(function()
+                        for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                            if v:IsA("Tool") and v.Name == "Punch" then
+                                game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):EquipTool(v)
+                            end
+                        end
+                        for i,h in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+                            if h:IsA("Tool") and h.Name == "Punch" then
+                                h:Activate()
+                            end
+                        end
+                        game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(162.233673, 3.66615629, -164.686783, -0.921312928, -1.80826774e-07, -0.38882193, -9.13036544e-08, 1, -2.48719346e-07, 0.38882193, -1.93647494e-07, -0.921312928)
+                    end)
+                end
+            end
+            if not getgenv().RK100 then
+                pcall(function()
+                    game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):UnequipTools()
+                end)
+            end
+        end)
+    end
+})
+
+B:Toggle({
+    Title = "石头5000",
+    Default = false,
+    Callback = function(state)
+        getgenv().RK5000 = state
+        spawn(function()
+            if game.Players.LocalPlayer.Durability.Value >= 5000 then
+                while getgenv().RK5000 do
+                    wait()
+                    pcall(function()
+                        for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                            if v:IsA("Tool") and v.Name == "Punch" then
+                                game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):EquipTool(v)
+                            end
+                        end
+                        for i,h in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+                            if h:IsA("Tool") and h.Name == "Punch" then
+                                h:Activate()
+                            end
+                        end
+                        game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(329.831482, 3.66450214, -618.48407, -0.806075394, -8.67358096e-08, 0.591812849, -1.05715522e-07, 1, 2.57029176e-09, -0.591812849, -6.04919563e-08, -0.806075394)
+                    end)
+                end
+            end
+            if not getgenv().RK5000 then
+                pcall(function()
+                    game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):UnequipTools()
+                end)
+            end
+        end)
+    end
+})
+
+B:Toggle({
+    Title = "石头150000",
+    Default = false,
+    Callback = function(state)
+        getgenv().RK150000 = state
+        spawn(function()
+            if game.Players.LocalPlayer.Durability.Value >= 150000 then
+                while getgenv().RK150000 do
+                    wait()
+                    pcall(function()
+                        for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                            if v:IsA("Tool") and v.Name == "Punch" then
+                                game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):EquipTool(v)
+                            end
+                        end
+                        for i,h in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+                            if h:IsA("Tool") and h.Name == "Punch" then
+                                h:Activate()
+                            end
+                        end
+                        game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-2566.78076, 3.97019577, -277.503235, -0.923934579, -4.11600105e-08, -0.382550538, -3.38838042e-08, 1, -2.57576183e-08, 0.382550538, -1.08360858e-08, -0.923934579)
+                    end)
+                end
+            end
+            if not getgenv().RK150000 then
+                pcall(function()
+                    game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):UnequipTools()
+                end)
+            end
+        end)
+    end
+})
+
+B:Toggle({
+    Title = "石头400000",
+    Default = false,
+    Callback = function(state)
+        getgenv().RK400000 = state
+        spawn(function()
+            if game.Players.LocalPlayer.Durability.Value >= 400000 then
+                while getgenv().RK400000 do
+                    wait()
+                    pcall(function()
+                        for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                            if v:IsA("Tool") and v.Name == "Punch" then
+                                game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):EquipTool(v)
+                            end
+                        end
+                        for i,h in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+                            if h:IsA("Tool") and h.Name == "Punch" then
+                                h:Activate()
+                            end
+                        end
+                        game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(2155.61743, 3.79830337, 1227.06482, -0.551303148, -9.16796949e-09, -0.834304988, -5.61318245e-08, 1, 2.61027839e-08, 0.834304988, 6.12216127e-08, -0.551303148)
+                    end)
+                end
+            end
+            if not getgenv().RK400000 then
+                pcall(function()
+                    game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):UnequipTools()
+                end)
+            end
+        end)
+    end
+})
+
+B:Toggle({
+    Title = "石头750000",
+    Default = false,
+    Callback = function(state)
+        getgenv().RK750000 = state
+        spawn(function()
+            if game.Players.LocalPlayer.Durability.Value >= 750000 then
+                while getgenv().RK750000 do
+                    wait()
+                    pcall(function()
+                        for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                            if v:IsA("Tool") and v.Name == "Punch" then
+                                game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):EquipTool(v)
+                            end
+                        end
+                        for i,h in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+                            if h:IsA("Tool") and h.Name == "Punch" then
+                                h:Activate()
+                            end
+                        end
+                        game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-7285.6499, 3.66624784, -1228.27417, 0.857643783, -1.58175091e-08, -0.514244199, -1.22581563e-08, 1, -5.12025977e-08, 0.514244199, 5.02172774e-08, 0.857643783)
+                    end)
+                end
+            end
+            if not getgenv().RK750000 then
+                pcall(function()
+                    game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):UnequipTools()
+                end)
+            end
+        end)
+    end
+})
+
+B:Toggle({
+    Title = "石头100万",
+    Default = false,
+    Callback = function(state)
+        getgenv().RK1M = state
+        spawn(function()
+            if game.Players.LocalPlayer.Durability.Value >= 1000000 then
+                while getgenv().RK1M do
+                    wait()
+                    pcall(function()
+                        for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                            if v:IsA("Tool") and v.Name == "Punch" then
+                                game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):EquipTool(v)
+                            end
+                        end
+                        for i,h in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+                            if h:IsA("Tool") and h.Name == "Punch" then
+                                h:Activate()
+                            end
+                        end
+                        game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(4160.87109, 987.829102, -4136.64502, -0.893115997, 1.25481356e-05, 0.44982639, 5.02490684e-06, 1, -1.79187136e-05, -0.44982639, -1.37431543e-05, -0.893115997)
+                    end)
+                end
+            end
+            if not getgenv().RK1M then
+                pcall(function()
+                    game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):UnequipTools()
+                end)
+            end
+        end)
+    end
+})
+
+B:Toggle({
+    Title = "石头500万",
+    Default = false,
+    Callback = function(state)
+        getgenv().RK5M = state
+        spawn(function()
+            if game.Players.LocalPlayer.Durability.Value >= 5000000 then
+                while getgenv().RK5M do
+                    wait()
+                    pcall(function()
+                        for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                            if v:IsA("Tool") and v.Name == "Punch" then
+                                game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):EquipTool(v)
+                            end
+                        end
+                        for i,h in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+                            if h:IsA("Tool") and h.Name == "Punch" then
+                                h:Activate()
+                            end
+                        end
+                        game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-8957.54395, 5.53625107, -6126.90186, -0.803919137, 6.6065212e-08, 0.594738603, -8.93136143e-09, 1, -1.23155459e-07, -0.594738603, -1.04318865e-07, -0.803919137)
+                    end)
+                end
+            end
+            if not getgenv().RK5M then
+                pcall(function()
+                    game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):UnequipTools()
+                end)
+            end
+        end)
+    end
+})
+
+B:Toggle({
+    Title = "石头1000万",
+    Default = false,
+    Callback = function(state)
+        getgenv().JungleRock10M = state
+        spawn(function()
+            if game.Players.LocalPlayer.Durability.Value >= 10000000 then
+                while getgenv().JungleRock10M do
+                    wait()
+                    pcall(function()
+                        for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                            if v:IsA("Tool") and v.Name == "Punch" then
+                                game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):EquipTool(v)
+                            end
+                        end
+                        for i,h in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+                            if h:IsA("Tool") and h.Name == "Punch" then
+                                h:Activate()
+                            end
+                        end
+                        game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-7552.9, 3.4, 2847.7, -0.803919137, 6.6065212e-08, 0.594738603, -8.93136143e-09, 1, -1.23155459e-07, -0.594738603, -1.04318865e-07, -0.803919137)
+                    end)
+                end
+            end
+            if not getgenv().JungleRock10M then
+                pcall(function()
+                    game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):UnequipTools()
+                end)
+            end
+        end)
+    end
+})
+
+local karmaSection = C:Section({Title = "自动刷业报", Opened = true})
+if not _G.WindUI_AutoStates then
+    _G.WindUI_AutoStates = {
+        AutoKillReport = false,
+        AutoKillReport2 = false,
+        AutoKillReport3 = false,
+        AutoKillReport4 = false,
+        AutoKill = false,
+        killall = false
+    }
+end
+
+local AutoStates = _G.WindUI_AutoStates
+
+C:Toggle({
+    Title = "自动刷业报v1",
+    Default = AutoStates.AutoKillReport,
+    Callback = function(state)
+        AutoStates.AutoKillReport = state
+        if AutoStates.AutoKillReportLoops then 
+            for _,c in pairs(AutoStates.AutoKillReportLoops) do 
+                c:Disconnect()
+            end 
+        end 
+        AutoStates.AutoKillReportLoops = {}
+        if not state then 
+            if game.Players.LocalPlayer.Character then 
+                local h = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
+                if h then 
+                    h:UnequipTools()
+                end 
+            end 
+            return 
+        end 
+        
+        local pL = game:GetService("RunService").Heartbeat:Connect(function()
+            if not AutoStates.AutoKillReport then 
+                pL:Disconnect()
+                return 
+            end 
+            local c = game.Players.LocalPlayer.Character 
+            if c and c:FindFirstChild("Humanoid") and c.Humanoid.Health > 0 then 
+                local p = c:FindFirstChild("Punch") or game.Players.LocalPlayer.Backpack:FindFirstChild("Punch")
+                if p then 
+                    p.Parent = c 
+                    p:Activate()
+                end 
+            end 
+        end)
+        table.insert(AutoStates.AutoKillReportLoops, pL)
+        
+        local tL = game:GetService("RunService").Heartbeat:Connect(function()
+            if not AutoStates.AutoKillReport then 
+                tL:Disconnect()
+                return 
+            end 
+            local c = game.Players.LocalPlayer.Character 
+            if c and c:FindFirstChild("Humanoid") and c.Humanoid.Health > 0 then 
+                local p = {}
+                for _,pl in ipairs(game.Players:GetPlayers()) do 
+                    if pl ~= game.Players.LocalPlayer and pl.Character and pl.Character:FindFirstChild("HumanoidRootPart") and pl.Character.Humanoid.Health > 0 then 
+                        table.insert(p, pl)
+                    end 
+                end 
+                if #p > 0 then 
+                    local t = p[math.random(#p)]
+                    local r = c:WaitForChild("HumanoidRootPart")
+                    r.CFrame = t.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,2)
+                end 
+            end 
+        end)
+        table.insert(AutoStates.AutoKillReportLoops, tL)
+    end
+})
+
+C:Toggle({
+    Title = "自动刷业报v2",
+    Default = AutoStates.AutoKillReport2,
+    Callback = function(state)
+        AutoStates.AutoKillReport2 = state
+        if AutoStates.AutoKillReportLoops2 then 
+            for _,c in pairs(AutoStates.AutoKillReportLoops2) do 
+                c:Disconnect()
+            end 
+        end 
+        AutoStates.AutoKillReportLoops2 = {}
+        if not state then 
+            if game.Players.LocalPlayer.Character then 
+                local h = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
+                if h then 
+                    h:UnequipTools()
+                end 
+            end 
+            return 
+        end 
+        
+        local sP = CFrame.new(-8751.0,120.4,-5863.1,0.59992,-2.24e-09,0.80006,4.46e-09,1,-5.44e-10,-0.80006,3.90e-09,0.59992)
+        local function tS()
+            local c = game.Players.LocalPlayer.Character 
+            if c and c:FindFirstChild("HumanoidRootPart") then 
+                c.HumanoidRootPart.CFrame = sP 
+            end 
+        end 
+        
+        local lKT = 0 
+        local kC = 0.15 
+        
+        local pL = game:GetService("RunService").Heartbeat:Connect(function()
+            if not AutoStates.AutoKillReport2 then 
+                pL:Disconnect()
+                return 
+            end 
+            local c = game.Players.LocalPlayer.Character 
+            if c and c:FindFirstChild("Humanoid") and c.Humanoid.Health > 0 then 
+                local p = c:FindFirstChild("Punch") or game.Players.LocalPlayer.Backpack:FindFirstChild("Punch")
+                if p then 
+                    p.Parent = c 
+                    p:Activate()
+                end 
+            end 
+        end)
+        table.insert(AutoStates.AutoKillReportLoops2, pL)
+        
+        local tL = game:GetService("RunService").Heartbeat:Connect(function()
+            if not AutoStates.AutoKillReport2 then 
+                tL:Disconnect()
+                return 
+            end 
+            local c = game.Players.LocalPlayer.Character 
+            if c and c:FindFirstChild("Humanoid") and c.Humanoid.Health > 0 then 
+                local p = {}
+                for _,pl in ipairs(game.Players:GetPlayers()) do 
+                    if pl ~= game.Players.LocalPlayer and pl.Character and pl.Character:FindFirstChild("HumanoidRootPart") and pl.Character.Humanoid.Health > 0 then 
+                        table.insert(p, pl)
+                    end 
+                end 
+                if #p > 0 then 
+                    local cT = tick()
+                    if cT - lKT >= kC then 
+                        local t = p[math.random(#p)]
+                        local r = c:WaitForChild("HumanoidRootPart")
+                        r.CFrame = t.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,2)
+                        lKT = cT 
+                    else 
+                        tS()
+                    end 
+                else 
+                    tS()
+                end 
+            end 
+        end)
+        table.insert(AutoStates.AutoKillReportLoops2, tL)
+        
+        local dC = game.Players.LocalPlayer.CharacterAdded:Connect(function(c)
+            if AutoStates.AutoKillReport2 then 
+                wait(1)
+                tS()
+            end 
+        end)
+        table.insert(AutoStates.AutoKillReportLoops2, dC)
+    end
+})
+
+C:Toggle({
+    Title = "自动刷业报v3",
+    Default = false,
+    Callback = function(state)
+        getgenv().AutoKarmaV3 = state
+        
+        if not state then
+            if autoPunchLoop then
+                autoPunchLoop:Disconnect()
+                autoPunchLoop = nil
+            end
+            if attractLoop then
+                attractLoop:Disconnect()
+                attractLoop = nil
+            end
+            if game.Players.LocalPlayer.Character then 
+                local humanoid = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
+                if humanoid then 
+                    humanoid:UnequipTools()
+                end 
+            end 
+            if platform then
+                platform:Destroy()
+                platform = nil
+            end
+            return
+        end
+        
+        platform = Instance.new('Part', workspace)
+        platform.Size = Vector3.new(50, 30, 50)
+        platform.Position = Vector3.new(0, 3000000, 0)
+        platform.CanCollide = true
+        platform.Anchored = true
+        platform.Name = "AutoKarmaPlatform"
+        
+        local function teleportToPlatform()
+            local character = game.Players.LocalPlayer.Character
+            if character and character:FindFirstChild("HumanoidRootPart") then
+                character.HumanoidRootPart.CFrame = platform.CFrame + Vector3.new(0, 25, 0)
+            end
+        end
+        
+        teleportToPlatform()
+        
+        game.Players.LocalPlayer.CharacterAdded:Connect(function(newChar)
+            if getgenv().AutoKarmaV3 then
+                newChar:WaitForChild("HumanoidRootPart")
+                teleportToPlatform()
+            end
+        end)
+        
+        autoPunchLoop = game:GetService("RunService").Heartbeat:Connect(function()
+            if not getgenv().AutoKarmaV3 then 
+                return 
+            end 
+            local character = game.Players.LocalPlayer.Character 
+            if character and character:FindFirstChild("Humanoid") and character.Humanoid.Health > 0 then 
+                local punch = character:FindFirstChild("Punch") or game.Players.LocalPlayer.Backpack:FindFirstChild("Punch")
+                if punch then 
+                    punch.Parent = character 
+                    punch:Activate()
+                end 
+            end 
+        end)
+        
+        attractLoop = game:GetService("RunService").Heartbeat:Connect(function()
+            if not getgenv().AutoKarmaV3 then 
+                return 
+            end 
+            local character = game.Players.LocalPlayer.Character 
+            if character and character:FindFirstChild("Humanoid") and character.Humanoid.Health > 0 then 
+                teleportToPlatform() 
+                for _, player in ipairs(game.Players:GetPlayers()) do 
+                    if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character.Humanoid.Health > 0 then 
+                        local targetHRP = player.Character.HumanoidRootPart
+                        local myHRP = character.HumanoidRootPart
+                        targetHRP.CFrame = myHRP.CFrame * CFrame.new(0, 0, -2)
+                    end 
+                end 
+            end 
+        end)
+    end
+})
+
+C:Toggle({
+    Title = "自动刷业报v4",
+    Default = AutoStates.AutoKillReport3,
+    Callback = function(state)
+        AutoStates.AutoKillReport3 = state
+        if AutoStates.AutoKillReportLoops3 then 
+            for _,c in pairs(AutoStates.AutoKillReportLoops3) do 
+                c:Disconnect()
+            end 
+        end 
+        AutoStates.AutoKillReportLoops3 = {}
+        if not state then 
+            if game.Players.LocalPlayer.Character then 
+                local h = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
+                if h then 
+                    h:UnequipTools()
+                end 
+            end 
+            return 
+        end 
+        
+        local pL = game:GetService("RunService").Heartbeat:Connect(function()
+            if not AutoStates.AutoKillReport3 then 
+                pL:Disconnect()
+                return 
+            end 
+            for _,target in pairs(game.Players:GetPlayers()) do 
+                if target ~= game.Players.LocalPlayer and target.Character and target.Character:FindFirstChild("Humanoid") and target.Character.Humanoid.Health > 0 then 
+                    pcall(function()
+                        for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do 
+                            if v:IsA("Tool") and v.Name == "Punch" then 
+                                game.Players.LocalPlayer.Character.Humanoid:EquipTool(v)
+                            end 
+                        end 
+                        local p = game.Players.LocalPlayer.Character:FindFirstChild("Punch") or game.Players.LocalPlayer.Backpack:FindFirstChild("Punch")
+                        if p then 
+                            p.Parent = game.Players.LocalPlayer.Character
+                            p:Activate()
+                        end
+                        local head = target.Character:FindFirstChild("Head")
+                        local lchar = game.Players.LocalPlayer.Character 
+                        local hand = lchar and lchar:FindFirstChild("LeftHand")
+                        if head and hand then 
+                            firetouchinterest(head, hand, 0)
+                            wait(0.01)
+                            firetouchinterest(head, hand, 1)
+                        end 
+                    end)
+                end 
+            end 
+            wait(0.1)
+        end)
+        table.insert(AutoStates.AutoKillReportLoops3, pL)
+    end
+})
+
+local karmaSection2 = C:Section({Title = "自定义", Opened = true})
+
+Interstellar = Interstellar or {}
+Interstellar.killplayers = {}
+
+local Plr = game:GetService("Players")
+local LP = Plr.LocalPlayer
+local PlayerList = {}
+
+local function initializePlayerList()
+    PlayerList = {}
+    for _, player in ipairs(Plr:GetPlayers()) do
+        if player ~= LP then
+            table.insert(PlayerList, player.Name)
+        end
+    end
+end
+
+local function refreshPlayerList()
+    initializePlayerList()
+    if killplayerDropdown then
+        killplayerDropdown:Refresh(PlayerList)
+        WindUI:Notify({
+            Title = "玩家列表",
+            Content = "玩家列表已刷新 (" .. #PlayerList .. " 个玩家)",
+            Duration = 3,
+        })
+    end
+end
+
+Plr.PlayerAdded:Connect(function(player)
+    if player ~= LP then
+        table.insert(PlayerList, player.Name)
+        if killplayerDropdown then
+            killplayerDropdown:Refresh(PlayerList)
+        end
+    end
+end)
+
+Plr.PlayerRemoving:Connect(function(player)
+    local index = table.find(PlayerList, player.Name)
+    if index then
+        table.remove(PlayerList, index)
+        local killIndex = table.find(Interstellar.killplayers, player.Name)
+        if killIndex then
+            table.remove(Interstellar.killplayers, killIndex)
+        end
+        if killplayerDropdown then
+            killplayerDropdown:Refresh(PlayerList)
+        end
+    end
+end)
+
+initializePlayerList()
+
+local killplayerDropdown = C:Dropdown({
+    Title = "要远程的玩家",
+    Values = PlayerList,
+    Value = {},
+    Multi = true,
+    AllowNone = true,
+    Callback = function(values)
+        Interstellar.killplayers = values or {}
+        WindUI:Notify({
+            Title = "远程",
+            Content = "已设置 " .. #Interstellar.killplayers .. " 个玩家为远程目标",
+            Duration = 3,
+        })
+    end
+})
+
+C:Toggle({
+    Title = "选中名单远程击杀(不选列表默认全部)",
+    Default = false,
+    Callback = function(state)
+        AutoStates = AutoStates or {}
+        AutoStates.AutoKill = state
+        
+        if state then
+            spawn(function()
+                while AutoStates.AutoKill do 
+                    pcall(function()
+                        local targets = {}
+                        if #Interstellar.killplayers > 0 then
+                            targets = Interstellar.killplayers
+                        else
+                            targets = PlayerList
+                        end
+                        
+                        for _, playerName in pairs(targets) do
+                            local target = Plr:FindFirstChild(playerName)
+                            if target and target.Character and target.Character:FindFirstChild("Humanoid") and target.Character.Humanoid.Health > 0 then 
+                                for i,v in pairs(LP.Backpack:GetChildren()) do 
+                                    if v:IsA("Tool") and v.Name == "Punch" then 
+                                        LP.Character.Humanoid:EquipTool(v)
+                                    end 
+                                end 
+                                
+                                local p = LP.Character:FindFirstChild("Punch") or LP.Backpack:FindFirstChild("Punch")
+                                if p then 
+                                    p.Parent = LP.Character
+                                    p:Activate()
+                                end
+                                
+                                local head = target.Character:FindFirstChild("Head")
+                                local lchar = LP.Character 
+                                local hand = lchar and lchar:FindFirstChild("LeftHand")
+                                if head and hand then 
+                                    firetouchinterest(head, hand, 0)
+                                    wait(0.01)
+                                    firetouchinterest(head, hand, 1)
+                                end 
+                            end 
+                        end
+                    end)
+                    wait(0.1)
+                end 
+            end)
+        end
+    end
+})
+
+C:Button({
+    Title = "查看选定远程名单",
+    Callback = function()
+        local targets = {}
+        if #Interstellar.killplayers > 0 then
+            targets = Interstellar.killplayers
+        else
+            targets = PlayerList
+        end
+        
+        WindUI:Notify({
+            Title = "远程目标 (" .. #targets .. " 个玩家)",
+            Content = table.concat(targets, ", "),
+            Duration = 5,
+        })
+    end
+})
+
+C:Button({
+    Title = "刷新玩家列表",
+    Callback = function()
+        refreshPlayerList()
+        WindUI:Notify({
+            Title = "玩家列表",
+            Content = "刷新玩家列表成功",
+            Duration = 3,
+        })
+    end
+})
+
+local equipmentSection = D:Section({Title = "跑步机", Opened = true})
+
+D:Toggle({
+    Title = "沙滩跑步机10",
+    Default = false,
+    Callback = function(state)
+        getgenv().PPJ10 = state
+        while getgenv().PPJ10 do
+            wait()
+            local humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid")
+            local rootPart = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+            humanoid.WalkSpeed = 10
+            rootPart.CFrame = CFrame.new(238.671112, 5.40315914, 387.713165, -0.0160072874, -2.90710176e-08, -0.99987185, -3.3434191e-09, 1, -2.90212157e-08, 0.99987185, 2.87843993e-09, -0.0160072874)
+            local RunService = game:GetService("RunService")
+            local Players = game:GetService("Players")
+            local localPlayer = Players.LocalPlayer
+            RunService:BindToRenderStep("move", Enum.RenderPriority.Character.Value + 1, function()
+                if localPlayer.Character then
+                    local hum = localPlayer.Character:FindFirstChild("Humanoid")
+                    if hum then
+                        hum:Move(Vector3.new(10000, 0, -1), true)
+                    end
+                end
+            end)
+        end
+        if not getgenv().PPJ10 then
+            local RunService = game:GetService("RunService")
+            RunService:UnbindFromRenderStep("move")
+        end
+    end
+})
+
+D:Toggle({
+    Title = "冰霜健身房跑步机2000",
+    Default = false,
+    Callback = function(state)
+        if game.Players.LocalPlayer.Agility.Value >= 2000 then
+            getgenv().PPJ2000 = state
+            while getgenv().PPJ2000 do
+                wait()
+                local humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid")
+                local rootPart = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+                humanoid.WalkSpeed = 10
+                rootPart.CFrame = CFrame.new(-3005.37866, 14.3221855, -464.697876, -0.015773816, -1.38508964e-08, 0.999875605, -5.13225586e-08, 1, 1.30429667e-08, -0.999875605, -5.11104332e-08, -0.015773816)
+                local RunService = game:GetService("RunService")
+                local Players = game:GetService("Players")
+                local localPlayer = Players.LocalPlayer
+                RunService:BindToRenderStep("move", Enum.RenderPriority.Character.Value + 1, function()
+                    if localPlayer.Character then
+                        local hum = localPlayer.Character:FindFirstChild("Humanoid")
+                        if hum then
+                            hum:Move(Vector3.new(10000, 0, -1), true)
+                        end
+                    end
+                end)
+            end
+        end
+        if not getgenv().PPJ2000 then
+            local RunService = game:GetService("RunService")
+            RunService:UnbindFromRenderStep("move")
+        end
+    end
+})
+
+D:Toggle({
+    Title = "神话健身房跑步机2000",
+    Default = false,
+    Callback = function(state)
+        if game.Players.LocalPlayer.Agility.Value >= 2000 then
+            getgenv().SHPPJ2000 = state
+            while getgenv().SHPPJ2000 do
+                wait()
+                local humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid")
+                local rootPart = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+                humanoid.WalkSpeed = 10
+                rootPart.CFrame = CFrame.new(2571.23706, 15.6896839, 898.650391, 0.999968231, 2.23868635e-09, -0.00797206629, -1.73198844e-09, 1, 6.35660768e-08, 0.00797206629, -6.3550246e-08, 0.999968231)
+                local RunService = game:GetService("RunService")
+                local Players = game:GetService("Players")
+                local localPlayer = Players.LocalPlayer
+                RunService:BindToRenderStep("move", Enum.RenderPriority.Character.Value + 1, function()
+                    if localPlayer.Character then
+                        local hum = localPlayer.Character:FindFirstChild("Humanoid")
+                        if hum then
+                            hum:Move(Vector3.new(10000, 0, -1), true)
+                        end
+                    end
+                end)
+            end
+        end
+        if not getgenv().SHPPJ2000 then
+            local RunService = game:GetService("RunService")
+            RunService:UnbindFromRenderStep("move")
+        end
+    end
+})
+
+D:Toggle({
+    Title = "永恒健身房跑步机3500",
+    Default = false,
+    Callback = function(state)
+        if game.Players.LocalPlayer.Agility.Value >= 3500 then
+            getgenv().YHPPJ3500 = state
+            while getgenv().YHPPJ3500 do
+                wait()
+                local humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid")
+                local rootPart = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+                humanoid.WalkSpeed = 10
+                rootPart.CFrame = CFrame.new(-7077.79102, 29.6702118, -1457.59961, -0.0322036594, -3.31122768e-10, 0.99948132, -6.44344267e-09, 1, 1.23684493e-10, -0.99948132, -6.43611742e-09, -0.0322036594)
+                local RunService = game:GetService("RunService")
+                local Players = game:GetService("Players")
+                local localPlayer = Players.LocalPlayer
+                RunService:BindToRenderStep("move", Enum.RenderPriority.Character.Value + 1, function()
+                    if localPlayer.Character then
+                        local hum = localPlayer.Character:FindFirstChild("Humanoid")
+                        if hum then
+                            hum:Move(Vector3.new(10000, 0, -1), true)
+                        end
+                    end
+                end)
+            end
+        end
+        if not getgenv().YHPPJ3500 then
+            local RunService = game:GetService("RunService")
+            RunService:UnbindFromRenderStep("move")
+        end
+    end
+})
+
+D:Toggle({
+    Title = "传奇健身房跑步机3000",
+    Default = false,
+    Callback = function(state)
+        if game.Players.LocalPlayer.Agility.Value >= 3000 then
+            getgenv().CQPPJ3000 = state
+            while getgenv().CQPPJ3000 do
+                wait()
+                local humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid")
+                local rootPart = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+                humanoid.WalkSpeed = 10
+                rootPart.CFrame = CFrame.new(4370.82812, 999.358704, -3621.42773, -0.960604727, -8.41949266e-09, -0.27791819, -6.12478646e-09, 1, -9.12496567e-09, 0.27791819, -7.06329528e-09, -0.960604727)
+                local RunService = game:GetService("RunService")
+                local Players = game:GetService("Players")
+                local localPlayer = Players.LocalPlayer
+                RunService:BindToRenderStep("move", Enum.RenderPriority.Character.Value + 1, function()
+                    if localPlayer.Character then
+                        local hum = localPlayer.Character:FindFirstChild("Humanoid")
+                        if hum then
+                            hum:Move(Vector3.new(10000, 0, -1), true)
+                        end
+                    end
+                end)
+            end
+        end
+        if not getgenv().CQPPJ3000 then
+            local RunService = game:GetService("RunService")
+            RunService:UnbindFromRenderStep("move")
+        end
+    end
+})
+
+D:Toggle({
+    Title = "丛林健身房跑步机20000",
+    Default = false,
+    Callback = function(state)
+        if game.Players.LocalPlayer.Agility.Value >= 20000 then
+            getgenv().JungleTreadmill = state
+            while getgenv().JungleTreadmill do
+                wait()
+                local humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid")
+                local rootPart = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+                humanoid.WalkSpeed = 10
+                rootPart.CFrame = CFrame.new(-8138.67919921875, 28.270538330078125, 2833.511474609375, -0.960604727, -8.41949266e-09, -0.27791819, -6.12478646e-09, 1, -9.12496567e-09, 0.27791819, -7.06329528e-09, -0.960604727)
+                local RunService = game:GetService("RunService")
+                local Players = game:GetService("Players")
+                local localPlayer = Players.LocalPlayer
+                RunService:BindToRenderStep("JungleRun", Enum.RenderPriority.Character.Value + 1, function()
+                    if localPlayer.Character then
+                        local hum = localPlayer.Character:FindFirstChild("Humanoid")
+                        if hum then
+                            hum:Move(Vector3.new(10000, 0, -1), true)
+                        end
+                    end
+                end)
+            end
+        end
+        if not getgenv().JungleTreadmill then
+            local RunService = game:GetService("RunService")
+            RunService:UnbindFromRenderStep("JungleRun")
+        end
+    end
+})
+
+local squatSection = D:Section({Title = "深蹲器材", Opened = true})
+
+D:Toggle({
+    Title = "沙滩深蹲架",
+    Default = false,
+    Callback = function(state)
+        getgenv().SquatBeach = state
+        if getgenv().SquatBeach then
+            spawn(function()
+                while getgenv().SquatBeach do
+                    pcall(function()
+                        if game.Players.LocalPlayer.leaderstats.Strength.Value >= 1000 then
+                            if game.Players.LocalPlayer.machineInUse.Value == nil then
+                                game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(232.627625, 3.67689133, 96.3039856, -0.963445187, -7.78685845e-08, -0.267905563, -7.92865222e-08, 1, -5.52570167e-09, 0.267905563, 1.5917589e-08, -0.963445187)
+                                wait(0.00001)
+                                local vim = game:GetService("VirtualInputManager")
+                                vim:SendKeyEvent(true, "E", false, game)
+                                wait(0.00001)
+                                vim:SendKeyEvent(false, "E", false, game)
+                            else
+                                local A_1 = "rep"
+                                local A_2 = game:GetService("Workspace").machinesFolder["Squat Rack"].interactSeat
+                                local Event = game:GetService("Players").LocalPlayer.muscleEvent
+                                Event:FireServer(A_1, A_2)
+                            end
+                        end
+                    end)
+                    wait()
+                end
+            end)
+        else
+            pcall(function()
+                local char = game.Players.LocalPlayer.Character
+                if char then
+                    char:WaitForChild("Humanoid").Jump = true
+                end
+            end)
+        end
+    end
+})
+
+D:Toggle({
+    Title = "霜冻健身房深蹲架",
+    Default = false,
+    Callback = function(state)
+        getgenv().SquatFrostGym = state
+        if getgenv().SquatFrostGym then
+            spawn(function()
+                while getgenv().SquatFrostGym do
+                    pcall(function()
+                        if game.Players.LocalPlayer.leaderstats.Strength.Value >= 4000 then
+                            if game.Players.LocalPlayer.machineInUse.Value == nil then
+                                game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-2629.13818, 3.36860609, -609.827454, -0.995664716, -2.67296816e-08, -0.0930150598, -1.90042453e-08, 1, -8.39415222e-08, 0.0930150598, -8.18099295e-08, -0.995664716)
+                                wait(0.00001)
+                                local vim = game:GetService("VirtualInputManager")
+                                vim:SendKeyEvent(true, "E", false, game)
+                                wait(0.00001)
+                                vim:SendKeyEvent(false, "E", false, game)
+                            else
+                                local A_1 = "rep"
+                                local A_2 = game:GetService("Workspace").machinesFolder["Squat Rack"].interactSeat
+                                local Event = game:GetService("Players").LocalPlayer.muscleEvent
+                                Event:FireServer(A_1, A_2)
+                            end
+                        end
+                    end)
+                    wait(0.00001)
+                end
+            end)
+        else
+            pcall(function()
+                local char = game.Players.LocalPlayer.Character
+                if char then
+                    char:WaitForChild("Humanoid").Jump = true
+                end
+            end)
+        end
+    end
+})
+
+D:Toggle({
+    Title = "传奇健身房深蹲架",
+    Default = false,
+    Callback = function(state)
+        getgenv().SquatLegendGym = state
+        if getgenv().SquatLegendGym then
+            spawn(function()
+                while getgenv().SquatLegendGym do
+                    pcall(function()
+                        if game.Players.LocalPlayer.machineInUse.Value == nil then
+                            game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(4443.04443, 987.521484, -4061.12988, 0.83309716, 3.33018835e-09, 0.553126693, -2.87759438e-09, 1, -1.68654424e-09, -0.553126693, -1.86619012e-10, 0.83309716)
+                            wait(0.00001)
+                            local vim = game:GetService("VirtualInputManager")
+                            vim:SendKeyEvent(true, "E", false, game)
+                            wait(0.00001)
+                            vim:SendKeyEvent(false, "E", false, game)
+                        else
+                            local A_1 = "rep"
+                            local A_2 = game:GetService("Workspace").machinesFolder["Squat Rack"].interactSeat
+                            local Event = game:GetService("Players").LocalPlayer.muscleEvent
+                            Event:FireServer(A_1, A_2)
+                        end
+                    end)
+                    wait(0.00001)
+                end
+            end)
+        else
+            pcall(function()
+                local char = game.Players.LocalPlayer.Character
+                if char then
+                    char:WaitForChild("Humanoid").Jump = true
+                end
+            end)
+        end
+    end
+})
+
+D:Toggle({
+    Title = "肌肉之王健身房深蹲架",
+    Default = false,
+    Callback = function(state)
+        getgenv().SquatMuscleGym = state
+        if getgenv().SquatMuscleGym then
+            spawn(function()
+                while getgenv().SquatMuscleGym do
+                    pcall(function()
+                        if game.Players.LocalPlayer.machineInUse.Value == nil then
+                            game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-8757.37012, 13.2186356, -6051.24365, -0.902269304, 1.63610299e-08, -0.431172907, 1.71076486e-08, 1, 2.14606288e-09, 0.431172907, -5.44002754e-09, -0.902269304)
+                            wait(0.00001)
+                            local vim = game:GetService("VirtualInputManager")
+                            vim:SendKeyEvent(true, "E", false, game)
+                            wait(0.00001)
+                            vim:SendKeyEvent(false, "E", false, game)
+                        else
+                            local A_1 = "rep"
+                            local A_2 = game:GetService("Workspace").machinesFolder["Squat Rack"].interactSeat
+                            local Event = game:GetService("Players").LocalPlayer.muscleEvent
+                            Event:FireServer(A_1, A_2)
+                        end
+                    end)
+                    wait(0.00001)
+                end
+            end)
+        else
+            pcall(function()
+                local char = game.Players.LocalPlayer.Character
+                if char then
+                    char:WaitForChild("Humanoid").Jump = true
+                end
+            end)
+        end
+    end
+})
+
+D:Toggle({
+    Title = "丛林健身房深蹲架",
+    Default = false,
+    Callback = function(state)
+        getgenv().SquatJungleGym = state
+        if getgenv().SquatJungleGym then
+            spawn(function()
+                while getgenv().SquatJungleGym do
+                    pcall(function()
+                        if game.Players.LocalPlayer.machineInUse.Value == nil then
+                            game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-8383.45, 3.43 + 80, 2854.54, -0.902269304, 1.63610299e-08, -0.431172907, 1.71076486e-08, 1, 2.14606288e-09, 0.431172907, -5.44002754e-09, -0.902269304)
+                            wait(0.00001)
+                            local vim = game:GetService("VirtualInputManager")
+                            vim:SendKeyEvent(true, "E", false, game)
+                            wait(0.00001)
+                            vim:SendKeyEvent(false, "E", false, game)
+                        else
+                            local A_1 = "rep"
+                            local A_2 = game:GetService("Workspace").machinesFolder["Squat Rack"].interactSeat
+                            local Event = game:GetService("Players").LocalPlayer.muscleEvent
+                            Event:FireServer(A_1, A_2)
+                        end
+                    end)
+                    wait(0.00001)
+                end
+            end)
+        else
+            pcall(function()
+                local char = game.Players.LocalPlayer.Character
+                if char then
+                    char:WaitForChild("Humanoid").Jump = true
+                end
+            end)
+        end
+    end
+})
+
+local pullupSection = D:Section({Title = "引体向上器材", Opened = true})
+
+D:Toggle({
+    Title = "沙滩引体向上",
+    Default = false,
+    Callback = function(state)
+        getgenv().PullupBeach = state
+        if getgenv().PullupBeach then
+            spawn(function()
+                while getgenv().PullupBeach do
+                    pcall(function()
+                        if game.Players.LocalPlayer.leaderstats.Strength.Value >= 1000 then
+                            if game.Players.LocalPlayer.machineInUse.Value == nil then
+                                game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-185.157745, 5.81071186, 104.747154, 0.227061391, -8.2363325e-09, 0.97388047, 5.58502826e-08, 1, -4.56432803e-09, -0.97388047, 5.54278827e-08, 0.227061391)
+                                wait(0.00001)
+                                local vim = game:GetService("VirtualInputManager")
+                                vim:SendKeyEvent(true, "E", false, game)
+                                wait(0.00001)
+                                vim:SendKeyEvent(false, "E", false, game)
+                            else
+                                local A_1 = "rep"
+                                local A_2 = game:GetService("Workspace").machinesFolder["Legends Pullup"].interactSeat
+                                local Event = game:GetService("Players").LocalPlayer.muscleEvent
+                                Event:FireServer(A_1, A_2)
+                            end
+                        end
+                    end)
+                    wait(0.00001)
+                end
+            end)
+        else
+            pcall(function()
+                local char = game.Players.LocalPlayer.Character
+                if char then
+                    char:WaitForChild("Humanoid").Jump = true
+                end
+            end)
+        end
+    end
+})
+
+D:Toggle({
+    Title = "神话健身房引体向上",
+    Default = false,
+    Callback = function(state)
+        getgenv().PullupMythGym = state
+        if getgenv().PullupMythGym then
+            spawn(function()
+                while getgenv().PullupMythGym do
+                    pcall(function()
+                        if game.Players.LocalPlayer.leaderstats.Strength.Value >= 4000 then
+                            if game.Players.LocalPlayer.machineInUse.Value == nil then
+                                game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(2315.82104, 5.81071281, 847.153076, 0.993555248, 6.99809632e-08, 0.113349125, -7.05298859e-08, 1, 8.32554692e-10, -0.113349125, -8.82168916e-09, 0.993555248)
+                                wait(0.00001)
+                                local vim = game:GetService("VirtualInputManager")
+                                vim:SendKeyEvent(true, "E", false, game)
+                                wait(0.00001)
+                                vim:SendKeyEvent(false, "E", false, game)
+                            else
+                                local A_1 = "rep"
+                                local A_2 = game:GetService("Workspace").machinesFolder["Legends Pullup"].interactSeat
+                                local Event = game:GetService("Players").LocalPlayer.muscleEvent
+                                Event:FireServer(A_1, A_2)
+                            end
+                        end
+                    end)
+                    wait(0.00001)
+                end
+            end)
+        else
+            pcall(function()
+                local char = game.Players.LocalPlayer.Character
+                if char then
+                    char:WaitForChild("Humanoid").Jump = true
+                end
+            end)
+        end
+    end
+})
+
+D:Toggle({
+    Title = "霜冻健身房深蹲架",
+    Default = false,
+    Callback = function(state)
+        getgenv().SquatFrostGym = state
+        if getgenv().SquatFrostGym then
+            spawn(function()
+                while getgenv().SquatFrostGym do
+                    pcall(function()
+                        if game.Players.LocalPlayer.leaderstats.Strength.Value >= 4000 then
+                            if game.Players.LocalPlayer.machineInUse.Value == nil then
+                                game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-2629.13818, 3.36860609, -609.827454, -0.995664716, -2.67296816e-08, -0.0930150598, -1.90042453e-08, 1, -8.39415222e-08, 0.0930150598, -8.18099295e-08, -0.995664716)
+                                wait(0.0001)
+                                local vim = game:GetService("VirtualInputManager")
+                                vim:SendKeyEvent(true, "E", false, game)
+                                wait(0.0001)
+                                vim:SendKeyEvent(false, "E", false, game)
+                            else
+                                local A_1 = "rep"
+                                local A_2 = game:GetService("Workspace").machinesFolder["Squat Rack"].interactSeat
+                                local Event = game:GetService("Players").LocalPlayer.muscleEvent
+                                Event:FireServer(A_1, A_2)
+                            end
+                        end
+                    end)
+                    wait()
+                end
+            end)
+        else
+            pcall(function()
+                local char = game.Players.LocalPlayer.Character
+                if char then
+                    char:WaitForChild("Humanoid").Jump = true
+                end
+            end)
+        end
+    end
+})
+
+D:Toggle({
+    Title = "传奇健身房深蹲架",
+    Default = false,
+    Callback = function(state)
+        getgenv().SquatLegendGym = state
+        if getgenv().SquatLegendGym then
+            spawn(function()
+                while getgenv().SquatLegendGym do
+                    pcall(function()
+                        if game.Players.LocalPlayer.machineInUse.Value == nil then
+                            game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(4443.04443, 987.521484, -4061.12988, 0.83309716, 3.33018835e-09, 0.553126693, -2.87759438e-09, 1, -1.68654424e-09, -0.553126693, -1.86619012e-10, 0.83309716)
+                            wait(0.0001)
+                            local vim = game:GetService("VirtualInputManager")
+                            vim:SendKeyEvent(true, "E", false, game)
+                            wait(0.0001)
+                            vim:SendKeyEvent(false, "E", false, game)
+                        else
+                            local A_1 = "rep"
+                            local A_2 = game:GetService("Workspace").machinesFolder["Squat Rack"].interactSeat
+                            local Event = game:GetService("Players").LocalPlayer.muscleEvent
+                            Event:FireServer(A_1, A_2)
+                        end
+                    end)
+                    wait()
+                end
+            end)
+        else
+            pcall(function()
+                local char = game.Players.LocalPlayer.Character
+                if char then
+                    char:WaitForChild("Humanoid").Jump = true
+                end
+            end)
+        end
+    end
+})
+
+D:Toggle({
+    Title = "肌肉之王健身房深蹲架",
+    Default = false,
+    Callback = function(state)
+        getgenv().SquatMuscleGym = state
+        if getgenv().SquatMuscleGym then
+            spawn(function()
+                while getgenv().SquatMuscleGym do
+                    pcall(function()
+                        if game.Players.LocalPlayer.machineInUse.Value == nil then
+                            game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-8757.37012, 13.2186356, -6051.24365, -0.902269304, 1.63610299e-08, -0.431172907, 1.71076486e-08, 1, 2.14606288e-09, 0.431172907, -5.44002754e-09, -0.902269304)
+                            wait(0.0001)
+                            local vim = game:GetService("VirtualInputManager")
+                            vim:SendKeyEvent(true, "E", false, game)
+                            wait(0.0001)
+                            vim:SendKeyEvent(false, "E", false, game)
+                        else
+                            local A_1 = "rep"
+                            local A_2 = game:GetService("Workspace").machinesFolder["Squat Rack"].interactSeat
+                            local Event = game:GetService("Players").LocalPlayer.muscleEvent
+                            Event:FireServer(A_1, A_2)
+                        end
+                    end)
+                    wait()
+                end
+            end)
+        else
+            pcall(function()
+                local char = game.Players.LocalPlayer.Character
+                if char then
+                    char:WaitForChild("Humanoid").Jump = true
+                end
+            end)
+        end
+    end
+})
+
+D:Toggle({
+    Title = "丛林健身房深蹲架",
+    Default = false,
+    Callback = function(state)
+        getgenv().SquatJungleGym = state
+        if getgenv().SquatJungleGym then
+            spawn(function()
+                while getgenv().SquatJungleGym do
+                    pcall(function()
+                        if game.Players.LocalPlayer.machineInUse.Value == nil then
+                            game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-8383.45, 3.43 + 80, 2854.54, -0.902269304, 1.63610299e-08, -0.431172907, 1.71076486e-08, 1, 2.14606288e-09, 0.431172907, -5.44002754e-09, -0.902269304)
+                            wait(0.0001)
+                            local vim = game:GetService("VirtualInputManager")
+                            vim:SendKeyEvent(true, "E", false, game)
+                            wait(0.0001)
+                            vim:SendKeyEvent(false, "E", false, game)
+                        else
+                            local A_1 = "rep"
+                            local A_2 = game:GetService("Workspace").machinesFolder["Squat Rack"].interactSeat
+                            local Event = game:GetService("Players").LocalPlayer.muscleEvent
+                            Event:FireServer(A_1, A_2)
+                        end
+                    end)
+                    wait()
+                end
+            end)
+        else
+            pcall(function()
+                local char = game.Players.LocalPlayer.Character
+                if char then
+                    char:WaitForChild("Humanoid").Jump = true
+                end
+            end)
+        end
+    end
+})
+
+local pullupSection = D:Section({Title = "丢石头", Opened = true})
+
+D:Toggle({
+    Title = "沙滩投掷石",
+    Default = false,
+    Callback = function(state)
+        getgenv().ThrowBeach = state
+        if getgenv().ThrowBeach then
+            spawn(function()
+                while getgenv().ThrowBeach do
+                    pcall(function()
+                        if game.Players.LocalPlayer.leaderstats.Strength.Value >= 3000 then
+                            if game.Players.LocalPlayer.machineInUse.Value == nil then
+                                game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-91.6730804, 3.67689133, -292.42868, -0.221022144, -2.21041621e-08, -0.975268781, 1.21414407e-08, 1, -2.54162646e-08, 0.975268781, -1.7458726e-08, -0.221022144)
+                                wait(0.0001)
+                                local vim = game:GetService("VirtualInputManager")
+                                vim:SendKeyEvent(true, "E", false, game)
+                                wait(0.0001)
+                                vim:SendKeyEvent(false, "E", false, game)
+                            else
+                                local A_1 = "rep"
+                                local A_2 = game:GetService("Workspace").machinesFolder.Deadlift.interactSeat
+                                local Event = game:GetService("Players").LocalPlayer.muscleEvent
+                                Event:FireServer(A_1, A_2)
+                            end
+                        end
+                    end)
+                    wait()
+                end
+            end)
+        else
+            pcall(function()
+                local char = game.Players.LocalPlayer.Character
+                if char then
+                    char:WaitForChild("Humanoid").Jump = true
+                end
+            end)
+        end
+    end
+})
+
+D:Toggle({
+    Title = "神话健身房投掷石",
+    Default = false,
+    Callback = function(state)
+        getgenv().ThrowMythGym = state
+        if getgenv().ThrowMythGym then
+            spawn(function()
+                while getgenv().ThrowMythGym do
+                    pcall(function()
+                        if game.Players.LocalPlayer.leaderstats.Strength.Value >= 10000 then
+                            if game.Players.LocalPlayer.machineInUse.Value == nil then
+                                game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(2486.01733, 3.67689276, 1237.89331, 0.883595645, -2.06135038e-08, -0.468250751, -3.3286871e-09, 1, -5.03036404e-08, 0.468250751, 4.60067362e-08, 0.883595645)
+                                wait(0.0001)
+                                local vim = game:GetService("VirtualInputManager")
+                                vim:SendKeyEvent(true, "E", false, game)
+                                wait(0.0001)
+                                vim:SendKeyEvent(false, "E", false, game)
+                            else
+                                local A_1 = "rep"
+                                local A_2 = game:GetService("Workspace").machinesFolder.Deadlift.interactSeat
+                                local Event = game:GetService("Players").LocalPlayer.muscleEvent
+                                Event:FireServer(A_1, A_2)
+                            end
+                        end
+                    end)
+                    wait()
+                end
+            end)
+        else
+            pcall(function()
+                local char = game.Players.LocalPlayer.Character
+                if char then
+                    char:WaitForChild("Humanoid").Jump = true
+                end
+            end)
+        end
+    end
+})
+
+D:Toggle({
+    Title = "传奇健身房投掷石",
+    Default = false,
+    Callback = function(state)
+        getgenv().ThrowLegendGym = state
+        if getgenv().ThrowLegendGym then
+            spawn(function()
+                while getgenv().ThrowLegendGym do
+                    pcall(function()
+                        if game.Players.LocalPlayer.machineInUse.Value == nil then
+                            game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(4189.96143, 987.829773, -3903.0166, 0.422592968, 0, 0.906319559, 0, 1, 0, -0.906319559, 0, 0.422592968)
+                            wait(0.0001)
+                            local vim = game:GetService("VirtualInputManager")
+                            vim:SendKeyEvent(true, "E", false, game)
+                            wait(0.0001)
+                            vim:SendKeyEvent(false, "E", false, game)
+                        else
+                            local A_1 = "rep"
+                            local A_2 = game:GetService("Workspace").machinesFolder.Deadlift.interactSeat
+                            local Event = game:GetService("Players").LocalPlayer.muscleEvent
+                            Event:FireServer(A_1, A_2)
+                        end
+                    end)
+                    wait()
+                end
+            end)
+        else
+            pcall(function()
+                local char = game.Players.LocalPlayer.Character
+                if char then
+                    char:WaitForChild("Humanoid").Jump = true
+                end
+            end)
+        end
+    end
+})
+
+D:Toggle({
+    Title = "肌肉之王投掷石",
+    Default = false,
+    Callback = function(state)
+        getgenv().ThrowMuscleGym = state
+        if getgenv().ThrowMuscleGym then
+            spawn(function()
+                while getgenv().ThrowMuscleGym do
+                    pcall(function()
+                        if game.Players.LocalPlayer.machineInUse.Value == nil then
+                            game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-8935.4384765625, 13.855730056762695, -5693.66748046875)
+                            wait(0.0001)
+                            local vim = game:GetService("VirtualInputManager")
+                            vim:SendKeyEvent(true, "E", false, game)
+                            wait(0.0001)
+                            vim:SendKeyEvent(false, "E", false, game)
+                        else
+                            local A_1 = "rep"
+                            local A_2 = game:GetService("Workspace").machinesFolder.Deadlift.interactSeat
+                            local Event = game:GetService("Players").LocalPlayer.muscleEvent
+                            Event:FireServer(A_1, A_2)
+                        end
+                    end)
+                    wait()
+                end
+            end)
+        else
+            pcall(function()
+                local char = game.Players.LocalPlayer.Character
+                if char then
+                    char:WaitForChild("Humanoid").Jump = true
+                end
+            end)
+        end
+    end
+})
+
+D:Toggle({
+    Title = "丛林健身房投掷石",
+    Default = false,
+    Callback = function(state)
+        getgenv().ThrowJungleGym = state
+        if getgenv().ThrowJungleGym then
+            spawn(function()
+                while getgenv().ThrowJungleGym do
+                    pcall(function()
+                        if game.Players.LocalPlayer.machineInUse.Value == nil then
+                            game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-8620.99, 89.81, 2673.54, -0.902269304, 1.63610299e-08, -0.431172907, 1.71076486e-08, 1, 2.14606288e-09, 0.431172907, -5.44002754e-09, -0.902269304)
+                            wait(0.0001)
+                            local vim = game:GetService("VirtualInputManager")
+                            vim:SendKeyEvent(true, "E", false, game)
+                            wait(0.0001)
+                            vim:SendKeyEvent(false, "E", false, game)
+                        else
+                            local A_1 = "rep"
+                            local A_2 = game:GetService("Workspace").machinesFolder.Throw.interactSeat
+                            local Event = game:GetService("Players").LocalPlayer.muscleEvent
+                            Event:FireServer(A_1, A_2)
+                        end
+                    end)
+                    wait()
+                end
+            end)
+        else
+            pcall(function()
+                local char = game.Players.LocalPlayer.Character
+                if char then
+                    char:WaitForChild("Humanoid").Jump = true
+                end
+            end)
+        end
+    end
+})
+
+local modifySection = F:Section({Title = "美化数据", Opened = true})
+
+F:Input({
+    Title = "力量",
+    Desc = "输入力量数值",
+    Callback = function(value)
+        if value and value ~= "" and tonumber(value) then
+            game:GetService("Players").LocalPlayer.leaderstats.Strength.Value = tonumber(value)
+        end
+    end
+})
+
+F:Input({
+    Title = "耐力",
+    Desc = "输入耐力数值",
+    Callback = function(value)
+        if value and value ~= "" and tonumber(value) then
+            game:GetService("Players").LocalPlayer.Durability.Value = tonumber(value)
+        end
+    end
+})
+
+F:Input({
+    Title = "敏捷",
+    Desc = "输入敏捷数值",
+    Callback = function(value)
+        if value and value ~= "" and tonumber(value) then
+            game:GetService("Players").LocalPlayer.Agility.Value = tonumber(value)
+        end
+    end
+})
+
+F:Input({
+    Title = "重生",
+    Desc = "输入重生次数",
+    Callback = function(value)
+        if value and value ~= "" and tonumber(value) then
+            game:GetService("Players").LocalPlayer.leaderstats.Rebirths.Value = tonumber(value)
+        end
+    end
+})
+
+F:Input({
+    Title = "宝石",
+    Desc = "输入宝石数量",
+    Callback = function(value)
+        if value and value ~= "" and tonumber(value) then
+            game:GetService("Players").LocalPlayer.Gems.Value = tonumber(value)
+        end
+    end
+})
+
+F:Input({
+    Title = "邪恶业报",
+    Desc = "输入邪恶业报数值",
+    Callback = function(value)
+        if value and value ~= "" and tonumber(value) then
+            game:GetService("Players").LocalPlayer.evilKarma.Value = tonumber(value)
+        end
+    end
+})
+
+F:Input({
+    Title = "好人业报",
+    Desc = "输入好人业报数值",
+    Callback = function(value)
+        if value and value ~= "" and tonumber(value) then
+            game:GetService("Players").LocalPlayer.goodKarma.Value = tonumber(value)
+        end
+    end
+})
+
+F:Input({
+    Title = "总业报",
+    Desc = "输入总业报数值",
+    Callback = function(value)
+        if value and value ~= "" and tonumber(value) then
+            game:GetService("Players").LocalPlayer.leaderstats.Kills.Value = tonumber(value)
+        end
+    end
+})
+
+local rebirthSection = E:Section({Title = "自动重生", Opened = true})
+
+E:Toggle({
+    Title = "自动重生",
+    Default = false,
+    Callback = function(state)
+        getgenv().AutoRebirth = state
+        if getgenv().AutoRebirth then
+            spawn(function()
+                while getgenv().AutoRebirth do
+                    pcall(function()
+                        game:GetService("ReplicatedStorage").rEvents.rebirthRemote:InvokeServer("rebirthRequest")
+                    end)
+                    wait()
+                end
+            end)
+        end
+    end
+})
+
+local customSection = E:Section({Title = "自定义", Opened = true})
+
+E:Input({
+    Title = "自定义重生次数",
+    Desc = "只能输入大于现在的重生次数",
+    Callback = function(value)
+        Interstellar.birth = tonumber(value) or 0
+    end
+})
+
+E:Toggle({
+    Title = "重生到指定的重生次数",
+    Default = false,
+    Callback = function(state)
+        Interstellar.autobirth = state
+        if Interstellar.autobirth then
+            spawn(function()
+                local player = game:GetService("Players").LocalPlayer
+                local targetRebirths = Interstellar.birth
+                while Interstellar.autobirth do
+                    if player.leaderstats.Rebirths.Value >= targetRebirths then
+                        Interstellar.autobirth = false
+                        Window:Notify({
+                            Title = "重生",
+                            Content = "已自动重生到目标次数",
+                            Duration = 3
+                        })
+                        break
+                    else
+                        game:GetService("ReplicatedStorage").rEvents.rebirthRemote:InvokeServer("rebirthRequest")
+                        wait()
+                    end
+                end
+            end)
+        end
+    end
+})
+
+E:Divider()
+
+E:Paragraph({
+    Title = "适合直接打石头卡宠的重生次数",
+    Desc = "重生:80\n重生:280\n重生:580\n重生:980\n重生:1480\n重生:2080\n重生:2780\n重生:3580\n重生:4480\n重生:5480\n重生:6580\n重生:7780\n重生:9080\n重生:10480\n重生:11980\n重生:13580\n重生:15280\n重生:17080\n重生:18980\n重生:94980\n重生:189980",
+    ThumbnailSize = 190,
+})
+
+local teleportSection = G:Section({Title = "传送区", Opened = true})
+
+local function T(c)
+    game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").CFrame = c
+end
+
+G:Button({
+    Title = "安全点",
+    Callback = function()
+        T(CFrame.new(-51.67,32.22,1290.41,0.99455,1.24e-08,-0.10422,-7.59e-09,1,4.62e-08,0.10422,-4.52e-08,0.99455))
+    end
+})
+
+G:Toggle({
+    Title = "安全点循环",
+    Default = false,
+    Callback = function(state)
+        getgenv().SafeSpot2 = state
+        spawn(function()
+            while getgenv().SafeSpot2 do 
+                wait()
+                pcall(function()
+                    local char = game.Players.LocalPlayer.Character 
+                    if not char then 
+                        game.Players.LocalPlayer.CharacterAdded:Wait()
+                        char = game.Players.LocalPlayer.Character 
+                        char:WaitForChild("HumanoidRootPart")
+                    end 
+                    char.HumanoidRootPart.CFrame = CFrame.new(-51.67,32.22,1290.41,0.99455,1.24e-08,-0.10422,-7.59e-09,1,4.62e-08,0.10422,-4.52e-08,0.99455)
+                end)
+            end 
+        end)
+    end
+})
+
+G:Toggle({
+    Title = "安全点循环2",
+    Default = false,
+    Callback = function(state)
+        getgenv().SafeSpot2 = state
+        spawn(function()
+            while getgenv().SafeSpot2 do 
+                wait()
+                pcall(function()
+                    local char = game.Players.LocalPlayer.Character 
+                    if not char then 
+                        game.Players.LocalPlayer.CharacterAdded:Wait()
+                        char = game.Players.LocalPlayer.Character 
+                        char:WaitForChild("HumanoidRootPart")
+                    end 
+                    char.HumanoidRootPart.CFrame = CFrame.new(0, 100050, 133.15)
+                end)
+            end 
+        end)
+    end
+})
+
+G:Button({
+    Title = "雕像头顶",
+    Callback = function()
+        T(CFrame.new(1.19,85.09,244.49,0.59992,-2.24e-09,0.80006,4.46e-09,1,-5.44e-10,-0.80006,3.90e-09,0.59992))
+    end
+})
+
+G:Button({
+    Title = "肌肉王雕像头顶",
+    Callback = function()
+        T(CFrame.new(-8751.0,120.4,-5863.1,0.59992,-2.24e-09,0.80006,4.46e-09,1,-5.44e-10,-0.80006,3.90e-09,0.59992))
+    end
+})
+
+G:Button({
+    Title = "出生点",
+    Callback = function()
+        T(CFrame.new(7,3,108))
+    end
+})
+
+G:Button({
+    Title = "新手岛",
+    Callback = function()
+        T(CFrame.new(-37.61,4.16,1877.14))
+    end
+})
+
+G:Button({
+    Title = "传说健身房",
+    Callback = function()
+        T(CFrame.new(4603.28,988.18,-3897.87))
+    end
+})
+
+G:Button({
+    Title = "永恒健身房",
+    Callback = function()
+        T(CFrame.new(-6758.96,4.01,-1284.92))
+    end
+})
+
+G:Button({
+    Title = "神话健身房",
+    Callback = function()
+        T(CFrame.new(2250.78,4.01,1073.23))
+    end
+})
+
+G:Button({
+    Title = "冰霜健身房",
+    Callback = function()
+        T(CFrame.new(-2623.02,4.01,-409.07))
+    end
+})
+
+G:Button({
+    Title = "肌肉之王健身房",
+    Callback = function()
+        T(CFrame.new(-8625.93,13.86,-5730.47))
+    end
+})
+
+G:Button({
+    Title = "丛林健身房",
+    Callback = function()
+        T(CFrame.new(-8685.62,3.43,2392.33))
+    end
+})
+
+local collectSection = H:Section({Title = "功能", Opened = true})
+
+H:Button({
+    Title = "使用一次奶昔",
+    Callback = function()
+        local char = game.Players.LocalPlayer.Character 
+        if not char then return end 
+        local humanoid = char:FindFirstChild("Humanoid")
+        if not humanoid then return end 
+        for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do 
+            if v:IsA("Tool") and (v.Name:find("奶昔") or v.Name:find("Shake") or v.Name:find("Milkshake")) then 
+                humanoid:EquipTool(v)
+                v:Activate()
+                wait(0.1)
+                break 
+            end 
+        end 
+    end
+})
+
+H:Toggle({
+    Title = "自动使用奶昔",
+    Default = false,
+    Callback = function(state)
+        getgenv().AutoShake = state 
+        while getgenv().AutoShake do 
+            wait()
+            local char = game.Players.LocalPlayer.Character 
+            if not char then wait(1) continue end 
+            local humanoid = char:FindFirstChild("Humanoid")
+            if not humanoid then continue end 
+            local shakeFound = false 
+            for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do 
+                if v:IsA("Tool") and (v.Name:find("奶昔") or v.Name:find("Shake") or v.Name:find("Milkshake")) then 
+                    humanoid:EquipTool(v)
+                    v:Activate()
+                    shakeFound = true 
+                    wait(1)
+                    break 
+                end 
+            end 
+            if not shakeFound then 
+                wait(3)
+            end 
+        end 
+    end
+})
+
+H:Button({
+    Title = "使用一次能量棒",
+    Callback = function()
+        local c = game.Players.LocalPlayer.Character 
+        if not c then return end 
+        local h = c:FindFirstChild("Humanoid")
+        if not h then return end 
+        for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do 
+            if v:IsA("Tool") and (v.Name:find("Protein Bar") or v.Name:find("能量棒") or v.Name:find("Energy Bar")) then 
+                h:EquipTool(v)
+                v:Activate()
+                wait(0.1)
+                break 
+            end 
+        end 
+    end
+})
+
+H:Toggle({
+    Title = "自动使用能量棒",
+    Default = false,
+    Callback = function(state)
+        getgenv().AutoREB = state 
+        while getgenv().AutoREB do 
+            wait()
+            local c = game.Players.LocalPlayer.Character 
+            if not c then wait(1) continue end 
+            local h = c:FindFirstChild("Humanoid")
+            if not h then continue end 
+            local f = false 
+            for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do 
+                if v:IsA("Tool") and (v.Name:find("Protein Bar") or v.Name:find("能量棒") or v.Name:find("Energy Bar")) then 
+                    h:EquipTool(v)
+                    v:Activate()
+                    f = true 
+                    wait(1)
+                    break 
+                end 
+            end 
+            if not f then 
+                wait(3)
+            end 
+        end 
+    end
+})
+
+H:Divider()
+
+H:Button({
+    Title = "使用一次蛋白质蛋",
+    Callback = function()
+        local c = game.Players.LocalPlayer.Character 
+        if not c then return end 
+        local h = c:FindFirstChild("Humanoid")
+        if not h then return end 
+        for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do 
+            if v:IsA("Tool") and (v.Name:find("Protein Egg") or v.Name:find("蛋白质蛋")) then 
+                h:EquipTool(v)
+                v:Activate()
+                wait(0.1)
+                break 
+            end 
+        end 
+    end
+})
+
+H:Button({
+    Title = "使用一次热带摇晃",
+    Callback = function()
+        local c = game.Players.LocalPlayer.Character 
+        if not c then return end 
+        local h = c:FindFirstChild("Humanoid")
+        if not h then return end 
+        for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do 
+            if v:IsA("Tool") and (v.Name:find("Tropical Shake") or v.Name:find("热带摇晃")) then 
+                h:EquipTool(v)
+                v:Activate()
+                wait(0.1)
+                break 
+            end 
+        end 
+    end
+})
+
+H:Divider()
+
+H:Button({
+    Title = "收集宝石",
+    Callback = function()
+        local jk = {}
+        for _,v in pairs(game:GetService("ReplicatedStorage").chestRewards:GetDescendants()) do 
+            if v.Name ~= "Light Karma Chest" and v.Name ~= "Evil Karma Chest" then 
+                table.insert(jk, v.Name)
+            end 
+        end 
+        for i=1,#jk do 
+            wait(2)
+            game:GetService("ReplicatedStorage").rEvents.checkChestRemote:InvokeServer(jk[i])
+        end 
+    end
+})
+
+local Interstellar = {
+    BuyAuto = false, BuyDark = false, BuyMuscle = false, BuyNeon = false,
+    EvolveAuto = false, EvolveDark = false, EvolveMuscle = false, EvolveNeon = false, EvolveNeonCN = false,
+    BlueCrystal = false, GreenCrystal = false, FrostCrystal = false, MythicalCrystal = false,
+    InfernoCrystal = false, LegendsCrystal = false, MuscleElite = false, GalaxyOracle = false, JungleCrystal = false,
+    AutoOpen = false
+}
+
+local BuyPetShop, EvolvePet, OpenCrystal = "", "", ""
+
+local petshow = {"肌肉王光环", "暗星", "霓虹卫报", "赛博对决龙"}
+local petNames = {
+    ["肌肉王光环"] = "Muscle King",
+    ["暗星"] = "Darkstar Hunter", 
+    ["霓虹卫报"] = "Neon Guardian",
+    ["赛博对决龙"] = "Cybernetic Showdown Dragon"
+}
+
+local crystalshow = {"Blue Crystal", "Green Crystal", "Frost Crystal", "Mythical Crystal", "Inferno Crystal", "Legends Crystal", "Muscle Elite Crystal", "Galaxy Oracle Crystal", "Jungle Crystal"}
+local crystalNames = {
+    ["蓝色宠物蛋"] = "Blue Crystal",
+    ["绿色宠物蛋"] = "Green Crystal",
+    ["冰霜宠物蛋"] = "Frost Crystal",
+    ["神话宠物蛋"] = "Mythical Crystal",
+    ["地狱宠物蛋"] = "Inferno Crystal",
+    ["传奇宠物蛋"] = "Legends Crystal",
+    ["传奇宠物蛋"] = "Muscle Elite Crystal",
+    ["肌肉王宠物蛋"] = "Galaxy Oracle Crystal",
+    ["丛林宠物蛋"] = "Jungle Crystal"
+}
+local crystalshowChinese = {}
+for _, engName in ipairs(crystalshow) do
+    for chnName, eName in pairs(crystalNames) do
+        if eName == engName then
+            table.insert(crystalshowChinese, chnName)
+            break
+        end
+    end
+end
+
+local function CheckPetInventory(petName)
+    local backpack = game:GetService("Players").LocalPlayer.Backpack
+    local player = game:GetService("Players").LocalPlayer
+    local found = false
+    for _, item in pairs(backpack:GetChildren()) do
+        if item.Name == petName then
+            found = true
+            break
+        end
+    end
+    for _, item in pairs(player.Character:GetChildren()) do
+        if item.Name == petName then
+            found = true
+            break
+        end
+    end
+    return found
+end
+
+local buySection = I:Section({Title = "购买", Opened = true})
+
+I:Paragraph({
+    Title = "关于直接购买宠物",
+    Desc = "你得保证你有充足的宝石\n因为购买一个宠物就值0.4亿左右\n否则购买失败",
+    ThumbnailSize = 200,
+})
+
+local BuyPetShop = nil
+local autoBuyPet = false
+
+I:Dropdown({
+    Title = "选择购买的宠物",
+    Values = petshow,
+    Value = "空",
+    Callback = function(v)
+        BuyPetShop = petNames[v]
+    end
+})
+
+I:Button({
+    Title = "购买选中宠物一次",
+    Callback = function()
+        if BuyPetShop then
+            local p = game.ReplicatedStorage.cPetShopFolder:FindFirstChild(BuyPetShop)
+            if p then
+                game.ReplicatedStorage.cPetShopRemote:InvokeServer(p)
+            end
+        end
+    end
+})
+
+I:Toggle({
+    Title = "自动购买选中宠物",
+    Default = false,
+    Callback = function(state)
+        autoBuyPet = state
+        if state and BuyPetShop then
             task.spawn(function()
-                while functions.Infstamina do
-                    if Methods.Infstamina == "Getgc" then
-                        local stamina = {}
-                        local function get()
-                            for _, value in pairs(getgc(true)) do
-                                if type(value) == "table" and rawget(value, "S") then
-                                    table.insert(stamina, value)
-                                end
-                            end
-                        end
-                        local success = pcall(get)
-                        if success then
-                            for _, a in pairs(stamina) do
-                                a.S = 100
-                            end
-                        end
-                    elseif Methods.Infstamina == "low exploit" then
-                        if me.Character then
-                            local hum = me.Character:FindFirstChild("Humanoid")
-                            if hum and not hum:GetAttribute("ZSPRN_M") then
-                                hum:SetAttribute("ZSPRN_M", true)
-                            end
-                        end
-                        me.CharacterAdded:Connect(function(char)
-                            if functions.Infstamina and char and char:WaitForChild("Humanoid") then
-                                local hum = char:FindFirstChild("Humanoid")
-                                if hum and not hum:GetAttribute("ZSPRN_M") then
-                                    hum:SetAttribute("ZSPRN_M", true)
-                                end
+                while autoBuyPet and BuyPetShop do
+                    local p = game.ReplicatedStorage.cPetShopFolder:FindFirstChild(BuyPetShop)
+                    if p then
+                        pcall(function()
+                            game.ReplicatedStorage.cPetShopRemote:InvokeServer(p)
+                            if CheckPetInventory(BuyPetShop) then
+                                autoBuyPet = false
                             end
                         end)
                     end
-                    run.RenderStepped:Wait()
+                    task.wait(0.5)
                 end
             end)
-        else
-            if me.Character then
-                local hum = me.Character:FindFirstChild("Humanoid")
-                if hum then
-                    hum:SetAttribute("ZSPRN_M", nil)
-                end
-            end
+        elseif state and not BuyPetShop then
+            autoBuyPet = false
         end
     end
 })
 
-Tabs.Player:Dropdown({
-    Title = "无限体力方法",
-    Desc = "选择实现方法",
-    Values = {"Getgc", "low exploit"},
-    Value = Methods.Infstamina,
-    Multi = false,
-    AllowNone = false,
-    Callback = function(Value)
-        Methods.Infstamina = Value
-    end
-})
+local evolveSection = I:Section({Title = "进化", Opened = true})
 
-Tabs.Player:Toggle({
-    Title = "无坠落伤害",
-    Desc = "防止坠落伤害",
-    Value = functions.Nofalldamage,
-    Callback = function(Value)
-        functions.Nofalldamage = Value
-        if Value then
-            if me.Character then
-                local ff = Instance.new("ForceField")
-                ff.Parent = me.Character
-                ff.Visible = false
-            end
-            me.CharacterAdded:Connect(function(char)
-                if functions.Nofalldamage and char and char:WaitForChild("HumanoidRootPart") and char:WaitForChild("Humanoid") then
-                    local ff = Instance.new("ForceField")
-                    ff.Parent = char
-                    ff.Visible = false
-                end
-            end)
-        else
-            if me.Character then
-                for _, a in pairs(me.Character:GetChildren()) do
-                    if a:IsA("ForceField") and a.Visible == false then
-                        a:Destroy()
-                    end
-                end
-            end
-        end
-    end
-})
-
-Tabs.Player:Toggle({
-    Title = "穿墙",
-    Desc = "可以穿过墙壁",
-    Value = functions.Noclip,
-    Callback = function(Value)
-        functions.Noclip = Value
-        if Value then
-            RUNS.Noclip = run.RenderStepped:Connect(function()
-                local char = me.Character
-                if char then
-                    for _, a in pairs(char:GetDescendants()) do
-                        if a:IsA("BasePart") and a.CanCollide then
-                            a.CanCollide = false
-                        end
-                    end
-                end
-            end)
-        else
-            if RUNS.Noclip then
-                RUNS.Noclip:Disconnect()
-                RUNS.Noclip = nil
-            end
-        end
-    end
-})
-
-Tabs.Player:Toggle({
-    Title = "伪装倒地",
-    Desc = "伪装成倒地状态",
-    Value = functions.FakeDown,
-    Callback = function(Value)
-        functions.FakeDown = Value
-        if Value then
-            local getvalue = CharStats(me).Downed
-            getvalue.Value = true
-            getvalue:GetPropertyChangedSignal("Value"):Connect(function()
-                if functions.FakeDown then
-                    getvalue.Value = true
-                end
-            end)
-        else
-            CharStats(me).Downed.Value = false
-        end
-    end
-})
-
-Tabs.Player:Toggle({
-    Title = "停止颈部移动",
-    Desc = "停止角色颈部移动",
-    Value = functions.Stopneckmove,
-    Callback = function(Value)
-        functions.Stopneckmove = Value
-        if Value then
-            if me.Character then
-                me.Character:SetAttribute("NoNeckMovement", true)
-            end
-            me.CharacterAdded:Connect(function(char)
-                if char and char:FindFirstChild("Humanoid") then
-                    if functions.Stopneckmove then
-                        char:SetAttribute("NoNeckMovement", true)
-                    end
-                else
-                    repeat task.wait() until char and char:FindFirstChild("Humanoid")
-                    if functions.Stopneckmove then
-                        char:SetAttribute("NoNeckMovement", true)
-                    end
-                end
-            end)
-        else
-            if me.Character then
-                me.Character:SetAttribute("NoNeckMovement", nil)
-            end
-        end
-    end
-})
-
-Tabs.Player:Toggle({
-    Title = "肢体不碎",
-    Desc = "防止肢体断裂",
-    Value = functions.Unbreaklimbs,
-    Callback = function(Value)
-        functions.Unbreaklimbs = Value
-        local limbsfolder = CharStats(me).HealthValues
-        local function fixLimbs()
-            for _, a in pairs(limbsfolder:GetChildren()) do
-                for _, i in pairs(a:GetChildren()) do
-                    if i and i.Name == "Broken" then
-                        if functions.Unbreaklimbs then
-                            i.Value = false
-                            i:GetPropertyChangedSignal("Value"):Connect(function()
-                                if functions.Unbreaklimbs then
-                                    i.Value = false
-                                end
-                            end)
-                        end
-                    end
-                end
-            end
-        end
-        fixLimbs()
-        limbsfolder.ChildAdded:Connect(fixLimbs)
-    end
-})
-
-Tabs.Combat:Toggle({
-    Title = "近战光环",
-    Desc = "最好别乱用",
-    Value = functions.Meleeaura,
-    Callback = function(Value)
-        functions.Meleeaura = Value
-        if Value then
-            local remote1 = rp.Events["XMHH.2"]
-            local remote2 = rp.Events["XMHH2.2"]
-            local part
-            local randpart = nil
-            local LastTick = tick()
-            local AttachTick = tick()
-            local attachcd = 0.1
-            local AttachCD = {
-                Fists = 0.05, Knuckledusters = 0.05, Nunchucks = 0.05, Shiv = 0.05,
-                Bat = 1, ["Metal-Bat"] = 1, Chainsaw = 2.5, Balisong = 0.05,
-                Rambo = 0.3, Shovel = 3, Sledgehammer = 2, Katana = 0.1,
-                Wrench = 0.1, FireAxe = 2.6
-            }
-            local function Attack(target)
-                if not (target and target:FindFirstChild("Head")) then return end
-                local mychar = me.Character
-                if not mychar then return end
-                local TOOL = mychar:FindFirstChildOfClass("Tool")
-                if not TOOL then return end
-                local AnimFolder = TOOL:FindFirstChild("AnimsFolder")
-                if not AnimFolder then return end
-                local anim = AnimFolder:FindFirstChild("Slash1")
-                if not anim then return end
-                if tick() - AttachTick >= attachcd then
-                    local result = remote1:InvokeServer("🍞", tick(), TOOL, "43TRFWX", "Normal", tick(), true)
-                    attachcd = AttachCD[TOOL.Name] or 0.5
-                    if SectionSettings.MeleeAura.ShowAnim then
-                        local load = me.Character.Humanoid.Animator:LoadAnimation(anim)
-                        load:Play()
-                        load:AdjustSpeed(1.3)
-                    end
-                    task.wait(0.3 + math.random() * 0.2)
-                    if TOOL then
-                        local Handle = TOOL:FindFirstChild("WeaponHandle") or TOOL:FindFirstChild("Handle") or me.Character:FindFirstChild("Right Arm")
-                        local arg2 = {
-                            "🍞", tick(), TOOL, "2389ZFX34", result, true, Handle,
-                            target:FindFirstChild(part), target,
-                            me.Character.HumanoidRootPart.Position,
-                            target:FindFirstChild(part).Position
-                        }
-                        if TOOL.Name == "Chainsaw" then
-                            for _ = 1, 15 do remote2:FireServer(unpack(arg2)) end
-                        else
-                            remote2:FireServer(unpack(arg2))
-                        end
-                        AttachTick = tick()
-                    end
-                end
-            end
-            task.spawn(function()
-                while functions.Meleeaura do
-                    local mychar = me.Character or me.CharacterAdded:Wait()
-                    if mychar then
-                        local myhrp = mychar:FindFirstChild("HumanoidRootPart")
-                        if myhrp then
-                            for _, a in pairs(plrs:GetPlayers()) do
-                                if a == me then continue end
-                                local char = a.Character
-                                if not char then continue end
-                                local hrp = char:FindFirstChild("HumanoidRootPart")
-                                if not hrp then continue end
-                                if (myhrp.Position - hrp.Position).Magnitude >= SectionSettings.MeleeAura.Distance then continue end
-                                local hum = char:FindFirstChildOfClass("Humanoid")
-                                if not hum or hum.Health == 0 then continue end
-                                if char:FindFirstChildOfClass("ForceField") then continue end
-                                if SectionSettings.MeleeAura.CheckWhiteList and table.find(WhiteList, a) then continue end
-                                if SectionSettings.MeleeAura.CheckTeam and a.Team == me.Team then continue end
-                                if SectionSettings.MeleeAura.CheckDowned and CharStats(a).Downed.Value then continue end
-                                local count = #SectionSettings.MeleeAura.TargetParts
-                                if count == 0 then
-                                    part = "Head"
-                                elseif count == 1 then
-                                    part = SectionSettings.MeleeAura.TargetParts[1]
-                                else
-                                    if tick() - LastTick >= 0.2 then
-                                        randpart = SectionSettings.MeleeAura.TargetParts[math.random(1, count)]
-                                        LastTick = tick()
-                                    end
-                                    part = randpart or SectionSettings.MeleeAura.TargetParts[1]
-                                end
-                                Attack(char)
-                            end
-                        end
-                    end
-                    run.Heartbeat:Wait()
-                end
-            end)
-        end
-    end
-})
-
-Tabs.Combat:Toggle({
-    Title = "显示动画",
-    Desc = "显示攻击动画",
-    Value = SectionSettings.MeleeAura.ShowAnim,
-    Callback = function(Value)
-        SectionSettings.MeleeAura.ShowAnim = Value
-    end
-})
-Tabs.Visual:Toggle({
-    Title = "ESP",
-    Desc = "显示玩家轮廓",
-    Value = functions.ESP,
-    Callback = function(Value)
-        functions.ESP = Value
-        if Value then
-            RUNS.ESP = run.Heartbeat:Connect(function()
-                if SectionSettings.ESP.Highlight then
-                    for _, a in pairs(plrs:GetPlayers()) do
-                        if a ~= me then
-                            local char = a.Character
-                            if char and not char:FindFirstChild("Highlight") then
-                                local hg = Instance.new("Highlight")
-                                hg.Parent = char
-                                hg.FillTransparency = 1
-                            end
-                        end
-                    end
-                    plrs.PlayerAdded:Connect(function(player)
-                        if functions.ESP then
-                            local char = player.Character or player.CharacterAdded:Wait()
-                            if char and SectionSettings.ESP.Highlight and not char:FindFirstChild("Highlight") then
-                                local hg = Instance.new("Highlight")
-                                hg.Parent = char
-                                hg.FillTransparency = 1
-                            end
-                        end
-                    end)
-                else
-                    for _, a in pairs(plrs:GetPlayers()) do
-                        if a ~= me then
-                            local char = a.Character
-                            if char then
-                                local h = char:FindFirstChild("Highlight")
-                                if h then h:Destroy() end
-                            end
-                        end
-                    end
-                end
-            end)
-        else
-            if RUNS.ESP then
-                RUNS.ESP:Disconnect()
-                RUNS.ESP = nil
-            end
-            for _, a in pairs(plrs:GetPlayers()) do
-                if a ~= me then
-                    local char = a.Character
-                    if char then
-                        local h = char:FindFirstChild("Highlight")
-                        if h then h:Destroy() end
-                    end
-                end
-            end
-        end
-    end
-})
-
-Tabs.Visual:Toggle({
-    Title = "高亮显示",
-    Desc = "高亮显示其他玩家",
-    Value = SectionSettings.ESP.Highlight,
-    Callback = function(Value)
-        SectionSettings.ESP.Highlight = Value
-    end
-})
-
-Tabs.Visual:Toggle({
-    Title = "手臂特效",
-    Desc = "改变手臂材质",
-    Value = functions.ArmsChams,
-    Callback = function(Value)
-        functions.ArmsChams = Value
-        local viewfolder = camera:WaitForChild("ViewModel")
-        if Value then
-            viewfolder["Left Arm"].Material = Enum.Material.ForceField
-            viewfolder["Right Arm"].Material = Enum.Material.ForceField
-        else
-            viewfolder["Left Arm"].Material = Enum.Material.Plastic
-            viewfolder["Right Arm"].Material = Enum.Material.Plastic
-        end
-        me.CharacterAdded:Connect(function(char)
-            repeat task.wait() until char and char.Parent
-            local vf = camera:WaitForChild("ViewModel")
-            if functions.ArmsChams then
-                vf["Left Arm"].Material = Enum.Material.ForceField
-                vf["Right Arm"].Material = Enum.Material.ForceField
-            else
-                vf["Left Arm"].Material = Enum.Material.Plastic
-                vf["Right Arm"].Material = Enum.Material.Plastic
-            end
-        end)
-    end
-})
-
-local function Create(Class, Properties)
-    local _Instance = typeof(Class) == 'string' and Instance.new(Class) or Class
-    for Property, Value in pairs(Properties) do
-        _Instance[Property] = Value
-    end
-    return _Instance
-end
-
-local ESPSettings = {
-    Enabled = true,
-    TeamCheck = true,
-    MaxDistance = 200,
-    FontSize = 11,
-    FadeOut = {
-        OnDistance = true,
-        OnDeath = false,
-        OnLeave = false,
-    },
-    Options = {
-        Teamcheck = false, TeamcheckRGB = Color3.fromRGB(0, 255, 0),
-        Friendcheck = true, FriendcheckRGB = Color3.fromRGB(0, 255, 0),
-        Highlight = false, HighlightRGB = Color3.fromRGB(255, 0, 0),
-    },
-    Drawing = {
-        Chams = {
-            Enabled  = true,
-            Thermal = true,
-            FillRGB = Color3.fromRGB(255, 140, 0),
-            Fill_Transparency = 100,
-            OutlineRGB = Color3.fromRGB(255, 140, 0),
-            Outline_Transparency = 100,
-            VisibleCheck = true,
-        },
-        Names = {
-            Enabled = true,
-            RGB = Color3.fromRGB(255, 255, 255),
-        },
-        Flags = {
-            Enabled = true,
-        },
-        Distances = {
-            Enabled = true,
-            Position = "Text",
-            RGB = Color3.fromRGB(255, 255, 255),
-        },
-        Weapons = {
-            Enabled = true, WeaponTextRGB = Color3.fromRGB(255, 140, 0),
-            Outlined = false,
-            Gradient = false,
-            GradientRGB1 = Color3.fromRGB(255, 255, 255), GradientRGB2 = Color3.fromRGB(255, 140, 0),
-        },
-        Healthbar = {
-            Enabled = true,
-            HealthText = true, Lerp = false, HealthTextRGB = Color3.fromRGB(255, 140, 0),
-            Width = 2.5,
-            Gradient = true, GradientRGB1 = Color3.fromRGB(200, 0, 0), GradientRGB2 = Color3.fromRGB(60, 60, 125), GradientRGB3 = Color3.fromRGB(255, 140, 0),
-        },
-        Boxes = {
-            Animate = true,
-            RotationSpeed = 300,
-            Gradient = false, GradientRGB1 = Color3.fromRGB(255, 140, 0), GradientRGB2 = Color3.fromRGB(0, 0, 0),
-            GradientFill = true, GradientFillRGB1 = Color3.fromRGB(255, 140, 0), GradientFillRGB2 = Color3.fromRGB(0, 0, 0),
-            Filled = {
-                Enabled = true,
-                Transparency = 0.75,
-                RGB = Color3.fromRGB(0, 0, 0),
-            },
-            Full = {
-                Enabled = true,
-                RGB = Color3.fromRGB(255, 255, 255),
-            },
-            Corner = {
-                Enabled = true,
-                RGB = Color3.fromRGB(255, 140, 0),
-            },
-        },
-    },
-}
-
-local ESPManager = {}
-do
-    local Workspace, RunService, Players, CoreGui, Lighting = game:GetService("Workspace"), game:GetService("RunService"), game:GetService("Players"), game:GetService("CoreGui"), game:GetService("Lighting")
-    local lplayer = Players.LocalPlayer
-    local camera = Workspace.CurrentCamera
-    local Cam = Workspace.CurrentCamera
-    local ScreenGui = nil
-    local Connections = {}
-    local RotationAngle = -45
-    local Tick = tick()
-    local function FadeOutOnDist(element, distance)
-        if not element then return end
-        local transparency = math.max(0.1, 1 - (distance / ESPSettings.MaxDistance))
-        if element:IsA("TextLabel") then
-            element.TextTransparency = 1 - transparency
-        elseif element:IsA("ImageLabel") then
-            element.ImageTransparency = 1 - transparency
-        elseif element:IsA("UIStroke") then
-            element.Transparency = 1 - transparency
-        elseif element:IsA("Frame") then
-            element.BackgroundTransparency = 1 - transparency
-        elseif element:IsA("Highlight") then
-            element.FillTransparency = 1 - transparency
-            element.OutlineTransparency = 1 - transparency
-        end
-    end
-    local function CreatePlayerESP(plr)
-        if not ScreenGui then return end
-        if Connections[plr] then return end
-        local Box = Create("Frame", {Parent = ScreenGui, BackgroundColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 0.75, BorderSizePixel = 0})
-        local Gradient1 = Create("UIGradient", {Parent = Box, Enabled = ESPSettings.Drawing.Boxes.GradientFill, Color = ColorSequence.new{ColorSequenceKeypoint.new(0, ESPSettings.Drawing.Boxes.GradientFillRGB1), ColorSequenceKeypoint.new(1, ESPSettings.Drawing.Boxes.GradientFillRGB2)}})
-        local Outline = Create("UIStroke", {Parent = Box, Enabled = ESPSettings.Drawing.Boxes.Gradient, Transparency = 0, Color = Color3.fromRGB(255, 255, 255), LineJoinMode = Enum.LineJoinMode.Miter})
-        local Gradient2 = Create("UIGradient", {Parent = Outline, Enabled = ESPSettings.Drawing.Boxes.Gradient, Color = ColorSequence.new{ColorSequenceKeypoint.new(0, ESPSettings.Drawing.Boxes.GradientRGB1), ColorSequenceKeypoint.new(1, ESPSettings.Drawing.Boxes.GradientRGB2)}})
-        local Healthbar = Create("Frame", {Parent = ScreenGui, BackgroundColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 0})
-        local BehindHealthbar = Create("Frame", {Parent = ScreenGui, ZIndex = -1, BackgroundColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 0})
-        local HealthbarGradient = Create("UIGradient", {Parent = Healthbar, Enabled = ESPSettings.Drawing.Healthbar.Gradient, Rotation = -90, Color = ColorSequence.new{ColorSequenceKeypoint.new(0, ESPSettings.Drawing.Healthbar.GradientRGB1), ColorSequenceKeypoint.new(0.5, ESPSettings.Drawing.Healthbar.GradientRGB2), ColorSequenceKeypoint.new(1, ESPSettings.Drawing.Healthbar.GradientRGB3)}})
-        local Chams = Create("Highlight", {Parent = ScreenGui, FillTransparency = 1, OutlineTransparency = 0, OutlineColor = Color3.fromRGB(255, 140, 0), DepthMode = "AlwaysOnTop"})
-        local LeftTop = Create("Frame", {Parent = ScreenGui, BackgroundColor3 = ESPSettings.Drawing.Boxes.Corner.RGB, Position = UDim2.new(0, 0, 0, 0)})
-        local LeftSide = Create("Frame", {Parent = ScreenGui, BackgroundColor3 = ESPSettings.Drawing.Boxes.Corner.RGB, Position = UDim2.new(0, 0, 0, 0)})
-        local RightTop = Create("Frame", {Parent = ScreenGui, BackgroundColor3 = ESPSettings.Drawing.Boxes.Corner.RGB, Position = UDim2.new(0, 0, 0, 0)})
-        local RightSide = Create("Frame", {Parent = ScreenGui, BackgroundColor3 = ESPSettings.Drawing.Boxes.Corner.RGB, Position = UDim2.new(0, 0, 0, 0)})
-        local BottomSide = Create("Frame", {Parent = ScreenGui, BackgroundColor3 = ESPSettings.Drawing.Boxes.Corner.RGB, Position = UDim2.new(0, 0, 0, 0)})
-        local BottomDown = Create("Frame", {Parent = ScreenGui, BackgroundColor3 = ESPSettings.Drawing.Boxes.Corner.RGB, Position = UDim2.new(0, 0, 0, 0)})
-        local BottomRightSide = Create("Frame", {Parent = ScreenGui, BackgroundColor3 = ESPSettings.Drawing.Boxes.Corner.RGB, Position = UDim2.new(0, 0, 0, 0)})
-        local BottomRightDown = Create("Frame", {Parent = ScreenGui, BackgroundColor3 = ESPSettings.Drawing.Boxes.Corner.RGB, Position = UDim2.new(0, 0, 0, 0)})
-        local function HideESP()
-            Box.Visible = false
-            Healthbar.Visible = false
-            BehindHealthbar.Visible = false
-            LeftTop.Visible = false
-            LeftSide.Visible = false
-            BottomSide.Visible = false
-            BottomDown.Visible = false
-            RightTop.Visible = false
-            RightSide.Visible = false
-            BottomRightSide.Visible = false
-            BottomRightDown.Visible = false
-            Chams.Enabled = false
-        end
-        local connection
-        connection = RunService.RenderStepped:Connect(function()
-            if not ESPSettings.Enabled then
-                HideESP()
-                return
-            end
-            if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-                local HRP = plr.Character.HumanoidRootPart
-                local Humanoid = plr.Character:FindFirstChild("Humanoid")
-                if not Humanoid then return end
-                local Pos, OnScreen = Cam:WorldToScreenPoint(HRP.Position)
-                local Dist = (Cam.CFrame.Position - HRP.Position).Magnitude / 3.5714285714
-                if OnScreen and Dist <= ESPSettings.MaxDistance then
-                    local Size = HRP.Size.Y
-                    local scaleFactor = (Size * Cam.ViewportSize.Y) / (Pos.Z * 2)
-                    local w, h = 3 * scaleFactor, 4.5 * scaleFactor
-                    if ESPSettings.FadeOut.OnDistance then
-                        FadeOutOnDist(Box, Dist)
-                        FadeOutOnDist(Outline, Dist)
-                        FadeOutOnDist(Healthbar, Dist)
-                        FadeOutOnDist(BehindHealthbar, Dist)
-                        FadeOutOnDist(LeftTop, Dist)
-                        FadeOutOnDist(LeftSide, Dist)
-                        FadeOutOnDist(BottomSide, Dist)
-                        FadeOutOnDist(BottomDown, Dist)
-                        FadeOutOnDist(RightTop, Dist)
-                        FadeOutOnDist(RightSide, Dist)
-                        FadeOutOnDist(BottomRightSide, Dist)
-                        FadeOutOnDist(BottomRightDown, Dist)
-                        FadeOutOnDist(Chams, Dist)
-                    end
-                    if ESPSettings.TeamCheck and plr ~= lplayer and ((lplayer.Team ~= plr.Team and plr.Team) or (not lplayer.Team and not plr.Team)) then
-                        Chams.Adornee = plr.Character
-                        Chams.Enabled = ESPSettings.Drawing.Chams.Enabled
-                        Chams.FillColor = ESPSettings.Drawing.Chams.FillRGB
-                        Chams.OutlineColor = ESPSettings.Drawing.Chams.OutlineRGB
-                        if ESPSettings.Drawing.Chams.Thermal then
-                            local breathe_effect = math.atan(math.sin(tick() * 2)) * 2 / math.pi
-                            Chams.FillTransparency = ESPSettings.Drawing.Chams.Fill_Transparency * breathe_effect * 0.01
-                            Chams.OutlineTransparency = ESPSettings.Drawing.Chams.Outline_Transparency * breathe_effect * 0.01
-                        end
-                        Chams.DepthMode = ESPSettings.Drawing.Chams.VisibleCheck and "Occluded" or "AlwaysOnTop"
-                        LeftTop.Visible = ESPSettings.Drawing.Boxes.Corner.Enabled
-                        LeftTop.Position = UDim2.new(0, Pos.X - w / 2, 0, Pos.Y - h / 2)
-                        LeftTop.Size = UDim2.new(0, w / 5, 0, 1)
-                        LeftSide.Visible = ESPSettings.Drawing.Boxes.Corner.Enabled
-                        LeftSide.Position = UDim2.new(0, Pos.X - w / 2, 0, Pos.Y - h / 2)
-                        LeftSide.Size = UDim2.new(0, 1, 0, h / 5)
-                        BottomSide.Visible = ESPSettings.Drawing.Boxes.Corner.Enabled
-                        BottomSide.Position = UDim2.new(0, Pos.X - w / 2, 0, Pos.Y + h / 2)
-                        BottomSide.Size = UDim2.new(0, 1, 0, h / 5)
-                        BottomSide.AnchorPoint = Vector2.new(0, 5)
-                        BottomDown.Visible = ESPSettings.Drawing.Boxes.Corner.Enabled
-                        BottomDown.Position = UDim2.new(0, Pos.X - w / 2, 0, Pos.Y + h / 2)
-                        BottomDown.Size = UDim2.new(0, w / 5, 0, 1)
-                        BottomDown.AnchorPoint = Vector2.new(0, 1)
-                        RightTop.Visible = ESPSettings.Drawing.Boxes.Corner.Enabled
-                        RightTop.Position = UDim2.new(0, Pos.X + w / 2, 0, Pos.Y - h / 2)
-                        RightTop.Size = UDim2.new(0, w / 5, 0, 1)
-                        RightTop.AnchorPoint = Vector2.new(1, 0)
-                        RightSide.Visible = ESPSettings.Drawing.Boxes.Corner.Enabled
-                        RightSide.Position = UDim2.new(0, Pos.X + w / 2 - 1, 0, Pos.Y - h / 2)
-                        RightSide.Size = UDim2.new(0, 1, 0, h / 5)
-                        RightSide.AnchorPoint = Vector2.new(0, 0)
-                        BottomRightSide.Visible = ESPSettings.Drawing.Boxes.Corner.Enabled
-                        BottomRightSide.Position = UDim2.new(0, Pos.X + w / 2, 0, Pos.Y + h / 2)
-                        BottomRightSide.Size = UDim2.new(0, 1, 0, h / 5)
-                        BottomRightSide.AnchorPoint = Vector2.new(1, 1)
-                        BottomRightDown.Visible = ESPSettings.Drawing.Boxes.Corner.Enabled
-                        BottomRightDown.Position = UDim2.new(0, Pos.X + w / 2, 0, Pos.Y + h / 2)
-                        BottomRightDown.Size = UDim2.new(0, w / 5, 0, 1)
-                        BottomRightDown.AnchorPoint = Vector2.new(1, 1)
-                        Box.Position = UDim2.new(0, Pos.X - w / 2, 0, Pos.Y - h / 2)
-                        Box.Size = UDim2.new(0, w, 0, h)
-                        Box.Visible = ESPSettings.Drawing.Boxes.Full.Enabled
-                        if ESPSettings.Drawing.Boxes.Filled.Enabled then
-                            Box.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                            Box.BackgroundTransparency = ESPSettings.Drawing.Boxes.GradientFill and ESPSettings.Drawing.Boxes.Filled.Transparency or 1
-                            Box.BorderSizePixel = 1
-                        else
-                            Box.BackgroundTransparency = 1
-                        end
-                        RotationAngle = RotationAngle + (tick() - Tick) * ESPSettings.Drawing.Boxes.RotationSpeed * math.cos(math.pi / 4 * tick() - math.pi / 2)
-                        if ESPSettings.Drawing.Boxes.Animate then
-                            Gradient1.Rotation = RotationAngle
-                            Gradient2.Rotation = RotationAngle
-                        else
-                            Gradient1.Rotation = -45
-                            Gradient2.Rotation = -45
-                        end
-                        Tick = tick()
-                        local health = Humanoid.Health / Humanoid.MaxHealth
-                        Healthbar.Visible = ESPSettings.Drawing.Healthbar.Enabled
-                        Healthbar.Position = UDim2.new(0, Pos.X - w / 2 - 6, 0, Pos.Y - h / 2 + h * (1 - health))
-                        Healthbar.Size = UDim2.new(0, ESPSettings.Drawing.Healthbar.Width, 0, h * health)
-                        BehindHealthbar.Visible = ESPSettings.Drawing.Healthbar.Enabled
-                        BehindHealthbar.Position = UDim2.new(0, Pos.X - w / 2 - 6, 0, Pos.Y - h / 2)
-                        BehindHealthbar.Size = UDim2.new(0, ESPSettings.Drawing.Healthbar.Width, 0, h)
-                    else
-                        HideESP()
-                    end
-                else
-                    HideESP()
-                end
-            else
-                HideESP()
-            end
-        end)
-        Connections[plr] = {connection}
-    end
-    function ESPManager:Start()
-        if ScreenGui then return end
-        ScreenGui = Create("ScreenGui", {
-            Parent = CoreGui,
-            Name = "ESPHolder",
-        })
-        for _, v in pairs(Players:GetPlayers()) do
-            if v ~= lplayer and not Connections[v] then
-                CreatePlayerESP(v)
-            end
-        end
-        Connections.PlayerAdded = Players.PlayerAdded:Connect(function(v)
-            if v ~= lplayer and not Connections[v] then
-                CreatePlayerESP(v)
-            end
-        end)
-    end
-    function ESPManager:Stop()
-        if ScreenGui then
-            ScreenGui:Destroy()
-            ScreenGui = nil
-        end
-        for _, conn in pairs(Connections) do
-            if type(conn) == "table" then
-                for _, c in ipairs(conn) do
-                    c:Disconnect()
-                end
-            else
-                conn:Disconnect()
-            end
-        end
-        Connections = {}
-    end
-    function ESPManager:SetEnabled(enabled)
-        ESPSettings.Enabled = enabled
-        if enabled then
-            self:Start()
-        else
-            self:Stop()
-        end
-    end
-end
-
-Tabs.Visual:Toggle({
-    Title = "ESP2",
-    Desc = "增强型玩家透视",
-    Value = false,
-    Callback = function(value)
-        ESPManager:SetEnabled(value)
-    end
-})
-local originalCharacterData = {}
-local transparencyLoopConnection = nil
-local rainbowColor = Color3.fromHSV(0, 1, 1)
-local function restoreCharacterAppearance()
-    for part, data in pairs(originalCharacterData) do
-        if part and part.Parent then
-            part.Material = data.material
-            part.Color = data.color
-            part.Transparency = data.transparency
-        end
-    end
-    originalCharacterData = {}
-end
-local function updateRainbowColor()
-    local hue = tick() % 1
-    rainbowColor = Color3.fromHSV(hue, 1, 1)
-end
-local function transparencyLoop()
-    if not me.Character then
-        if next(originalCharacterData) then
-            restoreCharacterAppearance()
-        end
-        return
-    end
-    local isRainbowEnabled = transparentRainbowToggle and transparentRainbowToggle.Value or false
-    if isRainbowEnabled then
-        updateRainbowColor()
-    end
-    for _, part in ipairs(me.Character:GetDescendants()) do
-        if part:IsA("BasePart") then
-            if not originalCharacterData[part] then
-                originalCharacterData[part] = {
-                    material = part.Material,
-                    color = part.Color,
-                    transparency = part.Transparency
-                }
-            end
-            part.Material = Enum.Material.ForceField
-            if isRainbowEnabled then
-                part.Color = rainbowColor
-            else
-                part.Color = originalCharacterData[part].color
-            end
-            part.Transparency = 0
-        end
-    end
-end
-local transparentToggle = nil
-local transparentRainbowToggle = nil
-transparentToggle = Tabs.Visual:Toggle({
-    Title = "人物透明",
-    Desc = "使自己的角色半透明",
-    Value = false,
-    Callback = function(value)
-        if value then
-            if transparencyLoopConnection then transparencyLoopConnection:Disconnect() end
-            transparencyLoopConnection = run.Heartbeat:Connect(transparencyLoop)
-        else
-            if transparencyLoopConnection then
-                transparencyLoopConnection:Disconnect()
-                transparencyLoopConnection = nil
-            end
-            restoreCharacterAppearance()
-        end
-    end
-})
-transparentRainbowToggle = Tabs.Visual:Toggle({
-    Title = "人物变色",
-    Desc = "角色颜色渐变",
-    Value = false,
-    Callback = function(value)
-        if not value and transparentToggle.Value then
-            restoreCharacterAppearance()
-            task.wait()
-            transparencyLoop()
-        end
-    end
-})
-local MainTab = Window:Tab({ Title = "无敌功能", })
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-local LocalPlayer = Players.LocalPlayer
-local Mouse = LocalPlayer:GetMouse()
-
-local Utility = {}
-function Utility:GetCharacter(plr)
-    return plr.Character or plr.CharacterAdded:Wait()
-end
-function Utility:GetHumanoid(char)
-    return char:FindFirstChildOfClass("Humanoid")
-end
-function Utility:GetHead(char)
-    return char:FindFirstChild("Head")
-end
-function Utility:GetRootPart(char)
-    return char:FindFirstChild("HumanoidRootPart")
-end
-function Utility:GetDistance(pos1, pos2)
-    return (pos1 - pos2).Magnitude
-end
-function Utility:Random(min, max)
-    return math.random(min, max)
-end
-
-local features = {
-    HeadDamageReduction = false,
-    HeadProtectionBox = false,
-    HideHeadMode = false,
-    AutoParry = false,
-    AutoExecute = false,
-    AutoParryDistance = 10
-}
-
-local headDamageConnection = nil
-local protectionPart = nil
-local hideHeadConnection = nil
-local autoParryConnection = nil
-local autoExecuteConnection = nil
-local originalHeadProperties = {}
-
-local function applyHideHead(character, hide)
-    local head = Utility:GetHead(character)
-    if not head then return end
-    if hide then
-        originalHeadProperties[character] = {
-            Transparency = head.Transparency,
-            CanCollide = head.CanCollide,
-            CanQuery = head.CanQuery,
-            Massless = head.Massless,
-            Size = head.Size
-        }
-        head.Transparency = 1
-        head.CanCollide = false
-        head.CanQuery = false
-        head.Massless = true
-        head.Size = Vector3.new(0.1, 0.1, 0.1)
-    else
-        local props = originalHeadProperties[character]
-        if props then
-            head.Transparency = props.Transparency
-            head.CanCollide = props.CanCollide
-            head.CanQuery = props.CanQuery
-            head.Massless = props.Massless
-            head.Size = props.Size
-            originalHeadProperties[character] = nil
-        else
-            head.Transparency = 0
-            head.CanCollide = true
-            head.CanQuery = true
-            head.Massless = false
-            head.Size = Vector3.new(2, 1, 1)
-        end
-    end
-end
-
-local function onCharacterAdded(character)
-    if features.HeadDamageReduction then
-        local humanoid = Utility:GetHumanoid(character)
-        if humanoid then
-            if headDamageConnection then headDamageConnection:Disconnect() end
-            headDamageConnection = humanoid.HealthChanged:Connect(function(newHealth)
-                local damage = humanoid.MaxHealth - newHealth
-                if damage > 30 then
-                    humanoid.Health = newHealth + damage * 0.5
-                end
-            end)
-        end
-    end
-    
-    if features.HeadProtectionBox then
-        local head = Utility:GetHead(character)
-        if head then
-            pcall(function()
-                protectionPart = head:FindFirstChild("HeadProtection")
-                if not protectionPart then
-                    protectionPart = Instance.new("Part")
-                    protectionPart.Name = "HeadProtection"
-                    protectionPart.Size = Vector3.new(3, 3, 3)
-                    protectionPart.Transparency = 1
-                    protectionPart.CanCollide = true
-                    protectionPart.Anchored = false
-                    protectionPart.Parent = head
-                    local weld = Instance.new("Weld")
-                    weld.Part0 = head
-                    weld.Part1 = protectionPart
-                    weld.Parent = protectionPart
-                end
-            end)
-        end
-    end
-
-    if features.HideHeadMode then
-        applyHideHead(character, true)
-    end
-end
-
-local function onCharacterRemoving()
-    if headDamageConnection then
-        headDamageConnection:Disconnect()
-        headDamageConnection = nil
-    end
-    if protectionPart then
-        pcall(function() protectionPart:Destroy() end)
-        protectionPart = nil
-    end
-end
-
-local function toggleHeadDamageReduction(state)
-    features.HeadDamageReduction = state
-    if state then
-        local char = Utility:GetCharacter(LocalPlayer)
-        local humanoid = Utility:GetHumanoid(char)
-        if humanoid then
-            if headDamageConnection then headDamageConnection:Disconnect() end
-            headDamageConnection = humanoid.HealthChanged:Connect(function(newHealth)
-                local damage = humanoid.MaxHealth - newHealth
-                if damage > 30 then
-                    humanoid.Health = newHealth + damage * 0.5
-                end
-            end)
-        end
-    else
-        if headDamageConnection then
-            headDamageConnection:Disconnect()
-            headDamageConnection = nil
-        end
-    end
-end
-
-local function toggleHeadProtectionBox(state)
-    features.HeadProtectionBox = state
-    if state then
-        local char = Utility:GetCharacter(LocalPlayer)
-        local head = Utility:GetHead(char)
-        if head then
-            pcall(function()
-                protectionPart = head:FindFirstChild("HeadProtection")
-                if not protectionPart then
-                    protectionPart = Instance.new("Part")
-                    protectionPart.Name = "HeadProtection"
-                    protectionPart.Size = Vector3.new(3, 3, 3)
-                    protectionPart.Transparency = 1
-                    protectionPart.CanCollide = true
-                    protectionPart.Anchored = false
-                    protectionPart.Parent = head
-                    local weld = Instance.new("Weld")
-                    weld.Part0 = head
-                    weld.Part1 = protectionPart
-                    weld.Parent = protectionPart
-                end
-            end)
-        end
-    else
-        if protectionPart then
-            pcall(function() protectionPart:Destroy() end)
-            protectionPart = nil
-        end
-    end
-end
-
-local function toggleHideHeadMode(state)
-    features.HideHeadMode = state
-    local char = Utility:GetCharacter(LocalPlayer)
-    if state then
-        applyHideHead(char, true)
-    else
-        applyHideHead(char, false)
-    end
-end
-
-local function toggleAutoParry(state)
-    features.AutoParry = state
-    if autoParryConnection then
-        autoParryConnection:Disconnect()
-        autoParryConnection = nil
-    end
-    if state then
-        autoParryConnection = RunService.Heartbeat:Connect(function()
-            local char = Utility:GetCharacter(LocalPlayer)
-            local root = Utility:GetRootPart(char)
-            if not root then return end
-            local distanceThreshold = features.AutoParryDistance
-            for _, player in ipairs(Players:GetPlayers()) do
-                if player == LocalPlayer then continue end
-                local character = Utility:GetCharacter(player)
-                local targetRoot = Utility:GetRootPart(character)
-                if targetRoot then
-                    local distance = Utility:GetDistance(root.Position, targetRoot.Position)
-                    if distance <= distanceThreshold then
-                        local tool = character:FindFirstChildOfClass("Tool")
-                        if tool and tool:IsA("Tool") then
-                            pcall(function()
-                                if syn and syn.input then
-                                    syn.input:SendKeyEvent("Q", true)
-                                    task.wait(0.1)
-                                    syn.input:SendKeyEvent("Q", false)
-                                elseif keypress and keyrelease then
-                                    keypress(0x51)
-                                    task.wait(0.1)
-                                    keyrelease(0x51)
-                                else
-                                    local VirtualUser = game:GetService("VirtualUser")
-                                    VirtualUser:CaptureController()
-                                    VirtualUser:ClickButton1(Vector2.new(0,0))
-                                end
-                            end)
-                        end
-                    end
-                end
-            end
-        end)
-    end
-end
-
-local function toggleAutoExecute(state)
-    features.AutoExecute = state
-    if autoExecuteConnection then
-        autoExecuteConnection:Disconnect()
-        autoExecuteConnection = nil
-    end
-    if state then
-        autoExecuteConnection = RunService.RenderStepped:Connect(function()
-            local char = Utility:GetCharacter(LocalPlayer)
-            local mouseTarget = Mouse.Target
-            if mouseTarget then
-                local targetChar = mouseTarget:FindFirstAncestorOfClass("Model")
-                if targetChar and targetChar:FindFirstChild("Downed") then
+I:Toggle({
+    Title = "自动进化赛博对决龙",
+    Default = false,
+    Callback = function(s)
+        Interstellar.EvolveDark = s
+        if s then
+            spawn(function()
+                while Interstellar.EvolveDark do
                     pcall(function()
-                        local tool = char:FindFirstChildOfClass("Tool")
-                        if tool then
-                            tool:Activate()
-                        end
+                        game.ReplicatedStorage.rEvents.petEvolveEvent:FireServer("evolvePet", "Cybernetic Showdown Dragon")
                     end)
+                    wait()
                 end
-            end
+            end)
+        end
+    end
+})
+
+I:Toggle({
+    Title = "自动进化暗星",
+    Default = false,
+    Callback = function(s)
+        Interstellar.EvolveDark = s
+        if s then
+            spawn(function()
+                while Interstellar.EvolveDark do
+                    pcall(function()
+                        game.ReplicatedStorage.rEvents.petEvolveEvent:FireServer("evolvePet", "Darkstar Hunter")
+                    end)
+                    wait()
+                end
+            end)
+        end
+    end
+})
+
+I:Toggle({
+    Title = "自动进化肌肉王光环",
+    Default = false,
+    Callback = function(state)
+        Interstellar.EvolveMuscle = state
+        if Interstellar.EvolveMuscle then
+            spawn(function()
+                while Interstellar.EvolveMuscle do
+                    pcall(function()
+                        game:GetService("ReplicatedStorage").rEvents.petEvolveEvent:FireServer("evolvePet", "Muscle King")
+                    end)
+                    wait()
+                end
+            end)
+        end
+    end
+})
+
+I:Toggle({
+    Title = "自动进化霓虹卫报",
+    Default = false,
+    Callback = function(s)
+        Interstellar.EvolveNeon = s
+        if s then
+            spawn(function()
+                while Interstellar.EvolveNeon do
+                    pcall(function()
+                        game.ReplicatedStorage.rEvents.petEvolveEvent:FireServer("evolvePet", "Neon Guardian")
+                    end)
+                    wait()
+                end
+            end)
+        end
+    end
+})
+
+local crystalSection = I:Section({Title = "宠物蛋", Opened = true})
+
+I:Paragraph({
+    Title = "因为列表汉化有问题",
+    Desc = "Blue Crystal = 蓝色宠物蛋\nGreen Crystal = 绿色宠物蛋\nFrost Crystal = 冰霜宠物蛋\nMythical Crystal = 神话宠物蛋\nInferno Crystal = 地狱宠物蛋\nLegends Crystal = 传奇宠物蛋\nGalaxy Oracle Crystal = 肌肉王宠物蛋\nJungle Crystal = 丛林宠物蛋",
+    ThumbnailSize = 200,
+})
+
+I:Dropdown({
+    Title = "选择宠物蛋",
+    Values = crystalshow,
+    Value = "空",
+    Callback = function(v)
+        OpenCrystal = v
+    end
+})
+
+I:Button({
+    Title = "购买宠物蛋",
+    Callback = function()
+        pcall(function()
+            game:GetService("ReplicatedStorage").rEvents.openCrystalRemote:InvokeServer("openCrystal", OpenCrystal)
         end)
     end
-end
+})
 
-local function setupCharacterEvents()
-    LocalPlayer.CharacterAdded:Connect(function(character)
-        onCharacterAdded(character)
-    end)
-    LocalPlayer.CharacterRemoving:Connect(function()
-        onCharacterRemoving()
-    end)
-    if LocalPlayer.Character then
-        onCharacterAdded(LocalPlayer.Character)
-    end
-end
-MainTab:Button({
-    Title = "antikick(防踢 必须开)",
-    Callback = function()
-        local v4 = next
-        local v5, v6 = getgc(true)
-        while true do
-            local v7
-            v6, v7 = v4(v5, v6)
-            if v6 == nil then
-                break
-            end
-            if typeof(v7) == "function" and (getfenv(v7).script and (getfenv(v7).script.Parent == nil and not isourclosure(v7))) then
-                local v8 = debug.info(v7, "s")
-                if v8 ~= "[C]" and not (v8:find("Network") or v8:find("PlayerGui.Client")) then
-                    hookfunction(v7, function()
-                        return coroutine.yield()
+I:Toggle({
+    Title = "自动购买选中宠物蛋",
+    Default = false,
+    Callback = function(s)
+        Interstellar.AutoOpen = s
+        if s then
+            spawn(function()
+                while Interstellar.AutoOpen do
+                    pcall(function()
+                        game:GetService("ReplicatedStorage").rEvents.openCrystalRemote:InvokeServer("openCrystal", OpenCrystal)
                     end)
+                    wait()
+                end
+            end)
+        end
+    end
+})
+
+local otherSection = J:Section({Title = "常用功能", Opened = true})
+
+otherSection:Toggle({
+    Title = "去雾", 
+    Default = false, 
+    Callback = function(state)
+        if state then
+            game.Lighting.FogStart = 3276634343
+            game.Lighting.FogEnd = 3276734343
+        else
+            game.Lighting.FogStart = 0
+        end
+    end
+})
+
+otherSection:Divider()
+
+otherSection:Slider({
+    Title = "视野",
+    Step = 1,
+    Value = {Min = 10, Max = 180, Default = workspace.CurrentCamera.FieldOfView},
+    Callback = function(FOV)
+        getgenv().TargetFOV = FOV
+        workspace.CurrentCamera.FieldOfView = FOV
+        
+        if not getgenv().FOVLoop then
+            getgenv().FOVLoop = game:GetService("RunService").Heartbeat:Connect(function()
+                if workspace.CurrentCamera then
+                    workspace.CurrentCamera.FieldOfView = getgenv().TargetFOV
+                end
+            end)
+            
+            game.Players.LocalPlayer.CharacterAdded:Connect(function()
+                wait(1)
+                if workspace.CurrentCamera then
+                    workspace.CurrentCamera.FieldOfView = getgenv().TargetFOV
+                end
+            end)
+        end
+    end
+})
+
+otherSection:Divider()
+
+otherSection:Toggle({
+    Title = "穿墙",
+    Default = false,
+    Callback = function(state)
+        if state then
+            getgenv().noclipConnection = game:GetService("RunService").Stepped:Connect(function()
+                local LocalPlayer = game:GetService("Players").LocalPlayer
+                if LocalPlayer.Character then
+                    for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = false
+                        end
+                    end
+                end
+            end)
+        else
+            if getgenv().noclipConnection then
+                getgenv().noclipConnection:Disconnect()
+                getgenv().noclipConnection = nil
+            end
+            
+            local LocalPlayer = game:GetService("Players").LocalPlayer
+            if LocalPlayer.Character then
+                for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = true
+                    end
                 end
             end
         end
     end
 })
-MainTab:Toggle({
-    Title = "头部伤害减免",
-    Value = false,
-    Callback = toggleHeadDamageReduction
-})
-MainTab:Toggle({
-    Title = "头部保护碰撞箱",
-    Value = false,
-    Callback = toggleHeadProtectionBox
-})
-MainTab:Toggle({
-    Title = "藏头",
-    Value = false,
-    Callback = toggleHideHeadMode
-})
-MainTab:Toggle({
-    Title = "自动格挡",
-    Value = false,
-    Callback = toggleAutoParry
-})
-MainTab:Slider({
-    Title = "自动格挡距离",
-    Value = {
-        Min = 0,
-        Max = 30,
-        Default = 10,
-    },
-    Callback = function(value)
-        features.AutoParryDistance = value
+
+otherSection:Divider()
+
+local flySpeed = 150
+local flyMultiplier = 5
+otherSection:Slider({
+    Title = "飞行倍率",
+    Step = 0.1,
+    Value = {Min = 1, Max = 20, Default = 5},
+    Callback = function(multiplier)
+        flyMultiplier = multiplier
     end
 })
-MainTab:Toggle({
-    Title = "自动处决",
-    Value = false,
-    Callback = toggleAutoExecute
+
+otherSection:Toggle({
+    Title = "飞行开关",
+    Default = false,
+    Callback = function(bak)
+        getgenv().fly = bak
+        if bak then
+            local controlModule = require(game.Players.LocalPlayer.PlayerScripts:WaitForChild('PlayerModule'):WaitForChild("ControlModule"))
+            local character = game.Players.LocalPlayer.Character
+            if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+            
+            local function setupFlight(character)
+                local hrp = character:FindFirstChild("HumanoidRootPart")
+                if not hrp then return end
+                
+                if hrp:FindFirstChild("VelocityHandler") then hrp.VelocityHandler:Destroy() end
+                if hrp:FindFirstChild("GyroHandler") then hrp.GyroHandler:Destroy() end
+                
+                local bv = Instance.new("BodyVelocity")
+                bv.Name = "VelocityHandler"
+                bv.Parent = hrp
+                bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+                bv.Velocity = Vector3.new(0, 0, 0)
+                
+                local bg = Instance.new("BodyGyro")
+                bg.Name = "GyroHandler"
+                bg.Parent = hrp
+                bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+                bg.P = 1000
+                bg.D = 50
+                
+                return bv, bg
+            end
+            
+            local bv, bg = setupFlight(character)
+            
+            local camera = game.Workspace.CurrentCamera
+            getgenv().FlyLoop = game:GetService("RunService").RenderStepped:Connect(function()
+                local currentCharacter = game.Players.LocalPlayer.Character
+                local hrp = currentCharacter and currentCharacter:FindFirstChild("HumanoidRootPart")
+                if currentCharacter and hrp and hrp:FindFirstChild("VelocityHandler") and hrp:FindFirstChild("GyroHandler") and getgenv().fly then
+                    currentCharacter.Humanoid.PlatformStand = true
+                    hrp.GyroHandler.CFrame = camera.CFrame
+                    
+                    local direction = controlModule:GetMoveVector()
+                    local actualSpeed = flySpeed * flyMultiplier
+                    
+                    hrp.VelocityHandler.Velocity = Vector3.new()
+                    if direction.X ~= 0 then
+                        hrp.VelocityHandler.Velocity = hrp.VelocityHandler.Velocity + camera.CFrame.RightVector * (direction.X * actualSpeed)
+                    end
+                    if direction.Z ~= 0 then
+                        hrp.VelocityHandler.Velocity = hrp.VelocityHandler.Velocity - camera.CFrame.LookVector * (direction.Z * actualSpeed)
+                    end
+                    if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.Space) then
+                        hrp.VelocityHandler.Velocity = hrp.VelocityHandler.Velocity + Vector3.new(0, actualSpeed/2, 0)
+                    end
+                    if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.LeftShift) then
+                        hrp.VelocityHandler.Velocity = hrp.VelocityHandler.Velocity - Vector3.new(0, actualSpeed/2, 0)
+                    end
+                end
+            end)
+        else
+            if getgenv().FlyLoop then
+                getgenv().FlyLoop:Disconnect()
+            end
+            local character = game.Players.LocalPlayer.Character
+            if character and character:FindFirstChild("HumanoidRootPart") then
+                local hrp = character.HumanoidRootPart
+                if hrp:FindFirstChild("VelocityHandler") then hrp.VelocityHandler:Destroy() end
+                if hrp:FindFirstChild("GyroHandler") then hrp.GyroHandler:Destroy() end
+                character.Humanoid.PlatformStand = false
+            end
+        end
+    end
 })
 
-setupCharacterEvents()
+K:Button({
+    Title = "解锁全部通行证",
+    Callback = function()
+        pcall(function()
+            for i, v in ipairs(game:GetService("ReplicatedStorage").gamepassIds:GetChildren()) do
+                v.Parent = game.Players.LocalPlayer.ownedGamepasses
+            end
+        end)
+    end
+})
