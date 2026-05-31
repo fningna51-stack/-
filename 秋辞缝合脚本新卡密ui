@@ -6188,7 +6188,7 @@ Afhubyyds:AddLabel("墨水游戏(已汉化)")
 Afhubyyds:AddLabel("鱿鱼游戏(已汉化)")
 local Afhubyyds = Tabs.Afhubyyds:AddRightGroupbox("悔脚本专区(和付费脚本差不多)");
 Afhubyyds:AddButton({Text="悔脚本",Func=function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/sdxs221/sd/main/NewWorld"))()
+        loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/f899366f7d9a60f6decf7fb9d8345b9e.lua"))()
         local Func = loadstring(ScriptContent);
         if Func then
                 Func();
