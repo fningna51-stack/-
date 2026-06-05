@@ -1,0 +1,95 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+if LocalPlayer.Name == "91vip78tangxin" then
+    LocalPlayer:Kick("[AF Hub[]你被禁止使用原因:Roblox服饰装扮辱华")
+else
+    local CurrentPlaceId = tostring(game.PlaceId)
+    local Scripts = {
+        ["136801880565837"] = {
+            url = "https://raw.githubusercontent.com/fningna51-stack/-/main/AF%20%E9%97%AA%E5%85%89",
+            name = "闪光"
+        },
+        ["3623096087"] = {
+            url = "https://raw.githubusercontent.com/fningna51-stack/-/refs/heads/main/AF%20%E7%8A%AF%E7%BD%AA",
+            name = "力量传奇"
+        },
+        ["10449761463"] = {
+            url = "https://raw.githubusercontent.com/fningna51-stack/-/main/AF%20%E6%9C%80%E5%BC%BA%E6%88%98%E5%9C%BA",
+            name = "最坚强的战场"
+        },
+        ["116495829188952"] = {
+            url = "https://raw.githubusercontent.com/fningna51-stack/-/main/AF%20%E6%AD%BB%E9%93%81%E8%BD%A8",
+            name = "死铁轨"
+        },
+        ["112154570415147"] = {
+            url = "https://raw.githubusercontent.com/fningna51-stack/-/main/AF%20%E6%92%95%E5%92%AC%E4%B9%8B%E5%A4%9C",
+            name = "撕咬之夜"
+        },
+        [""] = {
+            url = "https://raw.githubusercontent.com/fningna51-stack/-/main/AF%20GB%E5%86%85%E8%84%8F%E4%B8%8E%E9%BB%91%E7%81%AB%E8%8D%AF",
+            name = "GB"
+        },
+        ["70876832253163"] = {
+            url = "https://raw.githubusercontent.com/fningna51-stack/-/main/AF%20%E6%AD%BB%E9%93%81%E8%BD%A8",
+            name = "死铁轨"
+        },
+        [""] = {
+            url = "",
+            name = ""
+        },
+        [""] = {
+            url = "",
+            name = ""
+        },
+        [""] = {
+            url = "",
+            name = ""
+        },
+        [""] = {
+            url = "",
+            name = ""
+        },
+        [""] = {
+            url = "",
+            name = ""
+        },
+        [""] = {
+            url = "",
+            name = ""
+        },
+        [""] = {
+            url = "",
+            name = ""
+        },
+        [""] = {
+            url = "",
+            name = ""
+        }
+    }
+
+    local RevenantLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/Revenant", true))()
+    local RunService = game:GetService("RunService")
+    local t = 0
+    RunService.Heartbeat:Connect(function(dt)
+        t = t + 0.012
+        local r = math.sin(t*1.1)*0.45+0.55
+        local g = math.sin(t*1.3)*0.45+0.55
+        local b = math.sin(t*1.6)*0.45+0.55
+        RevenantLib.DefaultColor = Color3.new(r,g,b)
+    end)
+
+    if Scripts[CurrentPlaceId] then
+        loadstring(game:HttpGet(Scripts[CurrentPlaceId].url))()
+        RevenantLib:Notification({
+            Text = "自动执行成功 当前游戏: " .. Scripts[CurrentPlaceId].name .. "\u{e000}",
+            Duration = 6,
+        })
+        wait(1)
+    else
+        RevenantLib:Notification({
+            Text = "当前游戏我们不支持 可以提供游戏id我们会选择是否更新 游戏ID: " .. CurrentPlaceId,
+            Duration = 5,
+        })
+    end
+end
