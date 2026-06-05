@@ -41,82 +41,391 @@ local TweenService = game:GetService("TweenService")
 local LocalPlayer = Players.LocalPlayer
 
 local cloneref = cloneref or function(instance) return instance end
-local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Yisan886/Aero/refs/heads/main/ui.lua.txt"))()
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/YIRDEX/Miscs/refs/heads/main/YXWindUI.lua"))()
 
 WindUI:AddTheme({
-    Name = "My Theme",
-    Accent = Color3.fromHex("#18181b"),
-    Background = Color3.fromHex("#101010"),
-    Outline = Color3.fromHex("#FFFFFF"),
+    Name = "AF Hub", 
+    Accent = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#FF4C4C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#FF1A1A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#CC0000"), Transparency = 0}
+    }, {Rotation = 90}),
+    Background = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#FF4C4C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#FF1A1A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#CC0000"), Transparency = 0}
+    }, {Rotation = 90}),
+    Outline = Color3.fromHex("#FF6666"),
     Text = Color3.fromHex("#FFFFFF"),
-    Placeholder = Color3.fromHex("#7a7a7a"),
-    Button = Color3.fromHex("#52525b"),
-    Icon = Color3.fromHex("#a1a1aa"),
+    Placeholder = Color3.fromHex("#AAAAAA"),
+    Button = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#FF4C4C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#FF1A1A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#CC0000"), Transparency = 0}
+    }, {Rotation = 90}),
+    Icon = Color3.fromHex("#FF6666")
 })
+
+-- 月夜
+WindUI:AddTheme({
+    Name = "月夜",
+    Accent = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#232526"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#636363"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#E0E0E0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Dialog = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#1C1C1C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#3A3A3A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#636363"), Transparency = 0}
+    }, {Rotation = 90}),
+    Outline = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#B0B0B0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#C0C0C0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#E0E0E0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Text = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#FFFFFF"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#D9D9D9"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#BFBFBF"), Transparency = 0}
+    }, {Rotation = 90}),
+    Placeholder = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#A0A0A0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#B0B0B0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#C0C0C0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Background = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#101010"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#3A3A3A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#636363"), Transparency = 0}
+    }, {Rotation = 90}),
+    Button = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#3A3A3A"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#636363"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#A2A2A2"), Transparency = 0}
+    }, {Rotation = 90}),
+    Icon = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#C0C0C0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#E0E0E0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#FFFFFF"), Transparency = 0}
+    }, {Rotation = 90})
+})
+
+-- 冬日霜雪
+WindUI:AddTheme({
+    Name = "冬日霜雪",
+    Accent = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#D0E8F2"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#A0D4F2"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#70C0F2"), Transparency = 0}
+    }, {Rotation = 45}),
+    Dialog = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#E0F7FF"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#B0EFFF"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#80E7FF"), Transparency = 0}
+    }, {Rotation = 45}),
+    Outline = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#70C0F2"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#50B0E0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#30A0D0"), Transparency = 0}
+    }, {Rotation = 45}),
+    Text = Color3.fromHex("#000000"),
+    Placeholder = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#7FB3D5"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#5FA2C5"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#3F91B5"), Transparency = 0}
+    }, {Rotation = 45}),
+    Background = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#E6F0FA"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#CDE0F5"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#B4D1F0"), Transparency = 0}
+    }, {Rotation = 45}),
+    Button = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#50B0E0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#30A0D0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#108FC0"), Transparency = 0}
+    }, {Rotation = 45}),
+    Icon = Color3.fromHex("#00FFFF")
+})
+
+-- 月渊
+WindUI:AddTheme({
+    Name = "月渊",
+    Accent = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#0D0D1A"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#1A1A33"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#2E2E5C"), Transparency = 0}
+    }, {Rotation = 90}),
+    Dialog = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#101026"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#1A1A3D"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#333366"), Transparency = 0}
+    }, {Rotation = 90}),
+    Outline = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#2E2E5C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#404080"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#5050A0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Text = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#A0A0FF"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#C0C0FF"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#E0E0FF"), Transparency = 0}
+    }, {Rotation = 90}),
+    Placeholder = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#6060A0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#8080C0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#A0A0E0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Background = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#0A0A1A"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#1A1A33"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#2E2E5C"), Transparency = 0}
+    }, {Rotation = 90}),
+    Button = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#404080"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#5050A0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#6060C0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Icon = Color3.fromHex("#00FFFF")
+})
+
+WindUI:SetFont("rbxassetid://12187369639")
 
 local Window = WindUI:CreateWindow({
-    Title = "AF Hub      ",
-    Folder = "AF Hub",
-    SideBarWidth = 180,
-    Background = "https://chaton-images.s3.us-east-2.amazonaws.com/GHn9L9UJLf0XcVNyCpbG72D0rmNmBEWndPkh6CjJNya8GLnWzz1vImvt8wlJSBwv_2700x1519x1393696.jpeg", -- video 
-    BackgroundImageTransparency = 0.5,
-    OpenButton = {
-        Title = "打开AF闪光",
-        CornerRadius = UDim.new(1, 0),
-        StrokeThickness = 3,
-        Enabled = true,
-        Draggable = true,
-        OnlyMobile = false,
-        Scale = 0.9,
-        Color = ColorSequence.new(
-            Color3.fromHex("#30FF6A"),
-            Color3.fromHex("#e7ff2f")
-        ),
+    Title = '<font color="#FF0000">A</font><font color="#00F0FF">F</font><font color="#00E5FF">-</font><font color="#00D5FF">H</font><font color="#00C8FF">U</font><font color="#00BBFF">B</font>', -- 窗口标题
+    Icon = "rbxassetid://82225829203828", 
+    Author = "@秋辞", -- 窗口副标题，可选
+    Folder = "YX-Hub文件夹", -- 保存密钥和图片的文件夹
+    Size = UDim2.fromOffset(520, 400), -- 窗口大小
+    MinSize = Vector2.new(560, 350), -- 窗口最小尺寸
+    MaxSize = Vector2.new(850, 560), -- 窗口最大尺寸
+    Transparent = true, -- 窗口透明度
+    Theme = "冬日霜雪", 
+    Resizable = true, -- 是否可调整窗口大小
+    SideBarWidth = 150, -- 侧边栏（标签页）宽度
+    HideSearchBar = false, -- 隐藏搜索栏
+    ScrollBarEnabled = true, -- 位于滚动框右侧的滚动条
+Background = "rbxassetid://136059273188532",
+    
+    User = { -- 位于左下角的用户信息
+        Enabled = false,
+        Anonymous = false,
+        Callback = function() -- 点击时的回调函数，可选，可移除
+            print("点击")
+        end,
     },
-    Topbar = {
-        Height = 44,
-        ButtonsType = "Mac",
-    },
 })
 
-Window:Tag({
-    Title = "V1.03",
-    Color = Color3.fromHex("00CED1"),
-    Radius = 2,
-})
 
-Window:Tag({
-    Title = "QCC",
-    Icon = "crown",
-    Color = Color3.fromHex("FFD700"),
-    Radius = 2,
-})
 
-Window:Tag({
-    Title = "QVC",
-    Icon = "square-chevron-right",
-    Color = Color3.fromHex("#30ff6a"),
-    Radius = 2,
+-- 编辑窗口展开按钮配置
+Window:EditOpenButton({
+    Title = '<font color="#FF0000">A</font><font color="#00F0FF">F</font><font color="#00E5FF">-</font><font color="#00D5FF">H</font><font color="#00C8FF">U</font><font color="#00BBFF">B</font>',
+    Icon = "snowflake",
+    -- 按钮圆角大小
+    CornerRadius = UDim.new(99,99),
+    -- 边框粗细
+    StrokeThickness = 3,
+    Window:SetIconSize(30),
+    Color = ColorSequence.new(Color3.fromHex("00FFFF"), Color3.fromHex("00BBFF")),
+    OnlyMobile = false,
+    Enabled = true,
+    Draggable = true,
 })
 
 local COLOR_SCHEMES = {
     ["彩虹颜色"] = {ColorSequence.new({
-        ColorSequenceKeypoint.new(0,    Color3.fromHex("FF0000")),
-        ColorSequenceKeypoint.new(0.16, Color3.fromHex("FFA500")),
-        ColorSequenceKeypoint.new(0.33, Color3.fromHex("FFFF00")),
-        ColorSequenceKeypoint.new(0.5,  Color3.fromHex("00FF00")),
-        ColorSequenceKeypoint.new(0.66, Color3.fromHex("0000FF")),
-        ColorSequenceKeypoint.new(0.83, Color3.fromHex("4B0082")),
-        ColorSequenceKeypoint.new(1,    Color3.fromHex("EE82EE"))
+        ColorSequenceKeypoint.new(0, Color3.fromHex("00FFFF")),
+        ColorSequenceKeypoint.new(1, Color3.fromHex("0000FF"))
     }), "palette"},
-
-    ["绿黄渐变"] = {ColorSequence.new({
-        ColorSequenceKeypoint.new(0,   Color3.fromHex("30FF6A")),
-        ColorSequenceKeypoint.new(0.5, Color3.fromHex("a8ff00")),
-        ColorSequenceKeypoint.new(1,   Color3.fromHex("e7ff2f"))
-    }), "waves"},
 }
 
+local borderAnimation
+local animationSpeed = 5
+
+local function createRainbowBorder(window, colorScheme)
+    local mainFrame = window.UIElements.Main
+    if not mainFrame then return nil end
+
+    local existingStroke = mainFrame:FindFirstChild("RainbowStroke")
+    if existingStroke then existingStroke:Destroy() end
+
+    if not mainFrame:FindFirstChildOfClass("UICorner") then
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 16)
+        corner.Parent = mainFrame
+    end
+
+    local rainbowStroke = Instance.new("UIStroke")
+    rainbowStroke.Name = "RainbowStroke"
+    rainbowStroke.Thickness = 2
+    rainbowStroke.Color = Color3.new(1, 1, 1)
+    rainbowStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    rainbowStroke.LineJoinMode = Enum.LineJoinMode.Round
+    rainbowStroke.Parent = mainFrame
+
+    local glowEffect = Instance.new("UIGradient")
+    glowEffect.Name = "GlowEffect"
+    local schemeData = COLOR_SCHEMES[colorScheme or "彩虹颜色"]
+    glowEffect.Color = schemeData and schemeData[1] or COLOR_SCHEMES["彩虹颜色"][1]
+    glowEffect.Rotation = 0
+    glowEffect.Parent = rainbowStroke
+
+    return rainbowStroke
+end
+
+local function startBorderAnimation(window, speed)
+    local mainFrame = window.UIElements.Main
+    if not mainFrame then return nil end
+    local rainbowStroke = mainFrame:FindFirstChild("RainbowStroke")
+    if not rainbowStroke then return nil end
+    local glowEffect = rainbowStroke:FindFirstChild("GlowEffect")
+    if not glowEffect then return nil end
+
+    return game:GetService("RunService").Heartbeat:Connect(function()
+        if not rainbowStroke or rainbowStroke.Parent == nil then return end
+        glowEffect.Rotation = (tick() * speed * 10) % 360
+    end)
+end
+
+local rainbowStroke = createRainbowBorder(Window, "彩虹颜色")
+if rainbowStroke then
+    borderAnimation = startBorderAnimation(Window, animationSpeed)
+end
+
+local Lighting = game:GetService("Lighting")
+local TweenServiceBlur = game:GetService("TweenService")
+
+local blur = Lighting:FindFirstChildOfClass("BlurEffect")
+if not blur then
+    blur = Instance.new("BlurEffect")
+    blur.Size = 0
+    blur.Parent = Lighting
+end
+
+task.spawn(function()
+    local wasOpen = false
+    while true do
+        task.wait(0.1)
+        local mainFrame = Window.UIElements and Window.UIElements.Main
+        local isOpen = mainFrame and mainFrame.Visible or false
+        
+        if isOpen ~= wasOpen then
+            wasOpen = isOpen
+            TweenServiceBlur:Create(blur, TweenInfo.new(0.3), {
+                Size = isOpen and 20 or 0
+            }):Play()
+        end
+    end
+end)
+
+local info = Window:Section({
+    Title = "主页",
+    Icon = "star",
+    Opened = true
+})
+
+local Tab1 = info:Tab({
+    Title = "信息",
+    Icon = "info", -- optional
+    Locked = false,
+})
+
+
+
+local Paragraph = Tab1:Paragraph({
+    Title = 'AF Hub',
+    Desc = '欢迎使用AF Hub脚本(＾ν＾)',
+    Thumbnail = "rbxassetid://100781334247855",
+    ThumbnailSize = 200,
+    Locked = false,
+})
+
+local Paragraph1 = Tab1:Paragraph({
+    Title = 'AF Hub',
+    Desc = '主打缝合 :D',
+    Thumbnail = "rbxassetid://72531855816776",
+    ThumbnailSize = 200,
+    Locked = false,
+})
+
+Tab1:Section({ 
+    Title = "开发者",
+    TextXAlignment = "Center",
+    TextSize = 20,
+})
+
+local Paragraph = Tab1:Paragraph({
+    Title = "秋词",
+    Desc = "AF Hub作者",
+    Image = "rbxassetid://138882879525986",
+    ImageSize = 60,
+    Locked = false,
+})
+
+local Paragraph = Tab1:Paragraph({
+    Title = "YirdeX",
+    Desc = "ui背景设计者",
+    Image = "rbxassetid://90051928527603",
+    ImageSize = 60,
+    Locked = false,
+})
+
+local Tab3 = info:Tab({
+    Title = "复制",
+    Icon = "file-code",
+    Locked = false,
+})
+
+local Button1 = Tab3:Button({
+    Title = "复制主群",
+    Desc = "复制作者QQ群", -- 可选参数
+    Icon = "file-code", -- 图标名称 或 资源ID链接，可选参数
+    IconAlign = "Left",
+    Locked = false, -- 是否禁用按钮，可选参数
+    LockedTitle = "已锁定", -- 按钮禁用时显示的文字，可选参数
+    Callback = function()
+setclipboard("2152069753")
+    end
+})
+
+local Tab2 = info:Tab({
+    Title = "公告",
+    Icon = "menu",
+    Locked = false,
+})
+local Section1 = Tab2:Section({
+    Title = "AF Hub[公告]", -- 分区标题
+    Icon = "component", -- 图标，支持图标名称或资源ID（可选）
+    TextSize = 30, -- 标题文字大小（可选）
+    TextXAlignment = "Left", -- 文字水平对齐方式：左对齐/居中/右对齐（可选）
+    Box = true, -- 是否显示分区外框（可选）
+    BoxBorder = true, -- 是否显示外框边框（可选）
+    Opened = true, -- 分区默认是否展开（可选）
+    FontWeight = Enum.FontWeight.SemiBold, -- 标题字体粗细（可选）
+    DescFontWeight = Enum.FontWeight.Medium, -- 描述文字字体粗细（可选）
+    TextTransparency = 0, -- 标题文字透明度（可选）
+    DescTextTransparency = 0, -- 描述文字透明度（可选）
+})
+
+Section1:Paragraph({
+    Title = "这个是公告？",
+    TextSize = 30, 
+    Thumbnail = "rbxassetid://85076999766387",
+    ThumbnailSize = 100,
+})
+
+
+
+
+
+
+Window:Divider()
+local functiond = Window:Section({
+    Title = "功能区",
+    Icon = "folder-cog",
+    Opened = true,
+})
 local borderAnimation
 local animationSpeed = 5
 
@@ -2071,7 +2380,7 @@ do
     end
 
     KillTab:Toggle({
-        Title = "杀戮光环",
+        Title = "愤怒机器人[杀戮光环]",
         Value = false,
         Callback = function(state)
             if state then
@@ -2112,3 +2421,211 @@ do
         end
     })
 end
+
+Window:Divider()
+local SettingsTab = Window:Tab({
+    Title = "Ui设置",
+    Desc = "Ui美术设置", -- 可选
+    Icon = "settings", -- lucide 图标 或 "rbxassetid://" 或 URL，可选
+    IconThemed = true, -- 使用主题颜色，可选
+    Locked = false, -- 禁用标签页交互，可选
+    ShowTabTitle = false, -- 在标签页内显示标题，可选
+    Border = true, -- 在标签页周围添加边框，可选
+})
+
+local ThemeSelectDropdown = SettingsTab:Dropdown({
+    Title = "选择主题",
+    Multi = false,
+    AllowNone = false,
+    Value = nil,
+    Values = themeValues,
+    Callback = function(theme)
+        WindUI:SetTheme(theme)
+    end
+})
+
+
+SettingsTab:Divider()
+SettingsTab:Section({ 
+    Title = "背景选择",
+    TextXAlignment = "Center",
+    TextSize = 20,
+})
+
+local Dropdown = SettingsTab:Dropdown({
+    Title = "切换背景图",
+    Values = {
+        {
+            Title = "无背景",
+            Icon = "app-window",
+            Callback = function()
+                Window:SetBackgroundImage("rbxassetid://0")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换为无背景",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图1(默认)",
+            Desc = "秋词提供",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://136059273188532")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图1",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图2",
+            Icon = "app-window",
+            Callback = function()
+       Window:SetBackgroundImage("rbxassetid://101182501948173")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图2",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图3",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://90514823373955")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图3",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图4",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://103858984350097")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图4",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图5",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://137662774446930")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图5",
+                    Duration = 3
+                })
+            end
+        },
+                {
+            Title = "背景图6",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://73618579935939")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图6",
+                    Duration = 3
+                })
+            end
+        },
+                {
+            Title = "背景图7",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://131845772886226")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图7",
+                    Duration = 3
+                })
+            end
+        },
+                {
+            Title = "背景图8",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://92388982051300")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图8",
+                    Duration = 3
+                })
+            end
+        },
+                        {
+            Title = "背景图9",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://103197377834563")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图9",
+                    Duration = 3
+                })
+            end
+        },
+                        {
+            Title = "背景图10",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://123887383447725")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图10",
+                    Duration = 3
+                })
+            end
+        },
+                        {
+            Title = "背景图11",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://84371548883810")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图11",
+                    Duration = 3
+                })
+            end
+        },
+    }
+})
+
+SettingsTab:Section({ 
+    Title = "自定义背景",
+    TextXAlignment = "Center",
+    TextSize = 20,
+})
+SettingsTab:Divider()
+
+local CustomBackground = SettingsTab:Input({
+    Title = "背景 ID",
+    Type = "Input",
+    Placeholder = "输入图片ID",
+    Callback = function(input)
+        if input ~= "" then
+            _G.BackgroundImage = "rbxassetid://" .. input
+            Window:SetBackgroundImage(_G.BackgroundImage)
+        end
+    end
+})
+
+local Keybind = SettingsTab:Keybind({
+    Title = "关闭界面的快捷键",
+    Value = "G",
+    Callback = function(v)
+        Window:SetToggleKey(Enum.KeyCode[v])
+    end
+})
