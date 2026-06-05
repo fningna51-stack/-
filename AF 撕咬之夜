@@ -435,6 +435,29 @@ Tabs.Local:Section({ Title = "属性" })
 Tabs.Local:Slider({ Title = "速度(25以内)", Value = { Min = 0, Max = 50, Default = 15 }, Callback = function(v) valWalkSpeed = v end })
 Tabs.Local:Toggle({ Title = "启用", Callback = function(v) modifyWalkSpeed = v end })
 
+Tabs.Local:Section({ Title = "体力" })
+
+Tabs.Local:Toggle({
+    Title = "无限体力 + 始终冲刺",
+    Default = false,
+    Callback = function(state)
+        infiniteStaminaEnabled = state
+        if state then
+            if infiniteStaminaConnection then infiniteStaminaConnection:Disconnect() end
+            infiniteStaminaConnection = RunService.Heartbeat:Connect(function()
+                if LocalPlayer.Character then
+                    LocalPlayer.Character:SetAttribute('WalkSpeed', 25)
+                end
+            end)
+        else
+            if infiniteStaminaConnection then infiniteStaminaConnection:Disconnect() end
+            if LocalPlayer.Character then
+                LocalPlayer.Character:SetAttribute('WalkSpeed', 16)
+            end
+        end
+    end
+})
+
 Tabs.Local:Section({ Title = "功能" })
 Tabs.Local:Toggle({
     Title = "开启穿墙",
@@ -463,7 +486,7 @@ Tabs.Visuals:Toggle({
 })
 Tabs.Visuals:Toggle({ Title = "除雾", Callback = function(v) _G.RemoveFog = v end })
 
-Tabs.Visuals:Section({ Title = "透视" })
+Tabs.Visuals:Section({ Title = "透视[暂时没用推荐搭配其他脚本使用]" })
 local function applyESP(obj, color, text)
     if not obj then return end
     if not obj:FindFirstChild("Highlight") then
