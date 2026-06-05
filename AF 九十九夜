@@ -1,0 +1,1113 @@
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/YIRDEX/Miscs/refs/heads/main/YXWindUI.lua"))()
+
+WindUI:AddTheme({
+    Name = "AF Hub", 
+    Accent = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#FF4C4C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#FF1A1A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#CC0000"), Transparency = 0}
+    }, {Rotation = 90}),
+    Background = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#FF4C4C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#FF1A1A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#CC0000"), Transparency = 0}
+    }, {Rotation = 90}),
+    Outline = Color3.fromHex("#FF6666"),
+    Text = Color3.fromHex("#FFFFFF"),
+    Placeholder = Color3.fromHex("#AAAAAA"),
+    Button = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#FF4C4C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#FF1A1A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#CC0000"), Transparency = 0}
+    }, {Rotation = 90}),
+    Icon = Color3.fromHex("#FF6666")
+})
+
+-- 月夜
+WindUI:AddTheme({
+    Name = "月夜",
+    Accent = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#232526"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#636363"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#E0E0E0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Dialog = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#1C1C1C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#3A3A3A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#636363"), Transparency = 0}
+    }, {Rotation = 90}),
+    Outline = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#B0B0B0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#C0C0C0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#E0E0E0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Text = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#FFFFFF"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#D9D9D9"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#BFBFBF"), Transparency = 0}
+    }, {Rotation = 90}),
+    Placeholder = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#A0A0A0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#B0B0B0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#C0C0C0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Background = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#101010"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#3A3A3A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#636363"), Transparency = 0}
+    }, {Rotation = 90}),
+    Button = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#3A3A3A"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#636363"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#A2A2A2"), Transparency = 0}
+    }, {Rotation = 90}),
+    Icon = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#C0C0C0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#E0E0E0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#FFFFFF"), Transparency = 0}
+    }, {Rotation = 90})
+})
+
+-- 冬日霜雪
+WindUI:AddTheme({
+    Name = "冬日霜雪",
+    Accent = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#D0E8F2"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#A0D4F2"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#70C0F2"), Transparency = 0}
+    }, {Rotation = 45}),
+    Dialog = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#E0F7FF"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#B0EFFF"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#80E7FF"), Transparency = 0}
+    }, {Rotation = 45}),
+    Outline = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#70C0F2"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#50B0E0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#30A0D0"), Transparency = 0}
+    }, {Rotation = 45}),
+    Text = Color3.fromHex("#000000"),
+    Placeholder = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#7FB3D5"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#5FA2C5"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#3F91B5"), Transparency = 0}
+    }, {Rotation = 45}),
+    Background = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#E6F0FA"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#CDE0F5"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#B4D1F0"), Transparency = 0}
+    }, {Rotation = 45}),
+    Button = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#50B0E0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#30A0D0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#108FC0"), Transparency = 0}
+    }, {Rotation = 45}),
+    Icon = Color3.fromHex("#00FFFF")
+})
+
+-- 月渊
+WindUI:AddTheme({
+    Name = "月渊",
+    Accent = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#0D0D1A"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#1A1A33"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#2E2E5C"), Transparency = 0}
+    }, {Rotation = 90}),
+    Dialog = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#101026"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#1A1A3D"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#333366"), Transparency = 0}
+    }, {Rotation = 90}),
+    Outline = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#2E2E5C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#404080"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#5050A0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Text = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#A0A0FF"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#C0C0FF"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#E0E0FF"), Transparency = 0}
+    }, {Rotation = 90}),
+    Placeholder = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#6060A0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#8080C0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#A0A0E0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Background = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#0A0A1A"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#1A1A33"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#2E2E5C"), Transparency = 0}
+    }, {Rotation = 90}),
+    Button = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#404080"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#5050A0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#6060C0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Icon = Color3.fromHex("#00FFFF")
+})
+
+WindUI:SetFont("rbxassetid://12187369639")
+
+local Window = WindUI:CreateWindow({
+    Title = '<font color="#FF0000">A</font><font color="#00F0FF">F</font><font color="#00E5FF">-</font><font color="#00D5FF">H</font><font color="#00C8FF">U</font><font color="#00BBFF">B</font>', -- 窗口标题
+    Icon = "rbxassetid://82225829203828", 
+    Author = "@秋辞", -- 窗口副标题，可选
+    Folder = "YX-Hub文件夹", -- 保存密钥和图片的文件夹
+    Size = UDim2.fromOffset(520, 400), -- 窗口大小
+    MinSize = Vector2.new(560, 350), -- 窗口最小尺寸
+    MaxSize = Vector2.new(850, 560), -- 窗口最大尺寸
+    Transparent = true, -- 窗口透明度
+    Theme = "冬日霜雪", 
+    Resizable = true, -- 是否可调整窗口大小
+    SideBarWidth = 150, -- 侧边栏（标签页）宽度
+    HideSearchBar = false, -- 隐藏搜索栏
+    ScrollBarEnabled = true, -- 位于滚动框右侧的滚动条
+Background = "rbxassetid://136059273188532",
+    
+    User = { -- 位于左下角的用户信息
+        Enabled = false,
+        Anonymous = false,
+        Callback = function() -- 点击时的回调函数，可选，可移除
+            print("点击")
+        end,
+    },
+})
+
+
+
+-- 编辑窗口展开按钮配置
+Window:EditOpenButton({
+    Title = '<font color="#FF0000">A</font><font color="#00F0FF">F</font><font color="#00E5FF">-</font><font color="#00D5FF">H</font><font color="#00C8FF">U</font><font color="#00BBFF">B</font>',
+    Icon = "snowflake",
+    CornerRadius = UDim.new(99,99),
+    StrokeThickness = 3,
+    IconSize = 30,
+    Color = ColorSequence.new(Color3.fromHex("00FFFF"), Color3.fromHex("00BBFF")),
+    OnlyMobile = false,
+    Enabled = true,
+    Draggable = true,
+})
+
+local COLOR_SCHEMES = {
+    ["彩虹颜色"] = {ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromHex("00FFFF")),
+        ColorSequenceKeypoint.new(1, Color3.fromHex("0000FF"))
+    }), "palette"},
+}
+
+local borderAnimation
+local animationSpeed = 5
+
+local function createRainbowBorder(window, colorScheme)
+    local mainFrame = window.UIElements.Main
+    if not mainFrame then return nil end
+
+    local existingStroke = mainFrame:FindFirstChild("RainbowStroke")
+    if existingStroke then existingStroke:Destroy() end
+
+    if not mainFrame:FindFirstChildOfClass("UICorner") then
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 16)
+        corner.Parent = mainFrame
+    end
+
+    local rainbowStroke = Instance.new("UIStroke")
+    rainbowStroke.Name = "RainbowStroke"
+    rainbowStroke.Thickness = 2
+    rainbowStroke.Color = Color3.new(1, 1, 1)
+    rainbowStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    rainbowStroke.LineJoinMode = Enum.LineJoinMode.Round
+    rainbowStroke.Parent = mainFrame
+
+    local glowEffect = Instance.new("UIGradient")
+    glowEffect.Name = "GlowEffect"
+    local schemeData = COLOR_SCHEMES[colorScheme or "彩虹颜色"]
+    glowEffect.Color = schemeData and schemeData[1] or COLOR_SCHEMES["彩虹颜色"][1]
+    glowEffect.Rotation = 0
+    glowEffect.Parent = rainbowStroke
+
+    return rainbowStroke
+end
+
+local function startBorderAnimation(window, speed)
+    local mainFrame = window.UIElements.Main
+    if not mainFrame then return nil end
+    local rainbowStroke = mainFrame:FindFirstChild("RainbowStroke")
+    if not rainbowStroke then return nil end
+    local glowEffect = rainbowStroke:FindFirstChild("GlowEffect")
+    if not glowEffect then return nil end
+
+    return game:GetService("RunService").Heartbeat:Connect(function()
+        if not rainbowStroke or rainbowStroke.Parent == nil then return end
+        glowEffect.Rotation = (tick() * speed * 10) % 360
+    end)
+end
+
+local rainbowStroke = createRainbowBorder(Window, "彩虹颜色")
+if rainbowStroke then
+    borderAnimation = startBorderAnimation(Window, animationSpeed)
+end
+
+local Lighting = game:GetService("Lighting")
+local TweenServiceBlur = game:GetService("TweenService")
+
+local blur = Lighting:FindFirstChildOfClass("BlurEffect")
+if not blur then
+    blur = Instance.new("BlurEffect")
+    blur.Size = 0
+    blur.Parent = Lighting
+end
+
+task.spawn(function()
+    local wasOpen = false
+    while true do
+        task.wait(0.1)
+        local mainFrame = Window.UIElements and Window.UIElements.Main
+        local isOpen = mainFrame and mainFrame.Visible or false
+        
+        if isOpen ~= wasOpen then
+            wasOpen = isOpen
+            TweenServiceBlur:Create(blur, TweenInfo.new(0.3), {
+                Size = isOpen and 20 or 0
+            }):Play()
+        end
+    end
+end)
+
+local info = Window:Section({
+    Title = "主页",
+    Icon = "star",
+    Opened = true
+})
+
+local Tab1 = info:Tab({
+    Title = "信息",
+    Icon = "info", -- optional
+    Locked = false,
+})
+
+
+
+local Paragraph = Tab1:Paragraph({
+    Title = 'AF Hub',
+    Desc = '欢迎使用YX-HUB脚本(＾ν＾)',
+    Thumbnail = "rbxassetid://100781334247855",
+    ThumbnailSize = 200,
+    Locked = false,
+})
+
+local Paragraph1 = Tab1:Paragraph({
+    Title = 'AF Hun',
+    Desc = '主打缝合 :D',
+    Thumbnail = "rbxassetid://72531855816776",
+    ThumbnailSize = 200,
+    Locked = false,
+})
+
+Tab1:Section({ 
+    Title = "开发者",
+    TextXAlignment = "Center",
+    TextSize = 20,
+})
+
+local Paragraph = Tab1:Paragraph({
+    Title = "秋词",
+    Desc = "AF Hub作者",
+    Image = "rbxassetid://138882879525986",
+    ImageSize = 60,
+    Locked = false,
+})
+
+local Paragraph = Tab1:Paragraph({
+    Title = "YirdeX",
+    Desc = "ui背景设计者",
+    Image = "rbxassetid://90051928527603",
+    ImageSize = 60,
+    Locked = false,
+})
+
+local Tab3 = info:Tab({
+    Title = "复制",
+    Icon = "file-code",
+    Locked = false,
+})
+
+local Button1 = Tab3:Button({
+    Title = "复制主群",
+    Desc = "复制作者QQ群", -- 可选参数
+    Icon = "file-code", -- 图标名称 或 资源ID链接，可选参数
+    IconAlign = "Left",
+    Locked = false, -- 是否禁用按钮，可选参数
+    LockedTitle = "已锁定", -- 按钮禁用时显示的文字，可选参数
+    Callback = function()
+setclipboard("938714427")
+    end
+})
+
+local Tab2 = info:Tab({
+    Title = "公告",
+    Icon = "menu",
+    Locked = false,
+})
+local Section1 = Tab2:Section({
+    Title = "AF Hub[公告]", -- 分区标题
+    Icon = "component", -- 图标，支持图标名称或资源ID（可选）
+    TextSize = 30, -- 标题文字大小（可选）
+    TextXAlignment = "Left", -- 文字水平对齐方式：左对齐/居中/右对齐（可选）
+    Box = true, -- 是否显示分区外框（可选）
+    BoxBorder = true, -- 是否显示外框边框（可选）
+    Opened = true, -- 分区默认是否展开（可选）
+    FontWeight = Enum.FontWeight.SemiBold, -- 标题字体粗细（可选）
+    DescFontWeight = Enum.FontWeight.Medium, -- 描述文字字体粗细（可选）
+    TextTransparency = 0, -- 标题文字透明度（可选）
+    DescTextTransparency = 0, -- 描述文字透明度（可选）
+})
+
+Section1:Paragraph({
+    Title = "这个是公告？",
+    TextSize = 30, 
+    Thumbnail = "rbxassetid://85076999766387",
+    ThumbnailSize = 100,
+})
+
+
+
+
+
+
+Window:Divider()
+local functiond = Window:Section({
+    Title = "功能区",
+    Icon = "folder-cog",
+    Opened = true,
+})
+local Tabs = {
+    Main = Window:Tab({ Title = "主要功能", Icon = "zap" }),
+    Ninja = Window:Tab({ Title = "传送", Icon = "user" }),
+    ESP = Window:Tab({ Title = "透视", Icon = "dumbbell" }),
+}
+
+Window:SelectTab(1)
+
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local ProximityPromptService = game:GetService("ProximityPromptService")
+
+local LP = Players.LocalPlayer
+local Character = LP.Character or LP.CharacterAdded:Wait()
+
+local Features = {
+    KillAura = false,
+    AutoChop = false,
+    AutoEat = false,
+    ChildESP = false,
+    ChestESP = false,
+    InstantInteract = false
+}
+
+local Blacklist = {}
+
+local ClientModule
+local EatRemote
+local function GetClientModule()
+    if not ClientModule then
+        ClientModule = require(LP:WaitForChild("PlayerScripts"):WaitForChild("Client"))
+        EatRemote = ClientModule and ClientModule.Events and ClientModule.Events.RequestConsumeItem
+    end
+    return ClientModule, EatRemote
+end
+
+local espData = {}
+local function createESP(target, name)
+    local rootPart = target:FindFirstChild("HumanoidRootPart") or target.PrimaryPart or target:FindFirstChildWhichIsA("BasePart")
+    if not rootPart or espData[target] then return end
+
+    local billboard = Instance.new("BillboardGui")
+    billboard.Adornee = rootPart
+    billboard.Size = UDim2.new(0, 100, 0, 100)
+    billboard.StudsOffset = Vector3.new(0, 3, 0)
+    billboard.AlwaysOnTop = true
+    billboard.Parent = rootPart
+    billboard.Enabled = true
+
+    local label = Instance.new("TextLabel")
+    label.Text = name .. "\n" .. "0m"
+    label.Size = UDim2.new(1, 0, 0, 40)
+    label.Position = UDim2.new(0, 0, 0, 0)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.new(1, 1, 1)
+    label.TextStrokeTransparency = 0.3
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = 14
+    label.Parent = billboard
+
+    if name:match("Chest") then
+        local image = Instance.new("ImageLabel")
+        image.Position = UDim2.new(0, 20, 0, 40)
+        image.Size = UDim2.new(0, 60, 0, 60)
+        image.Image = "rbxassetid://18660563116"
+        image.BackgroundTransparency = 1
+        image.Parent = billboard
+    end
+
+    espData[target] = {gui = billboard, label = label, image = image}
+end
+
+local function update99NightESP()
+    local playerChar = LP.Character
+    if not playerChar or not playerChar:FindFirstChild("HumanoidRootPart") then return end
+    local playerPos = playerChar.HumanoidRootPart.Position
+
+    for target, data in pairs(espData) do
+        if not target.Parent or not target:IsDescendantOf(workspace) then
+            data.gui:Destroy()
+            espData[target] = nil
+        else
+            local rootPart = target:FindFirstChild("HumanoidRootPart") or target.PrimaryPart or target:FindFirstChildWhichIsA("BasePart")
+            if rootPart then
+                local dist = (playerPos - rootPart.Position).Magnitude
+                data.label.Text = data.label.Text:match("^(.-)%.-\n") .. "\n" .. math.floor(dist) .. "m"
+            end
+        end
+    end
+
+    if Features.ChestESP then
+        for _, chest in next, Workspace.Items:GetChildren() do
+            if chest.Name:match("Chest") and chest:IsA("Model") and not table.find(Blacklist, chest) and chest:FindFirstChild("Main") and not espData[chest] then
+                createESP(chest, "宝箱")
+            end
+        end
+    end
+
+    if Features.ChildESP then
+        for _, child in next, Workspace.Characters:GetChildren() do
+            if table.find({"Lost Child", "Lost Child1", "Lost Child2", "Lost Child3", "Dino Kid", "kraken kid", "Squid kid", "Koala Kid", "koala"}, child.Name) and child:FindFirstChild("HumanoidRootPart") and not table.find(Blacklist, child) and not espData[child] then
+                createESP(child, "孩子")
+            end
+        end
+    end
+end
+
+local function toggle99NightESP(enabled)
+    Features.ChestESP = enabled
+    Features.ChildESP = enabled
+
+    if enabled then
+        update99NightESP()
+        WindUI:Notify({Title = "提示", Content = "已开启99夜透视", Duration = 2})
+    else
+        for _, data in pairs(espData) do
+            data.gui:Destroy()
+        end
+        espData = {}
+        WindUI:Notify({Title = "提示", Content = "已关闭99夜透视", Duration = 2})
+    end
+end
+
+local function TryEatFood(food)
+    local _, remote = GetClientModule()
+    if not remote then 
+        WindUI:Notify({Title = "错误", Content = "无法获取进食远程函数", Duration = 5})
+        return 
+    end
+
+    if not ReplicatedStorage:FindFirstChild("TempStorage") then
+        WindUI:Notify({Title = "错误", Content = "找不到临时存储", Duration = 5})
+        return
+    end
+
+    WindUI:Notify({Title = "AlienX", Content = "正在尝试吃下" .. food.Name, Duration = 5})
+    food.Parent = ReplicatedStorage.TempStorage
+    local success, result = pcall(function()
+        return remote:InvokeServer(food)
+    end)
+
+    if success and result and result.Success then
+        WindUI:Notify({Title = "AlienX", Content = "成功吃下 " .. food.Name, Duration = 5})
+    else
+        WindUI:Notify({Title = "AlienX", Content = "进食失败", Duration = 5})
+    end
+end
+
+local itemConfig = {
+    {name = "Log", display = "木头", espColor = Color3.fromRGB(139, 69, 19)},
+    {name = "Carrot", display = "胡萝卜", espColor = Color3.fromRGB(255, 165, 0)},
+    {name = "Berry", display = "浆果", espColor = Color3.fromRGB(255, 0, 0)},
+    {name = "Bolt", display = "螺栓", espColor = Color3.fromRGB(255, 255, 0)},
+    {name = "Broken Fan", display = "风扇", espColor = Color3.fromRGB(100, 100, 100)},
+    {name = "Coal", display = "煤炭", espColor = Color3.fromRGB(0, 0, 0)},
+    {name = "Coin Stack", display = "钱堆", espColor = Color3.fromRGB(255, 215, 0)},
+    {name = "Fuel Canister", display = "燃料罐", espColor = Color3.fromRGB(255, 50, 50)},
+    {name = "Item Chest", display = "宝箱", espColor = Color3.fromRGB(210, 180, 140)},
+    {name = "Old Flashlight", display = "手电筒", espColor = Color3.fromRGB(200, 200, 200)},
+    {name = "Old Radio", display = "收音机", espColor = Color3.fromRGB(150, 150, 150)},
+    {name = "Rifle Ammo", display = "步枪子弹", espColor = Color3.fromRGB(150, 75, 0)},
+    {name = "Revolver Ammo", display = "左轮子弹", espColor = Color3.fromRGB(150, 75, 0)},
+    {name = "Sheet Metal", display = "金属板", espColor = Color3.fromRGB(192, 192, 192)},
+    {name = "Revolver", display = "左轮", espColor = Color3.fromRGB(75, 75, 75)},
+    {name = "Rifle", display = "步枪", espColor = Color3.fromRGB(75, 75, 75)},
+    {name = "Bandage", display = "绷带", espColor = Color3.fromRGB(255, 240, 245)},
+    {name = "Crossbow Cultist", display = "敌人", espColor = Color3.fromRGB(255, 0, 0)},
+    {name = "Bear", display = "熊", espColor = Color3.fromRGB(139, 69, 19)},
+    {name = "Alpha Wolf", display = "阿尔法狼", espColor = Color3.fromRGB(128, 128, 128)},
+    {name = "Wolf", display = "狼", espColor = Color3.fromRGB(192, 192, 192)},
+    {name = "Chair", display = "椅子", espColor = Color3.fromRGB(160, 82, 45)},
+    {name = "Tyre", display = "轮胎", espColor = Color3.fromRGB(20, 20, 20)},
+    {name = "Alien Chest", display = "外星宝箱", espColor = Color3.fromRGB(0, 255, 0)},
+    {name = "Chest", display = "宝箱", espColor = Color3.fromRGB(210, 180, 140)},
+    {name = "Lost Child", display = "走失的孩子", espColor = Color3.fromRGB(0, 255, 255)},
+    {name = "Lost Child1", display = "走失的孩子1", espColor = Color3.fromRGB(0, 255, 255)},
+    {name = "Lost Child2", display = "走失的孩子2", espColor = Color3.fromRGB(0, 255, 255)},
+    {name = "Lost Child3", display = "走失的孩子3", espColor = Color3.fromRGB(0, 255, 255)},
+    {name = "Dino Kid", display = "恐龙孩子", espColor = Color3.fromRGB(0, 255, 255)},
+    {name = "kraken kid", display = "海怪孩子", espColor = Color3.fromRGB(0, 255, 255)},
+    {name = "Squid kid", display = "鱿鱼孩子", espColor = Color3.fromRGB(0, 255, 255)},
+    {name = "Koala Kid", display = "考拉孩子", espColor = Color3.fromRGB(0, 255, 255)},
+    {name = "koala", display = "考拉", espColor = Color3.fromRGB(0, 255, 255)}
+}
+
+local BONFIRE_POSITION = Vector3.new(0.189, 7.831, -0.341)
+
+local function findItems(itemName)
+    local found = {}
+    local folders = {"ltems", "Items", "MapItems", "WorldItems"}
+    
+    for _, folderName in ipairs(folders) do
+        local folder = workspace:FindFirstChild(folderName)
+        if folder then
+            for _, item in ipairs(folder:GetDescendants()) do
+                if item.Name == itemName and item:IsA("Model") then
+                    local primaryPart = item.PrimaryPart or item:FindFirstChild("HumanoidRootPart")
+                    if primaryPart then
+                        table.insert(found, {model = item, part = primaryPart})
+                    end
+                end
+            end
+        end
+    end
+    
+    return found
+end
+
+local function teleportToItem(itemName, displayName)
+    local character = Character
+    if not character then return end
+    
+    local items = findItems(itemName)
+    if #items == 0 then
+        WindUI:Notify({Title = "提示", Content = "未找到"..displayName, Duration = 2})
+        return
+    end
+    
+    local closest = nil
+    local minDist = math.huge
+    local charPos = character.PrimaryPart.Position
+    
+    for _, item in ipairs(items) do
+        local dist = (item.part.Position - charPos).Magnitude
+        if dist < minDist then
+            minDist = dist
+            closest = item.part
+        end
+    end
+    
+    if closest then
+        character:MoveTo(closest.Position + Vector3.new(0, 3, 0))
+        WindUI:Notify({Title = "成功", Content = "已传送到"..displayName, Duration = 2})
+    end
+end
+
+local function teleportToBonfire()
+    local character = Character
+    if not character then return end
+    
+    character:MoveTo(BONFIRE_POSITION)
+    WindUI:Notify({Title = "成功", Content = "已传送回篝火", Duration = 2})
+end
+
+local function teleportItemsToPlayer(itemName, displayName)
+    local character = Character
+    if not character then 
+        WindUI:Notify({Title = "错误", Content = "无法获取角色", Duration = 2})
+        return 
+    end
+    
+    local items = findItems(itemName)
+    if #items == 0 then
+        WindUI:Notify({Title = "提示", Content = "未找到"..displayName, Duration = 2})
+        return
+    end
+    
+    local charPos = character.PrimaryPart.Position
+    local radius = 5
+    local angleStep = (2 * math.pi) / #items
+    
+    for i, item in ipairs(items) do
+        local angle = angleStep * i
+        local x = math.cos(angle) * radius
+        local z = math.sin(angle) * radius
+        local targetPos = charPos + Vector3.new(x, 0, z)
+        
+        if item.model:FindFirstChild("Handle") then
+            item.model.Handle.CFrame = CFrame.new(targetPos)
+        elseif item.part then
+            item.part.CFrame = CFrame.new(targetPos)
+        end
+    end
+    
+    WindUI:Notify({
+        Title = "成功", 
+        Content = "已将"..#items.."个"..displayName.."传送到你旁边", 
+        Duration = 2
+    })
+end
+
+local function toggleESP(itemName, displayName, color)
+    if _G["ESP_"..itemName] then
+        for _, gui in ipairs(_G["ESP_"..itemName].guis) do
+            gui:Destroy()
+        end
+        _G["ESP_"..itemName].conn:Disconnect()
+        _G["ESP_"..itemName] = nil
+        WindUI:Notify({Title = "提示", Content = "已关闭"..displayName.."透视", Duration = 2})
+        return
+    end
+    
+    local items = findItems(itemName)
+    _G["ESP_"..itemName] = {guis = {}}
+    
+    local function createESP(itemPart)
+        local billboard = Instance.new("BillboardGui")
+        billboard.Adornee = itemPart
+        billboard.Size = UDim2.new(0, 100, 0, 40)
+        billboard.AlwaysOnTop = true
+        billboard.MaxDistance = 300
+        
+        local text = Instance.new("TextLabel")
+        text.Text = displayName
+        text.Size = UDim2.new(1, 0, 1, 0)
+        text.Font = Enum.Font.SourceSansBold
+        text.TextSize = 18
+        text.TextColor3 = color
+        text.BackgroundTransparency = 1
+        text.TextStrokeTransparency = 0.5
+        text.TextStrokeColor3 = Color3.new(0, 0, 0)
+        text.Parent = billboard
+        
+        billboard.Parent = itemPart
+        table.insert(_G["ESP_"..itemName].guis, billboard)
+    end
+    
+    for _, item in ipairs(items) do
+        createESP(item.part)
+    end
+    
+    _G["ESP_"..itemName].conn = workspace.DescendantAdded:Connect(function(descendant)
+        if descendant.Name == itemName and descendant:IsA("Model") then
+            local primaryPart = descendant.PrimaryPart or descendant:FindFirstChild("HumanoidRootPart")
+            if primaryPart then
+                createESP(primaryPart)
+            end
+        end
+    end)
+    
+    WindUI:Notify({
+        Title = "提示", 
+        Content = "已开启"..displayName.."透视 ("..#items.."个)", 
+        Duration = 2
+    })
+end
+
+
+local lastKillAura, lastAutoChop, lastAutoEat = 0, 0, 0
+local instantInteractConn
+RunService.Heartbeat:Connect(function()
+    local now = tick()
+    
+    if Features.InstantInteract then
+        if not instantInteractConn then
+            instantInteractConn = ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
+                prompt.HoldDuration = 0
+            end)
+        end
+    else
+        if instantInteractConn then
+            instantInteractConn:Disconnect()
+            instantInteractConn = nil
+        end
+    end
+
+    if Features.KillAura and now - lastKillAura >= 0.7 then
+        lastKillAura = now
+        if Character and Character:FindFirstChild("ToolHandle") then
+            local tool = Character.ToolHandle.OriginalItem.Value
+            if tool and ({["Old Axe"] = true, ["Good Axe"] = true, ["Spear"] = true, ["Hatchet"] = true, ["Bone Club"] = true})[tool.Name] then
+                for _, target in next, Workspace.Characters:GetChildren() do
+                    if target:IsA("Model") and target:FindFirstChild("HumanoidRootPart") and target:FindFirstChild("HitRegisters") then
+                        if (Character.HumanoidRootPart.Position - target.HumanoidRootPart.Position).Magnitude <= 100 then
+                            ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("ToolDamageObject"):InvokeServer(target, tool, true, Character.HumanoidRootPart.CFrame)
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    -- 自动砍树
+    if Features.AutoChop and now - lastAutoChop >= 0.7 then
+        lastAutoChop = now
+        if Character and Character:FindFirstChild("ToolHandle") then
+            local tool = Character.ToolHandle.OriginalItem.Value
+            if tool and ({["Old Axe"] = true, ["Stone Axe"] = true, ["Iron Axe"] = true})[tool.Name] then
+                local function ChopTree(path)
+                    for _, tree in next, path:GetChildren() do
+                        task.wait(.1)
+                        if tree:IsA("Model") and ({["Small Tree"] = true, ["TreeBig1"] = true, ["TreeBig2"] = true, ["TreeBig3"] = true})[tree.Name] and tree:FindFirstChild("HitRegisters") then
+                            local trunk = tree:FindFirstChild("Trunk") or tree:FindFirstChild("HumanoidRootPart") or tree.PrimaryPart
+                            if trunk and (Character.HumanoidRootPart.Position - trunk.Position).Magnitude <= 100 then
+                                ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("ToolDamageObject"):InvokeServer(tree, tool, true, Character.HumanoidRootPart.CFrame)
+                            end
+                        end
+                    end
+                end
+                ChopTree(Workspace.Map.Foliage)
+                ChopTree(Workspace.Map.Landmarks)
+            end
+        end
+    end
+
+    if Features.AutoEat and now - lastAutoEat >= 10 then
+        lastAutoEat = now
+        if Character and Character:FindFirstChild("HumanoidRootPart") then
+            local foundFood = false
+            for _, obj in pairs(Workspace.Items:GetChildren()) do
+                if obj:IsA("Model") and ({["Carrot"] = true, ["Berry"] = true, ["Morsel"] = false, ["Cooked Morsel"] = true, ["Steak"] = false, ["Cooked Steak"] = true})[obj.Name] then
+                    local mainPart = obj:FindFirstChild("Handle") or obj.PrimaryPart
+                    if mainPart and (mainPart.Position - Character.HumanoidRootPart.Position).Magnitude < 25 then
+                        foundFood = true
+                        TryEatFood(obj)
+                        break
+                    end
+                end
+            end
+            if not foundFood then
+                WindUI:Notify({Title = "AlienX", Content = "25米范围内无食物", Duration = 5})
+            end
+        else
+            WindUI:Notify({Title = "AlienX", Content = "等待玩家加载", Duration = 5})
+        end
+    end
+
+    if Features.ChestESP or Features.ChildESP then
+        update99NightESP()
+    end
+end)
+
+Tabs.Main:Toggle({
+    Title = "杀戮光环",
+    Description = "自动攻击附近敌人",
+    Value = false,
+    Callback = function(value)
+        Features.KillAura = value
+    end
+})
+
+Tabs.Main:Toggle({
+    Title = "自动砍树",
+    Description = "自动砍伐附近树木",
+    Value = false,
+    Callback = function(value)
+        Features.AutoChop = value
+    end
+})
+
+Tabs.Main:Toggle({
+    Title = "自动进食",
+    Description = "自动吃附近食物",
+    Value = false,
+    Callback = function(value)
+        Features.AutoEat = value
+    end
+})
+
+Tabs.Main:Toggle({
+    Title = "瞬间互动",
+    Description = "立即完成所有互动",
+    Value = false,
+    Callback = function(value)
+        Features.InstantInteract = value
+    end
+})
+
+Tabs.Ninja:Button({
+    Title = "传送回篝火",
+    Callback = teleportToBonfire
+})
+
+for _, item in ipairs(itemConfig) do
+    Tabs.Ninja:Button({
+        Title = "传送到"..item.display,
+        Callback = function()
+            teleportToItem(item.name, item.display)
+        end
+    })
+    Tabs.Ninja:Button({
+        Title = "召唤"..item.display,
+        Callback = function()
+            teleportItemsToPlayer(item.name, item.display)
+        end
+    })
+end
+
+Tabs.ESP:Toggle({
+    Title = "99夜透视 (宝箱&孩子)",
+    Value = false,
+    Callback = toggle99NightESP
+})
+
+for _, item in ipairs(itemConfig) do
+    Tabs.ESP:Button({
+        Title = item.display.."透视",
+        Callback = function() 
+            toggleESP(item.name, item.display, item.espColor) 
+        end
+    })
+end
+
+Tabs.ESP:Button({
+    Title = "清除所有透视",
+    Callback = function()
+        for _, item in ipairs(itemConfig) do
+            if _G["ESP_"..item.name] then
+                for _, gui in ipairs(_G["ESP_"..item.name].guis) do
+                    gui:Destroy()
+                end
+                _G["ESP_"..item.name].conn:Disconnect()
+                _G["ESP_"..item.name] = nil
+            end
+        end
+        for _, data in pairs(espData) do
+            data.gui:Destroy()
+        end
+        espData = {}
+        Features.ChestESP = false
+        Features.ChildESP = false
+        WindUI:Notify({Title = "提示", Content = "已清除所有透视", Duration = 2})
+    end
+})
+
+
+
+
+
+
+Window:Divider()
+local SettingsTab = Window:Tab({
+    Title = "Ui设置",
+    Desc = "Ui美术设置", -- 可选
+    Icon = "settings", -- lucide 图标 或 "rbxassetid://" 或 URL，可选
+    IconThemed = true, -- 使用主题颜色，可选
+    Locked = false, -- 禁用标签页交互，可选
+    ShowTabTitle = false, -- 在标签页内显示标题，可选
+    Border = true, -- 在标签页周围添加边框，可选
+})
+
+local ThemeSelectDropdown = SettingsTab:Dropdown({
+    Title = "选择主题",
+    Multi = false,
+    AllowNone = false,
+    Value = nil,
+    Values = {"AF Hub", "月夜", "冬日霜雪", "月渊"},
+    Callback = function(theme)
+        WindUI:SetTheme(theme)
+    end
+})
+
+
+SettingsTab:Divider()
+SettingsTab:Section({ 
+    Title = "背景选择",
+    TextXAlignment = "Center",
+    TextSize = 20,
+})
+
+local Dropdown = SettingsTab:Dropdown({
+    Title = "切换背景图",
+    Values = {
+        {
+            Title = "无背景",
+            Icon = "app-window",
+            Callback = function()
+                -- 清除背景图
+                Window:SetBackgroundImage("rbxassetid://0")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换为无背景",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图1(默认)",
+            Desc = "秋词提供",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://136059273188532")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图1",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图2",
+            Icon = "app-window",
+            Callback = function()
+       Window:SetBackgroundImage("rbxassetid://101182501948173")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图2",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图3",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://90514823373955")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图3",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图4",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://103858984350097")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图4",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图5",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://137662774446930")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图5",
+                    Duration = 3
+                })
+            end
+        },
+                {
+            Title = "背景图6",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://73618579935939")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图6",
+                    Duration = 3
+                })
+            end
+        },
+                {
+            Title = "背景图7",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://131845772886226")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图7",
+                    Duration = 3
+                })
+            end
+        },
+                {
+            Title = "背景图8",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://92388982051300")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图8",
+                    Duration = 3
+                })
+            end
+        },
+                        {
+            Title = "背景图9",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://103197377834563")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图9",
+                    Duration = 3
+                })
+            end
+        },
+                        {
+            Title = "背景图10",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://123887383447725")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图10",
+                    Duration = 3
+                })
+            end
+        },
+                        {
+            Title = "背景图11",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://84371548883810")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图11",
+                    Duration = 3
+                })
+            end
+        },
+    }
+})
+
+SettingsTab:Section({ 
+    Title = "自定义背景",
+    TextXAlignment = "Center",
+    TextSize = 20,
+})
+SettingsTab:Divider()
+
+local CustomBackground = SettingsTab:Input({
+    Title = "背景 ID",
+    Type = "Input",
+    Placeholder = "输入图片ID",
+    Callback = function(input)
+        if input ~= "" then
+            _G.BackgroundImage = "rbxassetid://" .. input
+            Window:SetBackgroundImage(_G.BackgroundImage)
+        end
+    end
+})
+
+local Keybind = SettingsTab:Keybind({
+    Title = "关闭界面的快捷键",
+    Value = "G",
+    Callback = function(v)
+        Window:SetToggleKey(Enum.KeyCode[v])
+    end
+})
