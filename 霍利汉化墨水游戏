@@ -1,0 +1,347 @@
+local RunScriptFirst = false
+
+local Translations = {
+["HollyScriptX"]="秋辞汉化",
+["Toggle"]="切换",
+["Lock"]="锁定",
+["Loader"]="加载器",
+["Settings"]="设置",
+["Search"]="搜索",
+["Authentication"]="认证",
+["Input"]="输入",
+["Enter your key here"]="在此输入您的密钥",
+["Check Key"]="检查密钥",
+["Get Permanent Key"]="获取永久密钥",
+["Join Discord"]="加入Discord",
+["Menu"]="菜单",
+["Open Keybind Menu"]="打开键位菜单",
+["Notification Side"]="通知侧边",
+["Right"]="右侧",
+["Custom Cursor"]="自定义光标",
+["Menu bind"]="菜单键位",
+["Unload"]="卸载",
+["Games"]="游戏",
+["Players"]="玩家",
+["Guards"]="守卫",
+["Main"]="主要",
+["Red Light Green Light"]="一二三木头人",
+["Remove Injury"]="移除伤害",
+["God Mode"]="上帝模式",
+["Teleport to End"]="传送到终点",
+["Dalgonas"]="抠糖饼",
+["Free Lighter"]="免费打火机",
+["Anti Crack"]="防封",
+["Auto Dalgona V2"]="自动抠糖饼V2",
+["Hide And Seek"]="捉迷藏",
+["Infinite Stamina"]="无限耐力",
+["Auto Escape"]="自动逃脱",
+["Auto Pickup Keys"]="自动捡钥匙",
+["ESP Dropped Keys"]="掉落钥匙透视",
+["ESP Exit Doors"]="出口门透视",
+["Spikes Kill"]="尖刺击杀",
+["Delete Spikes"]="删除尖刺",
+["Teleport to Hider"]="传送到躲藏者",
+["Teleport to Seeker"]="传送到寻找者",
+["Keybind for teleport to hider:"]="传送到躲藏者键位：",
+["Keybind for teleport to seeker:"]="传送到寻找者键位：",
+["Last Dinner"]="最后的晚餐",
+["Zone Kill"]="区域击杀",
+["Teleport To Safe Spot"]="传送到安全点",
+["Rebel"]="反抗者",
+["Auto Kill Guards"]="自动击杀守卫",
+["Infinite Ammo"]="无限弹药",
+["Rapid Fire"]="快速射击",
+["Hitbox + ESP Guards"]="守卫碰撞箱+透视",
+["Guard Hitbox Size"]="守卫碰撞箱大小",
+["Auto Dodge"]="自动躲避",
+["TP To Spikes"]="传送到尖刺",
+["Show Spikes (red)"]="显示尖刺(红色)",
+["Jump Rope"]="跳绳",
+["Anti Fall"]="防坠落",
+["AntiHit + Balance"]="防坠落+平衡",
+["Remove Rope"]="删除绳子",
+["Teleport to Start"]="传送到起点",
+["Teleport to End"]="传送到终点",
+["Glass Bridge"]="玻璃桥",
+["Glass ESP"]="玻璃透视",
+["Glass ESP Transparency"]="玻璃透视透明度",
+["Anti-Break"]="防碎",
+["Mingle"]="混合",
+["Void Kill"]="虚空击杀",
+["Sky Squid"]="天空鱿鱼",
+["Players Stats"]="玩家属性",
+["Search"]="搜索",
+["Type name..."]="输入名称...",
+["Select"]="选择",
+["Biggest Player"]="最大玩家",
+["Wins: 0"]="胜利: 0",
+["Money: 0"]="金钱: 0",
+["Equipped Power: None"]="已装备技能: 无",
+["Guard Power: None"]="守卫技能: 无",
+["Level: 1"]="等级: 1",
+["Power Spins: 0"]="技能旋转: 0",
+["Guard Spins: 0"]="守卫旋转: 0",
+["Bobux Donated: 0"]="捐赠Bobux: 0",
+["VIP: No"]="VIP: 否",
+["Glass Manufact vision: No"]="玻璃制造商视野: 否",
+["2x vote: No"]="双倍投票: 否",
+["Perm Guard: No"]="永久守卫: 否",
+["Lighter: No"]="打火机: 否",
+["Faster Sprint: 0"]="更快冲刺: 0",
+["Strength boost: 0"]="力量增强: 0",
+["Won boost: 0"]="胜利增强: 0",
+["Search"]="搜索",
+["Misc"]="杂项",
+["Select Player"]="选择玩家",
+["Teleport to Selected"]="传送到所选玩家",
+["Spectate Selected"]="观战所选玩家",
+["Stop Spectating"]="停止观战",
+["Teleport to Nearest"]="传送到最近的玩家",
+["Keybind for TP to nearest:"]="传送到最近玩家键位：",
+["Gun"]="枪械",
+["Hitbox Expander"]="碰撞箱扩展",
+["Hitbox Size"]="碰撞箱大小",
+["Rapid Fire"]="快速射击",
+["Infinite Ammo"]="无限弹药",
+["AutoShoot"]="自动射击",
+["Extras"]="额外功能",
+["Free Guard"]="免费守卫",
+["Permanent Guard"]="永久守卫",
+["Player"]="玩家",
+["FOV Changer"]="视野角度修改",
+["FOV Value"]="视野角度值",
+["Fullbright"]="全亮模式",
+["Ambience"]="视野模糊",
+["No Cooldown Proximity"]="无冷却冲刺",
+["Fly Speed"]="飞行速度",
+["Flight"]="飞行",
+["TP Through Walls"]="穿墙传送",
+["Infinite Jump"]="无限跳跃",
+["Emotes"]="表情动作",
+["Search Emote"]="搜索表情动作",
+["Type emote name"]="输入表情动作名称",
+["Select Emote"]="选择表情动作",
+["Dream Journal"]="梦想日记",
+["Play/Stop Emote"]="播放/停止表情动作",
+["Rich Billionaire"]="超级富豪",
+["Free Title (NOT FE)"]="免费称号(非FE)",
+["Custom"]="自定义",
+["Custom Player Tag"]="自定义玩家标签",
+["Custom Tag Number"]="自定义标签号码",
+["067"]="067",
+["Custom Wins"]="自定义胜利次数",
+["Custom Win Value"]="自定义胜利值",
+["67"]="67",
+["Custom Win Streak"]="自定义连胜次数",
+["Custom Clothes Color"]="自定义衣服颜色",
+["Boosts"]="增益效果",
+["Speed Hack"]="速度作弊",
+["Speed Value"]="速度值",
+["Gamepasses (NOT FE)"]="游戏通行证(非FE)",
+["Permanent Guard"]="永久守卫",
+["Custom Player Tag"]="自定义玩家标签",
+["Private Server Plus"]="解锁私人服务器",
+["Free VIP"]="免费VIP",
+["Lighter"]="打火机",
+["Combat"]="战斗",
+["Player Attach"]="玩家附加",
+["Face Target"]="面向目标",
+["Desync"]="取消同步",
+["Noclip"]="穿墙",
+["Auto Complete (BETA)"]="自动完成(BETA)",
+["Free Parkour Artist"]="免费跑酷艺术家",
+["Unlock faster sprint level 6"]="解锁更快冲刺等级6",
+["Auto Next Game"]="自动下一局",
+["Players ESP"]="玩家透视",
+["Teleport Up 100"]="向上传送100",
+["Teleport Down -40"]="向下传送-40",
+["Safe Place on Low Health"]="低血量安全区",
+["Auto QTE"]="自动QTE",
+["AntiFall"]="防坠落",
+["Auto Collect Bandage"]="自动收集绷带",
+["Auto Vote"]="自动投票",
+["Vote Option"]="投票选项",
+["KeepPlaying"]="继续游玩",
+["Select Title"]="选择称号",
+["Play/Stop Emote"]="播放/停止表情动作",
+["Rich Billionaire"]="超级富豪",
+["Free Title (NOT FE)"]="免费称号(非FE)",
+["Custom"]="自定义",
+["Custom Player Tag"]="自定义玩家标签",
+["Custom Tag Number"]="自定义标签号码",
+["067"]="067",
+["Custom Wins"]="自定义胜利次数",
+["Custom Win Value"]="自定义胜利值",
+["67"]="67",
+["Custom Win Streak"]="自定义连胜次数",
+["Custom Clothes Color"]="自定义衣服颜色",
+["Boosts"]="增益效果",
+["Speed Hack"]="速度作弊",
+["Speed Value"]="速度值",
+["Emotes"]="表情动作",
+["Search Emote"]="搜索表情动作",
+["Type emote name"]="输入表情动作名称",
+["Select Emote"]="选择表情动作",
+["Dream Journal"]="梦想日记",
+["Play/Stop Emote"]="播放/停止表情动作",
+["Combat"]="战斗",
+["Player Attach"]="玩家附加",
+["None"]="无",
+["Face Target"]="面向目标",
+["Desync"]="取消同步",
+["Gamepasses (NOT FE)"]="游戏通行证 (非免费)",
+["Permanent Guard"]="永久守卫",
+["Custom Player Tag"]="自定义玩家标签",
+["Private Server Plus"]="私人服务器增强版",
+["Free VIP"]="免费VIP",
+["Lighter"]="打火机",
+["Rich Billionaire"]="亿万富翁",
+["Free Title (NOT FE)"]="免费称号 (非免费)",
+["Custom"]="自定义",
+["Custom Tag Number"]="自定义标签数字",
+["067"]="067",
+["Custom Wins"]="自定义胜利次数",
+["Custom Win Value"]="自定义胜利值",
+["67"]="67",
+["Custom Winstreak"]="自定义连胜",
+["0"]="0",
+["Custom Clothes Color"]="自定义衣服颜色",
+["Boosts"]="增益效果",
+["Speed Hack"]="速度修改",
+["Speed Value"]="速度值",
+["40/50"]="40/50",
+["Remove Stun"]="移除眩晕",
+["Menu"]="菜单",
+["Open Keybind Menu"]="打开键位菜单",
+["Custom Cursor"]="自定义光标",
+["Notification Side"]="通知侧边",
+["Right"]="右侧",
+["Menu bind"]="菜单键位",
+["Z"]="Z",
+["DPI Scale"]="DPI缩放",
+["100"]="100",
+["Unload Script"]="卸载脚本",
+["Themes"]="主题",
+["Background color"]="背景颜色",
+["Main color"]="主色调",
+["Accent color"]="强调色",
+["Outline color"]="轮廓色",
+["Font color"]="字体颜色",
+["Font Face"]="字体样式",
+["Code"]="代码",
+["Executor Info"]="执行器信息",
+["Executor: Delta"]="执行器：Delta",
+["If you found any bugs dm:"]="如果你发现任何Bug，请私信：",
+["@t3e6 (Discord)"]="@t3e6 (Discord)",
+["Copy Discord Tag"]="复制Discord标签",
+["Configuration"]="配置",
+["Config name"]="配置名称",
+["Create config"]="创建配置",
+["Config list"]="配置列表",
+["---"]="---",
+["Load config"]="加载配置",
+["Overwrite config"]="覆盖配置",
+["Delete config"]="删除配置",
+["Auto Complete [BETA]"]="自动完成 [测试版]（应该是抠糖饼里面的小游戏）",
+["Free Parkour Artist"]="免费跑酷艺术家",
+["Refresh list"]="刷新列表"
+}
+
+local function processTextComponent(gui, newText)
+    if gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox") then
+        pcall(function()
+            gui.RichText = true
+            if gui:FindFirstChildOfClass("UITextSizeConstraint") then
+                gui.UITextSizeConstraint.MaxTextSize = gui.TextSize
+            end
+        end)
+    end
+    return newText
+end
+
+local function translateText(text)
+    if not text or type(text) ~= "string" then return text end
+    if Translations[text] then return Translations[text] end
+    for en, cn in pairs(Translations) do
+        if text:find(en) then return text:gsub(en, cn) end
+    end
+    return text
+end
+
+local function translateAllElements()
+    local function translateGui(gui)
+        for _, element in ipairs(gui:GetDescendants()) do
+            if element:IsA("TextLabel") or element:IsA("TextButton") or element:IsA("TextBox") then
+                local currentText = element.Text
+                if currentText and currentText ~= "" then
+                    local translatedText = translateText(currentText)
+                    if translatedText ~= currentText then
+                        element.Text = processTextComponent(element, translatedText)
+                    end
+                end
+            end
+        end
+    end
+
+    pcall(translateGui, game:GetService("CoreGui"))
+
+    local player = game:GetService("Players").LocalPlayer
+    if player and player:FindFirstChild("PlayerGui") then
+        pcall(translateGui, player.PlayerGui)
+    end
+end
+
+local function setupListener()
+    local function connectToGui(gui)
+        gui.DescendantAdded:Connect(function(descendant)
+            if descendant:IsA("TextLabel") or descendant:IsA("TextButton") or descendant:IsA("TextBox") then
+                local currentText = descendant.Text
+                if currentText and currentText ~= "" then
+                    local translatedText = translateText(currentText)
+                    if translatedText ~= currentText then
+                        descendant.Text = processTextComponent(descendant, translatedText)
+                    end
+                end
+
+                descendant:GetPropertyChangedSignal("Text"):Connect(function()
+                    local newText = descendant.Text
+                    if newText and newText ~= "" then
+                        local translatedText = translateText(newText)
+                        if translatedText ~= newText then
+                            descendant.Text = processTextComponent(descendant, translatedText)
+                        end
+                    end
+                end)
+            end
+        end)
+    end
+
+    pcall(connectToGui, game:GetService("CoreGui"))
+
+    local player = game:GetService("Players").LocalPlayer
+    if player and player:FindFirstChild("PlayerGui") then
+        pcall(connectToGui, player.PlayerGui)
+    end
+end
+
+local function startTranslation()
+    translateAllElements()
+    setupListener()
+end
+
+local function loadScript()
+    local success, err = pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/saosdkjiqwdjuqjudidw/HollyScriptX/refs/heads/main/main.lua"))()
+    end)
+    if not success then
+        warn("加载失败:", err)
+    end
+end
+
+if RunScriptFirst then
+    loadScript()
+    startTranslation()
+else
+    startTranslation()
+    loadScript()
+end
