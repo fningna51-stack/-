@@ -89,6 +89,7 @@ local Tabs = {
     Main = Window:AddTab("玩家通用", "info"),
     ScriptCenter = Window:AddTab("脚本中心", "info"),
     Afhubyyds = Window:AddTab("付费功能", "info"),
+    Qczhdh = Window:AddTab("AF 自动加载", "info"),
     Settings = Window:AddTab("设置", "settings"),
 }
 
@@ -6227,6 +6228,46 @@ Afhubyyds:AddLabel("渴求的吸血鬼")
 Afhubyyds:AddLabel("8个球池经典")
 Afhubyyds:AddLabel("伐木大亨")
 Afhubyyds:AddLabel("通用")
+local Qczhdh = Tabs.Qczhdh:AddLeftGroupbox("AF脚本加载器")
+Qczhdh:AddButton({Text="AF Hub自动加载",Func=function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/fningna51-stack/-/main/AF%20Hun%E8%87%AA%E5%8A%A8%E5%8A%A0%E8%BD%BD",true))()
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
+Qczhdh:AddLabel("支持服务器如下：")
+Qczhdh:AddLabel("1.死铁轨[功能特别少后续添加]")
+Qczhdh:AddLabel("2.撕咬之夜")
+Qczhdh:AddLabel("3.闪光")
+Qczhdh:AddLabel("4.力量传奇")
+Qczhdh:AddLabel("5.最坚强的战场")
+Qczhdh:AddLabel("6.GB[10天后]")
+Qczhdh:AddLabel("7.通缉")
+Qczhdh:AddLabel("8.九十九夜")
+Qczhdh:AddLabel("9.决斗场")
+Qczhdh:AddLabel("10.Chian[还没有该服务器id]")
+
+local Qczhdh = Tabs.Qczhdh:AddRightGroupbox("AF（脚本中心） 最后一次更新公告");
+Qczhdh:AddLabel("最后一次更新")
+Qczhdh:AddLabel("我该说些什么呢？")
+Qczhdh:AddLabel("为什么这个会在右侧？")
+Qczhdh:AddLabel("这是我故意的，也没有人会注意")
+Qczhdh:AddLabel("我想说的是…")
+Qczhdh:AddLabel("2026.6.19中考，祝我中考顺利吧")
+Qczhdh:AddLabel("虽然不可能🥹")
+Qczhdh:AddLabel("你说读职校？")
+Qczhdh:AddLabel("可是你知道一个职校学费9000到1万多的痛苦吗")
+Qczhdh:AddLabel("好了也不说那么多了")
+Qczhdh:AddLabel("看来我食言了添加100个服务器好用的服务器")
+Qczhdh:AddLabel("你用我脚本的时候我已经很开心了😃")
+Qczhdh:AddLabel("这次真的可能陨落了")
+Qczhdh:AddLabel("4个快手号")
+Qczhdh:AddLabel("4次希望全部被熄灭")
+Qczhdh:AddLabel("每天提心吊胆的")
+Qczhdh:AddLabel("这个脚本中心我会送给其他人写，也可能不会有人")
+Qczhdh:AddLabel("从此快手上没有叫秋辞的Roblox脚本主播")
+Qczhdh:AddLabel("祝你每天开心！")
 
 local ScriptCenterLeftGroup = Tabs.ScriptCenter:AddLeftGroupbox("脚本中心1");
 local ScriptCenterRightGroup = Tabs.ScriptCenter:AddRightGroupbox("脚本中心2");
