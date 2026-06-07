@@ -2093,6 +2093,20 @@ Yule:AddButton({Text="飞踢脚本",Func=function()
                 Func();
         end
 end});
+Yule:AddButton({Text="无敌少侠脚本",Func=function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/giobolqvi1/Omni-man-fly-by-GioBolqv1/refs/heads/main/omniman.lua"))()
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
+Yule:AddButton({Text="祖国人脚本",Func=function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/giobolqvi1/homelander-by-GioBolqv1/refs/heads/main/homelander.lua"))()
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
 Yule:AddButton({Text="VR脚本",Func=function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/randomstring0/Qwerty/refs/heads/main/qwerty45.lua"))()
         local Func = loadstring(ScriptContent);
