@@ -538,7 +538,18 @@ BlackHoleTab:Button({
         loadstring(game:HttpGet("https://pastefy.app/BbXuvVkK/raw", true))()
     end
 })
-
+BlackHoleTab:Button({
+    Title = "祖国人脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/giobolqvi1/homelander-by-GioBolqv1/refs/heads/main/homelander.lua"))()
+    end
+})
+BlackHoleTab:Button({
+    Title = "无敌少侠脚本",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/giobolqvi1/Omni-man-fly-by-GioBolqv1/refs/heads/main/omniman.lua"))()
+    end
+})
 local CommandTab = MainSection:Tab({
     Title = "指令",
     Icon = "terminal",
