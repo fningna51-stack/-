@@ -1,0 +1,1566 @@
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/YIRDEX/Miscs/refs/heads/main/YXWindUI.lua"))()
+
+WindUI:AddTheme({
+    Name = "AF Hub", 
+    Accent = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#FF4C4C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#FF1A1A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#CC0000"), Transparency = 0}
+    }, {Rotation = 90}),
+    Background = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#FF4C4C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#FF1A1A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#CC0000"), Transparency = 0}
+    }, {Rotation = 90}),
+    Outline = Color3.fromHex("#FF6666"),
+    Text = Color3.fromHex("#FFFFFF"),
+    Placeholder = Color3.fromHex("#AAAAAA"),
+    Button = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#FF4C4C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#FF1A1A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#CC0000"), Transparency = 0}
+    }, {Rotation = 90}),
+    Icon = Color3.fromHex("#FF6666")
+})
+
+-- 月夜
+WindUI:AddTheme({
+    Name = "月夜",
+    Accent = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#232526"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#636363"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#E0E0E0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Dialog = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#1C1C1C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#3A3A3A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#636363"), Transparency = 0}
+    }, {Rotation = 90}),
+    Outline = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#B0B0B0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#C0C0C0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#E0E0E0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Text = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#FFFFFF"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#D9D9D9"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#BFBFBF"), Transparency = 0}
+    }, {Rotation = 90}),
+    Placeholder = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#A0A0A0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#B0B0B0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#C0C0C0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Background = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#101010"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#3A3A3A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#636363"), Transparency = 0}
+    }, {Rotation = 90}),
+    Button = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#3A3A3A"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#636363"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#A2A2A2"), Transparency = 0}
+    }, {Rotation = 90}),
+    Icon = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#C0C0C0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#E0E0E0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#FFFFFF"), Transparency = 0}
+    }, {Rotation = 90})
+})
+
+-- 冬日霜雪
+WindUI:AddTheme({
+    Name = "冬日霜雪",
+    Accent = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#D0E8F2"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#A0D4F2"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#70C0F2"), Transparency = 0}
+    }, {Rotation = 45}),
+    Dialog = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#E0F7FF"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#B0EFFF"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#80E7FF"), Transparency = 0}
+    }, {Rotation = 45}),
+    Outline = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#70C0F2"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#50B0E0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#30A0D0"), Transparency = 0}
+    }, {Rotation = 45}),
+    Text = Color3.fromHex("#000000"),
+    Placeholder = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#7FB3D5"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#5FA2C5"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#3F91B5"), Transparency = 0}
+    }, {Rotation = 45}),
+    Background = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#E6F0FA"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#CDE0F5"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#B4D1F0"), Transparency = 0}
+    }, {Rotation = 45}),
+    Button = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#50B0E0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#30A0D0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#108FC0"), Transparency = 0}
+    }, {Rotation = 45}),
+    Icon = Color3.fromHex("#00FFFF")
+})
+
+-- 月渊
+WindUI:AddTheme({
+    Name = "月渊",
+    Accent = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#0D0D1A"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#1A1A33"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#2E2E5C"), Transparency = 0}
+    }, {Rotation = 90}),
+    Dialog = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#101026"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#1A1A3D"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#333366"), Transparency = 0}
+    }, {Rotation = 90}),
+    Outline = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#2E2E5C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#404080"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#5050A0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Text = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#A0A0FF"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#C0C0FF"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#E0E0FF"), Transparency = 0}
+    }, {Rotation = 90}),
+    Placeholder = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#6060A0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#8080C0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#A0A0E0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Background = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#0A0A1A"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#1A1A33"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#2E2E5C"), Transparency = 0}
+    }, {Rotation = 90}),
+    Button = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#404080"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#5050A0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#6060C0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Icon = Color3.fromHex("#00FFFF")
+})
+
+WindUI:SetFont("rbxassetid://12187369639")
+
+local Window = WindUI:CreateWindow({
+    Title = '<font color="#FF0000">A</font><font color="#00F0FF">F</font><font color="#00E5FF">-</font><font color="#00D5FF">H</font><font color="#00C8FF">U</font><font color="#00BBFF">B</font>', -- 窗口标题
+    Icon = "rbxassetid://82225829203828", 
+    Author = "@秋辞", -- 窗口副标题，可选
+    Folder = "YX-Hub文件夹", -- 保存密钥和图片的文件夹
+    Size = UDim2.fromOffset(520, 400), -- 窗口大小
+    MinSize = Vector2.new(560, 350), -- 窗口最小尺寸
+    MaxSize = Vector2.new(850, 560), -- 窗口最大尺寸
+    Transparent = true, -- 窗口透明度
+    Theme = "冬日霜雪", 
+    Resizable = true, -- 是否可调整窗口大小
+    SideBarWidth = 150, -- 侧边栏（标签页）宽度
+    HideSearchBar = false, -- 隐藏搜索栏
+    ScrollBarEnabled = true, -- 位于滚动框右侧的滚动条
+Background = "rbxassetid://136059273188532",
+    
+    User = { -- 位于左下角的用户信息
+        Enabled = false,
+        Anonymous = false,
+        Callback = function() -- 点击时的回调函数，可选，可移除
+            print("点击")
+        end,
+    },
+})
+
+
+
+-- 编辑窗口展开按钮配置
+Window:EditOpenButton({
+    Title = '<font color="#FF0000">A</font><font color="#00F0FF">F</font><font color="#00E5FF">-</font><font color="#00D5FF">H</font><font color="#00C8FF">U</font><font color="#00BBFF">B</font>',
+    Icon = "snowflake",
+    CornerRadius = UDim.new(99,99),
+    StrokeThickness = 3,
+    IconSize = 30,
+    Color = ColorSequence.new(Color3.fromHex("00FFFF"), Color3.fromHex("00BBFF")),
+    OnlyMobile = false,
+    Enabled = true,
+    Draggable = true,
+})
+
+local COLOR_SCHEMES = {
+    ["彩虹颜色"] = {ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromHex("00FFFF")),
+        ColorSequenceKeypoint.new(1, Color3.fromHex("0000FF"))
+    }), "palette"},
+}
+
+local borderAnimation
+local animationSpeed = 5
+
+local function createRainbowBorder(window, colorScheme)
+    local mainFrame = window.UIElements.Main
+    if not mainFrame then return nil end
+
+    local existingStroke = mainFrame:FindFirstChild("RainbowStroke")
+    if existingStroke then existingStroke:Destroy() end
+
+    if not mainFrame:FindFirstChildOfClass("UICorner") then
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 16)
+        corner.Parent = mainFrame
+    end
+
+    local rainbowStroke = Instance.new("UIStroke")
+    rainbowStroke.Name = "RainbowStroke"
+    rainbowStroke.Thickness = 2
+    rainbowStroke.Color = Color3.new(1, 1, 1)
+    rainbowStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    rainbowStroke.LineJoinMode = Enum.LineJoinMode.Round
+    rainbowStroke.Parent = mainFrame
+
+    local glowEffect = Instance.new("UIGradient")
+    glowEffect.Name = "GlowEffect"
+    local schemeData = COLOR_SCHEMES[colorScheme or "彩虹颜色"]
+    glowEffect.Color = schemeData and schemeData[1] or COLOR_SCHEMES["彩虹颜色"][1]
+    glowEffect.Rotation = 0
+    glowEffect.Parent = rainbowStroke
+
+    return rainbowStroke
+end
+
+local function startBorderAnimation(window, speed)
+    local mainFrame = window.UIElements.Main
+    if not mainFrame then return nil end
+    local rainbowStroke = mainFrame:FindFirstChild("RainbowStroke")
+    if not rainbowStroke then return nil end
+    local glowEffect = rainbowStroke:FindFirstChild("GlowEffect")
+    if not glowEffect then return nil end
+
+    return game:GetService("RunService").Heartbeat:Connect(function()
+        if not rainbowStroke or rainbowStroke.Parent == nil then return end
+        glowEffect.Rotation = (tick() * speed * 10) % 360
+    end)
+end
+
+local rainbowStroke = createRainbowBorder(Window, "彩虹颜色")
+if rainbowStroke then
+    borderAnimation = startBorderAnimation(Window, animationSpeed)
+end
+
+local Lighting = game:GetService("Lighting")
+local TweenServiceBlur = game:GetService("TweenService")
+
+local blur = Lighting:FindFirstChildOfClass("BlurEffect")
+if not blur then
+    blur = Instance.new("BlurEffect")
+    blur.Size = 0
+    blur.Parent = Lighting
+end
+
+task.spawn(function()
+    local wasOpen = false
+    while true do
+        task.wait(0.1)
+        local mainFrame = Window.UIElements and Window.UIElements.Main
+        local isOpen = mainFrame and mainFrame.Visible or false
+        
+        if isOpen ~= wasOpen then
+            wasOpen = isOpen
+            TweenServiceBlur:Create(blur, TweenInfo.new(0.3), {
+                Size = isOpen and 20 or 0
+            }):Play()
+        end
+    end
+end)
+
+local info = Window:Section({
+    Title = "主页",
+    Icon = "star",
+    Opened = true
+})
+
+local Tab1 = info:Tab({
+    Title = "信息",
+    Icon = "info", -- optional
+    Locked = false,
+})
+
+
+
+local Paragraph = Tab1:Paragraph({
+    Title = 'AF Hub',
+    Desc = '欢迎使用YX-HUB脚本(＾ν＾)',
+    Thumbnail = "rbxassetid://100781334247855",
+    ThumbnailSize = 200,
+    Locked = false,
+})
+
+local Paragraph1 = Tab1:Paragraph({
+    Title = 'AF Hun',
+    Desc = '主打缝合 :D',
+    Thumbnail = "rbxassetid://72531855816776",
+    ThumbnailSize = 200,
+    Locked = false,
+})
+
+Tab1:Section({ 
+    Title = "开发者",
+    TextXAlignment = "Center",
+    TextSize = 20,
+})
+
+local Paragraph = Tab1:Paragraph({
+    Title = "秋词",
+    Desc = "AF Hub作者",
+    Image = "rbxassetid://138882879525986",
+    ImageSize = 60,
+    Locked = false,
+})
+
+local Paragraph = Tab1:Paragraph({
+    Title = "YirdeX",
+    Desc = "ui背景设计者",
+    Image = "rbxassetid://90051928527603",
+    ImageSize = 60,
+    Locked = false,
+})
+
+local Tab3 = info:Tab({
+    Title = "复制",
+    Icon = "file-code",
+    Locked = false,
+})
+
+local Button1 = Tab3:Button({
+    Title = "复制主群",
+    Desc = "复制作者QQ群", -- 可选参数
+    Icon = "file-code", -- 图标名称 或 资源ID链接，可选参数
+    IconAlign = "Left",
+    Locked = false, -- 是否禁用按钮，可选参数
+    LockedTitle = "已锁定", -- 按钮禁用时显示的文字，可选参数
+    Callback = function()
+setclipboard("938714427")
+    end
+})
+
+local Tab2 = info:Tab({
+    Title = "公告",
+    Icon = "menu",
+    Locked = false,
+})
+local Section1 = Tab2:Section({
+    Title = "AF Hub[公告]", -- 分区标题
+    Icon = "component", -- 图标，支持图标名称或资源ID（可选）
+    TextSize = 30, -- 标题文字大小（可选）
+    TextXAlignment = "Left", -- 文字水平对齐方式：左对齐/居中/右对齐（可选）
+    Box = true, -- 是否显示分区外框（可选）
+    BoxBorder = true, -- 是否显示外框边框（可选）
+    Opened = true, -- 分区默认是否展开（可选）
+    FontWeight = Enum.FontWeight.SemiBold, -- 标题字体粗细（可选）
+    DescFontWeight = Enum.FontWeight.Medium, -- 描述文字字体粗细（可选）
+    TextTransparency = 0, -- 标题文字透明度（可选）
+    DescTextTransparency = 0, -- 描述文字透明度（可选）
+})
+
+Section1:Paragraph({
+    Title = "这个是公告？",
+    TextSize = 30, 
+    Thumbnail = "rbxassetid://85076999766387",
+    ThumbnailSize = 100,
+})
+
+
+
+
+
+
+Window:Divider()
+local functiond = Window:Section({
+    Title = "功能区",
+    Icon = "folder-cog",
+    Opened = true,
+})
+local Tabs = {
+    Main = Window:Section({ Title = "所有关卡", Opened = true }),
+}
+
+local TabHandles = {
+    Q = Tabs.Main:Tab({ Title = "传送嫉妒1", Icon = "layout-grid" }),
+    W = Tabs.Main:Tab({ Title = "透视功能", Icon = "layout-grid" }),  
+}
+-----------------------------------屋子里------------------------------------------------
+
+local Button = TabHandles.Q:Button({
+    Title = "提示",
+    Desc = "第一关卡在日本屋子里",
+    Image = "palette",
+    ImageSize = 20,
+    Color = "White"
+})
+
+Button = TabHandles.Q:Button({
+    Title = "隐身怪物看不见",
+    Desc = "有些关卡，一卡一卡的",
+    Locked = false,
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Yungengxin/roblox/main/yinshen"))()
+            
+WindUI:Notify({
+    Title = "通知",
+    Content = "加载成功",
+    Duration = 1, -- 3 seconds
+    Icon = "layout-grid",
+})                        
+            
+ end
+})
+
+Button = TabHandles.Q:Button({
+    Title = "动画房间",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new( -1675.27, -23.32, -3411.01)
+            
+WindUI:Notify({
+    Title = "通知",
+    Content = "加载成功",
+    Duration = 1, -- 3 seconds
+    Icon = "layout-grid",
+})                        
+            
+ end
+})
+
+Button = TabHandles.Q:Button({
+    Title = "放毒老鼠地方",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new( -1562.39,  -29.25,  -3403.67)
+            
+WindUI:Notify({
+    Title = "通知",
+    Content = "加载成功",
+    Duration = 1, -- 3 seconds
+    Icon = "layout-grid",
+})                        
+            
+ end
+})
+
+Button = TabHandles.Q:Button({
+    Title = "老鼠1",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new( -1524.21,  -29.25,  -3580.63)
+            
+WindUI:Notify({
+    Title = "通知",
+    Content = "加载成功",
+    Duration = 1, -- 3 seconds
+    Icon = "layout-grid",
+})                        
+            
+ end
+})
+
+Button = TabHandles.Q:Button({
+    Title = "老鼠2",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-1642.97,  -23.44,  -3434.15)
+            
+WindUI:Notify({
+    Title = "通知",
+    Content = "加载成功",
+    Duration = 1, -- 3 seconds
+    Icon = "layout-grid",
+})                        
+            
+ end
+})
+
+Button = TabHandles.Q:Button({
+    Title = "老鼠3",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new( -1680.65,  -23.47,  -3391.97)
+            
+WindUI:Notify({
+    Title = "通知",
+    Content = "加载成功",
+    Duration = 1, -- 3 seconds
+    Icon = "layout-grid",
+})                        
+            
+ end
+})
+
+Button = TabHandles.Q:Button({
+    Title = "老鼠4",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new( -1620.64,  -23.44,  -3397.37)
+            
+WindUI:Notify({
+    Title = "通知",
+    Content = "加载成功",
+    Duration = 1, -- 3 seconds
+    Icon = "layout-grid",
+})                        
+            
+ end
+})
+
+Button = TabHandles.Q:Button({
+    Title = "毒老鼠老井",
+    Desc = "老鼠毒放在老鼠身上的",
+    Locked = false,
+    Callback = function()
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new( -1531.34, -30.17,  -3541.97)
+            
+WindUI:Notify({
+    Title = "通知",
+    Content = "加载成功",
+    Duration = 1, -- 3 seconds
+    Icon = "layout-grid",
+})                        
+            
+ end
+})
+-----------------------------------山坡上巨蛇------------------------------------------------
+
+local Button = TabHandles.Q:Button({
+    Title = "提示",
+    Desc = "第二关卡山坡上的巨蛇",
+    Image = "palette",
+    ImageSize = 20,
+    Color = "White"
+})
+
+
+Button = TabHandles.Q:Button({
+    Title = "巨大蛇怪山坡秒过",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new( 578.31,  567.98,  -380.59)
+            
+WindUI:Notify({
+    Title = "通知",
+    Content = "加载成功",
+    Duration = 1, -- 3 seconds
+    Icon = "layout-grid",
+})                        
+            
+ end
+})
+
+Button = TabHandles.Q:Button({
+    Title = "洞穴秒过",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new( 3837.46,  137.13,  12.84)
+            
+WindUI:Notify({
+    Title = "通知",
+    Content = "加载成功",
+    Duration = 3, -- 3 seconds
+    Icon = "layout-grid",
+})                        
+            
+ end
+})
+-----------------------------------村庄------------------------------------------------
+
+local Button = TabHandles.Q:Button({
+    Title = "提示",
+    Desc = "第三关卡你在村庄里",
+    Image = "palette",
+    ImageSize = 20,
+    Color = "White"
+})
+
+
+Button = TabHandles.Q:Button({
+    Title = "传送谈话村民",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new()
+            
+WindUI:Notify({
+    Title = "通知",
+    Content = "加载成功",
+    Duration = 1, -- 3 seconds
+    Icon = "layout-grid",
+})                        
+            
+ end
+})
+
+Button = TabHandles.Q:Button({
+    Title = "传送洞穴里",
+    Desc = "",
+    Locked = false,
+    Callback = function()
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new( 343.48,  20.66,  3608.81)
+            
+WindUI:Notify({
+    Title = "通知",
+    Content = "加载成功",
+    Duration = 1, -- 3 seconds
+    Icon = "layout-grid",
+})                        
+            
+ end
+})
+
+-----------------------------------透视功能------------------------------------------------
+
+getgenv().ESPEnabled = false
+getgenv().ShowBox = false
+getgenv().ShowHealth = false
+getgenv().ShowName = false
+getgenv().ShowDistance = false
+getgenv().ShowTracer = false
+getgenv().TeamCheck = false
+getgenv().ShowSkeleton = false
+getgenv().ShowRadar = false
+getgenv().ShowPlayerCount = false
+getgenv().ShowWeapon = false
+getgenv().ShowFOV = false
+getgenv().OutOfViewArrows = false
+getgenv().Chams = false
+
+getgenv().TracerColor = Color3.new(1, 0, 0)
+getgenv().SkeletonColor = Color3.new(0.2, 0.8, 1)
+getgenv().BoxColor = Color3.new(1, 1, 1)
+getgenv().HealthBarColor = Color3.new(0, 1, 0)
+getgenv().HealthTextColor = Color3.new(1, 1, 1)
+getgenv().NameColor = Color3.new(1, 1, 1)
+getgenv().DistanceColor = Color3.new(1, 1, 0)
+getgenv().WeaponColor = Color3.new(1, 0.5, 0)
+getgenv().ArrowColor = Color3.new(1, 0, 0)
+getgenv().FOVColor = Color3.new(1, 1, 1)
+getgenv().ChamsColor = Color3.new(1, 0, 0)
+
+getgenv().BoxThickness = 1
+getgenv().TracerThickness = 1
+getgenv().SkeletonThickness = 2
+getgenv().FOVRadius = 100
+getgenv().ArrowSize = 15
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+
+local function getGradientColor(time)
+    local r = math.sin(time * 2) * 0.5 + 0.5
+    local g = math.sin(time * 3) * 0.5 + 0.5
+    local b = math.sin(time * 4) * 0.5 + 0.5
+    return Color3.new(r, g, b)
+end
+
+local playerCountText = Drawing.new("Text")
+playerCountText.Visible = false
+playerCountText.Color = Color3.new(1, 1, 1)
+playerCountText.Size = 20
+playerCountText.Font = Drawing.Fonts.Monospace
+playerCountText.Outline = true
+playerCountText.OutlineColor = Color3.new(0, 0, 0)
+playerCountText.Position = Vector2.new(Camera.ViewportSize.X / 2, 10)
+
+local fovCircle = Drawing.new("Circle")
+fovCircle.Visible = false
+fovCircle.Color = getgenv().FOVColor
+fovCircle.Thickness = 1
+fovCircle.Filled = false
+fovCircle.Radius = getgenv().FOVRadius
+fovCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+
+local function updatePlayerCount()
+    local playerCount = #Players:GetPlayers()
+    playerCountText.Text = "在线玩家: " .. playerCount
+    playerCountText.Visible = getgenv().ESPEnabled and getgenv().ShowPlayerCount
+
+    local time = tick()
+    playerCountText.Color = getGradientColor(time)
+end
+
+local function updateFOV()
+    fovCircle.Visible = getgenv().ShowFOV
+    fovCircle.Color = getgenv().FOVColor
+    fovCircle.Radius = getgenv().FOVRadius
+    fovCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+end
+
+local ESPComponents = {}
+
+local function createESP(player)
+    local box = Drawing.new("Square")
+    box.Visible = false
+    box.Color = getgenv().BoxColor
+    box.Thickness = getgenv().BoxThickness
+    box.Filled = false
+
+    local healthBar = Drawing.new("Square")
+    healthBar.Visible = false
+    healthBar.Color = getgenv().HealthBarColor
+    healthBar.Thickness = 1
+    healthBar.Filled = true
+
+    local healthBarBackground = Drawing.new("Square")
+    healthBarBackground.Visible = false
+    healthBarBackground.Color = Color3.new(0, 0, 0)
+    healthBarBackground.Transparency = 0.5
+    healthBarBackground.Thickness = 1
+    healthBarBackground.Filled = true
+
+    local healthBarBorder = Drawing.new("Square")
+    healthBarBorder.Visible = false
+    healthBarBorder.Color = Color3.new(1, 1, 1)
+    healthBarBorder.Thickness = 1
+    healthBarBorder.Filled = false
+
+    local healthText = Drawing.new("Text")
+    healthText.Visible = false
+    healthText.Color = getgenv().HealthTextColor
+    healthText.Size = 14
+    healthText.Font = Drawing.Fonts.Monospace
+    healthText.Outline = true
+    healthText.OutlineColor = Color3.new(0, 0, 0)
+
+    local nameText = Drawing.new("Text")
+    nameText.Visible = false
+    nameText.Color = getgenv().NameColor
+    nameText.Size = 16
+    nameText.Font = Drawing.Fonts.Monospace
+    nameText.Outline = true
+    nameText.OutlineColor = Color3.new(0, 0, 0)
+
+    local distanceText = Drawing.new("Text")
+    distanceText.Visible = false
+    distanceText.Color = getgenv().DistanceColor
+    distanceText.Size = 14
+    distanceText.Font = Drawing.Fonts.Monospace
+    distanceText.Outline = true
+    distanceText.OutlineColor = Color3.new(0, 0, 0)
+
+    local weaponText = Drawing.new("Text")
+    weaponText.Visible = false
+    weaponText.Color = getgenv().WeaponColor
+    weaponText.Size = 14
+    weaponText.Font = Drawing.Fonts.Monospace
+    weaponText.Outline = true
+    weaponText.OutlineColor = Color3.new(0, 0, 0)
+
+    local tracer = Drawing.new("Line")
+    tracer.Visible = false
+    tracer.Color = getgenv().TracerColor
+    tracer.Thickness = getgenv().TracerThickness
+
+    local arrow = Drawing.new("Triangle")
+    arrow.Visible = false
+    arrow.Color = getgenv().ArrowColor
+    arrow.Filled = true
+    arrow.Thickness = 1
+
+    local skeletonLines = {}
+    local skeletonPoints = {}
+
+    local function createSkeleton()
+        for i = 1, 15 do
+            skeletonLines[i] = Drawing.new("Line")
+            skeletonLines[i].Visible = false
+            skeletonLines[i].Color = getgenv().SkeletonColor
+            skeletonLines[i].Thickness = getgenv().SkeletonThickness
+        end
+
+        skeletonPoints["Head"] = Drawing.new("Circle")
+        skeletonPoints["Head"].Visible = false
+        skeletonPoints["Head"].Color = Color3.new(1, 0.5, 0)
+        skeletonPoints["Head"].Thickness = 2
+        skeletonPoints["Head"].Filled = true
+        skeletonPoints["Head"].Radius = 4
+    end
+
+    createSkeleton()
+
+    local lastHealth = 100
+    local healthChangeTime = 0
+    local smoothHealth = 100
+
+    ESPComponents[player] = {
+        box = box,
+        healthBar = healthBar,
+        healthBarBackground = healthBarBackground,
+        healthBarBorder = healthBarBorder,
+        healthText = healthText,
+        nameText = nameText,
+        distanceText = distanceText,
+        weaponText = weaponText,
+        tracer = tracer,
+        arrow = arrow,
+        skeletonLines = skeletonLines,
+        skeletonPoints = skeletonPoints
+    }
+
+    RunService.RenderStepped:Connect(function()
+        if not getgenv().ESPEnabled or not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") or not player.Character:FindFirstChild("Humanoid") or player == LocalPlayer then
+            box.Visible = false
+            healthBar.Visible = false
+            healthBarBackground.Visible = false
+            healthBarBorder.Visible = false
+            healthText.Visible = false
+            nameText.Visible = false
+            distanceText.Visible = false
+            weaponText.Visible = false
+            tracer.Visible = false
+            arrow.Visible = false
+            for _, line in pairs(skeletonLines) do
+                line.Visible = false
+            end
+            for _, point in pairs(skeletonPoints) do
+                point.Visible = false
+            end
+            return
+        end
+
+        if getgenv().TeamCheck and player.Team == LocalPlayer.Team then
+            box.Visible = false
+            healthBar.Visible = false
+            healthBarBackground.Visible = false
+            healthBarBorder.Visible = false
+            healthText.Visible = false
+            nameText.Visible = false
+            distanceText.Visible = false
+            weaponText.Visible = false
+            tracer.Visible = false
+            arrow.Visible = false
+            for _, line in pairs(skeletonLines) do
+                line.Visible = false
+            end
+            for _, point in pairs(skeletonPoints) do
+                point.Visible = false
+            end
+            return
+        end
+
+        local character = player.Character
+        local rootPart = character:FindFirstChild("HumanoidRootPart")
+        local humanoid = character:FindFirstChild("Humanoid")
+
+        if rootPart and humanoid and humanoid.Health > 0 then
+            local rootPos, onScreen = Camera:WorldToViewportPoint(rootPart.Position)
+            local headPos, _ = Camera:WorldToViewportPoint(rootPart.Position + Vector3.new(0, 3, 0))
+            local legPos, _ = Camera:WorldToViewportPoint(rootPart.Position - Vector3.new(0, 3, 0))
+
+            local weaponName = "无武器"
+            for _, tool in ipairs(character:GetChildren()) do
+                if tool:IsA("Tool") then
+                    weaponName = tool.Name
+                    break
+                end
+            end
+
+            if getgenv().ShowBox and onScreen then
+                box.Size = Vector2.new(1000 / rootPos.Z, headPos.Y - legPos.Y)
+                box.Position = Vector2.new(rootPos.X - box.Size.X / 2, rootPos.Y - box.Size.Y / 2)
+                box.Visible = true
+                box.Color = getgenv().BoxColor
+                box.Thickness = getgenv().BoxThickness
+            else
+                box.Visible = false
+            end
+
+            if getgenv().ShowHealth and onScreen then
+                local healthPercentage = humanoid.Health / humanoid.MaxHealth
+                local barWidth = 50
+                local barHeight = 5
+                local barX = headPos.X - barWidth / 2
+                local barY = headPos.Y - 20
+
+                healthBarBackground.Size = Vector2.new(barWidth, barHeight)
+                healthBarBackground.Position = Vector2.new(barX, barY)
+                healthBarBackground.Visible = true
+
+                healthBarBorder.Size = Vector2.new(barWidth, barHeight)
+                healthBarBorder.Position = Vector2.new(barX, barY)
+                healthBarBorder.Visible = true
+
+                smoothHealth = smoothHealth + (humanoid.Health - smoothHealth) * 0.1
+                local smoothHealthPercentage = smoothHealth / humanoid.MaxHealth
+
+                healthBar.Size = Vector2.new(barWidth * smoothHealthPercentage, barHeight)
+                healthBar.Position = Vector2.new(barX, barY)
+
+                if smoothHealthPercentage >= 0.8 then
+                    healthBar.Color = Color3.new(0, 1, 0)
+                elseif smoothHealthPercentage >= 0.5 then
+                    healthBar.Color = Color3.new(1, 1, 0)
+                elseif smoothHealthPercentage >= 0.2 then
+                    healthBar.Color = Color3.new(1, 0.5, 0)
+                else
+                    healthBar.Color = Color3.new(1, 0, 0)
+                end
+
+                healthBar.Visible = true
+
+                if humanoid.Health ~= lastHealth then
+                    healthChangeTime = tick()
+                    lastHealth = humanoid.Health
+                end
+
+                if tick() - healthChangeTime < 0.5 then
+                    healthBar.Color = Color3.new(1, 0, 0)
+                end
+
+                healthText.Position = Vector2.new(barX + barWidth + 5, barY - 5)
+                healthText.Text = math.floor(humanoid.Health) .. "/" .. math.floor(humanoid.MaxHealth)
+                healthText.Visible = true
+            else
+                healthBar.Visible = false
+                healthBarBackground.Visible = false
+                healthBarBorder.Visible = false
+                healthText.Visible = false
+            end
+
+            if getgenv().ShowName and onScreen then
+                nameText.Position = Vector2.new(headPos.X, headPos.Y - 35)
+                nameText.Text = player.Name
+                nameText.Visible = true
+
+                if getgenv().ShowDistance then
+                    local distance = (LocalPlayer.Character.HumanoidRootPart.Position - rootPart.Position).Magnitude
+                    distanceText.Position = Vector2.new(headPos.X, headPos.Y + 10)
+                    distanceText.Text = math.floor(distance) .. "m"
+                    distanceText.Visible = true
+                else
+                    distanceText.Visible = false
+                end
+                
+                if getgenv().ShowWeapon then
+                    weaponText.Position = Vector2.new(headPos.X, headPos.Y - 50)
+                    weaponText.Text = weaponName
+                    weaponText.Visible = true
+                else
+                    weaponText.Visible = false
+                end
+            else
+                nameText.Visible = false
+                distanceText.Visible = false
+                weaponText.Visible = false
+            end
+
+            if getgenv().ShowTracer then
+                local head = character:FindFirstChild("Head")
+                if head then
+                    local headPos, onScreen = Camera:WorldToViewportPoint(head.Position)
+                    if onScreen then
+                        tracer.From = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y)
+                        tracer.To = Vector2.new(headPos.X, headPos.Y)
+                        tracer.Visible = true
+                        tracer.Color = getgenv().TracerColor
+                        tracer.Thickness = getgenv().TracerThickness
+                        
+                        local distance = (LocalPlayer.Character.HumanoidRootPart.Position - rootPart.Position).Magnitude
+                        if distance < 20 then
+                            tracer.Color = Color3.new(0, 1, 0)
+                        elseif distance < 50 then
+                            tracer.Color = Color3.new(1, 1, 0) 
+                        else
+                            tracer.Color = getgenv().TracerColor 
+                        end
+                    else
+                        tracer.Visible = false
+                    end
+                else
+                    tracer.Visible = false
+                end
+            else
+                tracer.Visible = false
+            end
+
+            if getgenv().OutOfViewArrows and not onScreen then
+                local direction = (rootPart.Position - Camera.CFrame.Position).Unit
+                local dotProduct = Camera.CFrame.RightVector:Dot(direction)
+                local crossProduct = Camera.CFrame.RightVector:Cross(direction)
+                
+                local screenPosition = Vector2.new(
+                    Camera.ViewportSize.X / 2 + dotProduct * Camera.ViewportSize.X / 3,
+                    Camera.ViewportSize.Y / 2 - crossProduct.Y * Camera.ViewportSize.Y / 3
+                )
+                
+                screenPosition = Vector2.new(
+                    math.clamp(screenPosition.X, getgenv().ArrowSize, Camera.ViewportSize.X - getgenv().ArrowSize),
+                    math.clamp(screenPosition.Y, getgenv().ArrowSize, Camera.ViewportSize.Y - getgenv().ArrowSize)
+                )
+                
+                local angle = math.atan2(screenPosition.Y - Camera.ViewportSize.Y / 2, screenPosition.X - Camera.ViewportSize.X / 2)
+                
+                arrow.PointA = screenPosition
+                arrow.PointB = Vector2.new(
+                    screenPosition.X - getgenv().ArrowSize * math.cos(angle - 0.5),
+                    screenPosition.Y - getgenv().ArrowSize * math.sin(angle - 0.5)
+                )
+                arrow.PointC = Vector2.new(
+                    screenPosition.X - getgenv().ArrowSize * math.cos(angle + 0.5),
+                    screenPosition.Y - getgenv().ArrowSize * math.sin(angle + 0.5)
+                )
+                
+                arrow.Color = getgenv().ArrowColor
+                arrow.Visible = true
+            else
+                arrow.Visible = false
+            end
+
+            if getgenv().ShowSkeleton and onScreen then
+                local head = character:FindFirstChild("Head")
+                local torso = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
+                local leftArm = character:FindFirstChild("Left Arm") or character:FindFirstChild("LeftUpperArm")
+                local rightArm = character:FindFirstChild("Right Arm") or character:FindFirstChild("RightUpperArm")
+                local leftLeg = character:FindFirstChild("Left Leg") or character:FindFirstChild("LeftUpperLeg")
+                local rightLeg = character:FindFirstChild("Right Leg") or character:FindFirstChild("RightUpperLeg")
+                
+                if head and torso and leftArm and rightArm and leftLeg and rightLeg then
+                    local headPos = Camera:WorldToViewportPoint(head.Position)
+                    local torsoPos = Camera:WorldToViewportPoint(torso.Position)
+                    local leftArmPos = Camera:WorldToViewportPoint(leftArm.Position)
+                    local rightArmPos = Camera:WorldToViewportPoint(rightArm.Position)
+                    local leftLegPos = Camera:WorldToViewportPoint(leftLeg.Position)
+                    local rightLegPos = Camera:WorldToViewportPoint(rightLeg.Position)
+
+                    skeletonPoints["Head"].Position = Vector2.new(headPos.X, headPos.Y)
+                    skeletonPoints["Head"].Visible = true
+
+                    skeletonLines[1].From = Vector2.new(headPos.X, headPos.Y)
+                    skeletonLines[1].To = Vector2.new(torsoPos.X, torsoPos.Y) 
+                    skeletonLines[1].Visible = true
+
+                    skeletonLines[2].From = Vector2.new(torsoPos.X, torsoPos.Y)
+                    skeletonLines[2].To = Vector2.new(leftArmPos.X, leftArmPos.Y)
+                    skeletonLines[2].Visible = true
+
+                    skeletonLines[3].From = Vector2.new(torsoPos.X, torsoPos.Y)
+                    skeletonLines[3].To = Vector2.new(rightArmPos.X, rightArmPos.Y)
+                    skeletonLines[3].Visible = true
+
+                    skeletonLines[4].From = Vector2.new(torsoPos.X, torsoPos.Y)
+                    skeletonLines[4].To = Vector2.new(leftLegPos.X, leftLegPos.Y)
+                    skeletonLines[4].Visible = true
+
+                    skeletonLines[5].From = Vector2.new(torsoPos.X, torsoPos.Y)
+                    skeletonLines[5].To = Vector2.new(rightLegPos.X, rightLegPos.Y)
+                    skeletonLines[5].Visible = true
+                    
+                    if character:FindFirstChild("LeftLowerArm") then
+                        local leftLowerArmPos = Camera:WorldToViewportPoint(character.LeftLowerArm.Position)
+                        skeletonLines[6].From = Vector2.new(leftArmPos.X, leftArmPos.Y)
+                        skeletonLines[6].To = Vector2.new(leftLowerArmPos.X, leftLowerArmPos.Y)
+                        skeletonLines[6].Visible = true
+                    end
+
+                    if character:FindFirstChild("LeftLowerLeg") then
+                        local leftLowerLegPos = Camera:WorldToViewportPoint(character.LeftLowerLeg.Position)
+                        skeletonLines[8].From = Vector2.new(leftLegPos.X, leftLegPos.Y)
+                        skeletonLines[8].To = Vector2.new(leftLowerLegPos.X, leftLowerLegPos.Y)
+                        skeletonLines[8].Visible = true
+                    end
+
+                    if character:FindFirstChild("RightLowerLeg") then
+                        local rightLowerLegPos = Camera:WorldToViewportPoint(character.RightLowerLeg.Position)
+                        skeletonLines[9].From = Vector2.new(rightLegPos.X, rightLegPos.Y)
+                        skeletonLines[9].To = Vector2.new(rightLowerLegPos.X, rightLowerLegPos.Y)
+                        skeletonLines[9].Visible = true
+                    end
+                else
+                    for _, line in pairs(skeletonLines) do
+                        line.Visible = false
+                    end
+                    for _, point in pairs(skeletonPoints) do
+                        point.Visible = false
+                    end
+                end
+            else
+                for _, line in pairs(skeletonLines) do
+                    line.Visible = false
+                end
+                for _, point in pairs(skeletonPoints) do
+                    point.Visible = false
+                end
+            end
+        else
+            box.Visible = false
+            healthBar.Visible = false
+            healthBarBackground.Visible = false
+            healthBarBorder.Visible = false
+            healthText.Visible = false
+            nameText.Visible = false
+            distanceText.Visible = false
+            weaponText.Visible = false
+            tracer.Visible = false
+            arrow.Visible = false
+            for _, line in pairs(skeletonLines) do
+                line.Visible = false
+            end
+            for _, point in pairs(skeletonPoints) do
+                point.Visible = false
+            end
+        end
+    end)
+end
+
+local radar = Drawing.new("Circle")
+radar.Visible = false
+radar.Color = Color3.new(1, 1, 1)
+radar.Thickness = 2
+radar.Filled = false
+radar.Radius = 100
+radar.Position = Vector2.new(Camera.ViewportSize.X - 120, 120)
+
+local radarCenter = Drawing.new("Circle")
+radarCenter.Visible = false
+radarCenter.Color = Color3.new(1, 1, 1)
+radarCenter.Thickness = 2
+radarCenter.Filled = true
+radarCenter.Radius = 3
+radarCenter.Position = radar.Position
+
+local radarDirection = Drawing.new("Line")
+radarDirection.Visible = false
+radarDirection.Color = Color3.new(1, 1, 1)
+radarDirection.Thickness = 2
+
+local radarGridLines = {}
+for i = 1, 4 do
+    radarGridLines[i] = Drawing.new("Line")
+    radarGridLines[i].Visible = false
+    radarGridLines[i].Color = Color3.new(0.5, 0.5, 0.5)
+    radarGridLines[i].Thickness = 1
+end
+
+local radarRangeText = Drawing.new("Text")
+radarRangeText.Visible = false
+radarRangeText.Color = Color3.new(1, 1, 1)
+radarRangeText.Size = 14
+radarRangeText.Font = Drawing.Fonts.Monospace
+radarRangeText.Outline = true
+radarRangeText.OutlineColor = Color3.new(0, 0, 0)
+radarRangeText.Text = "100m"
+
+local radarPlayers = {}
+
+local function updateRadar()
+    if not getgenv().ShowRadar then
+        radar.Visible = false
+        radarCenter.Visible = false
+        radarDirection.Visible = false
+        radarRangeText.Visible = false
+        
+        for _, line in pairs(radarGridLines) do
+            line.Visible = false
+        end
+        
+        for _, player in pairs(radarPlayers) do
+            if player.dot then player.dot.Visible = false end
+            if player.direction then player.direction.Visible = false end
+            if player.name then player.name.Visible = false end
+        end
+        return
+    end
+
+    radar.Visible = true
+    radarCenter.Visible = true
+    radarDirection.Visible = true
+    radarRangeText.Visible = true
+    
+    radarRangeText.Position = Vector2.new(radar.Position.X, radar.Position.Y + radar.Radius + 5)
+    
+    for i = 1, 4 do
+        local angle = (i-1) * math.pi / 2
+        radarGridLines[i].From = radar.Position
+        radarGridLines[i].To = Vector2.new(
+            radar.Position.X + math.cos(angle) * radar.Radius,
+            radar.Position.Y + math.sin(angle) * radar.Radius
+        )
+        radarGridLines[i].Visible = true
+    end
+    
+    radarDirection.From = radar.Position
+    radarDirection.To = Vector2.new(radar.Position.X, radar.Position.Y - radar.Radius)
+
+    for _, player in pairs(Players:GetPlayers()) do
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player ~= LocalPlayer then
+            local rootPart = player.Character.HumanoidRootPart
+            local relativePosition = rootPart.Position - LocalPlayer.Character.HumanoidRootPart.Position
+            
+            local radarX = radar.Position.X + (relativePosition.X / 10)
+            local radarY = radar.Position.Y + (relativePosition.Z / 10)
+            
+            local distanceFromCenter = math.sqrt((radarX - radar.Position.X)^2 + (radarY - radar.Position.Y)^2)
+            
+            if distanceFromCenter > radar.Radius then
+                local angle = math.atan2(radarY - radar.Position.Y, radarX - radar.Position.X)
+                radarX = radar.Position.X + math.cos(angle) * radar.Radius
+                radarY = radar.Position.Y + math.sin(angle) * radar.Radius
+            end
+            
+            if not radarPlayers[player] then
+                radarPlayers[player] = {
+                    dot = Drawing.new("Circle"),
+                    direction = Drawing.new("Line"),
+                    name = Drawing.new("Text")
+                }
+                
+                radarPlayers[player].dot.Thickness = 1
+                radarPlayers[player].dot.Filled = true
+                radarPlayers[player].dot.Radius = 4
+                
+                radarPlayers[player].direction.Thickness = 2
+                radarPlayers[player].direction.Visible = true
+                
+                radarPlayers[player].name.Size = 12
+                radarPlayers[player].name.Font = Drawing.Fonts.Monospace
+                radarPlayers[player].name.Outline = true
+                radarPlayers[player].name.OutlineColor = Color3.new(0, 0, 0)
+            end
+            
+            if player.Team == LocalPlayer.Team then
+                radarPlayers[player].dot.Color = Color3.new(0, 1, 0)  
+                radarPlayers[player].direction.Color = Color3.new(0, 0.8, 0)
+                radarPlayers[player].name.Color = Color3.new(0, 1, 0)
+            else
+                radarPlayers[player].dot.Color = Color3.new(1, 0, 0) 
+                radarPlayers[player].direction.Color = Color3.new(1, 0, 0)
+                radarPlayers[player].name.Color = Color3.new(1, 0, 0)
+            end
+            
+            radarPlayers[player].dot.Position = Vector2.new(radarX, radarY)
+            radarPlayers[player].dot.Visible = true
+            
+            local lookVector = rootPart.CFrame.LookVector
+            local directionLength = 10
+            radarPlayers[player].direction.From = Vector2.new(radarX, radarY)
+            radarPlayers[player].direction.To = Vector2.new(
+                radarX + lookVector.X * directionLength,
+                radarY + lookVector.Z * directionLength
+            )
+            
+            radarPlayers[player].name.Position = Vector2.new(radarX, radarY - 15)
+            radarPlayers[player].name.Text = player.Name
+            radarPlayers[player].name.Visible = distanceFromCenter <= radar.Radius
+        elseif radarPlayers[player] then
+            radarPlayers[player].dot.Visible = false
+            radarPlayers[player].direction.Visible = false
+            radarPlayers[player].name.Visible = false
+        end
+    end
+    
+    for player, components in pairs(radarPlayers) do
+        if not Players:FindFirstChild(player.Name) then
+            components.dot.Visible = false
+            components.direction.Visible = false
+            components.name.Visible = false
+            radarPlayers[player] = nil
+        end
+    end
+end
+
+RunService.RenderStepped:Connect(updateRadar)
+RunService.RenderStepped:Connect(updatePlayerCount)
+RunService.RenderStepped:Connect(updateFOV)
+
+for _, player in pairs(Players:GetPlayers()) do
+    if player ~= LocalPlayer then
+        createESP(player)
+    end
+end
+
+Players.PlayerAdded:Connect(function(player)
+    if player ~= LocalPlayer then
+        createESP(player)
+    end
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+    if ESPComponents[player] then
+        for _, component in pairs(ESPComponents[player]) do
+            if typeof(component) == "table" then
+                for _, drawing in pairs(component) do
+                    drawing:Remove()
+                end
+            else
+                component:Remove()
+            end
+        end
+        ESPComponents[player] = nil
+    end
+end)
+---------------------------------------------------------------------------------------------透视功能
+Toggle = TabHandles.W:Toggle({
+    Title = "透视开启", 
+    Value = false, 
+    Callback = function(Value)
+        getgenv().ESPEnabled = Value
+    end
+})
+
+Toggle = TabHandles.W:Toggle({
+    Title = "模型透视", 
+    Value = false, 
+    Callback = function(Value)
+        getgenv().ShowSkeleton = Value
+    end
+})
+
+Toggle = TabHandles.W:Toggle({
+    Title = "方框透视", 
+    Value = false, 
+    Callback = function(Value)
+        getgenv().ShowBox = Value
+    end
+})
+
+
+
+Toggle = TabHandles.W:Toggle({
+    Title = "射线透视", 
+    Value = false, 
+    Callback = function(Value)
+        getgenv().ShowTracer = Value
+    end
+})
+
+local bulletTrackingEnabled = true  
+local oldHook = nil
+
+Toggle = TabHandles.W:Toggle({
+    Title = "名字透视", 
+    Value = false, 
+    Callback = function(Value)
+        getgenv().ShowName = Value
+    end
+})
+
+
+
+
+
+
+Window:Divider()
+local SettingsTab = Window:Tab({
+    Title = "Ui设置",
+    Desc = "Ui美术设置", -- 可选
+    Icon = "settings", -- lucide 图标 或 "rbxassetid://" 或 URL，可选
+    IconThemed = true, -- 使用主题颜色，可选
+    Locked = false, -- 禁用标签页交互，可选
+    ShowTabTitle = false, -- 在标签页内显示标题，可选
+    Border = true, -- 在标签页周围添加边框，可选
+})
+
+local ThemeSelectDropdown = SettingsTab:Dropdown({
+    Title = "选择主题",
+    Multi = false,
+    AllowNone = false,
+    Value = nil,
+    Values = {"AF Hub", "月夜", "冬日霜雪", "月渊"},
+    Callback = function(theme)
+        WindUI:SetTheme(theme)
+    end
+})
+
+
+SettingsTab:Divider()
+SettingsTab:Section({ 
+    Title = "背景选择",
+    TextXAlignment = "Center",
+    TextSize = 20,
+})
+
+local Dropdown = SettingsTab:Dropdown({
+    Title = "切换背景图",
+    Values = {
+        {
+            Title = "无背景",
+            Icon = "app-window",
+            Callback = function()
+                -- 清除背景图
+                Window:SetBackgroundImage("rbxassetid://0")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换为无背景",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图1(默认)",
+            Desc = "秋词提供",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://136059273188532")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图1",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图2",
+            Icon = "app-window",
+            Callback = function()
+       Window:SetBackgroundImage("rbxassetid://101182501948173")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图2",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图3",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://90514823373955")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图3",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图4",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://103858984350097")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图4",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图5",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://137662774446930")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图5",
+                    Duration = 3
+                })
+            end
+        },
+                {
+            Title = "背景图6",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://73618579935939")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图6",
+                    Duration = 3
+                })
+            end
+        },
+                {
+            Title = "背景图7",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://131845772886226")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图7",
+                    Duration = 3
+                })
+            end
+        },
+                {
+            Title = "背景图8",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://92388982051300")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图8",
+                    Duration = 3
+                })
+            end
+        },
+                        {
+            Title = "背景图9",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://103197377834563")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图9",
+                    Duration = 3
+                })
+            end
+        },
+                        {
+            Title = "背景图10",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://123887383447725")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图10",
+                    Duration = 3
+                })
+            end
+        },
+                        {
+            Title = "背景图11",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://84371548883810")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图11",
+                    Duration = 3
+                })
+            end
+        },
+    }
+})
+
+SettingsTab:Section({ 
+    Title = "自定义背景",
+    TextXAlignment = "Center",
+    TextSize = 20,
+})
+SettingsTab:Divider()
+
+local CustomBackground = SettingsTab:Input({
+    Title = "背景 ID",
+    Type = "Input",
+    Placeholder = "输入图片ID",
+    Callback = function(input)
+        if input ~= "" then
+            _G.BackgroundImage = "rbxassetid://" .. input
+            Window:SetBackgroundImage(_G.BackgroundImage)
+        end
+    end
+})
+
+local Keybind = SettingsTab:Keybind({
+    Title = "关闭界面的快捷键",
+    Value = "G",
+    Callback = function(v)
+        Window:SetToggleKey(Enum.KeyCode[v])
+    end
+})
