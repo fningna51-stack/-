@@ -1,0 +1,1091 @@
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/YIRDEX/Miscs/refs/heads/main/YXWindUI.lua"))()
+
+WindUI:AddTheme({
+    Name = "AF Hub", 
+    Accent = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#FF4C4C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#FF1A1A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#CC0000"), Transparency = 0}
+    }, {Rotation = 90}),
+    Background = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#FF4C4C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#FF1A1A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#CC0000"), Transparency = 0}
+    }, {Rotation = 90}),
+    Outline = Color3.fromHex("#FF6666"),
+    Text = Color3.fromHex("#FFFFFF"),
+    Placeholder = Color3.fromHex("#AAAAAA"),
+    Button = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#FF4C4C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#FF1A1A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#CC0000"), Transparency = 0}
+    }, {Rotation = 90}),
+    Icon = Color3.fromHex("#FF6666")
+})
+
+-- 月夜
+WindUI:AddTheme({
+    Name = "月夜",
+    Accent = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#232526"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#636363"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#E0E0E0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Dialog = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#1C1C1C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#3A3A3A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#636363"), Transparency = 0}
+    }, {Rotation = 90}),
+    Outline = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#B0B0B0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#C0C0C0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#E0E0E0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Text = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#FFFFFF"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#D9D9D9"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#BFBFBF"), Transparency = 0}
+    }, {Rotation = 90}),
+    Placeholder = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#A0A0A0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#B0B0B0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#C0C0C0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Background = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#101010"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#3A3A3A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#636363"), Transparency = 0}
+    }, {Rotation = 90}),
+    Button = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#3A3A3A"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#636363"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#A2A2A2"), Transparency = 0}
+    }, {Rotation = 90}),
+    Icon = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#C0C0C0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#E0E0E0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#FFFFFF"), Transparency = 0}
+    }, {Rotation = 90})
+})
+
+-- 冬日霜雪
+WindUI:AddTheme({
+    Name = "冬日霜雪",
+    Accent = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#D0E8F2"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#A0D4F2"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#70C0F2"), Transparency = 0}
+    }, {Rotation = 45}),
+    Dialog = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#E0F7FF"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#B0EFFF"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#80E7FF"), Transparency = 0}
+    }, {Rotation = 45}),
+    Outline = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#70C0F2"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#50B0E0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#30A0D0"), Transparency = 0}
+    }, {Rotation = 45}),
+    Text = Color3.fromHex("#000000"),
+    Placeholder = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#7FB3D5"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#5FA2C5"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#3F91B5"), Transparency = 0}
+    }, {Rotation = 45}),
+    Background = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#E6F0FA"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#CDE0F5"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#B4D1F0"), Transparency = 0}
+    }, {Rotation = 45}),
+    Button = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#50B0E0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#30A0D0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#108FC0"), Transparency = 0}
+    }, {Rotation = 45}),
+    Icon = Color3.fromHex("#00FFFF")
+})
+
+-- 月渊
+WindUI:AddTheme({
+    Name = "月渊",
+    Accent = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#0D0D1A"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#1A1A33"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#2E2E5C"), Transparency = 0}
+    }, {Rotation = 90}),
+    Dialog = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#101026"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#1A1A3D"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#333366"), Transparency = 0}
+    }, {Rotation = 90}),
+    Outline = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#2E2E5C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#404080"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#5050A0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Text = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#A0A0FF"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#C0C0FF"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#E0E0FF"), Transparency = 0}
+    }, {Rotation = 90}),
+    Placeholder = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#6060A0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#8080C0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#A0A0E0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Background = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#0A0A1A"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#1A1A33"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#2E2E5C"), Transparency = 0}
+    }, {Rotation = 90}),
+    Button = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#404080"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#5050A0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#6060C0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Icon = Color3.fromHex("#00FFFF")
+})
+
+WindUI:SetFont("rbxassetid://12187369639")
+
+local Window = WindUI:CreateWindow({
+    Title = '<font color="#FF0000">A</font><font color="#00F0FF">F</font><font color="#00E5FF">-</font><font color="#00D5FF">H</font><font color="#00C8FF">U</font><font color="#00BBFF">B</font>', -- 窗口标题
+    Icon = "rbxassetid://82225829203828", 
+    Author = "@秋辞", -- 窗口副标题，可选
+    Folder = "YX-Hub文件夹", -- 保存密钥和图片的文件夹
+    Size = UDim2.fromOffset(520, 400), -- 窗口大小
+    MinSize = Vector2.new(560, 350), -- 窗口最小尺寸
+    MaxSize = Vector2.new(850, 560), -- 窗口最大尺寸
+    Transparent = true, -- 窗口透明度
+    Theme = "冬日霜雪", 
+    Resizable = true, -- 是否可调整窗口大小
+    SideBarWidth = 150, -- 侧边栏（标签页）宽度
+    HideSearchBar = false, -- 隐藏搜索栏
+    ScrollBarEnabled = true, -- 位于滚动框右侧的滚动条
+Background = "rbxassetid://136059273188532",
+    
+    User = { -- 位于左下角的用户信息
+        Enabled = false,
+        Anonymous = false,
+        Callback = function() -- 点击时的回调函数，可选，可移除
+            print("点击")
+        end,
+    },
+})
+
+
+
+-- 编辑窗口展开按钮配置
+Window:EditOpenButton({
+    Title = '<font color="#FF0000">A</font><font color="#00F0FF">F</font><font color="#00E5FF">-</font><font color="#00D5FF">H</font><font color="#00C8FF">U</font><font color="#00BBFF">B</font>',
+    Icon = "snowflake",
+    CornerRadius = UDim.new(99,99),
+    StrokeThickness = 3,
+    IconSize = 30,
+    Color = ColorSequence.new(Color3.fromHex("00FFFF"), Color3.fromHex("00BBFF")),
+    OnlyMobile = false,
+    Enabled = true,
+    Draggable = true,
+})
+
+local COLOR_SCHEMES = {
+    ["彩虹颜色"] = {ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromHex("00FFFF")),
+        ColorSequenceKeypoint.new(1, Color3.fromHex("0000FF"))
+    }), "palette"},
+}
+
+local borderAnimation
+local animationSpeed = 5
+
+local function createRainbowBorder(window, colorScheme)
+    local mainFrame = window.UIElements.Main
+    if not mainFrame then return nil end
+
+    local existingStroke = mainFrame:FindFirstChild("RainbowStroke")
+    if existingStroke then existingStroke:Destroy() end
+
+    if not mainFrame:FindFirstChildOfClass("UICorner") then
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 16)
+        corner.Parent = mainFrame
+    end
+
+    local rainbowStroke = Instance.new("UIStroke")
+    rainbowStroke.Name = "RainbowStroke"
+    rainbowStroke.Thickness = 2
+    rainbowStroke.Color = Color3.new(1, 1, 1)
+    rainbowStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    rainbowStroke.LineJoinMode = Enum.LineJoinMode.Round
+    rainbowStroke.Parent = mainFrame
+
+    local glowEffect = Instance.new("UIGradient")
+    glowEffect.Name = "GlowEffect"
+    local schemeData = COLOR_SCHEMES[colorScheme or "彩虹颜色"]
+    glowEffect.Color = schemeData and schemeData[1] or COLOR_SCHEMES["彩虹颜色"][1]
+    glowEffect.Rotation = 0
+    glowEffect.Parent = rainbowStroke
+
+    return rainbowStroke
+end
+
+local function startBorderAnimation(window, speed)
+    local mainFrame = window.UIElements.Main
+    if not mainFrame then return nil end
+    local rainbowStroke = mainFrame:FindFirstChild("RainbowStroke")
+    if not rainbowStroke then return nil end
+    local glowEffect = rainbowStroke:FindFirstChild("GlowEffect")
+    if not glowEffect then return nil end
+
+    return game:GetService("RunService").Heartbeat:Connect(function()
+        if not rainbowStroke or rainbowStroke.Parent == nil then return end
+        glowEffect.Rotation = (tick() * speed * 10) % 360
+    end)
+end
+
+local rainbowStroke = createRainbowBorder(Window, "彩虹颜色")
+if rainbowStroke then
+    borderAnimation = startBorderAnimation(Window, animationSpeed)
+end
+
+local Lighting = game:GetService("Lighting")
+local TweenServiceBlur = game:GetService("TweenService")
+
+local blur = Lighting:FindFirstChildOfClass("BlurEffect")
+if not blur then
+    blur = Instance.new("BlurEffect")
+    blur.Size = 0
+    blur.Parent = Lighting
+end
+
+task.spawn(function()
+    local wasOpen = false
+    while true do
+        task.wait(0.1)
+        local mainFrame = Window.UIElements and Window.UIElements.Main
+        local isOpen = mainFrame and mainFrame.Visible or false
+        
+        if isOpen ~= wasOpen then
+            wasOpen = isOpen
+            TweenServiceBlur:Create(blur, TweenInfo.new(0.3), {
+                Size = isOpen and 20 or 0
+            }):Play()
+        end
+    end
+end)
+
+local info = Window:Section({
+    Title = "主页",
+    Icon = "star",
+    Opened = true
+})
+
+local Tab1 = info:Tab({
+    Title = "信息",
+    Icon = "info", -- optional
+    Locked = false,
+})
+
+
+
+local Paragraph = Tab1:Paragraph({
+    Title = 'AF Hub',
+    Desc = '欢迎使用YX-HUB脚本(＾ν＾)',
+    Thumbnail = "rbxassetid://100781334247855",
+    ThumbnailSize = 200,
+    Locked = false,
+})
+
+local Paragraph1 = Tab1:Paragraph({
+    Title = 'AF Hun',
+    Desc = '主打缝合 :D',
+    Thumbnail = "rbxassetid://72531855816776",
+    ThumbnailSize = 200,
+    Locked = false,
+})
+
+Tab1:Section({ 
+    Title = "开发者",
+    TextXAlignment = "Center",
+    TextSize = 20,
+})
+
+local Paragraph = Tab1:Paragraph({
+    Title = "秋词",
+    Desc = "AF Hub作者",
+    Image = "rbxassetid://138882879525986",
+    ImageSize = 60,
+    Locked = false,
+})
+
+local Paragraph = Tab1:Paragraph({
+    Title = "YirdeX",
+    Desc = "ui背景设计者",
+    Image = "rbxassetid://90051928527603",
+    ImageSize = 60,
+    Locked = false,
+})
+
+local Tab3 = info:Tab({
+    Title = "复制",
+    Icon = "file-code",
+    Locked = false,
+})
+
+local Button1 = Tab3:Button({
+    Title = "复制主群",
+    Desc = "复制作者QQ群", -- 可选参数
+    Icon = "file-code", -- 图标名称 或 资源ID链接，可选参数
+    IconAlign = "Left",
+    Locked = false, -- 是否禁用按钮，可选参数
+    LockedTitle = "已锁定", -- 按钮禁用时显示的文字，可选参数
+    Callback = function()
+setclipboard("938714427")
+    end
+})
+
+local Tab2 = info:Tab({
+    Title = "公告",
+    Icon = "menu",
+    Locked = false,
+})
+local Section1 = Tab2:Section({
+    Title = "AF Hub[公告]", -- 分区标题
+    Icon = "component", -- 图标，支持图标名称或资源ID（可选）
+    TextSize = 30, -- 标题文字大小（可选）
+    TextXAlignment = "Left", -- 文字水平对齐方式：左对齐/居中/右对齐（可选）
+    Box = true, -- 是否显示分区外框（可选）
+    BoxBorder = true, -- 是否显示外框边框（可选）
+    Opened = true, -- 分区默认是否展开（可选）
+    FontWeight = Enum.FontWeight.SemiBold, -- 标题字体粗细（可选）
+    DescFontWeight = Enum.FontWeight.Medium, -- 描述文字字体粗细（可选）
+    TextTransparency = 0, -- 标题文字透明度（可选）
+    DescTextTransparency = 0, -- 描述文字透明度（可选）
+})
+
+Section1:Paragraph({
+    Title = "这个是公告？",
+    TextSize = 30, 
+    Thumbnail = "rbxassetid://85076999766387",
+    ThumbnailSize = 100,
+})
+
+
+
+
+
+
+Window:Divider()
+local functiond = Window:Section({
+    Title = "功能区",
+    Icon = "folder-cog",
+    Opened = true,
+})
+
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+getgenv().QW = getgenv().QW or {
+    Speed = 50,
+    SpeedEnabled = false,
+    FlyEnabled = false,
+    NoclipEnabled = false,
+    AdminPanelEnabled = false,
+    SuckSharkEnabled = false,
+    SuckAllEnabled = false,
+    SharkESPEnabled = false,
+    SpeedThread = nil,
+    FlyThread = nil,
+    NoclipThread = nil,
+    SuckSharkThread = nil,
+    SuckAllThread = nil,
+    ESPThread = nil,
+    ESPObjects = {},
+}
+
+local function getCharacter()
+    local success, result = pcall(function() return Player.Character end)
+    return success and result or nil
+end
+
+local function getHumanoid()
+    local success, result = pcall(function()
+        local char = getCharacter()
+        return char and char:FindFirstChildOfClass("Humanoid")
+    end)
+    return success and result or nil
+end
+
+local function getRootPart()
+    local success, result = pcall(function()
+        local char = getCharacter()
+        return char and char:FindFirstChild("HumanoidRootPart")
+    end)
+    return success and result or nil
+end
+
+local function getSharkObjects()
+    local sharks = {}
+    pcall(function()
+        local sharkFolder = Workspace:FindFirstChild("Sharks")
+        if sharkFolder then
+            for _, child in ipairs(sharkFolder:GetChildren()) do
+                if child:IsA("Model") or child:IsA("Part") or child:IsA("MeshPart") then
+                    table.insert(sharks, child)
+                end
+            end
+        end
+    end)
+    return sharks
+end
+
+local function getSharkPlayers()
+    local sharks = {}
+    pcall(function()
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= Player then
+                local team = player.Team
+                if team and tostring(team):lower():find("shark") then
+                    table.insert(sharks, player)
+                end
+            end
+        end
+    end)
+    return sharks
+end
+
+local function getAllPlayers()
+    local allPlayers = {}
+    pcall(function()
+        local sharkPlayers = {}
+        for _, player in ipairs(Players:GetPlayers()) do
+            local team = player.Team
+            if team and tostring(team):lower():find("shark") then
+                sharkPlayers[player] = true
+            end
+        end
+        
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= Player and not sharkPlayers[player] then
+                table.insert(allPlayers, player)
+            end
+        end
+    end)
+    return allPlayers
+end
+
+local function clearESP()
+    for obj, instances in pairs(getgenv().QW.ESPObjects) do
+        pcall(function()
+            for _, inst in ipairs(instances) do
+                if inst and inst.Parent then inst:Destroy() end
+            end
+        end)
+    end
+    getgenv().QW.ESPObjects = {}
+end
+
+local function createESP(obj, text)
+    if not obj or getgenv().QW.ESPObjects[obj] then return end
+    
+    local hrp = obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChildWhichIsA("BasePart")
+    if not hrp then return end
+    
+    local highlight = Instance.new("Highlight")
+    highlight.Name = "QW_SharkESP"
+    highlight.Adornee = obj
+    highlight.FillColor = Color3.fromRGB(255, 0, 0)
+    highlight.OutlineColor = Color3.fromRGB(255, 0, 0)
+    highlight.FillTransparency = 0.3
+    highlight.OutlineTransparency = 0
+    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    highlight.Parent = obj
+
+    local bill = Instance.new("BillboardGui")
+    bill.Name = "QW_SharkESP_Text"
+    bill.Adornee = hrp
+    bill.Size = UDim2.new(0, 100, 0, 30)
+    bill.StudsOffset = Vector3.new(0, 3, 0)
+    bill.AlwaysOnTop = true
+    bill.Parent = obj
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.BackgroundTransparency = 1
+    label.Text = text
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.TextStrokeTransparency = 0
+    label.TextSize = 14
+    label.Parent = bill
+
+    getgenv().QW.ESPObjects[obj] = {highlight, bill}
+end
+
+local function espLoop()
+    pcall(function()
+        for obj in pairs(getgenv().QW.ESPObjects) do
+            if not obj or not obj.Parent then
+                getgenv().QW.ESPObjects[obj] = nil
+            end
+        end
+        
+        local sharkPlayers = getSharkPlayers()
+        for _, player in ipairs(sharkPlayers) do
+            if player.Character then
+                createESP(player.Character, "🦈 " .. player.Name)
+            end
+        end
+        
+        local sharkObjects = getSharkObjects()
+        for _, shark in ipairs(sharkObjects) do
+            createESP(shark, "🦈 鲨鱼")
+        end
+    end)
+end
+
+local function stopSpeed()
+    pcall(function()
+        local char = getCharacter()
+        if char then
+            local hum = getHumanoid()
+            if hum then hum.WalkSpeed = 16 end
+        end
+    end)
+end
+
+local function speedLoop()
+    pcall(function()
+        local hum = getHumanoid()
+        if hum then hum.WalkSpeed = getgenv().QW.Speed end
+    end)
+end
+
+local function stopFly()
+    pcall(function()
+        local char = getCharacter()
+        if char then
+            local hum = getHumanoid()
+            if hum then hum.PlatformStand = false end
+            local root = getRootPart()
+            if root then
+                local bodyVel = root:FindFirstChild("QW_FlyVelocity")
+                if bodyVel then bodyVel:Destroy() end
+                local bodyGyro = root:FindFirstChild("QW_BodyGyro")
+                if bodyGyro then bodyGyro:Destroy() end
+            end
+        end
+    end)
+end
+
+local function flyLoop()
+    pcall(function()
+        local char = getCharacter()
+        if not char then return end
+        local hum = getHumanoid()
+        local root = getRootPart()
+        if not hum or not root then return end
+        
+        hum.PlatformStand = true
+        hum.WalkSpeed = getgenv().QW.Speed
+        
+        local cam = Workspace.CurrentCamera
+        if not cam then return end
+        
+        local moveDir = hum.MoveDirection
+        if moveDir and moveDir.Magnitude > 0 then
+            local bodyVel = root:FindFirstChild("QW_FlyVelocity")
+            if not bodyVel then
+                bodyVel = Instance.new("BodyVelocity")
+                bodyVel.Name = "QW_FlyVelocity"
+                bodyVel.MaxForce = Vector3.new(4000, 4000, 4000)
+                bodyVel.Parent = root
+            end
+            bodyVel.Velocity = cam.CFrame.LookVector * moveDir.Z * getgenv().QW.Speed +
+                               cam.CFrame.RightVector * moveDir.X * getgenv().QW.Speed +
+                               Vector3.new(0, moveDir.Y * getgenv().QW.Speed, 0)
+        end
+        
+        local bodyGyro = root:FindFirstChild("QW_BodyGyro")
+        if not bodyGyro then
+            bodyGyro = Instance.new("BodyGyro")
+            bodyGyro.Name = "QW_BodyGyro"
+            bodyGyro.MaxTorque = Vector3.new(4000, 4000, 4000)
+            bodyGyro.P = 1000
+            bodyGyro.Parent = root
+        end
+        bodyGyro.CFrame = cam.CFrame
+    end)
+end
+
+local function noclipLoop()
+    pcall(function()
+        local char = getCharacter()
+        if char then
+            for _, part in ipairs(char:GetChildren()) do
+                if part:IsA("BasePart") then part.CanCollide = false end
+            end
+        end
+    end)
+end
+
+local function suckSharkLoop()
+    pcall(function()
+        local hrp = getRootPart()
+        if not hrp then return end
+        
+        local sharks = getSharkObjects()
+        for _, shark in ipairs(sharks) do
+            local primaryPart = shark.PrimaryPart or shark:FindFirstChildWhichIsA("BasePart")
+            if primaryPart then
+                if shark:IsA("Model") then
+                    shark:SetPrimaryPartCFrame(hrp.CFrame * CFrame.new(0, 15, -20))
+                else
+                    shark.CFrame = hrp.CFrame * CFrame.new(0, 15, -20)
+                end
+            end
+        end
+    end)
+end
+
+local function suckAllLoop()
+    pcall(function()
+        local hrp = getRootPart()
+        if not hrp then return end
+        
+        local players = getAllPlayers()
+        for _, player in ipairs(players) do
+            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                local playerHRP = player.Character.HumanoidRootPart
+                playerHRP.CFrame = hrp.CFrame * CFrame.new(0, 15, -20)
+            end
+        end
+    end)
+end
+
+local function getSharkBlaster()
+    pcall(function()
+        local sharkBlaster = ReplicatedStorage:FindFirstChild("ClientViewportObjects")
+        if sharkBlaster then
+            sharkBlaster = sharkBlaster:FindFirstChild("Weapons")
+            if sharkBlaster then
+                sharkBlaster = sharkBlaster:FindFirstChild("SharkBlaster")
+                if sharkBlaster then
+                    local backpack = Player:FindFirstChild("Backpack")
+                    if backpack and not backpack:FindFirstChild("SharkBlaster") then
+                        sharkBlaster:Clone().Parent = backpack
+                        WindUI:Notify({ Title = "获取成功", Content = "鲨鱼冲击波已添加到背包", Duration = 2 })
+                    else
+                        WindUI:Notify({ Title = "提示", Content = "背包中已有鲨鱼冲击波", Duration = 2 })
+                    end
+                else
+                    WindUI:Notify({ Title = "获取失败", Content = "未找到鲨鱼冲击波", Duration = 2 })
+                end
+            end
+        end
+    end)
+end
+
+local BaseTab = Window:Tab({ Title = "基础", Icon = "settings" })
+Window:SelectTab(1)
+BaseTab:Toggle({
+    Title = "加速",
+    Value = getgenv().QW.SpeedEnabled,
+    Callback = function(state)
+        getgenv().QW.SpeedEnabled = state
+        if state then
+            if getgenv().QW.SpeedThread then task.cancel(getgenv().QW.SpeedThread) end
+            getgenv().QW.SpeedThread = task.spawn(function()
+                while getgenv().QW.SpeedEnabled do
+                    speedLoop()
+                    task.wait(0.1)
+                end
+            end)
+            WindUI:Notify({ Title = "加速", Content = "已开启", Duration = 1.5 })
+        else
+            if getgenv().QW.SpeedThread then
+                task.cancel(getgenv().QW.SpeedThread)
+                getgenv().QW.SpeedThread = nil
+            end
+            stopSpeed()
+            WindUI:Notify({ Title = "加速", Content = "已关闭", Duration = 1.5 })
+        end
+    end
+})
+
+BaseTab:Toggle({
+    Title = "飞行",
+    Value = getgenv().QW.FlyEnabled,
+    Callback = function(state)
+        getgenv().QW.FlyEnabled = state
+        if state then
+            if getgenv().QW.FlyThread then task.cancel(getgenv().QW.FlyThread) end
+            getgenv().QW.FlyThread = task.spawn(function()
+                while getgenv().QW.FlyEnabled do
+                    flyLoop()
+                    task.wait(0.1)
+                end
+            end)
+            WindUI:Notify({ Title = "飞行", Content = "已开启", Duration = 1.5 })
+        else
+            if getgenv().QW.FlyThread then
+                task.cancel(getgenv().QW.FlyThread)
+                getgenv().QW.FlyThread = nil
+            end
+            stopFly()
+            WindUI:Notify({ Title = "飞行", Content = "已关闭", Duration = 1.5 })
+        end
+    end
+})
+
+BaseTab:Slider({
+    Title = "速度",
+    Value = { Min = 10, Max = 200, Default = getgenv().QW.Speed },
+    Callback = function(value)
+        getgenv().QW.Speed = value
+    end
+})
+
+BaseTab:Divider()
+
+BaseTab:Toggle({
+    Title = "穿墙",
+    Value = getgenv().QW.NoclipEnabled,
+    Callback = function(state)
+        getgenv().QW.NoclipEnabled = state
+        if state then
+            if getgenv().QW.NoclipThread then task.cancel(getgenv().QW.NoclipThread) end
+            getgenv().QW.NoclipThread = task.spawn(function()
+                while getgenv().QW.NoclipEnabled do
+                    noclipLoop()
+                    task.wait(0.2)
+                end
+            end)
+            WindUI:Notify({ Title = "穿墙", Content = "已开启", Duration = 1.5 })
+        else
+            if getgenv().QW.NoclipThread then
+                task.cancel(getgenv().QW.NoclipThread)
+                getgenv().QW.NoclipThread = nil
+            end
+            WindUI:Notify({ Title = "穿墙", Content = "已关闭", Duration = 1.5 })
+        end
+    end
+})
+
+local ESPTab = Window:Tab({ Title = "ESP", Icon = "eye" })
+
+ESPTab:Toggle({
+    Title = "鲨鱼ESP",
+    Value = getgenv().QW.SharkESPEnabled,
+    Callback = function(state)
+        getgenv().QW.SharkESPEnabled = state
+        if state then
+            if getgenv().QW.ESPThread then task.cancel(getgenv().QW.ESPThread) end
+            getgenv().QW.ESPThread = task.spawn(function()
+                while getgenv().QW.SharkESPEnabled do
+                    espLoop()
+                    task.wait(0.5)
+                end
+            end)
+            WindUI:Notify({ Title = "鲨鱼ESP", Content = "已开启", Duration = 1.5 })
+        else
+            if getgenv().QW.ESPThread then
+                task.cancel(getgenv().QW.ESPThread)
+                getgenv().QW.ESPThread = nil
+            end
+            clearESP()
+            WindUI:Notify({ Title = "鲨鱼ESP", Content = "已关闭", Duration = 1.5 })
+        end
+    end
+})
+
+local FeatureTab = Window:Tab({ Title = "特色", Icon = "star" })
+
+FeatureTab:Toggle({
+    Title = "管理员面板",
+    Value = getgenv().QW.AdminPanelEnabled,
+    Callback = function(state)
+        getgenv().QW.AdminPanelEnabled = state
+        pcall(function()
+            local panel = Player.PlayerGui:FindFirstChild("AdminPanel")
+            if panel then
+                panel.Enabled = state
+            end
+        end)
+        WindUI:Notify({ Title = "管理员面板", Content = state and "已开启" or "已关闭", Duration = 1.5 })
+    end
+})
+
+FeatureTab:Divider()
+
+FeatureTab:Toggle({
+    Title = "循环吸鲨鱼",
+    Value = getgenv().QW.SuckSharkEnabled,
+    Callback = function(state)
+        getgenv().QW.SuckSharkEnabled = state
+        if state then
+            if getgenv().QW.SuckSharkThread then task.cancel(getgenv().QW.SuckSharkThread) end
+            getgenv().QW.SuckSharkThread = task.spawn(function()
+                while getgenv().QW.SuckSharkEnabled do
+                    suckSharkLoop()
+                    task.wait(0.1)
+                end
+            end)
+            WindUI:Notify({ Title = "循环吸鲨鱼", Content = "已开启", Duration = 1.5 })
+        else
+            if getgenv().QW.SuckSharkThread then
+                task.cancel(getgenv().QW.SuckSharkThread)
+                getgenv().QW.SuckSharkThread = nil
+            end
+            WindUI:Notify({ Title = "循环吸鲨鱼", Content = "已关闭", Duration = 1.5 })
+        end
+    end
+})
+
+FeatureTab:Toggle({
+    Title = "吸全部玩家",
+    Value = getgenv().QW.SuckAllEnabled,
+    Callback = function(state)
+        getgenv().QW.SuckAllEnabled = state
+        if state then
+            if getgenv().QW.SuckAllThread then task.cancel(getgenv().QW.SuckAllThread) end
+            getgenv().QW.SuckAllThread = task.spawn(function()
+                while getgenv().QW.SuckAllEnabled do
+                    suckAllLoop()
+                    task.wait(0.1)
+                end
+            end)
+            WindUI:Notify({ Title = "吸全部玩家", Content = "已开启", Duration = 1.5 })
+        else
+            if getgenv().QW.SuckAllThread then
+                task.cancel(getgenv().QW.SuckAllThread)
+                getgenv().QW.SuckAllThread = nil
+            end
+            WindUI:Notify({ Title = "吸全部玩家", Content = "已关闭", Duration = 1.5 })
+        end
+    end
+})
+
+FeatureTab:Divider()
+
+FeatureTab:Button({
+    Title = "获取鲨鱼冲击波",
+    Callback = function()
+        getSharkBlaster()
+    end
+})
+
+
+
+
+
+
+Window:Divider()
+local SettingsTab = Window:Tab({
+    Title = "Ui设置",
+    Desc = "Ui美术设置", -- 可选
+    Icon = "settings", -- lucide 图标 或 "rbxassetid://" 或 URL，可选
+    IconThemed = true, -- 使用主题颜色，可选
+    Locked = false, -- 禁用标签页交互，可选
+    ShowTabTitle = false, -- 在标签页内显示标题，可选
+    Border = true, -- 在标签页周围添加边框，可选
+})
+
+local ThemeSelectDropdown = SettingsTab:Dropdown({
+    Title = "选择主题",
+    Multi = false,
+    AllowNone = false,
+    Value = nil,
+    Values = {"AF Hub", "月夜", "冬日霜雪", "月渊"},
+    Callback = function(theme)
+        WindUI:SetTheme(theme)
+    end
+})
+
+
+SettingsTab:Divider()
+SettingsTab:Section({ 
+    Title = "背景选择",
+    TextXAlignment = "Center",
+    TextSize = 20,
+})
+
+local Dropdown = SettingsTab:Dropdown({
+    Title = "切换背景图",
+    Values = {
+        {
+            Title = "无背景",
+            Icon = "app-window",
+            Callback = function()
+                -- 清除背景图
+                Window:SetBackgroundImage("rbxassetid://0")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换为无背景",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图1(默认)",
+            Desc = "秋词提供",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://136059273188532")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图1",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图2",
+            Icon = "app-window",
+            Callback = function()
+       Window:SetBackgroundImage("rbxassetid://101182501948173")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图2",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图3",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://90514823373955")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图3",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图4",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://103858984350097")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图4",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图5",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://137662774446930")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图5",
+                    Duration = 3
+                })
+            end
+        },
+                {
+            Title = "背景图6",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://73618579935939")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图6",
+                    Duration = 3
+                })
+            end
+        },
+                {
+            Title = "背景图7",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://131845772886226")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图7",
+                    Duration = 3
+                })
+            end
+        },
+                {
+            Title = "背景图8",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://92388982051300")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图8",
+                    Duration = 3
+                })
+            end
+        },
+                        {
+            Title = "背景图9",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://103197377834563")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图9",
+                    Duration = 3
+                })
+            end
+        },
+                        {
+            Title = "背景图10",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://123887383447725")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图10",
+                    Duration = 3
+                })
+            end
+        },
+                        {
+            Title = "背景图11",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://84371548883810")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图11",
+                    Duration = 3
+                })
+            end
+        },
+    }
+})
+
+SettingsTab:Section({ 
+    Title = "自定义背景",
+    TextXAlignment = "Center",
+    TextSize = 20,
+})
+SettingsTab:Divider()
+
+local CustomBackground = SettingsTab:Input({
+    Title = "背景 ID",
+    Type = "Input",
+    Placeholder = "输入图片ID",
+    Callback = function(input)
+        if input ~= "" then
+            _G.BackgroundImage = "rbxassetid://" .. input
+            Window:SetBackgroundImage(_G.BackgroundImage)
+        end
+    end
+})
+
+local Keybind = SettingsTab:Keybind({
+    Title = "关闭界面的快捷键",
+    Value = "G",
+    Callback = function(v)
+        Window:SetToggleKey(Enum.KeyCode[v])
+    end
+})
