@@ -1,56 +1,3 @@
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-
-local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
-
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "AF_Hub_Welcome"
-screenGui.ResetOnSpawn = false
-screenGui.IgnoreGuiInset = true
-screenGui.Parent = playerGui
-
-local textLabel = Instance.new("TextLabel")
-textLabel.Name = "GradientText"
-textLabel.Parent = screenGui
-textLabel.BackgroundTransparency = 1
-textLabel.TextScaled = true
-textLabel.Font = Enum.Font.SourceSansBold
-textLabel.TextXAlignment = Enum.TextXAlignment.Right
-textLabel.TextYAlignment = Enum.TextYAlignment.Top
-textLabel.RichText = false
-
-textLabel.Text =
-    "欢迎使用 AF Hub\n秋辞欢迎您\n祝你玩的愉快"
-
-local screenSize = workspace.CurrentCamera.ViewportSize
-textLabel.Size = UDim2.new(0, screenSize.X / 10 * 1.5, 0, screenSize.Y / 10 * 1.5)
-
-textLabel.Position = UDim2.new(1, -screenSize.X / 10 - 100, 0, 60)
-
-local gradient = Instance.new("UIGradient")
-gradient.Parent = textLabel
-gradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromHSV(0, 1, 1)),
-    ColorSequenceKeypoint.new(0.2, Color3.fromHSV(0.2, 1, 1)),
-    ColorSequenceKeypoint.new(0.4, Color3.fromHSV(0.4, 1, 1)),
-    ColorSequenceKeypoint.new(0.6, Color3.fromHSV(0.6, 1, 1)),
-    ColorSequenceKeypoint.new(0.8, Color3.fromHSV(0.8, 1, 1)),
-    ColorSequenceKeypoint.new(1, Color3.fromHSV(1, 1, 1))
-})
-
-local hue = 0
-RunService.RenderStepped:Connect(function()
-    hue = (hue + 0.001) % 1
-    gradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromHSV(hue, 1, 1)),
-        ColorSequenceKeypoint.new(0.2, Color3.fromHSV((hue + 0.2) % 1, 1, 1)),
-        ColorSequenceKeypoint.new(0.4, Color3.fromHSV((hue + 0.4) % 1, 1, 1)),
-        ColorSequenceKeypoint.new(0.6, Color3.fromHSV((hue + 0.6) % 1, 1, 1)),
-        ColorSequenceKeypoint.new(0.8, Color3.fromHSV((hue + 0.8) % 1, 1, 1)),
-        ColorSequenceKeypoint.new(1, Color3.fromHSV((hue + 1) % 1, 1, 1))
-    })
-end)
 local repo = 'https://raw.githubusercontent.com/DevSloPo/obsidian_UI/main/'
 local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
 local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
@@ -108,6 +55,7 @@ local Tong = Tabs.Main:AddLeftGroupbox("通用功能")
 local Nbcoos = Tabs.Main:AddLeftGroupbox("传送")
 local RightGroup = Tabs.Main:AddRightGroupbox("外部加载")
 local Ksqcnbcos = Tabs.Main:AddRightGroupbox("透视（全部可在墨水使用）")
+local Sjgnfh = Tabs.Main:AddRightGroupbox("视觉功能")
 local Bofang = Tabs.Main:AddRightGroupbox("播放功能")
 local Yule = Tabs.Main:AddRightGroupbox("娱乐脚本功能")
 local RotationControlGroup = Tabs.Main:AddRightGroupbox("旋转控制")
@@ -1691,6 +1639,1711 @@ Ksqcnbcos:AddToggle('TracerToggle', {
             end
             getgenv().cyberline_tracers = nil
             Library:Notify("射线透视 已关闭", 2)
+        end
+    end
+})
+Sjgnfh:AddToggle('MyToggle', {
+	Text = '残影',
+	Default = false,
+	Tooltip = '开启后走路有残影无法关闭',
+	Callback = function(Value)
+		print('[回调] 开关状态改变:', Value)
+
+		if not Value then return end
+
+		local Players = game:GetService("Players")
+		local TweenService = game:GetService("TweenService")
+		local Debris = game:GetService("Debris")
+		local RunService = game:GetService("RunService")
+
+		local localPlayer = Players.LocalPlayer
+
+		local CONFIG = {
+			GhostDuration = 0.5,
+			GhostColor = Color3.fromRGB(255, 255, 255),
+			BodyTransparency = 0.3,
+			MinMoveDistance = 1.2,
+			GhostScale = 0.9,
+			TpWalkSpeed = 5,
+		}
+
+		local function createLocalSmoke()
+			local attachment = Instance.new("Attachment")
+			local emitter = Instance.new("ParticleEmitter")
+
+			emitter.Name = "LocalDissolveSmoke"
+			emitter.Texture = "rbxassetid://241901177"
+			emitter.Rate = 2
+			emitter.Lifetime = NumberRange.new(0.2, CONFIG.GhostDuration)
+			emitter.Speed = NumberRange.new(0.1, 0.3)
+			emitter.VelocitySpread = 360
+			emitter.Size = NumberSequence.new({
+				NumberSequenceKeypoint.new(0, 0.4),
+				NumberSequenceKeypoint.new(1, 0.9)
+			})
+			emitter.Transparency = NumberSequence.new({
+				NumberSequenceKeypoint.new(0, 0.7),
+				NumberSequenceKeypoint.new(1, 1)
+			})
+			emitter.Color = ColorSequence.new(CONFIG.GhostColor)
+			emitter.Parent = attachment
+
+			return attachment
+		end
+
+		local smokeTemplate = createLocalSmoke()
+		local lastGhostPosition = Vector3.new(0, 0, 0)
+
+		local function createSingleGhost(character)
+			if not character then return end
+
+			local rootPart = character:FindFirstChild("HumanoidRootPart")
+			if not rootPart then return end
+
+			local ghostModel = Instance.new("Model")
+			ghostModel.Name = "MyPerfectGhostInstance"
+
+			local highlight = Instance.new("Highlight")
+			highlight.Name = "TrueNeonOutline"
+			highlight.FillColor = CONFIG.GhostColor
+			highlight.FillTransparency = 0.65
+			highlight.OutlineColor = CONFIG.GhostColor
+			highlight.OutlineTransparency = 0.3
+			highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+			highlight.Parent = ghostModel
+
+			for _, part in ipairs(character:GetDescendants()) do
+				if part:IsA("BasePart")
+					and part.Name ~= "HumanoidRootPart"
+					and part.Transparency < 0.9 then
+
+					local clonePart = Instance.new("Part")
+					clonePart.Size = part.Size * CONFIG.GhostScale
+					clonePart.CFrame = part.CFrame
+					clonePart.Anchored = true
+					clonePart.CanCollide = false
+					clonePart.CanTouch = false
+					clonePart.CanQuery = false
+
+					if part:IsA("MeshPart") then
+						local mesh = Instance.new("SpecialMesh")
+						mesh.MeshType = Enum.MeshType.FileMesh
+						mesh.MeshId = part.MeshId
+						mesh.Scale = Vector3.new(
+							CONFIG.GhostScale,
+							CONFIG.GhostScale,
+							CONFIG.GhostScale
+						)
+						mesh.Parent = clonePart
+					elseif part:FindFirstChildOfClass("SpecialMesh") then
+						local meshClone = part:FindFirstChildOfClass("SpecialMesh"):Clone()
+						meshClone.Scale *= CONFIG.GhostScale
+						meshClone.Parent = clonePart
+					end
+
+					clonePart.Material = Enum.Material.Neon
+					clonePart.Color = CONFIG.GhostColor
+					clonePart.Transparency = CONFIG.BodyTransparency
+					clonePart.Parent = ghostModel
+
+					local tween = TweenService:Create(
+						clonePart,
+						TweenInfo.new(CONFIG.GhostDuration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+						{ Transparency = 1 }
+					)
+					tween:Play()
+				end
+			end
+
+			if #ghostModel:GetChildren() > 1 then
+				ghostModel.Parent = workspace
+
+				local hlTween = TweenService:Create(
+					highlight,
+					TweenInfo.new(CONFIG.GhostDuration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+					{ OutlineTransparency = 1, FillTransparency = 1 }
+				)
+				hlTween:Play()
+
+				local smokeClone = smokeTemplate:Clone()
+				smokeClone.Parent = workspace
+				smokeClone.Position = rootPart.Position - Vector3.new(0, 1.8, 0)
+
+				Debris:AddItem(ghostModel, CONFIG.GhostDuration)
+				Debris:AddItem(smokeClone, CONFIG.GhostDuration)
+			else
+				ghostModel:Destroy()
+			end
+		end
+
+		RunService.RenderStepped:Connect(function()
+			pcall(function()
+				local character = localPlayer.Character
+				if character
+					and character:FindFirstChild("Humanoid")
+					and character:FindFirstChild("HumanoidRootPart") then
+
+					local humanoid = character.Humanoid
+					local rootPart = character.HumanoidRootPart
+
+					if humanoid.MoveDirection.Magnitude > 0 then
+						character:TranslateBy(
+							humanoid.MoveDirection * CONFIG.TpWalkSpeed / 100
+						)
+
+						local currentPosition = rootPart.Position
+						local distanceMoved =
+							(currentPosition - lastGhostPosition).Magnitude
+
+						if distanceMoved >= CONFIG.MinMoveDistance then
+							createSingleGhost(character)
+							lastGhostPosition = currentPosition
+						end
+					end
+				end
+			end)
+		end)
+	end
+})
+Sjgnfh:AddToggle('MyToggle', {
+	Text = '3D信息栏',
+	Default = false,
+	Tooltip = '开启后会出现信息栏',
+	Callback = function(Value)
+		print('[回调] 开关状态改变:', Value)
+
+		if not Value then return end
+
+		if getgenv().QuantumHUD_Running then
+			pcall(function()
+				game:GetService("RunService"):UnbindFromRenderStep("Quantum_Stationary_Engine")
+				local legacy = game:GetService("Workspace"):FindFirstChild("QUANTUM_STATIONARY_STORAGE")
+				if legacy then legacy:Destroy() end
+			end)
+		end
+		getgenv().QuantumHUD_Running = true
+
+		getgenv().LaunchQuantumGraphicsPipeline = function(customConfig)
+			customConfig = customConfig or {}
+
+			local QuantumHUD = {}
+			QuantumHUD.__index = QuantumHUD
+
+			local Players = game:GetService("Players")
+			local Workspace = game:GetService("Workspace")
+			local RunService = game:GetService("RunService")
+			local Lighting = game:GetService("Lighting")
+
+			function QuantumHUD.new()
+				local self = setmetatable({}, QuantumHUD)
+
+				self.Config = {
+					MaxHUDs = customConfig.MaxHUDs or 5,
+					MaxDistance = customConfig.MaxDistance or 110,
+					StorageName = "QUANTUM_STATIONARY_STORAGE",
+
+					BodyReflectance = customConfig.BodyReflectance or 0.15,
+					HeadReflectance = customConfig.HeadReflectance or 0.01,
+					LightBrightness = customConfig.LightBrightness or 0.45,
+					LightRange = customConfig.LightRange or 11.0,
+					OutlineTransparency = customConfig.OutlineTransparency or 0.05,
+
+					PinkGlassBg = Color3.fromRGB(255, 230, 238),
+					PinkGlassStroke = Color3.fromRGB(255, 230, 238),
+					MyCardBg = Color3.fromRGB(45, 15, 22),
+					MyCardStroke = Color3.fromRGB(45, 15, 22),
+
+					HealthBarProgressColor = Color3.fromRGB(255, 120, 160),
+					HealthBarContainerColor = Color3.fromRGB(255, 255, 255),
+
+					TextHDMain = Color3.fromRGB(255, 255, 255),
+					TextHDSub = Color3.fromRGB(255, 190, 210),
+					ShadowColor = Color3.fromRGB(20, 5, 10),
+
+					CardSize = Vector3.new(4.6, 1.75, 0.05),
+					ShoulderHeight = 1.6,
+					EyeSeparation = 4.3,
+					ViewAngleThreshold = 0.12,
+
+					BaseStiffness = 18.5,
+					FluidDragCoeff = 0.25,
+					ParallaxIntensity = 0.35,
+					MicroVibeFreq = 8.5
+				}
+
+				self.LocalPlayer = Players.LocalPlayer
+				self.Slots = {}
+				self.IsRunning = false
+				self.StorageFolder = nil
+
+				self.MyFluidState = {
+					Position = Vector3.new(),
+					Velocity = Vector3.new(),
+					Rotation = Vector3.new()
+				}
+				self.SlotFluidStates = {}
+				self.GlobalCurrentAlpha = 1.0
+
+				return self
+			end
+
+			function QuantumHUD:_updateFluidEngine(state, targetPos, dt)
+				local displacement = state.Position - targetPos
+				local distance = displacement.Magnitude
+				local dynamicDamping = 0.45 + math.clamp(1 / (distance + 0.1), 0, 1.8)
+
+				local springForce = -self.Config.BaseStiffness * displacement
+				local baseDampingForce = -dynamicDamping * state.Velocity
+				local fluidDragForce = -state.Velocity.Unit * (state.Velocity.Magnitude ^ 2) * self.Config.FluidDragCoeff
+
+				if state.Velocity.Magnitude == 0 then fluidDragForce = Vector3.new() end
+				local acceleration = springForce + baseDampingForce + fluidDragForce
+
+				state.Velocity = state.Velocity + acceleration * dt
+				state.Position = state.Position + state.Velocity * dt
+				return state.Position
+			end
+
+			function QuantumHUD:_isTargetVisibleThroughCover(camera, myChar, targetChar, targetRoot)
+				if not myChar or not targetChar then return false end
+
+				local raycastParams = RaycastParams.new()
+				local ignoreList = {myChar, targetChar}
+				if self.StorageFolder then table.insert(ignoreList, self.StorageFolder) end
+				raycastParams.FilterDescendantsInstances = ignoreList
+				raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+
+				local camPos = camera.CFrame.Position
+				local checkPoints = { targetRoot.Position }
+
+				local head = targetChar:FindFirstChild("Head")
+				if head then table.insert(checkPoints, head.Position) end
+
+				local leftLeg = targetChar:FindFirstChild("Left Leg") or targetChar:FindFirstChild("LeftLowerLeg")
+				if leftLeg then table.insert(checkPoints, leftLeg.Position) end
+
+				local rightLeg = targetChar:FindFirstChild("Right Leg") or targetChar:FindFirstChild("RightLowerLeg")
+				if rightLeg then table.insert(checkPoints, rightLeg.Position) end
+
+				for _, point in ipairs(checkPoints) do
+					local direction = point - camPos
+					local result = Workspace:Raycast(camPos, direction, raycastParams)
+					if not result then return true end
+				end
+				return false
+			end
+
+			function QuantumHUD:PurgeLegacyPipelines()
+				pcall(function()
+					RunService:UnbindFromRenderStep("Quantum_Stationary_Engine")
+				end)
+				local legacy = Workspace:FindFirstChild(self.Config.StorageName)
+				if legacy then
+					pcall(function()
+						legacy:Destroy()
+					end)
+					task.wait(0.02)
+				end
+			end
+
+			function QuantumHUD:_buildGlassContainer(name)
+				if not self.StorageFolder then
+					self.StorageFolder = Workspace:FindFirstChild(self.Config.StorageName) or Instance.new("Folder")
+					self.StorageFolder.Name = self.Config.StorageName
+					self.StorageFolder.Parent = Workspace
+				end
+
+				local masterPart = Instance.new("Part")
+				masterPart.Name = "ST_Master_" .. name
+				masterPart.Size = self.Config.CardSize
+				masterPart.Transparency = 1
+				masterPart.CanCollide = false
+				masterPart.CanTouch = false
+				masterPart.CanQuery = false
+				masterPart.Anchored = true
+				masterPart.Parent = self.StorageFolder
+
+				local blurFilter = Instance.new("Part")
+				blurFilter.Name = "GlassBlurFilter"
+				blurFilter.Size = Vector3.new(self.Config.CardSize.X - 0.02, self.Config.CardSize.Y - 0.02, 0.01)
+				blurFilter.Material = Enum.Material.Glass
+				blurFilter.Transparency = 1
+				blurFilter.Color = self.Config.PinkGlassBg
+				blurFilter.CanCollide = false
+				blurFilter.CanTouch = false
+				blurFilter.CanQuery = false
+				blurFilter.Anchored = true
+				blurFilter.Parent = masterPart
+
+				return masterPart
+			end
+
+			function QuantumHUD:_attachUltraHDCanvas(parentPart, isLocal)
+				local sGui = Instance.new("SurfaceGui")
+				sGui.Name = "CanvasEngine"
+				sGui.Face = Enum.NormalId.Front
+				sGui.CanvasSize = Vector2.new(1380, 525)
+				sGui.PixelsPerStud = 300
+				sGui.AlwaysOnTop = true
+				sGui.LightInfluence = 0.0
+				sGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+				sGui.Enabled = false
+				sGui.Parent = parentPart
+
+				local canvas = Instance.new("CanvasGroup")
+				canvas.Name = "AlphaGroup"
+				canvas.Size = UDim2.new(1, 0, 1, 0)
+				canvas.BackgroundColor3 = isLocal and self.Config.MyCardBg or self.Config.PinkGlassBg
+				canvas.GroupTransparency = 1
+				canvas.BorderSizePixel = 0
+				canvas.Parent = sGui
+				Instance.new("UICorner", canvas).CornerRadius = UDim.new(0, 42)
+
+				local stroke = Instance.new("UIStroke", canvas)
+				stroke.Thickness = 6.5
+				stroke.Color = isLocal and self.Config.MyCardStroke or self.Config.PinkGlassStroke
+
+				local avatar = Instance.new("ImageLabel")
+				avatar.Name = "UserAvatar"
+				avatar.Size = UDim2.new(0, 130, 0, 130)
+				avatar.Position = UDim2.new(0, 45, 0.5, -65)
+				avatar.BackgroundTransparency = 1
+				avatar.Parent = canvas
+				Instance.new("UICorner", avatar).CornerRadius = UDim.new(1, 0)
+
+				local avStroke = Instance.new("UIStroke", avatar)
+				avStroke.Thickness = 4
+				avStroke.Color = stroke.Color
+
+				local function CreateHDText(name, size, pos, color, font)
+					local label = Instance.new("TextLabel")
+					label.Name = name
+					label.Size = UDim2.new(0.75, 0, 0.22, 0)
+					label.Position = pos
+					label.BackgroundTransparency = 1
+					label.TextColor3 = color
+					label.TextSize = size
+					label.Font = font
+					label.TextXAlignment = Enum.TextXAlignment.Left
+					label.TextStrokeTransparency = 1
+
+					local shadow = Instance.new("UIStroke", label)
+					shadow.Color = self.Config.ShadowColor
+					shadow.Thickness = 3.5
+					shadow.LineJoinMode = Enum.LineJoinMode.Round
+					label.Parent = canvas
+					return label
+				end
+
+				CreateHDText("TitleLabel", 46, UDim2.new(0, 210, 0.16, 0), self.Config.TextHDMain, Enum.Font.GothamBold)
+				CreateHDText("SubTagLabel", 32, UDim2.new(0, 210, 0.46, 0), self.Config.TextHDSub, Enum.Font.GothamBold)
+				CreateHDText("StatusLabel", 34, UDim2.new(0, 210, 0.72, 0), self.Config.TextHDMain, Enum.Font.Code)
+
+				if isLocal then
+					local coordLabel = CreateHDText("CoordLabel", 28, UDim2.new(0, 210, 0.73, 0), self.Config.TextHDSub, Enum.Font.Code)
+					coordLabel.Size = UDim2.new(0.75, 0, 0.18, 0)
+					canvas.StatusLabel.Position = UDim2.new(0, 210, 0.56, 0)
+					canvas.StatusLabel.TextSize = 30
+
+					local hpContainer = Instance.new("Frame")
+					hpContainer.Name = "HPContainer"
+					hpContainer.Size = UDim2.new(0, 1120, 0, 14)
+					hpContainer.Position = UDim2.new(0, 210, 0.43, 0)
+					hpContainer.BackgroundColor3 = self.Config.HealthBarContainerColor
+					hpContainer.BorderSizePixel = 0
+					hpContainer.Parent = canvas
+					Instance.new("UICorner", hpContainer).CornerRadius = UDim.new(0, 7)
+
+					local hpProgress = Instance.new("Frame")
+					hpProgress.Name = "HPProgress"
+					hpProgress.Size = UDim2.new(1, 0, 1, 0)
+					hpProgress.BackgroundColor3 = self.Config.HealthBarProgressColor
+					hpProgress.BorderSizePixel = 0
+					hpProgress.Parent = hpContainer
+					Instance.new("UICorner", hpProgress).CornerRadius = UDim.new(0, 7)
+				end
+
+				return canvas
+			end
+
+			function QuantumHUD:_calculateCinematicTransform(targetRoot, camera, state, gameTime, deltaTime)
+				local camCF = camera.CFrame
+				local baseShoulderPos = targetRoot.Position + Vector3.new(0, self.Config.ShoulderHeight, 0)
+				local targetWorldPos = baseShoulderPos + (camCF.RightVector * self.Config.EyeSeparation)
+
+				local slowLayer = math.sin(gameTime * 0.95) * math.cos(gameTime * 0.3) * 0.09
+				local fastLayer = math.sin(gameTime * self.Config.MicroVibeFreq) * 0.006
+				local finalBobY = slowLayer + fastLayer
+				local finalBobX = math.cos(gameTime * 1.1) * math.sin(gameTime * 0.4) * 0.06
+
+				targetWorldPos += Vector3.new(finalBobX, finalBobY, finalBobX * 0.3)
+
+				local dt = math.min(deltaTime, 0.03)
+				local currentPhysicsPos = self:_updateFluidEngine(state, targetWorldPos, dt)
+
+				local lookAtCF = CFrame.lookAt(currentPhysicsPos, camCF.Position, Vector3.new(0, 1, 0))
+				local localTargetVec = camCF:ToObjectSpace(lookAtCF).Position.Unit
+
+				local targetTiltX = -localTargetVec.Y * self.Config.ParallaxIntensity
+				local targetTiltY = localTargetVec.X * self.Config.ParallaxIntensity
+				state.Rotation = state.Rotation + (Vector3.new(targetTiltX, targetTiltY, 0) - state.Rotation) * 0.15
+
+				return lookAtCF * CFrame.Angles(state.Rotation.X, state.Rotation.Y, math.sin(gameTime * 0.5) * 0.005)
+			end
+
+			function QuantumHUD:_evaluateGlobalState(myRoot, myHum, camera)
+				if myHum.MoveDirection.Magnitude > 0.01 then
+					return 1.0
+				end
+				local cameraToMeDirection = (camera.CFrame.Position - myRoot.Position).Unit
+				local lookDirectionDot = myRoot.CFrame.LookVector:Dot(cameraToMeDirection)
+				if lookDirectionDot > self.Config.ViewAngleThreshold then
+					return 0.0
+				else
+					return 1.0
+				end
+			end
+
+			function QuantumHUD:_launchPipelineLoop()
+				RunService:BindToRenderStep("Quantum_Stationary_Engine", Enum.RenderPriority.Camera.Value + 1, function(dt)
+					if not self.IsRunning then return end
+
+					local camera = Workspace.CurrentCamera
+					local myChar = self.LocalPlayer.Character
+					local myRoot = myChar and myChar:FindFirstChild("HumanoidRootPart")
+					local myHum = myChar and myChar:FindFirstChild("Humanoid")
+					local currentTime = os.clock()
+
+					if not (camera and myRoot and myHum) then return end
+
+					local targetGlobalAlpha = self:_evaluateGlobalState(myRoot, myHum, camera)
+					local wasHidden = (self.GlobalCurrentAlpha > 0.95)
+
+					local alphaSpeed = targetGlobalAlpha == 0 and 0.09 or 0.25
+					self.GlobalCurrentAlpha = self.GlobalCurrentAlpha + (targetGlobalAlpha - self.GlobalCurrentAlpha) * alphaSpeed
+
+					local isGlobalVisible = self.GlobalCurrentAlpha < 0.95
+					local computedBlurTransparency = 0.45 + (self.GlobalCurrentAlpha * 0.55)
+
+					if self.My3DInstance then
+						if isGlobalVisible then
+							self.My3DInstance.CanvasEngine.Enabled = true
+							local alphaGroup = self.My3DInstance.CanvasEngine.AlphaGroup
+							alphaGroup.GroupTransparency = self.GlobalCurrentAlpha
+							self.My3DInstance.GlassBlurFilter.Transparency = computedBlurTransparency
+
+							local hpRatio = math.clamp(myHum.Health / myHum.MaxHealth, 0, 1)
+							alphaGroup.StatusLabel.Text = "💖 状态: " .. tostring(math.floor(hpRatio * 100)) .. "%"
+							alphaGroup.HPContainer.HPProgress.Size = UDim2.new(hpRatio, 0, 1, 0)
+
+							local pos = myRoot.Position
+							alphaGroup.CoordLabel.Text = string.format(
+								"坐标: X:%.1f / Y:%.1f / Z:%.1f",
+								pos.X, pos.Y, pos.Z
+							)
+
+							if wasHidden then
+								local basePos = myRoot.Position + (camera.CFrame.RightVector * self.Config.EyeSeparation)
+								self.MyFluidState.Position = basePos
+								self.MyFluidState.Velocity = Vector3.new()
+								self.MyFluidState.Rotation = Vector3.new()
+							end
+
+							local finalCF = self:_calculateCinematicTransform(myRoot, camera, self.MyFluidState, currentTime, dt)
+							self.My3DInstance.CFrame = finalCF
+							self.My3DInstance.GlassBlurFilter.CFrame = finalCF * CFrame.new(0, 0, -0.01)
+						else
+							self.My3DInstance.CanvasEngine.Enabled = false
+							self.My3DInstance.GlassBlurFilter.Transparency = 1
+						end
+					end
+
+					local targetPool = {}
+					for _, player in pairs(Players:GetPlayers()) do
+						if player ~= self.LocalPlayer
+							and player.Character
+							and player.Character:FindFirstChild("HumanoidRootPart")
+							and player.Character:FindFirstChild("Humanoid") then
+
+							local tChar = player.Character
+							local tRoot = tChar.HumanoidRootPart
+							local tHum = tChar.Humanoid
+
+							if tHum.Health > 0 then
+								local _, inViewport = camera:WorldToScreenPoint(tRoot.Position)
+								local distance = (myRoot.Position - tRoot.Position).Magnitude
+
+								if inViewport and distance <= self.Config.MaxDistance then
+									local isVisible = self:_isTargetVisibleThroughCover(camera, myChar, tChar, tRoot)
+									if isVisible then
+										table.insert(targetPool, {
+											player = player,
+											root = tRoot,
+											hum = tHum,
+											dist = distance,
+											char = tChar
+										})
+									end
+								end
+							end
+						end
+					end
+
+					table.sort(targetPool, function(a, b)
+						return a.dist < b.dist
+					end)
+
+					for i = 1, self.Config.MaxHUDs do
+						local slot = self.Slots[i]
+						local data = targetPool[i]
+
+						if data and isGlobalVisible then
+							slot.Part.CanvasEngine.Enabled = true
+							local alphaGroup = slot.Part.CanvasEngine.AlphaGroup
+							alphaGroup.GroupTransparency = self.GlobalCurrentAlpha
+							slot.Part.GlassBlurFilter.Transparency = computedBlurTransparency
+
+							if wasHidden
+								or not self.SlotFluidStates[i]
+								or slot.LastTarget ~= data.player then
+
+								local basePos = data.root.Position + (camera.CFrame.RightVector * self.Config.EyeSeparation)
+								self.SlotFluidStates[i] = {
+									Position = basePos,
+									Velocity = Vector3.new(),
+									Rotation = Vector3.new()
+								}
+							end
+
+							local finalCF = self:_calculateCinematicTransform(
+								data.root,
+								camera,
+								self.SlotFluidStates[i],
+								currentTime,
+								dt
+							)
+
+							slot.Part.CFrame = finalCF
+							slot.Part.GlassBlurFilter.CFrame = finalCF * CFrame.new(0, 0, -0.01)
+
+							if slot.LastTarget ~= data.player then
+								slot.LastTarget = data.player
+								alphaGroup.TitleLabel.Text = data.player.DisplayName
+
+								local avatarUrl = "rbxthumb://type=AvatarHeadShot&id="
+									.. tostring(data.player.UserId)
+									.. "&w=150&h=150"
+
+								if alphaGroup.UserAvatar.Image ~= avatarUrl then
+									alphaGroup.UserAvatar.Image = avatarUrl
+								end
+
+								local tool = data.char:FindFirstChildOfClass("Tool")
+								alphaGroup.SubTagLabel.Text = tool and ("🌸 " .. tool.Name) or "[ UNARMED ]"
+							end
+
+							alphaGroup.StatusLabel.Text =
+								"💢 HP: "
+								.. tostring(math.floor(data.hum.Health))
+								.. " / "
+								.. tostring(data.hum.MaxHealth)
+						else
+							if slot.Part then
+								slot.Part.CanvasEngine.Enabled = false
+								slot.Part.GlassBlurFilter.Transparency = 1
+							end
+							if not data then
+								slot.LastTarget = nil
+								self.SlotFluidStates[i] = nil
+							end
+						end
+					end
+				end)
+			end
+
+			function QuantumHUD:_applyVisualEnhancements(character)
+				if not character then return end
+
+				for _, item in ipairs(character:GetDescendants()) do
+					if item.Name == "Quantum_Self_Highlight" or item.Name == "Quantum_Self_PointLight" then
+						item:Destroy()
+					end
+				end
+
+				for _, part in ipairs(character:GetDescendants()) do
+					if part:IsA("MeshPart") or part:IsA("BasePart") then
+						if part:IsA("MeshPart") then
+							part.RenderFidelity = Enum.RenderFidelity.Precise
+						end
+						part.CastShadow = true
+
+						pcall(function()
+							if part.Material == Enum.Material.Plastic then
+								part.Material = Enum.Material.SmoothPlastic
+							end
+
+							if part.Name == "Head" or part.Name == "Face" or part.Name:find("Face") then
+								part.Reflectance = self.Config.HeadReflectance
+							else
+								part.Reflectance = self.Config.BodyReflectance
+							end
+						end)
+					end
+				end
+
+				local lowerTorso = character:FindFirstChild("LowerTorso") or character:FindFirstChild("Torso")
+				if lowerTorso then
+					local light = Instance.new("PointLight")
+					light.Name = "Quantum_Self_PointLight"
+					light.Color = Color3.fromRGB(255, 245, 250)
+					light.Brightness = self.Config.LightBrightness
+					light.Range = self.Config.LightRange
+					light.Shadows = true
+					light.Parent = lowerTorso
+				end
+
+				local highlight = Instance.new("Highlight")
+				highlight.Name = "Quantum_Self_Highlight"
+				highlight.FillColor = Color3.fromRGB(255, 255, 255)
+				highlight.FillTransparency = 1.0
+				highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+				highlight.OutlineTransparency = self.Config.OutlineTransparency
+				highlight.Adornee = character
+				highlight.Parent = character
+			end
+
+			function QuantumHUD:_maximizeMobileGraphicsPipeline()
+				pcall(function()
+					settings().Rendering.QualityLevel = Enum.QualityLevel.Level21
+					Lighting.Technology = Enum.Technology.Future
+					Lighting.ShadowMapEnabled = true
+					Lighting.GlobalShadows = true
+					Lighting.EnvironmentDiffuseScale = 1.0
+					Lighting.EnvironmentSpecularScale = 1.0
+					Lighting.Ambient = Color3.fromRGB(35, 32, 38)
+					Lighting.OutdoorAmbient = Color3.fromRGB(45, 42, 50)
+				end)
+
+				for _, fx in ipairs(Lighting:GetChildren()) do
+					if fx.Name:find("QuantumFX_") then
+						fx:Destroy()
+					end
+				end
+
+				local colorCorrection = Instance.new("ColorCorrectionEffect")
+				colorCorrection.Name = "QuantumFX_ColorMax"
+				colorCorrection.Brightness = 0.02
+				colorCorrection.Contrast = 0.20
+				colorCorrection.Saturation = 0.16
+				colorCorrection.TintColor = Color3.fromRGB(255, 252, 248)
+				colorCorrection.Parent = Lighting
+
+				local bloom = Instance.new("BloomEffect")
+				bloom.Name = "QuantumFX_BloomMax"
+				bloom.Intensity = 0.95
+				bloom.Size = 32
+				bloom.Threshold = 0.80
+				bloom.Parent = Lighting
+
+				local sunRays = Instance.new("SunRaysEffect")
+				sunRays.Name = "QuantumFX_SunRaysMax"
+				sunRays.Intensity = 0.40
+				sunRays.Spread = 0.92
+				sunRays.Parent = Lighting
+
+				local blur = Instance.new("BlurEffect")
+				blur.Name = "QuantumFX_MotionBlurMax"
+				blur.Size = 2.6
+				blur.Parent = Lighting
+
+				task.spawn(function()
+					for _, desc in ipairs(Workspace:GetDescendants()) do
+						if desc:IsA("BasePart")
+							and not desc:IsDescendantOf(Players.LocalPlayer.Character) then
+
+							pcall(function()
+								if desc.Material == Enum.Material.Plastic then
+									desc.Material = Enum.Material.SmoothPlastic
+								end
+								if desc.Reflectance < 0.05 then
+									desc.Reflectance = 0.06
+								end
+							end)
+						end
+					end
+				end)
+			end
+
+			function QuantumHUD:Start()
+				self:PurgeLegacyPipelines()
+				self.IsRunning = true
+
+				self:_maximizeMobileGraphicsPipeline()
+
+				self.My3DInstance = self:_buildGlassContainer("LocalPlayer")
+				local myCanvas = self:_attachUltraHDCanvas(self.My3DInstance, true)
+				myCanvas.TitleLabel.Text = "👑 " .. self.LocalPlayer.DisplayName
+				myCanvas.SubTagLabel.Text = "🌸如果没人爱着你，还有开发者爱着你(=^▽^=)"
+				myCanvas.UserAvatar.Image =
+					"rbxthumb://type=AvatarHeadShot&id="
+					.. tostring(self.LocalPlayer.UserId)
+					.. "&w=150&h=150"
+
+				if self.LocalPlayer.Character then
+					self:_applyVisualEnhancements(self.LocalPlayer.Character)
+				end
+
+				self.LocalPlayer.CharacterAdded:Connect(function(newCharacter)
+					self:_applyVisualEnhancements(newCharacter)
+				end)
+
+				for i = 1, self.Config.MaxHUDs do
+					local part = self:_buildGlassContainer("Slot_" .. i)
+					local canvas = self:_attachUltraHDCanvas(part, false)
+					self.Slots[i] = {
+						Part = part,
+						Canvas = canvas,
+						LastTarget = nil
+					}
+				end
+
+				self:_launchPipelineLoop()
+			end
+
+			local RunInstance = QuantumHUD.new()
+			RunInstance:Start()
+		end
+
+		LaunchQuantumGraphicsPipeline({
+			MaxHUDs = 5,
+			MaxDistance = 110,
+			BodyReflectance = 0.15,
+			HeadReflectance = 0.01,
+			LightBrightness = 0.45,
+			LightRange = 11.0,
+			OutlineTransparency = 0.05
+		})
+	end
+})
+Sjgnfh:AddToggle('MyToggle', {
+	Text = '2D信息栏',
+	Default = false,
+	Tooltip = '开启后无法关闭哦🤔',
+	Callback = function(Value)
+		print('[回调] 开关状态改变:', Value)
+
+		if not Value then return end
+
+		local TweenService = game:GetService("TweenService")
+		local Players = game:GetService("Players")
+		local CoreGui = game:GetService("CoreGui")
+		local Workspace = game:GetService("Workspace")
+
+		local localPlayer = Players.LocalPlayer
+
+		local Config = {
+			MaxHUDs = 4,
+			MaxDistance = 90,
+			HysteresisBuffer = 10,
+			MySnowCount = 20,
+			DevUsername = "此处填写你的名字",
+
+			BgColor = Color3.fromRGB(255, 255, 255),
+			BgTransparency = 0.15,
+			TextMain = Color3.fromRGB(30, 30, 35),
+			TextSub = Color3.fromRGB(115, 120, 130),
+			ActiveColor = Color3.fromRGB(25, 25, 30),
+			StrokeColor = Color3.fromRGB(255, 255, 255),
+
+			MyCardBg = Color3.fromRGB(10, 10, 18),
+			MyCardStroke = Color3.fromRGB(180, 220, 255),
+			DevCardBg = Color3.fromRGB(25, 10, 15),
+			DevCardStroke = Color3.fromRGB(255, 100, 150),
+
+			ShoulderSwitch = TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+		}
+
+		_G.HUDFeatureStates = {
+			ShowSelfHUD = true,
+			ShowOthersHUD = true
+		}
+
+		local Slots = {}
+
+		local function getAbsoluteAvatar(userId)
+			return "rbxthumb://type=AvatarHeadShot&id=" .. tostring(userId or 0) .. "&w=150&h=150"
+		end
+
+		local function isDeveloper(username)
+			return string.lower(username) == string.lower(Config.DevUsername)
+		end
+
+		local function getOptimalShoulderOffset(character, camera)
+			local hrp = character:FindFirstChild("HumanoidRootPart")
+			if not hrp then return Vector3.new(2.8, 1.2, -0.6), "Right" end
+			local rightVec = hrp.CFrame.RightVector
+			local leftPos = hrp.Position - (rightVec * 2.2)
+			local rightPos = hrp.Position + (rightVec * 2.2)
+			local camPos = camera.CFrame.Position
+
+			local rayParams = RaycastParams.new()
+			rayParams.FilterType = Enum.RaycastFilterType.Exclude
+			rayParams.FilterDescendantsInstances = {character, localPlayer.Character}
+
+			local rayLeft = Workspace:Raycast(leftPos, camPos - leftPos, rayParams)
+			local rayRight = Workspace:Raycast(rightPos, camPos - rightPos, rayParams)
+
+			if rayRight and not rayLeft then
+				return Vector3.new(-2.8, 1.2, -0.6), "Left"
+			elseif rayLeft and not rayRight then
+				return Vector3.new(2.8, 1.2, -0.6), "Right"
+			else
+				return Vector3.new(2.8, 1.2, -0.6), "Right"
+			end
+		end
+
+		local function isObstructedFromCamera(camera, targetRoot)
+			local rayParams = RaycastParams.new()
+			rayParams.FilterType = Enum.RaycastFilterType.Exclude
+			local allCharacters = {}
+			for _, p in pairs(Players:GetPlayers()) do
+				if p.Character then table.insert(allCharacters, p.Character) end
+			end
+			rayParams.FilterDescendantsInstances = allCharacters
+
+			local hitResult = Workspace:Raycast(camera.CFrame.Position, targetRoot.Position - camera.CFrame.Position, rayParams)
+			if hitResult and hitResult.Instance and (hitResult.Instance.CanCollide or hitResult.Instance:IsA("Terrain")) then
+				return true
+			end
+			return false
+		end
+
+		local function createPersonal3DHUD()
+			local my3DHUD = Instance.new("BillboardGui")
+			my3DHUD.Name = "MyPersonal3DHUD"
+			my3DHUD.Size = UDim2.new(3.5, 0, 1.4, 0)
+			my3DHUD.AlwaysOnTop = true
+			my3DHUD.ResetOnSpawn = false
+			my3DHUD.Enabled = false
+			my3DHUD.Parent = CoreGui
+
+			local myFrame = Instance.new("CanvasGroup")
+			myFrame.Name = "HUDFrame"
+			myFrame.Size = UDim2.new(1, 0, 1, 0)
+			myFrame.BorderSizePixel = 0
+			myFrame.Parent = my3DHUD
+			Instance.new("UICorner", myFrame).CornerRadius = UDim.new(0, 8)
+
+			local myStroke = Instance.new("UIStroke", myFrame)
+			myStroke.Thickness = 1.2
+			myStroke.Transparency = 0.3
+
+			if isDeveloper(localPlayer.Name) then
+				myFrame.BackgroundColor3 = Config.DevCardBg
+				myStroke.Color = Config.DevCardStroke
+			else
+				myFrame.BackgroundColor3 = Config.MyCardBg
+				myStroke.Color = Config.MyCardStroke
+			end
+
+			local mySnowContainer = Instance.new("Frame")
+			mySnowContainer.Size = UDim2.new(1, 0, 1, 0)
+			mySnowContainer.BackgroundTransparency = 1
+			mySnowContainer.ClipsDescendants = true
+			mySnowContainer.Parent = myFrame
+
+			for i = 1, Config.MySnowCount do
+				local flake = Instance.new("Frame")
+				flake.Size = UDim2.new(0, 4, 0, 4)
+				flake.Position = UDim2.new(math.random(), 0, math.random(), 0)
+				flake.BackgroundColor3 = Color3.fromRGB(240, 250, 255)
+				flake.BackgroundTransparency = math.random(3, 7) * 0.1
+				flake.Parent = mySnowContainer
+				Instance.new("UICorner", flake).CornerRadius = UDim.new(1, 0)
+
+				local speed = math.random(5, 10) * 0.003
+				task.spawn(function()
+					while flake and flake.Parent do
+						flake.Position = UDim2.new(flake.Position.X.Scale, 0, flake.Position.Y.Scale + speed, 0)
+						if flake.Position.Y.Scale > 1 then
+							flake.Position = UDim2.new(math.random(), 0, -0.05, 0)
+						end
+						task.wait(0.03)
+					end
+				end)
+			end
+
+			local myAvatarImage = Instance.new("ImageLabel")
+			myAvatarImage.Name = "AvatarImage"
+			myAvatarImage.Size = UDim2.new(0.22, 0, 0.65, 0)
+			myAvatarImage.Position = UDim2.new(0, 8, 0.175, 0)
+			myAvatarImage.BackgroundTransparency = 1
+			myAvatarImage.Image = getAbsoluteAvatar(localPlayer.UserId)
+			myAvatarImage.Parent = myFrame
+			Instance.new("UICorner", myAvatarImage).CornerRadius = UDim.new(1, 0)
+
+			local myAvStroke = Instance.new("UIStroke", myAvatarImage)
+			myAvStroke.Thickness = 1
+			myAvStroke.Color = isDeveloper(localPlayer.Name) and Config.DevCardStroke or Config.MyCardStroke
+			myAvStroke.Transparency = 0.4
+
+			local myNameLabel = Instance.new("TextLabel")
+			myNameLabel.Size = UDim2.new(0.72, -12, 0.26, 0)
+			myNameLabel.Position = UDim2.new(0.26, 6, 0.12, 0)
+			myNameLabel.BackgroundTransparency = 1
+			myNameLabel.Text = (isDeveloper(localPlayer.Name) and "🛠️ " or "👑 ") .. localPlayer.DisplayName
+			myNameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			myNameLabel.TextScaled = true
+			myNameLabel.Font = Enum.Font.GothamBold
+			myNameLabel.TextXAlignment = Enum.TextXAlignment.Left
+			myNameLabel.Parent = myFrame
+
+			local myTagLabel = Instance.new("TextLabel")
+			myTagLabel.Size = UDim2.new(0.72, -12, 0.18, 0)
+			myTagLabel.Position = UDim2.new(0.26, 6, 0.45, 0)
+			myTagLabel.BackgroundTransparency = 1
+			myTagLabel.Text = isDeveloper(localPlayer.Name) and "🔥 FOUNDER / DEVELOPER" or "✨ TACTICAL LIGHTING"
+			myTagLabel.TextColor3 = isDeveloper(localPlayer.Name) and Color3.fromRGB(255, 120, 150) or Color3.fromRGB(160, 210, 255)
+			myTagLabel.TextScaled = true
+			myTagLabel.Font = Enum.Font.GothamBold
+			myTagLabel.TextXAlignment = Enum.TextXAlignment.Left
+			myTagLabel.Parent = myFrame
+
+			local myStatusLabel = Instance.new("TextLabel")
+			myStatusLabel.Size = UDim2.new(0.72, -12, 0.16, 0)
+			myStatusLabel.Position = UDim2.new(0.26, 6, 0.72, 0)
+			myStatusLabel.BackgroundTransparency = 1
+			myStatusLabel.Text = "❤️ HEALTH: --%"
+			myStatusLabel.TextColor3 = Color3.fromRGB(255, 110, 110)
+			myStatusLabel.TextScaled = true
+			myStatusLabel.Font = Enum.Font.Code
+			myStatusLabel.TextXAlignment = Enum.TextXAlignment.Left
+			myStatusLabel.Parent = myFrame
+
+			return my3DHUD, myStatusLabel
+		end
+
+		local function buildOthersHUDInstancePool()
+			for i = 1, Config.MaxHUDs do
+				local bGui = Instance.new("BillboardGui")
+				bGui.Name = "SlotHUD_" .. i
+				bGui.Size = UDim2.new(3.2, 0, 1.2, 0)
+				bGui.AlwaysOnTop = true
+				bGui.MaxDistance = Config.MaxDistance + Config.HysteresisBuffer
+				bGui.Enabled = false
+				bGui.Parent = CoreGui
+
+				local frame = Instance.new("CanvasGroup")
+				frame.Name = "HUDFrame"
+				frame.Size = UDim2.new(1, 0, 1, 0)
+				frame.BorderSizePixel = 0
+				frame.Parent = bGui
+				Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 6)
+
+				local slotStroke = Instance.new("UIStroke", frame)
+				slotStroke.Thickness = 1
+
+				local playerAvatar = Instance.new("ImageLabel")
+				playerAvatar.Name = "PlayerAvatar"
+				playerAvatar.Size = UDim2.new(0.2, 0, 0.6, 0)
+				playerAvatar.Position = UDim2.new(0, 6, 0.2, 0)
+				playerAvatar.BackgroundTransparency = 1
+				playerAvatar.Parent = frame
+				Instance.new("UICorner", playerAvatar).CornerRadius = UDim.new(1, 0)
+
+				local paStroke = Instance.new("UIStroke", playerAvatar)
+				paStroke.Thickness = 1
+				paStroke.Transparency = 0.4
+
+				local nameLabel = Instance.new("TextLabel")
+				nameLabel.Name = "NameLabel"
+				nameLabel.Size = UDim2.new(0.76, -10, 0.24, 0)
+				nameLabel.Position = UDim2.new(0.24, 6, 0.1, 0)
+				nameLabel.BackgroundTransparency = 1
+				nameLabel.TextScaled = true
+				nameLabel.Font = Enum.Font.GothamBold
+				nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+				nameLabel.Parent = frame
+
+				local healthBg = Instance.new("Frame")
+				healthBg.Name = "HealthBg"
+				healthBg.Size = UDim2.new(0.76, -10, 0.06, 0)
+				healthBg.Position = UDim2.new(0.24, 6, 0.42, 0)
+				healthBg.BackgroundTransparency = 0.88
+				healthBg.Parent = frame
+
+				local healthBar = Instance.new("Frame")
+				healthBar.Name = "Bar"
+				healthBar.Size = UDim2.new(1, 0, 1, 0)
+				healthBar.BorderSizePixel = 0
+				healthBar.Parent = healthBg
+
+				local inventoryLabel = Instance.new("TextLabel")
+				inventoryLabel.Name = "InventoryLabel"
+				inventoryLabel.Size = UDim2.new(0.76, -10, 0.32, 0)
+				inventoryLabel.Position = UDim2.new(0.24, 6, 0.58, 0)
+				inventoryLabel.BackgroundTransparency = 1
+				inventoryLabel.TextScaled = true
+				inventoryLabel.Font = Enum.Font.Gotham
+				inventoryLabel.TextXAlignment = Enum.TextXAlignment.Left
+				inventoryLabel.Parent = frame
+
+				Slots[i] = {
+					Gui = bGui,
+					Frame = frame,
+					Stroke = slotStroke,
+					PaStroke = paStroke,
+					CurrentSide = nil,
+					LastTarget = nil
+				}
+			end
+		end
+
+		local function startHUDHeartbeat(my3DHUD, myStatusLabel)
+			task.spawn(function()
+				local myCurrentSide = nil
+
+				while task.wait(0.05) do
+					local camera = Workspace.CurrentCamera
+					local myChar = localPlayer.Character
+					local myRoot = myChar and myChar:FindFirstChild("HumanoidRootPart")
+					local myHum = myChar and myChar:FindFirstChild("Humanoid")
+
+					if camera and myRoot and myHum then
+						local camPosition = camera.CFrame.Position
+
+						local _, myInViewport = camera:WorldToScreenPoint(myRoot.Position)
+						local myValid =
+							_G.HUDFeatureStates.ShowSelfHUD
+							and myInViewport
+							and (camPosition - myRoot.Position).Magnitude <= (Config.MaxDistance + Config.HysteresisBuffer)
+							and not isObstructedFromCamera(camera, myRoot)
+
+						if myValid then
+							my3DHUD.Adornee = myRoot
+							my3DHUD.Enabled = true
+							myStatusLabel.Text = "❤️ HEALTH: "
+								.. tostring(math.clamp(math.floor((myHum.Health / myHum.MaxHealth) * 100), 0, 100))
+								.. "%"
+
+							local targetOffset, side = getOptimalShoulderOffset(myChar, camera)
+							if myCurrentSide ~= side then
+								myCurrentSide = side
+								TweenService:Create(my3DHUD, Config.ShoulderSwitch, { StudsOffsetWorldSpace = targetOffset }):Play()
+							end
+						else
+							my3DHUD.Enabled = false
+						end
+
+						local validTargets = {}
+						local currentMappedSlots = {}
+						for i = 1, Config.MaxHUDs do
+							if Slots[i].LastTarget then
+								currentMappedSlots[Slots[i].LastTarget] = i
+							end
+						end
+
+						if _G.HUDFeatureStates.ShowOthersHUD then
+							for _, player in pairs(Players:GetPlayers()) do
+								if player ~= localPlayer
+									and player.Character
+									and player.Character:FindFirstChild("HumanoidRootPart")
+									and player.Character:FindFirstChild("Humanoid") then
+
+									local tChar = player.Character
+									local tRoot = tChar.HumanoidRootPart
+									local hum = tChar.Humanoid
+
+									if hum.Health > 0 then
+										local _, inViewport = camera:WorldToScreenPoint(tRoot.Position)
+										if inViewport
+											and (camPosition - tRoot.Position).Magnitude <= (currentMappedSlots[player] and (Config.MaxDistance + Config.HysteresisBuffer) or Config.MaxDistance)
+											and not isObstructedFromCamera(camera, tRoot) then
+
+											table.insert(validTargets, {
+												player = player,
+												char = tChar,
+												root = tRoot,
+												hum = hum,
+												dist = (camPosition - tRoot.Position).Magnitude
+											})
+										end
+									end
+								end
+							end
+						end
+
+						local nextSlotAllocations = {}
+						local remainingTargets = {}
+
+						for _, targetData in ipairs(validTargets) do
+							local oldSlotIndex = currentMappedSlots[targetData.player]
+							if oldSlotIndex and not nextSlotAllocations[oldSlotIndex] then
+								nextSlotAllocations[oldSlotIndex] = targetData
+							else
+								table.insert(remainingTargets, targetData)
+							end
+						end
+
+						table.sort(remainingTargets, function(a, b)
+							return a.dist < b.dist
+						end)
+
+						for i = 1, Config.MaxHUDs do
+							if not nextSlotAllocations[i] and #remainingTargets > 0 then
+								nextSlotAllocations[i] = table.remove(remainingTargets, 1)
+							end
+						end
+
+						for i = 1, Config.MaxHUDs do
+							local slot = Slots[i]
+							local gui = slot.Gui
+							local frame = slot.Frame
+							local data = nextSlotAllocations[i]
+
+							if data and _G.HUDFeatureStates.ShowOthersHUD then
+								gui.Adornee = data.root
+								gui.Enabled = true
+
+								local targetOffset, side = getOptimalShoulderOffset(data.char, camera)
+								if slot.CurrentSide ~= side then
+									slot.CurrentSide = side
+									TweenService:Create(gui, Config.ShoulderSwitch, { StudsOffsetWorldSpace = targetOffset }):Play()
+								end
+
+								if isDeveloper(data.player.Name) then
+									frame.BackgroundColor3 = Config.DevCardBg
+									frame.BackgroundTransparency = 0.15
+									slot.Stroke.Color = Config.DevCardStroke
+									slot.PaStroke.Color = Config.DevCardStroke
+									frame.NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+									frame.NameLabel.Text = "🛠️ " .. data.player.DisplayName
+									frame.HealthBg.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+									frame.HealthBg.Bar.BackgroundColor3 = Config.DevCardStroke
+									frame.InventoryLabel.Text = "⚡ [ CORE DEVELOPER ]"
+									frame.InventoryLabel.TextColor3 = Color3.fromRGB(255, 180, 200)
+								else
+									frame.BackgroundColor3 = Config.BgColor
+									frame.BackgroundTransparency = Config.BgTransparency
+									slot.Stroke.Color = Config.StrokeColor
+									slot.PaStroke.Color = Config.StrokeColor
+									frame.NameLabel.TextColor3 = Config.TextMain
+									frame.NameLabel.Text = data.player.DisplayName
+									frame.HealthBg.BackgroundColor3 = Config.ActiveColor
+									frame.HealthBg.Bar.BackgroundColor3 = Color3.fromRGB(80, 200, 80)
+									local tool = data.char:FindFirstChildOfClass("Tool")
+									frame.InventoryLabel.Text = tool and ("⚡ " .. tool.Name) or "[ UNARMED ]"
+									frame.InventoryLabel.TextColor3 = Config.TextSub
+								end
+
+								if slot.LastTarget ~= data.player then
+									slot.LastTarget = data.player
+									frame.PlayerAvatar.Image = getAbsoluteAvatar(data.player.UserId)
+								end
+
+								frame.HealthBg.Bar.Size = UDim2.new(
+									math.clamp(data.hum.Health / data.hum.MaxHealth, 0, 1),
+									0,
+									1,
+									0
+								)
+							else
+								gui.Enabled = false
+								gui.Adornee = nil
+								slot.CurrentSide = nil
+								slot.LastTarget = nil
+							end
+						end
+					end
+				end
+			end)
+		end
+
+		for _, v in pairs(CoreGui:GetChildren()) do
+			if v.Name == "MyPersonal3DHUD" or v.Name:sub(1, 8) == "SlotHUD_" then
+				v:Destroy()
+			end
+		end
+
+		local my3DHUD, myStatusLabel = createPersonal3DHUD()
+		buildOthersHUDInstancePool()
+		startHUDHeartbeat(my3DHUD, myStatusLabel)
+	end
+})
+Sjgnfh:AddButton({
+	Text = '雪景(需要双击)',
+	Func = function()
+		Library:Notify("我艹你妈", 3)
+		print('你妈飞了')
+
+		local Lighting = game:GetService("Lighting")
+		local Workspace = game:GetService("Workspace")
+		local TweenService = game:GetService("TweenService")
+		local RunService = game:GetService("RunService")
+		local Players = game:GetService("Players")
+		local LocalPlayer = Players.LocalPlayer
+
+		local EnvironmentEngine = {
+			ActivePreset = {
+				SkyboxID = "rbxassetid://13540026264",
+				DayColor = Color3.fromRGB(140, 160, 195),
+				DecayColor = Color3.fromRGB(12, 16, 30),
+				ClockTime = 0.0,
+				Brightness = 0.1
+			},
+			BlizzardConfig = {
+				MaxSnowflakes = 1800,
+				SpawnInterval = 0.01,
+				SnowRadius = 75,
+				WindX = -45,
+				WindZ = 20
+			},
+			SnowflakePool = {},
+			PoolIndex = 1,
+			peFolder = nil,
+			SeaPlane = nil
+		}
+
+		function EnvironmentEngine:ClearPreviousSession()
+			pcall(function()
+				if Workspace:FindFirstChild("Quantum_PESnowLayer") then
+					Workspace.Quantum_PESnowLayer:Destroy()
+				end
+				if Workspace:FindFirstChild("Atmosphere_Forced_Sea") then
+					Workspace.Atmosphere_Forced_Sea:Destroy()
+				end
+			end)
+		end
+
+		function EnvironmentEngine:InitializeSkybox()
+			local sky = Lighting:FindFirstChildOfClass("Sky") or Instance.new("Sky", Lighting)
+			sky.SkyboxBk = self.ActivePreset.SkyboxID
+			sky.SkyboxDn = self.ActivePreset.SkyboxID
+			sky.SkyboxFt = self.ActivePreset.SkyboxID
+			sky.SkyboxLf = self.ActivePreset.SkyboxID
+			sky.SkyboxRt = self.ActivePreset.SkyboxID
+			sky.SkyboxUp = self.ActivePreset.SkyboxID
+			sky.CelestialBodiesShown = false
+		end
+
+		function EnvironmentEngine:ApplyLightingBaking()
+			Lighting.ClockTime = self.ActivePreset.ClockTime
+			Lighting.Brightness = self.ActivePreset.Brightness
+			Lighting.Ambient = self.ActivePreset.DecayColor
+			Lighting.OutdoorAmbient = self.ActivePreset.DayColor
+
+			local atmosphere = Lighting:FindFirstChildOfClass("Atmosphere") or Instance.new("Atmosphere", Lighting)
+			atmosphere.Density = 0.42
+			atmosphere.Haze = 3.6
+			atmosphere.Color = self.ActivePreset.DayColor
+			atmosphere.Decay = self.ActivePreset.DecayColor
+			atmosphere.Glare = 0.6
+		end
+
+		function EnvironmentEngine:BuildCustomSea()
+			local seaContainer = Instance.new("Folder")
+			seaContainer.Name = "Atmosphere_Forced_Sea"
+			seaContainer.Parent = Workspace
+
+			local seaPlane = Instance.new("Part")
+			seaPlane.Name = "ReflectiveSea"
+			seaPlane.Size = Vector3.new(12000, 1, 12000)
+			seaPlane.Position = Vector3.new(0, -3, 0)
+			seaPlane.Anchored = true
+			seaPlane.CanCollide = false
+			seaPlane.CastShadow = false
+			seaPlane.Material = Enum.Material.Glass
+			seaPlane.Color = Color3.fromRGB(15, 20, 32)
+			seaPlane.Transparency = 0.15
+			seaPlane.Parent = seaContainer
+
+			local function createWave(textureId, speed, trans, scale)
+				local tex = Instance.new("Texture")
+				tex.Texture = textureId
+				tex.Face = Enum.NormalId.Top
+				tex.Transparency = trans
+				tex.StudsPerTileU = scale
+				tex.StudsPerTileV = scale
+				tex.Color3 = self.ActivePreset.DayColor
+				tex.Parent = seaPlane
+
+				task.spawn(function()
+					local u, v = 0, 0
+					while seaPlane.Parent do
+						u = (u + speed.X) % 1
+						v = (v + speed.Y) % 1
+						tex.OffsetStudsU = u * scale
+						tex.OffsetStudsV = v * scale
+						task.wait(0.03)
+					end
+				end)
+			end
+
+			createWave("rbxassetid://6687848609", Vector2.new(0.002, 0.003), 0.4, 180)
+			createWave("rbxassetid://6687848609", Vector2.new(-0.0015, 0.0025), 0.5, 140)
+
+			self.SeaPlane = seaPlane
+		end
+
+		function EnvironmentEngine:StartAtmosphereBreathing()
+			local atmosphere = Lighting:FindFirstChildOfClass("Atmosphere")
+			if not atmosphere then return end
+
+			task.spawn(function()
+				local isHigh = false
+				while atmosphere.Parent do
+					isHigh = not isHigh
+					local targetHaze = isHigh and 4.3 or 3.2
+					local targetGlare = isHigh and 0.8 or 0.4
+
+					TweenService:Create(atmosphere, TweenInfo.new(4, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+						Haze = targetHaze,
+						Glare = targetGlare
+					}):Play()
+
+					task.wait(4)
+				end
+			end)
+		end
+
+		function EnvironmentEngine:InitializeSnowPool()
+			self.peFolder = Instance.new("Folder")
+			self.peFolder.Name = "Quantum_PESnowLayer"
+			self.peFolder.Parent = Workspace
+
+			for i = 1, self.BlizzardConfig.MaxSnowflakes do
+				local snowball = Instance.new("Part")
+				snowball.Shape = Enum.PartType.Ball
+				local microSize = math.random(6, 16) / 100
+				snowball.Size = Vector3.new(microSize, microSize, microSize)
+				snowball.Color = self.ActivePreset.DayColor
+				snowball.Material = Enum.Material.Neon
+				snowball.CanCollide = false
+				snowball.CanTouch = false
+				snowball.CanQuery = false
+				snowball.Anchored = true
+				snowball.CastShadow = false
+				snowball.Transparency = 1
+				snowball.Position = Vector3.new(0, 9999, 0)
+				snowball.Parent = self.peFolder
+
+				self.SnowflakePool[i] = {
+					Part = snowball,
+					Tween1 = nil,
+					Tween2 = nil
+				}
+			end
+		end
+
+		function EnvironmentEngine:EmitBlizzard(playerRoot)
+			if not playerRoot then return end
+
+			local slot = self.SnowflakePool[self.PoolIndex]
+			self.PoolIndex = (self.PoolIndex % self.BlizzardConfig.MaxSnowflakes) + 1
+
+			if slot.Tween1 then slot.Tween1:Cancel() end
+			if slot.Tween2 then slot.Tween2:Cancel() end
+
+			local snowball = slot.Part
+			local localRadius = self.BlizzardConfig.SnowRadius
+
+			local startPos = playerRoot.Position + Vector3.new(
+				math.random(-localRadius * 10, localRadius * 10) / 10 - (self.BlizzardConfig.WindX * 0.5),
+				math.random(400, 1100) / 10,
+				math.random(-localRadius * 10, localRadius * 10) / 10 - (self.BlizzardConfig.WindZ * 0.5)
+			)
+
+			local fallDuration = math.random(11, 20) / 10
+			local endPos = startPos + Vector3.new(
+				self.BlizzardConfig.WindX + math.random(-80, 80) / 10,
+				-125,
+				self.BlizzardConfig.WindZ + math.random(-80, 80) / 10
+			)
+
+			snowball.Position = startPos
+			snowball.Transparency = 1
+
+			slot.Tween1 = TweenService:Create(snowball, TweenInfo.new(0.08, Enum.EasingStyle.Sine), { Transparency = 0.08 })
+			slot.Tween2 = TweenService:Create(snowball, TweenInfo.new(fallDuration, Enum.EasingStyle.Linear), { Position = endPos })
+
+			slot.Tween1:Play()
+			slot.Tween2:Play()
+
+			task.delay(fallDuration - 0.25, function()
+				if snowball.Position.Y ~= 9999 then
+					TweenService:Create(snowball, TweenInfo.new(0.25, Enum.EasingStyle.Sine), { Transparency = 1 }):Play()
+				end
+			end)
+
+			task.delay(fallDuration, function()
+				if snowball.Position.Y ~= 9999 then
+					snowball.Transparency = 1
+					snowball.Position = Vector3.new(0, 9999, 0)
+				end
+			end)
+		end
+
+		function EnvironmentEngine:ConnectTrackingLoop()
+			local camera = Workspace.CurrentCamera
+
+			RunService.RenderStepped:Connect(function()
+				if camera and self.SeaPlane and self.SeaPlane.Parent then
+					self.SeaPlane.Position = Vector3.new(
+						camera.CFrame.Position.X,
+						self.SeaPlane.Position.Y,
+						camera.CFrame.Position.Z
+					)
+				end
+			end)
+		end
+
+		function EnvironmentEngine:StartBlizzardLoop()
+			task.spawn(function()
+				while true do
+					local myChar = LocalPlayer.Character
+					local myRoot = myChar and myChar:FindFirstChild("HumanoidRootPart")
+
+					if myRoot then
+						for _ = 1, 18 do
+							self:EmitBlizzard(myRoot)
+						end
+					end
+					task.wait(self.BlizzardConfig.SpawnInterval)
+				end
+			end)
+		end
+
+		function EnvironmentEngine:Run()
+			self:ClearPreviousSession()
+			self:InitializeSkybox()
+			self:ApplyLightingBaking()
+			self:BuildCustomSea()
+			self:StartAtmosphereBreathing()
+			self:InitializeSnowPool()
+			self:ConnectTrackingLoop()
+			self:StartBlizzardLoop()
+		end
+
+		EnvironmentEngine:Run()
+	end,
+	DoubleClick = true
+})
+Sjgnfh:AddToggle('AuraToggle', {
+    Text = '普通环绕光环',
+    Default = false,
+    Tooltip = '以玩家为中心生成 3D 环绕光环',
+    Callback = function(Value)
+        print('[回调] 环绕光环:', Value)
+
+        if not Value then return end
+
+        local RunService = game:GetService("RunService")
+        local Players = game:GetService("Players")
+        local Workspace = game:GetService("Workspace")
+        local TweenService = game:GetService("TweenService")
+
+        local LocalPlayer = Players.LocalPlayer
+        local Audio = Instance.new("Sound")
+        Audio.SoundId = "rbxassetid://183763324" -- 示例音乐
+        Audio.Looped = true
+        Audio.Volume = 0.8
+        Audio.Parent = Workspace
+        Audio:Play()
+
+        local bars = {}
+        local numBars = 64
+        local radius = 3
+
+        for i = 1, numBars do
+            local bar = Instance.new("Part")
+            bar.Anchored = true
+            bar.CanCollide = false
+            bar.Material = Enum.Material.Neon
+            bar.Color = Color3.fromRGB(10, 90, 390)
+            bar.Size = Vector3.new(0.12, 0.12, 0.12)
+            bar.Parent = Workspace
+            table.insert(bars, bar)
+        end
+
+        local connection
+        connection = RunService.RenderStepped:Connect(function()
+            if not Audio.Parent then
+                connection:Disconnect()
+                for _, b in ipairs(bars) do b:Destroy() end
+                return
+            end
+
+            local target = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if not target then return end
+
+            local center = target.CFrame * CFrame.new(0, -2, 0)
+            local loudness = Audio.PlaybackLoudness
+            local scale = math.clamp(loudness / 400, 0.05, 1)
+            local rotation = tick() * 0.8
+
+            for i, bar in ipairs(bars) do
+                local noise = math.noise(tick() * 4, i * 0.15, 0)
+                local height = math.clamp(scale + noise * scale * 0.6, 0.05, 1) * 5
+
+                bar.Size = bar.Size:Lerp(Vector3.new(0.14, height, 0.14), 0.3)
+
+                local angle = (i / numBars) * math.pi * 2 + rotation
+                local x = math.cos(angle) * radius
+                local z = math.sin(angle) * radius
+                local pos = center.Position + Vector3.new(x, 0, z)
+
+                bar.CFrame = bar.CFrame:Lerp(
+                    CFrame.lookAt(pos, Vector3.new(center.Position.X, pos.Y, center.Position.Z)),
+                    0.4
+                )
+
+                bar.Color = Color3.fromRGB(10, 132, 255):Lerp(Color3.new(1, 1, 1), scale - 0.3)
+            end
+        end)
+    end
+})
+local connection
+local bars = {}
+local currentSound = nil
+local musicDropdown = nil
+
+Sjgnfh:AddToggle('AuraToggle', {
+    Text = '环绕光环(音乐版)',
+    Default = false,
+    Tooltip = '以玩家为中心生成 3D 环绕音浪光环',
+    Callback = function(Enabled)
+        print('[回调] 环绕光环:', Enabled)
+
+        local RunService = game:GetService("RunService")
+        local Players = game:GetService("Players")
+        local Workspace = game:GetService("Workspace")
+
+        local LocalPlayer = Players.LocalPlayer
+
+        local MusicList = {
+            ["雨爱"] = "rbxassetid://79277371759525",
+            ["将军😭😭"] = "rbxassetid://117061993775129",
+            ["iQOO进行曲"] = "rbxassetid://109693244185458",
+            ["不值得"] = "rbxassetid://131649148795563",
+            ["山楂树之恋"] = "rbxassetid://114372452919028",
+            ["银河奥特曼主题曲"] = "rbxassetid://91550314012338",
+            ["纯DJ"] = "rbxassetid://99498025749186"
+        }
+
+        local function CreateSound(id)
+            if currentSound then
+                currentSound:Stop()
+                currentSound:Destroy()
+            end
+
+            currentSound = Instance.new("Sound")
+            currentSound.SoundId = id
+            currentSound.Volume = 0.8
+            currentSound.Looped = true
+            currentSound.Parent = Workspace
+            currentSound:Play()
+        end
+
+        if not Enabled then
+            if connection then
+                connection:Disconnect()
+                connection = nil
+            end
+
+            for _, b in ipairs(bars) do
+                if b then b:Destroy() end
+            end
+            bars = {}
+
+            if currentSound then
+                currentSound:Stop()
+                currentSound:Destroy()
+                currentSound = nil
+            end
+
+            if musicDropdown then
+                musicDropdown:SetVisible(false)
+                musicDropdown:SetValue("无")
+            end
+
+            return
+        end
+
+        local numBars = 72
+        local radius = 6
+
+        for i = 1, numBars do
+            local bar = Instance.new("Part")
+            bar.Anchored = true
+            bar.CanCollide = false
+            bar.Material = Enum.Material.Neon
+            bar.Color = Color3.fromRGB(10, 132, 255)
+            bar.Size = Vector3.new(0.12, 0.12, 0.12)
+            bar.Parent = Workspace
+            table.insert(bars, bar)
+        end
+
+        connection = RunService.RenderStepped:Connect(function()
+            local char = LocalPlayer.Character
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+            if not hrp or not currentSound then return end
+
+            local center = hrp.CFrame * CFrame.new(0, -2, 0)
+            local loudness = currentSound.PlaybackLoudness
+            local scale = math.clamp(loudness / 400, 0.05, 1)
+            local rotation = tick() * 0.8
+
+            for i, bar in ipairs(bars) do
+                local noise = math.noise(tick() * 4, i * 0.15, 0)
+                local height = math.clamp(scale + noise * scale * 0.6, 0.05, 1) * 5
+
+                bar.Size = bar.Size:Lerp(Vector3.new(0.14, height, 0.14), 0.3)
+
+                local angle = (i / numBars) * math.pi * 2 + rotation
+                local x = math.cos(angle) * radius
+                local z = math.sin(angle) * radius
+                local pos = center.Position + Vector3.new(x, 0, z)
+
+                bar.CFrame = bar.CFrame:Lerp(
+                    CFrame.lookAt(pos, Vector3.new(center.Position.X, pos.Y, center.Position.Z)),
+                    0.4
+                )
+
+                bar.Color = Color3.fromRGB(10, 132, 255):Lerp(Color3.new(1, 1, 1), scale - 0.3)
+            end
+        end)
+
+        if not musicDropdown then
+            musicDropdown = Sjgnfh:AddDropdown("MusicSelect", {
+                Text = "选择音乐",
+                Default = "无",
+                Values = {
+                    "无",
+                    "雨爱",
+                    "将军😭😭",
+                    "iQOO进行曲",
+                    "不值得",
+                    "山楂树之恋",
+                    "银河奥特曼主题曲",
+                    "纯DJ"
+                },
+                Callback = function(Value)
+                    if Value == "无" then
+                        if currentSound then
+                            currentSound:Stop()
+                            currentSound:Destroy()
+                            currentSound = nil
+                        end
+                        return
+                    end
+
+                    if MusicList[Value] then
+                        CreateSound(MusicList[Value])
+                    end
+                end
+            })
+        else
+            musicDropdown:SetVisible(true)
         end
     end
 })
