@@ -51,10 +51,19 @@ RunService.RenderStepped:Connect(function()
         ColorSequenceKeypoint.new(1, Color3.fromHSV((hue + 1) % 1, 1, 1))
     })
 end)
-         local repo = 'https://raw.githubusercontent.com/KingScriptAE/No-sirve-nada./refs/heads/main/'
+local repo = 'https://raw.githubusercontent.com/DevSloPo/obsidian_UI/main/'
 local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
 local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
 local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character
+local Humanoid = Character:WaitForChild("Humanoid")
 
 local Options = Library.Options
 local Toggles = Library.Toggles
@@ -1685,390 +1694,82 @@ Ksqcnbcos:AddToggle('TracerToggle', {
         end
     end
 })
-Bofang:AddButton({
-	Text = "点击播放雨爱",
-	Func = function()
-		local soundId = "rbxassetid://79277371759525"
-		local Workspace = game:GetService("Workspace")
+Bofang:AddLabel("选择即可播放")
+Bofang:AddDropdown("MusicSelect", {
+    Text = "选择音乐",
+    Default = "无",
+    Values = {
+        "无",
+        "雨爱",
+        "将军😭😭",
+        "iQOO进行曲",
+        "不值得",
+        "山楂树之恋",
+        "银河奥特曼主题曲",
+        "纯DJ"
+    },
+    Callback = function(Value)
+        local Workspace = game:GetService("Workspace")
 
-		local sound = Instance.new("Sound")
-		sound.SoundId = soundId
-		sound.Looped = false
-		sound.Volume = 0.5
-		sound.Parent = Workspace
-		sound:Play()
+        local MusicList = {
+            ["雨爱"] = "rbxassetid://79277371759525",
+            ["将军😭😭"] = "rbxassetid://117061993775129",
+            ["iQOO进行曲"] = "rbxassetid://109693244185458",
+            ["不值得"] = "rbxassetid://131649148795563",
+            ["山楂树之恋"] = "rbxassetid://114372452919028",
+            ["银河奥特曼主题曲"] = "rbxassetid://91550314012338",
+            ["纯DJ"] = "rbxassetid://99498025749186"
+        }
 
-		sound.Ended:Connect(function()
-			sound:Destroy()
-			warn("音效已播放完毕并销毁")
-		end)
+        for _, sound in ipairs(Workspace:GetDescendants()) do
+            if sound:IsA("Sound") then
+                for _, id in pairs(MusicList) do
+                    if sound.SoundId == id then
+                        sound:Stop()
+                        sound:Destroy()
+                    end
+                end
+            end
+        end
 
-		task.delay(10, function()
-			if sound and sound.Parent and not sound.IsPlaying then
-				sound:Destroy()
-				warn("音效加载超时/未播放，已自动销毁")
-			end
-		end)
+        if Value ~= "无" then
+            local sound = Instance.new("Sound")
+            sound.SoundId = MusicList[Value]
+            sound.Volume = 0.5
+            sound.Looped = false
+            sound.Parent = Workspace
+            sound:Play()
 
-		Library:Notify("正在播放音效...", 2)
-	end,
-	DoubleClick = false
+            sound.Ended:Connect(function()
+                sound:Destroy()
+            end)
+
+            task.delay(10, function()
+                if sound and sound.Parent and not sound.IsPlaying then
+                    sound:Destroy()
+                end
+            end)
+
+            Library:Notify("正在播放：" .. Value, 2)
+        else
+            Library:Notify("已停止播放音乐", 2)
+        end
+    end
 })
 Bofang:AddButton({
-	Text = "停止播放雨爱",
-	Func = function()
-		local Workspace = game:GetService("Workspace")
+    Text = "停止音乐",
+    Callback = function()
+        local Workspace = game:GetService("Workspace")
 
-		local targetSoundId = "rbxassetid://79277371759525"
-		local found = false
+        for _, sound in ipairs(Workspace:GetDescendants()) do
+            if sound:IsA("Sound") then
+                sound:Stop()
+                sound:Destroy()
+            end
+        end
 
-		for _, sound in ipairs(Workspace:GetDescendants()) do
-			if sound:IsA("Sound") and sound.SoundId == targetSoundId then
-				sound:Stop()
-				sound:Destroy()
-				found = true
-			end
-		end
-
-		if found then
-			Library:Notify("已停止播放青衣", 2)
-			warn("青衣音效已停止并销毁")
-		else
-			Library:Notify("没有找到正在播放的青衣音效", 2)
-			warn("未找到对应 SoundId 的音效")
-		end
-	end,
-	DoubleClick = false
-})
-Bofang:AddButton({
-	Text = "点击播放将军😭😭",
-	Func = function()
-		local soundId = "rbxassetid://117061993775129"
-		local Workspace = game:GetService("Workspace")
-
-		local sound = Instance.new("Sound")
-		sound.SoundId = soundId
-		sound.Looped = false
-		sound.Volume = 0.5
-		sound.Parent = Workspace
-		sound:Play()
-
-		sound.Ended:Connect(function()
-			sound:Destroy()
-			warn("音效已播放完毕并销毁")
-		end)
-
-		task.delay(10, function()
-			if sound and sound.Parent and not sound.IsPlaying then
-				sound:Destroy()
-				warn("音效加载超时/未播放，已自动销毁")
-			end
-		end)
-
-		Library:Notify("正在播放音效...", 2)
-	end,
-	DoubleClick = false
-})
-Bofang:AddButton({
-	Text = "停止播放将军😭😭",
-	Func = function()
-		local Workspace = game:GetService("Workspace")
-
-		local targetSoundId = "rbxassetid://117061993775129"
-		local found = false
-
-		for _, sound in ipairs(Workspace:GetDescendants()) do
-			if sound:IsA("Sound") and sound.SoundId == targetSoundId then
-				sound:Stop()
-				sound:Destroy()
-				found = true
-			end
-		end
-
-		if found then
-			Library:Notify("已停止播放青衣", 2)
-			warn("青衣音效已停止并销毁")
-		else
-			Library:Notify("没有找到正在播放的青衣音效", 2)
-			warn("未找到对应 SoundId 的音效")
-		end
-	end,
-	DoubleClick = false
-})
-Bofang:AddButton({
-	Text = "lQOO进行曲",
-	Func = function()
-		local soundId = "rbxassetid://109693244185458"
-		local Workspace = game:GetService("Workspace")
-
-		local sound = Instance.new("Sound")
-		sound.SoundId = soundId
-		sound.Looped = false
-		sound.Volume = 0.5
-		sound.Parent = Workspace
-		sound:Play()
-
-		sound.Ended:Connect(function()
-			sound:Destroy()
-			warn("音效已播放完毕并销毁")
-		end)
-
-		task.delay(10, function()
-			if sound and sound.Parent and not sound.IsPlaying then
-				sound:Destroy()
-				warn("音效加载超时/未播放，已自动销毁")
-			end
-		end)
-
-		Library:Notify("正在播放音效...", 2)
-	end,
-	DoubleClick = false
-})
-Bofang:AddButton({
-	Text = "停止播放lQOO进行曲",
-	Func = function()
-		local Workspace = game:GetService("Workspace")
-
-		local targetSoundId = "rbxassetid://109693244185458"
-		local found = false
-
-		for _, sound in ipairs(Workspace:GetDescendants()) do
-			if sound:IsA("Sound") and sound.SoundId == targetSoundId then
-				sound:Stop()
-				sound:Destroy()
-				found = true
-			end
-		end
-
-		if found then
-			Library:Notify("已停止播放青衣", 2)
-			warn("青衣音效已停止并销毁")
-		else
-			Library:Notify("没有找到正在播放的青衣音效", 2)
-			warn("未找到对应 SoundId 的音效")
-		end
-	end,
-	DoubleClick = false
-})
-Bofang:AddButton({
-	Text = "不值得",
-	Func = function()
-		local soundId = "rbxassetid://131649148795563"
-		local Workspace = game:GetService("Workspace")
-
-		local sound = Instance.new("Sound")
-		sound.SoundId = soundId
-		sound.Looped = false
-		sound.Volume = 0.5
-		sound.Parent = Workspace
-		sound:Play()
-
-		sound.Ended:Connect(function()
-			sound:Destroy()
-			warn("音效已播放完毕并销毁")
-		end)
-
-		task.delay(10, function()
-			if sound and sound.Parent and not sound.IsPlaying then
-				sound:Destroy()
-				warn("音效加载超时/未播放，已自动销毁")
-			end
-		end)
-
-		Library:Notify("正在播放音效...", 2)
-	end,
-	DoubleClick = false
-})
-Bofang:AddButton({
-	Text = "停止播放不值得",
-	Func = function()
-		local Workspace = game:GetService("Workspace")
-
-		local targetSoundId = "rbxassetid://131649148795563"
-		local found = false
-
-		for _, sound in ipairs(Workspace:GetDescendants()) do
-			if sound:IsA("Sound") and sound.SoundId == targetSoundId then
-				sound:Stop()
-				sound:Destroy()
-				found = true
-			end
-		end
-
-		if found then
-			Library:Notify("已停止播放青衣", 2)
-			warn("青衣音效已停止并销毁")
-		else
-			Library:Notify("没有找到正在播放的青衣音效", 2)
-			warn("未找到对应 SoundId 的音效")
-		end
-	end,
-	DoubleClick = false
-})
-Bofang:AddButton({
-	Text = "山楂树之恋",
-	Func = function()
-		local soundId = "rbxassetid://114372452919028"
-		local Workspace = game:GetService("Workspace")
-
-		local sound = Instance.new("Sound")
-		sound.SoundId = soundId
-		sound.Looped = false
-		sound.Volume = 0.5
-		sound.Parent = Workspace
-		sound:Play()
-
-		sound.Ended:Connect(function()
-			sound:Destroy()
-			warn("音效已播放完毕并销毁")
-		end)
-
-		task.delay(10, function()
-			if sound and sound.Parent and not sound.IsPlaying then
-				sound:Destroy()
-				warn("音效加载超时/未播放，已自动销毁")
-			end
-		end)
-
-		Library:Notify("正在播放音效...", 2)
-	end,
-	DoubleClick = false
-})
-Bofang:AddButton({
-	Text = "停止播放山楂树之恋",
-	Func = function()
-		local Workspace = game:GetService("Workspace")
-
-		local targetSoundId = "rbxassetid://114372452919028"
-		local found = false
-
-		for _, sound in ipairs(Workspace:GetDescendants()) do
-			if sound:IsA("Sound") and sound.SoundId == targetSoundId then
-				sound:Stop()
-				sound:Destroy()
-				found = true
-			end
-		end
-
-		if found then
-			Library:Notify("已停止播放青衣", 2)
-			warn("青衣音效已停止并销毁")
-		else
-			Library:Notify("没有找到正在播放的青衣音效", 2)
-			warn("未找到对应 SoundId 的音效")
-		end
-	end,
-	DoubleClick = false
-})
-Bofang:AddButton({
-	Text = "银河奥特曼主题曲",
-	Func = function()
-		local soundId = "rbxassetid://91550314012338"
-		local Workspace = game:GetService("Workspace")
-
-		local sound = Instance.new("Sound")
-		sound.SoundId = soundId
-		sound.Looped = false
-		sound.Volume = 0.5
-		sound.Parent = Workspace
-		sound:Play()
-
-		sound.Ended:Connect(function()
-			sound:Destroy()
-			warn("音效已播放完毕并销毁")
-		end)
-
-		task.delay(10, function()
-			if sound and sound.Parent and not sound.IsPlaying then
-				sound:Destroy()
-				warn("音效加载超时/未播放，已自动销毁")
-			end
-		end)
-
-		Library:Notify("正在播放音效...", 2)
-	end,
-	DoubleClick = false
-})
-Bofang:AddButton({
-	Text = "停止播放银河奥特曼主题曲",
-	Func = function()
-		local Workspace = game:GetService("Workspace")
-
-		local targetSoundId = "rbxassetid://91550314012338"
-		local found = false
-
-		for _, sound in ipairs(Workspace:GetDescendants()) do
-			if sound:IsA("Sound") and sound.SoundId == targetSoundId then
-				sound:Stop()
-				sound:Destroy()
-				found = true
-			end
-		end
-
-		if found then
-			Library:Notify("已停止播放青衣", 2)
-			warn("青衣音效已停止并销毁")
-		else
-			Library:Notify("没有找到正在播放的青衣音效", 2)
-			warn("未找到对应 SoundId 的音效")
-		end
-	end,
-	DoubleClick = false
-})
-Bofang:AddButton({
-	Text = "纯DJ",
-	Func = function()
-		local soundId = "rbxassetid://99498025749186"
-		local Workspace = game:GetService("Workspace")
-
-		local sound = Instance.new("Sound")
-		sound.SoundId = soundId
-		sound.Looped = false
-		sound.Volume = 0.5
-		sound.Parent = Workspace
-		sound:Play()
-
-		sound.Ended:Connect(function()
-			sound:Destroy()
-			warn("音效已播放完毕并销毁")
-		end)
-
-		task.delay(10, function()
-			if sound and sound.Parent and not sound.IsPlaying then
-				sound:Destroy()
-				warn("音效加载超时/未播放，已自动销毁")
-			end
-		end)
-
-		Library:Notify("正在播放音效...", 2)
-	end,
-	DoubleClick = false
-})
-Bofang:AddButton({
-	Text = "停止播放银纯DJ",
-	Func = function()
-		local Workspace = game:GetService("Workspace")
-
-		local targetSoundId = "rbxassetid://99498025749186"
-		local found = false
-
-		for _, sound in ipairs(Workspace:GetDescendants()) do
-			if sound:IsA("Sound") and sound.SoundId == targetSoundId then
-				sound:Stop()
-				sound:Destroy()
-				found = true
-			end
-		end
-
-		if found then
-			Library:Notify("已停止播放青衣", 2)
-			warn("青衣音效已停止并销毁")
-		else
-			Library:Notify("没有找到正在播放的青衣音效", 2)
-			warn("未找到对应 SoundId 的音效")
-		end
-	end,
-	DoubleClick = false
+        Library:Notify("已停止播放音乐", 2)
+    end
 })
 Yule:AddLabel("柳宗权同款撸屌脚本(不能在墨水使用)");
 Yule:AddButton({Text="撸屌R6",Func=function()
@@ -6310,9 +6011,59 @@ for _, category in ipairs(scriptCategories) do
                 rightIndex = rightIndex + 1;
         end
 end
-local MenuGroup = Tabs.Settings:AddLeftGroupbox('菜单')
-MenuGroup:AddButton('卸载脚本', function() Library:Unload() end)
-MenuGroup:AddLabel('菜单快捷键'):AddKeyPicker('MenuKeybind', { Default = 'RightShift', NoUI = true, Text = 'Menu keybind' })
+
+local MenuGroup = Tabs.Settings:AddLeftGroupbox("菜单")
+
+MenuGroup:AddToggle("KeybindMenuOpen", {
+    Text = "显示按键绑定菜单",
+    Default = Library.KeybindFrame.Visible,
+    Callback = function(State)
+        Library.KeybindFrame.Visible = State
+    end
+})
+
+MenuGroup:AddToggle("ShowCustomCursor", {
+    Text = "自定义光标",
+    Default = false,
+    Callback = function(State)
+        Library.ShowCustomCursor = State
+    end
+})
+
+MenuGroup:AddDropdown("NotificationSide", {
+    Text = "通知位置",
+    Default = "右侧",
+    Values = { "左侧", "右侧" },
+    Callback = function(Value)
+        Library:SetNotifySide(Value)
+    end
+})
+
+MenuGroup:AddDropdown("DPIDropdown", {
+    Text = "界面缩放 (DPI)",
+    Default = "100%",
+    Values = {
+        "50%", "75%", "100%", "125%", "150%", "175%", "200%"
+    },
+    Callback = function(Value)
+        local Scale = tonumber(Value:gsub("%%", ""))
+        Library:SetDPIScale(Scale / 100)
+    end
+})
+
+MenuGroup:AddDivider()
+
+MenuGroup:AddLabel("菜单快捷键")
+    :AddKeyPicker("MenuKeybind", {
+        Default = "RightShift",
+        NoUI = true,
+        Text = "菜单快捷键"
+    })
+
+MenuGroup:AddButton("卸载脚本", function()
+    Library:Unload()
+end)
+
 
 Library.ToggleKeybind = Options.MenuKeybind
 
@@ -6325,17 +6076,3 @@ SaveManager:BuildConfigSection(Tabs.Settings)
 ThemeManager:ApplyToTab(Tabs.Settings)
 Library:Notify("AF Hub - AF Hub墨水游戏 已加载", 3)
 Library:Notify("尊贵的 " .. game.Players.LocalPlayer.Name .. " 欢迎使用", 3)
-task.spawn(function()
-    task.wait(1.5)
-    for _, obj in ipairs(game:GetService("CoreGui"):GetDescendants()) do
-        if obj:IsA("TextButton") and not obj:FindFirstChildOfClass("UICorner") then
-            local c = Instance.new("UICorner")
-            c.CornerRadius = UDim.new(0, 20)
-            c.Parent = obj
-        elseif obj:IsA("ImageButton") and not obj:FindFirstChildOfClass("UICorner") then
-            local c = Instance.new("UICorner")
-            c.CornerRadius = UDim.new(0, 20)
-            c.Parent = obj
-        end
-    end
-end)
