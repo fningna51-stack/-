@@ -1578,7 +1578,6 @@ Ksqcnbcos:AddToggle('TracerToggle', {
         local LocalPlayer = Players.LocalPlayer
 
         if Value then
-            -- 清理旧 Tracers
             if getgenv().cyberline_tracers then
                 for _, line in pairs(getgenv().cyberline_tracers) do
                     pcall(function() line:Remove() end)
@@ -1642,6 +1641,10 @@ Ksqcnbcos:AddToggle('TracerToggle', {
         end
     end
 })
+Sjgnfh:AddLabel("这些功能均为缝合(除了环绕光环以外)")
+Sjgnfh:AddLabel("视觉源码群聊：798869680")
+Sjgnfh:AddLabel("作者：妖月季")
+Sjgnfh:AddLabel("QQ号：647511412")
 Sjgnfh:AddToggle('MyToggle', {
 	Text = '残影',
 	Default = false,
@@ -7615,6 +7618,11 @@ Qczhdh:AddLabel("7.通缉")
 Qczhdh:AddLabel("8.九十九夜")
 Qczhdh:AddLabel("9.决斗场")
 Qczhdh:AddLabel("10.Chian[还没有该服务器id]")
+Qczhdh:AddLabel("11.doors")
+Qczhdh:AddLabel("12.自然灾害")
+Qczhdh:AddLabel("13.监狱人生")
+Qczhdh:AddLabel("14.鲨鱼咬")
+Qczhdh:AddLabel("15.模仿者（第一章.第二章）")
 
 local Qczhdh = Tabs.Qczhdh:AddRightGroupbox("AF（脚本中心） 最后一次更新公告");
 Qczhdh:AddLabel("最后一次更新")
