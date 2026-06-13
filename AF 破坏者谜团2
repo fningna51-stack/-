@@ -1,0 +1,2334 @@
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/YIRDEX/Miscs/refs/heads/main/YXWindUI.lua"))()
+
+WindUI:AddTheme({
+    Name = "AF Hub", 
+    Accent = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#FF4C4C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#FF1A1A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#CC0000"), Transparency = 0}
+    }, {Rotation = 90}),
+    Background = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#FF4C4C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#FF1A1A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#CC0000"), Transparency = 0}
+    }, {Rotation = 90}),
+    Outline = Color3.fromHex("#FF6666"),
+    Text = Color3.fromHex("#FFFFFF"),
+    Placeholder = Color3.fromHex("#AAAAAA"),
+    Button = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#FF4C4C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#FF1A1A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#CC0000"), Transparency = 0}
+    }, {Rotation = 90}),
+    Icon = Color3.fromHex("#FF6666")
+})
+
+-- 月夜
+WindUI:AddTheme({
+    Name = "月夜",
+    Accent = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#232526"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#636363"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#E0E0E0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Dialog = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#1C1C1C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#3A3A3A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#636363"), Transparency = 0}
+    }, {Rotation = 90}),
+    Outline = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#B0B0B0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#C0C0C0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#E0E0E0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Text = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#FFFFFF"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#D9D9D9"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#BFBFBF"), Transparency = 0}
+    }, {Rotation = 90}),
+    Placeholder = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#A0A0A0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#B0B0B0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#C0C0C0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Background = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#101010"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#3A3A3A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#636363"), Transparency = 0}
+    }, {Rotation = 90}),
+    Button = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#3A3A3A"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#636363"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#A2A2A2"), Transparency = 0}
+    }, {Rotation = 90}),
+    Icon = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#C0C0C0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#E0E0E0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#FFFFFF"), Transparency = 0}
+    }, {Rotation = 90})
+})
+
+-- 冬日霜雪
+WindUI:AddTheme({
+    Name = "冬日霜雪",
+    Accent = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#D0E8F2"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#A0D4F2"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#70C0F2"), Transparency = 0}
+    }, {Rotation = 45}),
+    Dialog = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#E0F7FF"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#B0EFFF"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#80E7FF"), Transparency = 0}
+    }, {Rotation = 45}),
+    Outline = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#70C0F2"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#50B0E0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#30A0D0"), Transparency = 0}
+    }, {Rotation = 45}),
+    Text = Color3.fromHex("#000000"),
+    Placeholder = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#7FB3D5"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#5FA2C5"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#3F91B5"), Transparency = 0}
+    }, {Rotation = 45}),
+    Background = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#E6F0FA"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#CDE0F5"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#B4D1F0"), Transparency = 0}
+    }, {Rotation = 45}),
+    Button = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#50B0E0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#30A0D0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#108FC0"), Transparency = 0}
+    }, {Rotation = 45}),
+    Icon = Color3.fromHex("#00FFFF")
+})
+
+-- 月渊
+WindUI:AddTheme({
+    Name = "月渊",
+    Accent = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#0D0D1A"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#1A1A33"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#2E2E5C"), Transparency = 0}
+    }, {Rotation = 90}),
+    Dialog = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#101026"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#1A1A3D"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#333366"), Transparency = 0}
+    }, {Rotation = 90}),
+    Outline = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#2E2E5C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#404080"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#5050A0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Text = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#A0A0FF"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#C0C0FF"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#E0E0FF"), Transparency = 0}
+    }, {Rotation = 90}),
+    Placeholder = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#6060A0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#8080C0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#A0A0E0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Background = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#0A0A1A"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#1A1A33"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#2E2E5C"), Transparency = 0}
+    }, {Rotation = 90}),
+    Button = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#404080"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#5050A0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#6060C0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Icon = Color3.fromHex("#00FFFF")
+})
+
+WindUI:SetFont("rbxassetid://12187369639")
+
+local Window = WindUI:CreateWindow({
+    Title = '<font color="#FF0000">A</font><font color="#00F0FF">F</font><font color="#00E5FF">-</font><font color="#00D5FF">H</font><font color="#00C8FF">U</font><font color="#00BBFF">B</font>', -- 窗口标题
+    Icon = "rbxassetid://82225829203828", 
+    Author = "@秋辞", -- 窗口副标题，可选
+    Folder = "YX-Hub文件夹", -- 保存密钥和图片的文件夹
+    Size = UDim2.fromOffset(520, 400), -- 窗口大小
+    MinSize = Vector2.new(560, 350), -- 窗口最小尺寸
+    MaxSize = Vector2.new(850, 560), -- 窗口最大尺寸
+    Transparent = true, -- 窗口透明度
+    Theme = "冬日霜雪", 
+    Resizable = true, -- 是否可调整窗口大小
+    SideBarWidth = 150, -- 侧边栏（标签页）宽度
+    HideSearchBar = false, -- 隐藏搜索栏
+    ScrollBarEnabled = true, -- 位于滚动框右侧的滚动条
+Background = "rbxassetid://136059273188532",
+    
+    User = { -- 位于左下角的用户信息
+        Enabled = false,
+        Anonymous = false,
+        Callback = function() -- 点击时的回调函数，可选，可移除
+            print("点击")
+        end,
+    },
+})
+
+
+
+-- 编辑窗口展开按钮配置
+Window:EditOpenButton({
+    Title = '<font color="#FF0000">A</font><font color="#00F0FF">F</font><font color="#00E5FF">-</font><font color="#00D5FF">H</font><font color="#00C8FF">U</font><font color="#00BBFF">B</font>',
+    Icon = "snowflake",
+    CornerRadius = UDim.new(99,99),
+    StrokeThickness = 3,
+    IconSize = 30,
+    Color = ColorSequence.new(Color3.fromHex("00FFFF"), Color3.fromHex("00BBFF")),
+    OnlyMobile = false,
+    Enabled = true,
+    Draggable = true,
+})
+
+local COLOR_SCHEMES = {
+    ["彩虹颜色"] = {ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromHex("00FFFF")),
+        ColorSequenceKeypoint.new(1, Color3.fromHex("0000FF"))
+    }), "palette"},
+}
+
+local borderAnimation
+local animationSpeed = 5
+
+local function createRainbowBorder(window, colorScheme)
+    local mainFrame = window.UIElements.Main
+    if not mainFrame then return nil end
+
+    local existingStroke = mainFrame:FindFirstChild("RainbowStroke")
+    if existingStroke then existingStroke:Destroy() end
+
+    if not mainFrame:FindFirstChildOfClass("UICorner") then
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 16)
+        corner.Parent = mainFrame
+    end
+
+    local rainbowStroke = Instance.new("UIStroke")
+    rainbowStroke.Name = "RainbowStroke"
+    rainbowStroke.Thickness = 2
+    rainbowStroke.Color = Color3.new(1, 1, 1)
+    rainbowStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    rainbowStroke.LineJoinMode = Enum.LineJoinMode.Round
+    rainbowStroke.Parent = mainFrame
+
+    local glowEffect = Instance.new("UIGradient")
+    glowEffect.Name = "GlowEffect"
+    local schemeData = COLOR_SCHEMES[colorScheme or "彩虹颜色"]
+    glowEffect.Color = schemeData and schemeData[1] or COLOR_SCHEMES["彩虹颜色"][1]
+    glowEffect.Rotation = 0
+    glowEffect.Parent = rainbowStroke
+
+    return rainbowStroke
+end
+
+local function startBorderAnimation(window, speed)
+    local mainFrame = window.UIElements.Main
+    if not mainFrame then return nil end
+    local rainbowStroke = mainFrame:FindFirstChild("RainbowStroke")
+    if not rainbowStroke then return nil end
+    local glowEffect = rainbowStroke:FindFirstChild("GlowEffect")
+    if not glowEffect then return nil end
+
+    return game:GetService("RunService").Heartbeat:Connect(function()
+        if not rainbowStroke or rainbowStroke.Parent == nil then return end
+        glowEffect.Rotation = (tick() * speed * 10) % 360
+    end)
+end
+
+local rainbowStroke = createRainbowBorder(Window, "彩虹颜色")
+if rainbowStroke then
+    borderAnimation = startBorderAnimation(Window, animationSpeed)
+end
+
+local Lighting = game:GetService("Lighting")
+local TweenServiceBlur = game:GetService("TweenService")
+
+local blur = Lighting:FindFirstChildOfClass("BlurEffect")
+if not blur then
+    blur = Instance.new("BlurEffect")
+    blur.Size = 0
+    blur.Parent = Lighting
+end
+
+task.spawn(function()
+    local wasOpen = false
+    while true do
+        task.wait(0.1)
+        local mainFrame = Window.UIElements and Window.UIElements.Main
+        local isOpen = mainFrame and mainFrame.Visible or false
+        
+        if isOpen ~= wasOpen then
+            wasOpen = isOpen
+            TweenServiceBlur:Create(blur, TweenInfo.new(0.3), {
+                Size = isOpen and 20 or 0
+            }):Play()
+        end
+    end
+end)
+
+local info = Window:Section({
+    Title = "主页",
+    Icon = "star",
+    Opened = true
+})
+
+local Tab1 = info:Tab({
+    Title = "信息",
+    Icon = "info", -- optional
+    Locked = false,
+})
+
+
+
+local Paragraph = Tab1:Paragraph({
+    Title = 'AF Hub',
+    Desc = '欢迎使用YX-HUB脚本(＾ν＾)',
+    Thumbnail = "rbxassetid://100781334247855",
+    ThumbnailSize = 200,
+    Locked = false,
+})
+
+local Paragraph1 = Tab1:Paragraph({
+    Title = 'AF Hun',
+    Desc = '主打缝合 :D',
+    Thumbnail = "rbxassetid://72531855816776",
+    ThumbnailSize = 200,
+    Locked = false,
+})
+
+Tab1:Section({ 
+    Title = "开发者",
+    TextXAlignment = "Center",
+    TextSize = 20,
+})
+
+local Paragraph = Tab1:Paragraph({
+    Title = "秋词",
+    Desc = "AF Hub作者",
+    Image = "rbxassetid://138882879525986",
+    ImageSize = 60,
+    Locked = false,
+})
+
+local Paragraph = Tab1:Paragraph({
+    Title = "YirdeX",
+    Desc = "ui背景设计者",
+    Image = "rbxassetid://90051928527603",
+    ImageSize = 60,
+    Locked = false,
+})
+
+local Tab3 = info:Tab({
+    Title = "复制",
+    Icon = "file-code",
+    Locked = false,
+})
+
+local Button1 = Tab3:Button({
+    Title = "复制主群",
+    Desc = "复制作者QQ群", -- 可选参数
+    Icon = "file-code", -- 图标名称 或 资源ID链接，可选参数
+    IconAlign = "Left",
+    Locked = false, -- 是否禁用按钮，可选参数
+    LockedTitle = "已锁定", -- 按钮禁用时显示的文字，可选参数
+    Callback = function()
+setclipboard("938714427")
+    end
+})
+
+local Tab2 = info:Tab({
+    Title = "公告",
+    Icon = "menu",
+    Locked = false,
+})
+local Section1 = Tab2:Section({
+    Title = "AF Hub[公告]", -- 分区标题
+    Icon = "component", -- 图标，支持图标名称或资源ID（可选）
+    TextSize = 30, -- 标题文字大小（可选）
+    TextXAlignment = "Left", -- 文字水平对齐方式：左对齐/居中/右对齐（可选）
+    Box = true, -- 是否显示分区外框（可选）
+    BoxBorder = true, -- 是否显示外框边框（可选）
+    Opened = true, -- 分区默认是否展开（可选）
+    FontWeight = Enum.FontWeight.SemiBold, -- 标题字体粗细（可选）
+    DescFontWeight = Enum.FontWeight.Medium, -- 描述文字字体粗细（可选）
+    TextTransparency = 0, -- 标题文字透明度（可选）
+    DescTextTransparency = 0, -- 描述文字透明度（可选）
+})
+
+Section1:Paragraph({
+    Title = "这个是公告？",
+    TextSize = 30, 
+    Thumbnail = "rbxassetid://85076999766387",
+    ThumbnailSize = 100,
+})
+
+
+
+
+
+
+Window:Divider()
+local functiond = Window:Section({
+    Title = "功能区",
+    Icon = "folder-cog",
+    Opened = true,
+})
+local Linni = {
+    Ma = Window:Tab({ 
+        Title = "[ 属性修改 ]", 
+        Icon = "terminal" 
+    }),
+    Esp = Window:Tab({ 
+        Title = "[ 透视 ]", 
+        Icon = "eye" 
+    }),
+    Cata = Window:Tab({ 
+        Title = "[ 基础 ]", 
+        Icon = "sword" 
+    }),
+    Mr = Window:Tab({ 
+        Title = "[ 警察 ]", 
+        Icon = "user" 
+    }),
+    Killer = Window:Tab({ 
+        Title = "[ ez杀人犯 ]", 
+        Icon = "user" 
+    }),
+    Auto = Window:Tab({ 
+        Title = "[ 自动 ]", 
+        Icon = "baby" 
+    }),
+    Tl = Window:Tab({ 
+        Title = "[ 其他 ]", 
+        Icon = "pen-tool" 
+    }),
+}
+
+Window:SelectTab(1)
+local LinniJumpPower = 50
+local LinniGravity = 196.2
+local playerESP = false
+local coinTaffy = false
+local TaffyShoot = false
+local TaffyshootTChina = 2.8
+local TaffyPing = 1
+local TaffygunESP = false
+local TaffyDete = false
+local TaffyGetGun = false
+local TaffyMooKnife = false
+local TaffyAu = false
+local TaffyAuChina = nil
+local playerData = {}
+local claimedCoins = {}
+local TaffyChinaknife = false
+local antifail = false
+local trapESP = Instance.new("Highlight")
+trapESP.Name = "TrapESP"
+trapESP.FillColor = Color3.fromRGB(255, 112, 10)
+trapESP.OutlineColor = Color3.fromRGB(255, 112, 10)
+trapESP.FillTransparency = 0.5
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local localPlayer = Players.LocalPlayer
+local Linnitask = nil
+local LinniTime = false
+local TaffyBox = false
+local Taffyhit = 1
+local loopTaffyhit
+local Taffyaim = false
+local Taffyaimrscon
+local target
+local TaffyantiFly = false
+local TaffyantiFlyLastPos = Vector3.zero
+local flingNeutralizerCon
+local flingDetectionCon
+local detectedPlayers = {}
+local TaffyplayerFt
+local function powerfulFling(targetPlayer)
+    if not targetPlayer or not targetPlayer.Character then
+        WindUI:Notify({
+            Title = "目标玩家无效",
+            Duration = 1
+        })
+        return
+    end
+    local player = localPlayer
+    local mouse = player:GetMouse()
+    local Targets = {targetPlayer}
+    local AllBool = false
+    local Character = player.Character
+    local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+    local RootPart = Humanoid and Humanoid.RootPart
+    local TCharacter = targetPlayer.Character
+    local THumanoid = TCharacter:FindFirstChildOfClass("Humanoid")
+    local TRootPart = THumanoid and THumanoid.RootPart
+    local THead = TCharacter:FindFirstChild("Head")
+    local Accessory = TCharacter:FindFirstChildOfClass("Accessory")
+    local Handle = Accessory and Accessory:FindFirstChild("Handle")
+    if not Character or not Humanoid or not RootPart then
+        WindUI:Notify({
+            Title = "你的角色无效",
+            Duration = 1
+        })
+        return
+    end
+    if RootPart.Velocity.Magnitude < 50 then
+        getgenv().OldPos = RootPart.CFrame
+    end
+    if not getgenv().FPDH then
+        getgenv().FPDH = workspace.FallenPartsDestroyHeight
+    end
+    if THead then
+        workspace.CurrentCamera.CameraSubject = THead
+    elseif not THead and Handle then
+        workspace.CurrentCamera.CameraSubject = Handle
+    elseif THumanoid and TRootPart then
+        workspace.CurrentCamera.CameraSubject = THumanoid
+    end
+
+    if not TCharacter:FindFirstChildWhichIsA("BasePart") then
+        WindUI:Notify({
+            Title = "目标没有有效部位",
+            Duration = 1
+        })
+        return
+    end
+    local FPos = function(BasePart, Pos, Ang)
+        RootPart.CFrame = CFrame.new(BasePart.Position) * Pos * Ang
+        Character:SetPrimaryPartCFrame(CFrame.new(BasePart.Position) * Pos * Ang)
+        RootPart.Velocity = Vector3.new(9e7, 9e7 * 10, 9e7)
+        RootPart.RotVelocity = Vector3.new(9e8, 9e8, 9e8)
+    end
+
+    local SFBasePart = function(BasePart)
+        local TimeToWait = 2
+        local Time = tick()
+        local Angle = 0
+        repeat
+            if RootPart and THumanoid then
+                if BasePart.Velocity.Magnitude < 50 then
+                    Angle = Angle + 100
+                    FPos(BasePart, CFrame.new(0, 1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle),0 ,0))
+                    task.wait()
+                    FPos(BasePart, CFrame.new(0, -1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                    task.wait()
+                    FPos(BasePart, CFrame.new(2.25, 1.5, -2.25) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                    task.wait()
+                    FPos(BasePart, CFrame.new(-2.25, -1.5, 2.25) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                    task.wait()
+                    FPos(BasePart, CFrame.new(0, 1.5, 0) + THumanoid.MoveDirection,CFrame.Angles(math.rad(Angle), 0, 0))
+                    task.wait()
+                    FPos(BasePart, CFrame.new(0, -1.5, 0) + THumanoid.MoveDirection,CFrame.Angles(math.rad(Angle), 0, 0))
+                    task.wait()
+                else
+                    FPos(BasePart, CFrame.new(0, 1.5, THumanoid.WalkSpeed), CFrame.Angles(math.rad(90), 0, 0))
+                    task.wait()
+                    FPos(BasePart, CFrame.new(0, -1.5, -THumanoid.WalkSpeed), CFrame.Angles(0, 0, 0))
+                    task.wait()
+                    FPos(BasePart, CFrame.new(0, 1.5, THumanoid.WalkSpeed), CFrame.Angles(math.rad(90), 0, 0))
+                    task.wait()
+                    FPos(BasePart, CFrame.new(0, 1.5, TRootPart.Velocity.Magnitude / 1.25), CFrame.Angles(math.rad(90), 0, 0))
+                    task.wait()
+                    FPos(BasePart, CFrame.new(0, -1.5, -TRootPart.Velocity.Magnitude / 1.25), CFrame.Angles(0, 0, 0))
+                    task.wait()
+                    FPos(BasePart, CFrame.new(0, 1.5, TRootPart.Velocity.Magnitude / 1.25), CFrame.Angles(math.rad(90), 0, 0))
+                    task.wait()
+                    FPos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(math.rad(90), 0, 0))
+                    task.wait()
+                    FPos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(0, 0, 0))
+                    task.wait()
+                    FPos(BasePart, CFrame.new(0, -1.5 ,0), CFrame.Angles(math.rad(-90), 0, 0))
+                    task.wait()
+                    FPos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(0, 0, 0))
+                    task.wait()
+                end
+            else
+                break
+            end
+        until BasePart.Velocity.Magnitude > 500 or BasePart.Parent ~= targetPlayer.Character or targetPlayer.Parent ~= Players or targetPlayer.Character ~= TCharacter or (THumanoid and THumanoid.Sit) or Humanoid.Health <= 0 or tick() > Time + TimeToWait
+    end
+    workspace.FallenPartsDestroyHeight = 0/0
+    local BV = Instance.new("BodyVelocity")
+    BV.Name = "EpixVel"
+    BV.Parent = RootPart
+    BV.Velocity = Vector3.new(9e8, 9e8, 9e8)
+    BV.MaxForce = Vector3.new(1/0, 1/0, 1/0)
+    Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+    if TRootPart and THead then
+        if (TRootPart.CFrame.p - THead.CFrame.p).Magnitude > 5 then
+            SFBasePart(THead)
+        else
+            SFBasePart(TRootPart)
+        end
+    elseif TRootPart and not THead then
+        SFBasePart(TRootPart)
+    elseif not TRootPart and THead then
+        SFBasePart(THead)
+    elseif not TRootPart and not THead and Accessory and Handle then
+        SFBasePart(Handle)
+    else
+        WindUI:Notify({
+            Title = "找不到合适的甩飞部位",
+            Duration = 1
+        })
+        BV:Destroy()
+        return
+    end
+    BV:Destroy()
+    Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+    workspace.CurrentCamera.CameraSubject = Humanoid
+    repeat
+        RootPart.CFrame = getgenv().OldPos * CFrame.new(0, .5, 0)
+        Character:SetPrimaryPartCFrame(getgenv().OldPos * CFrame.new(0, .5, 0))
+        Humanoid:ChangeState("GettingUp")
+        for _, x in pairs(Character:GetChildren()) do
+            if x:IsA("BasePart") then
+                x.Velocity, x.RotVelocity = Vector3.new(), Vector3.new()
+            end
+        end
+        task.wait()
+    until (RootPart.Position - getgenv().OldPos.p).Magnitude < 25
+    workspace.FallenPartsDestroyHeight = getgenv().FPDH
+end
+
+local function findMurderer()
+    for _, i in ipairs(Players:GetPlayers()) do
+        if i.Backpack:FindFirstChild("Knife") then
+            return i
+        end
+    end
+    
+    for _, i in ipairs(Players:GetPlayers()) do
+        if not i.Character then continue end
+        if i.Character:FindFirstChild("Knife") then
+            return i
+        end
+    end
+    
+    if playerData then
+        for player, data in playerData do
+            if data.Role == "Murderer" then
+                if Players:FindFirstChild(player) then
+                    return Players:FindFirstChild(player)
+                end
+            end
+        end
+    end
+    return nil
+end
+local function findSheriff()
+    for _, i in ipairs(Players:GetPlayers()) do
+        if i.Backpack:FindFirstChild("Gun") then
+            return i
+        end
+    end
+    for _, i in ipairs(Players:GetPlayers()) do
+        if not i.Character then continue end
+        if i.Character:FindFirstChild("Gun") then
+            return i
+        end
+    end
+    if playerData then
+        for player, data in playerData do
+            if data.Role == "Sheriff" then
+                if Players:FindFirstChild(player) then
+                    return Players:FindFirstChild(player)
+                end
+            end
+        end
+    end
+    return nil
+end
+local function findSheriffThatsNotMe()
+    for _, i in ipairs(Players:GetPlayers()) do
+        if i == localPlayer then continue end
+        if i.Backpack:FindFirstChild("Gun") then
+            return i
+        end
+    end
+    for _, i in ipairs(Players:GetPlayers()) do
+        if i == localPlayer then continue end
+        if not i.Character then continue end
+        if i.Character:FindFirstChild("Gun") then
+            return i
+        end
+    end
+    if playerData then
+        for player, data in playerData do
+            if data.Role == "Sheriff" then
+                if Players:FindFirstChild(player) then
+                    if Players:FindFirstChild(player) == localPlayer then continue end
+                    return Players:FindFirstChild(player)
+                end
+            end
+        end
+    end
+    return nil
+end
+
+function reloadESP()
+    for _, v in ipairs(workspace:GetChildren()) do if v.Name == "PlayerESP" then v:Destroy() end end
+    local listplayers = Players:GetChildren()
+    for _, player in ipairs(listplayers) do
+        if player.Character then
+            local character = player.Character
+            if not character:FindFirstChild("PlayerESP") then
+                local a = Instance.new("Highlight", workspace)
+                a.Name = "玩家ESP"
+                a.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                a.Adornee = character
+                a.FillColor = Color3.fromRGB(255, 255, 255)
+                a.FillTransparency = 0.5
+                task.spawn(function()
+                    if player == findMurderer() then
+                        a.FillColor = Color3.fromRGB(255,0,0)
+                        a.OutlineColor = Color3.fromRGB(255,0,0)
+                    elseif player == findSheriff() then
+                        a.FillColor = Color3.fromRGB(0, 150, 255)
+                        a.OutlineColor = Color3.fromRGB(0, 150, 255)
+                    else
+                        a.FillColor = Color3.fromRGB(0,255,0)
+                        a.OutlineColor = Color3.fromRGB(0, 255, 0)
+                    end
+                end)
+            end
+        end
+    end
+end
+
+local function getMap()
+    for _, o in ipairs(workspace:GetChildren()) do
+        if o:FindFirstChild("CoinContainer") and o:FindFirstChild("Spawns") then
+            return o
+        end
+    end
+    return nil
+end
+
+local function getClosestModelToPlayer(player, models)
+    local closestModel = nil
+    local closestDistance = math.huge 
+    local playerPosition = player.Character.HumanoidRootPart.Position
+    
+    for _, model in ipairs(models) do
+        local modelPosition = model:GetPivot().Position
+        local distance = (modelPosition - playerPosition).Magnitude
+        if distance < closestDistance then
+            closestDistance = distance
+            closestModel = model
+        end
+    end
+    return closestModel
+end
+
+local function getPredictedPosition(player, TaffyshootTChina)
+    pcall(function()
+        player = player.Character
+        if not player.Character then return Vector3.new(0,0,0) end
+    end)
+    local playerHRP = player:FindFirstChild("UpperTorso")
+    local playerHum = player:FindFirstChild("Humanoid")
+    if not playerHRP or not playerHum then
+        return Vector3.new(0,0,0)
+    end
+
+    local playerPosition = playerHRP.Position
+    local velocity = Vector3.new()
+    velocity = playerHRP.AssemblyLinearVelocity
+    local playerMoveDirection = playerHum.MoveDirection
+    local playerLookVec = playerHRP.CFrame.LookVector
+    local yVelFactor = velocity.Y > 0 and -1 or 0.5
+    local predictedPosition
+    predictedPosition = playerHRP.Position + ((velocity * Vector3.new(0, 0.5, 0))) * (TaffyshootTChina / 15) + playerMoveDirection * TaffyshootTChina
+    predictedPosition = predictedPosition * (((localPlayer:GetNetworkPing() * 1000) * ((TaffyPing - 1) * 0.01)) + 1)
+
+    return predictedPosition
+end
+
+local function findNearestPlayer()
+    local nearestPlayer = nil
+    local shortestDistance = math.huge 
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= localPlayer and player.Character then 
+            local localRootPart = localPlayer.Character:FindFirstChild("HumanoidRootPart")
+            local otherRootPart = player.Character:FindFirstChild("HumanoidRootPart")
+
+            if localRootPart and otherRootPart then
+                local distance = (localRootPart.Position - otherRootPart.Position).Magnitude
+
+                if distance < shortestDistance then
+                    shortestDistance = distance
+                    nearestPlayer = player
+                end
+            end
+        end
+    end
+
+    return nearestPlayer
+end
+
+function splitString(str,delim)
+    local broken = {}
+    if delim == nil then delim = "," end
+    for w in string.gmatch(str,"[^"..delim.."]+") do
+        table.insert(broken,w)
+    end
+    return broken
+end
+
+function toTokens(str)
+    local tokens = {}
+    for op,name in string.gmatch(str,"([+-])([^+-]+)") do
+        table.insert(tokens,{Operator = op,Name = name})
+    end
+    return tokens
+end
+
+function onlyIncludeInTable(tab,matches)
+    local matchTable = {}
+    local resultTable = {}
+    for i,v in pairs(matches) do matchTable[v.Name] = true end
+    for i,v in pairs(tab) do if matchTable[v.Name] then table.insert(resultTable,v) end end
+    return resultTable
+end
+
+function removeTableMatches(tab,matches)
+    local matchTable = {}
+    local resultTable = {}
+    for i,v in pairs(matches) do matchTable[v.Name] = true end
+    for i,v in pairs(tab) do if not matchTable[v.Name] then table.insert(resultTable,v) end end
+    return resultTable
+end
+
+function getPlayersByName(Name)
+    local Name,Len,Found = string.lower(Name),#Name,{}
+    for _,v in pairs(Players:GetPlayers()) do
+        if Name:sub(0,1) == '@' then
+            if string.sub(string.lower(v.Name),1,Len-1) == Name:sub(2) then
+                table.insert(Found,v)
+            end
+        else
+            if string.sub(string.lower(v.Name),1,Len) == Name or string.sub(string.lower(v.DisplayName),1,Len) == Name then
+                table.insert(Found,v)
+            end
+        end
+    end
+    return Found
+end
+
+function getPlayer(list,speaker)
+    if list == nil then return {speaker.Name} end
+    local nameList = splitString(list,",")
+
+    local foundList = {}
+
+    for _,name in pairs(nameList) do
+        if string.sub(name,1,1) ~= "+" and string.sub(name,1,1) ~= "-" then name = "+"..name end
+        local tokens = toTokens(name)
+        local initialPlayers = Players:GetPlayers()
+
+        for i,v in pairs(tokens) do
+            if v.Operator == "+" then
+                local tokenContent = v.Name
+                local foundCase = false
+
+                if not foundCase then
+                    initialPlayers = onlyIncludeInTable(initialPlayers,getPlayersByName(tokenContent))
+                end
+            else
+                local tokenContent = v.Name
+                local foundCase = false
+
+                if not foundCase then
+                    initialPlayers = removeTableMatches(initialPlayers,getPlayersByName(tokenContent))
+                end
+            end
+        end
+
+        for i,v in pairs(initialPlayers) do table.insert(foundList,v) end
+    end
+
+    local foundNames = {}
+    for i,v in pairs(foundList) do table.insert(foundNames,v.Name) end
+
+    return foundNames[1]
+end
+
+Linni.Ma:Paragraph({
+    Title = [[
+提示:可能会动不了调整移速即可.]],
+    Image = "file-text",
+    ImageSize = 20,   
+    Color = "White"
+})
+    
+local LinniWs = 16 -- 这里改成了 LinniWs 对应底部的检测
+local fov = 70
+local clip = true
+local nocliploop
+Linni.Ma:Slider({
+    Title = "移动",
+    Step = 16,
+    Value = {Min = 0, Max = 100, Default = 16},
+    Callback = function(value)
+        LinniWs = value -- 这里也同步修改
+        if localPlayer.Character and localPlayer.Character:FindFirstChildOfClass("Humanoid") then
+            localPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = value
+        end
+    end
+})
+Linni.Ma:Slider({
+    Title = "视野范围",
+    Step = 1,
+    Value = {Min = 0, Max = 100, Default = 70},
+    Callback = function(value)
+        fov = value
+        workspace.CurrentCamera.FieldOfView = value
+    end
+})
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+
+local flySpeed = 50
+local flying = false
+
+local bodyVelocity, bodyGyro
+local renderSteppedConnection
+
+local function initialRise(character)
+    local riseSpeed = 10
+    local startTime = tick()
+    local riseTime = 1
+
+    while tick() - startTime < riseTime do
+        bodyVelocity.Velocity = Vector3.new(0, riseSpeed, 0)
+        RunService.RenderStepped:Wait()
+    end
+end
+
+local function startFlying()
+    if flying then return end
+    flying = true
+
+    local character = player.Character or player.CharacterAdded:Wait()
+    character.Humanoid.PlatformStand = true
+
+    if bodyVelocity then bodyVelocity:Destroy() end
+    if bodyGyro then bodyGyro:Destroy() end
+
+    bodyVelocity = Instance.new("BodyVelocity")
+    bodyVelocity.MaxForce = Vector3.new(100000, 100000, 100000)
+    bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+    bodyVelocity.Parent = character.HumanoidRootPart
+
+    bodyGyro = Instance.new("BodyGyro")
+    bodyGyro.MaxTorque = Vector3.new(100000, 100000, 100000)
+    bodyGyro.CFrame = character.HumanoidRootPart.CFrame
+    bodyGyro.Parent = character.HumanoidRootPart
+
+    initialRise(character)
+
+    if renderSteppedConnection then
+        renderSteppedConnection:Disconnect()
+    end
+
+    renderSteppedConnection = RunService.RenderStepped:Connect(function()
+        if flying then
+            local moveDirection = character.Humanoid.MoveDirection * flySpeed
+            local camLookVector = workspace.CurrentCamera.CFrame.LookVector
+
+            if moveDirection.Magnitude > 0 then
+                if camLookVector.Y > 0.2 then
+                    moveDirection = moveDirection + Vector3.new(0, camLookVector.Y * flySpeed, 0)
+                elseif camLookVector.Y < -0.2 then
+                    moveDirection = moveDirection + Vector3.new(0, camLookVector.Y * flySpeed, 0)
+                end
+            else
+                moveDirection = Vector3.new(0, 0, 0)
+            end
+
+            bodyVelocity.Velocity = moveDirection
+
+            local tiltAngle = 30
+            local tiltFactor = moveDirection.Magnitude / flySpeed
+            local tiltDirection = 1
+
+            if workspace.CurrentCamera.CFrame:VectorToObjectSpace(moveDirection).Z < 0 then
+                tiltDirection = -1
+            end
+
+            local tiltCFrame = CFrame.Angles(math.rad(tiltAngle) * tiltFactor * tiltDirection, 0, 0)
+            local targetCFrame = CFrame.new(character.HumanoidRootPart.Position, character.HumanoidRootPart.Position + camLookVector) * tiltCFrame
+            bodyGyro.CFrame = bodyGyro.CFrame:Lerp(targetCFrame, 0.2)
+        end
+    end)
+end
+
+local function stopFlying()
+    if not flying then return end
+    flying = false
+
+    local character = player.Character or player.CharacterAdded:Wait()
+    character.Humanoid.PlatformStand = false
+
+    if bodyVelocity then bodyVelocity:Destroy() end
+    if bodyGyro then bodyGyro:Destroy() end
+
+    if renderSteppedConnection then
+        renderSteppedConnection:Disconnect()
+    end
+end
+
+player.CharacterAdded:Connect(function(character)
+    if flying then
+        character.Humanoid.PlatformStand = true
+        startFlying()
+    end
+end)
+Linni.Ma:Input({
+    Title = "飞行速度",
+    Value = "",
+    Placeholder = "",
+    Callback = function(newSpeed)
+    flySpeed = tonumber(newSpeed) or flySpeed
+end})
+Linni.Ma:Toggle({
+Title = "飞行", 
+    Value = false,
+    Callback = function(state)
+    if state then
+        startFlying()
+    else
+        stopFlying()
+    end
+end})
+Linni.Ma:Toggle({
+    Title = "穿墙",
+    Value = false,
+    Callback = function(state)
+        clip = not state
+        if state then
+            nocliploop = RunService.Stepped:Connect(function()
+                if clip == false and localPlayer.Character ~= nil then
+                    for _, child in pairs(localPlayer.Character:GetDescendants()) do
+                        if child:IsA("BasePart") and child.CanCollide == true then
+                            child.CanCollide = false
+                        end
+                    end
+                end
+            end)
+        else
+            if nocliploop then
+                nocliploop:Disconnect()
+            end
+        end
+    end
+})
+Linni.Ma:Slider({
+    Title = "重力设置",
+    Step = 10,
+    Value = {Min = 0, Max = 500, Default = 196},
+    Callback = function(value)
+        LinniGravity = value
+        workspace.Gravity = value
+    end
+})
+Linni.Ma:Slider({
+    Title = "跳跃力量",
+    Step = 5,
+    Value = {Min = 0, Max = 200, Default = 50},
+    Callback = function(value)
+        LinniJumpPower = value
+        if localPlayer.Character and localPlayer.Character:FindFirstChildOfClass("Humanoid") then
+            localPlayer.Character:FindFirstChildOfClass("Humanoid").JumpPower = value
+        end
+    end
+})
+local function secondsToMinutes(seconds)
+    if seconds == -1 then return "" end
+    local minutes = math.floor(seconds / 60)
+    local remainingSeconds = seconds % 60
+    return string.format("%dm %ds", minutes, remainingSeconds)
+end
+Linni.Esp:Toggle({
+    Title = "显示当前回合剩余时间[你被淘汰后可开启]",
+    Desc = "结束了就是-1m 58ms",
+    Value = false,
+    Callback = function(state)
+        LinniTime = state
+        if state then
+            Linnitask = task.spawn(function()
+                while task.wait(0.5) and LinniTime do
+                    local success, timeLeft = pcall(function()
+                        return game.ReplicatedStorage.Remotes.Extras.GetTimer:InvokeServer()
+                    end)                  
+                    if success and timeLeft then
+                        local timeText = secondsToMinutes(timeLeft)
+                        WindUI:Notify({
+                            Title = "回合剩余时间",
+                            Content = timeText,
+                            Duration = 1
+                        })
+                    else
+                     WindUI:Notify({
+                            Title = "无法获取回合时间",
+                            Duration = 1
+                        })
+                        break
+                    end
+                end
+            end)
+        else
+            if Linnitask then
+                task.cancel(Linnitask)
+                Linnitask = nil
+            end
+            
+        end
+    end
+})
+Linni.Esp:Toggle({
+    Title = "玩家ESP[普通玩家和杀手和警长]",
+    Desc = "每回合需要重新开一遍因为只检测局内,不是全局",
+    Value = false,
+    Callback = function(state)
+        playerESP = state
+        if state then
+            if not findMurderer() or not findSheriff() then
+                repeat task.wait(1) until findSheriff() or findMurderer()
+            end
+            reloadESP()
+        else
+            for _, v in ipairs(workspace:GetChildren()) do 
+                if v.Name == "PlayerESP" then v:Destroy() end 
+            end
+        end
+    end
+})
+Linni.Esp:Toggle({
+    Title = "掉落枪支ESP",
+    Desc = "每回合需要重新开一遍因为只检测局内,不是全局[这个不知道]",
+    Value = false,
+    Callback = function(state)
+        TaffygunESP = state
+        if state then
+            if getMap() and getMap():FindFirstChild("GunDrop") then
+                local gunesp = Instance.new("Highlight", workspace)
+                gunesp.OutlineTransparency = 1
+                gunesp.FillColor = Color3.fromRGB(255, 255, 0)
+                gunesp.Name = "GunESP"
+                gunesp.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                gunesp.Adornee = getMap():FindFirstChild("GunDrop")
+                gunesp.Enabled = true
+            end
+        else
+            if workspace:FindFirstChild("GunESP") then
+                workspace:FindFirstChild("GunESP"):Destroy()
+            end
+        end
+    end
+})
+Linni.Esp:Toggle({
+    Title = "陷阱检测",
+    Desc = "每回合需要重新开一遍因为只检测局内,不是全局,这个不知道",
+    Value = false,
+    Callback = function(state)
+        TaffyDete = state
+        if state then
+            for _, v in ipairs(workspace:GetDescendants()) do
+                if v.Name == "Trap" and v.Parent:IsDescendantOf(workspace) then
+                    v.Transparency = 0
+                    local trapesp = trapESP:Clone()
+                    trapesp.Parent = workspace
+                    trapesp.Adornee = v
+                end
+            end
+        else
+            for _, v in ipairs(workspace:GetChildren()) do
+                if v.Name == "TrapESP" then v:Destroy() end
+            end
+        end
+    end
+})
+Linni.Mr:Paragraph({
+    Title = [[
+UI正常报错提示,脚本正常使用.
+提示:当警长一点都不好玩 可能射不中.]],
+    Image = "file-text",
+    ImageSize = 20,   
+    Color = "White"
+})
+Linni.Mr:Toggle({
+    Title = "自动射击",
+    Desc = "请到基础栏搭配里面的范围使用",
+    Value = false,
+    Callback = function(state)
+        TaffyShoot = state
+    end
+})
+Linni.Mr:Button({
+    Title = "甩飞杀手", 
+    Callback = function()
+        local murderer = findMurderer()
+        if not murderer then
+            WindUI:Notify({
+                Title = "找不到杀手",
+                Duration = 1
+            })
+            return
+        end
+        if murderer == localPlayer then
+            WindUI:Notify({
+                Title = "不能甩飞自己[因为你是警长]",
+                Duration = 1
+            })
+            return
+        end
+        powerfulFling(murderer)
+    end
+})
+Linni.Mr:Button({
+    Title = "射击杀手",
+    Callback = function()
+        if findSheriff() ~= localPlayer then 
+            WindUI:Notify({
+                Title = "你不是警长",
+                Duration = 1
+            })
+            return 
+        end
+        local murderer = findMurderer() or findSheriffThatsNotMe()
+        if not murderer then 
+            WindUI:Notify({
+                Title = "找不到杀手",
+                Duration = 1
+            })
+            return 
+        end
+        if not localPlayer.Character:FindFirstChild("Gun") then
+            local hum = localPlayer.Character:FindFirstChild("Humanoid")
+            if localPlayer.Backpack:FindFirstChild("Gun") then
+                hum:EquipTool(localPlayer.Backpack:FindFirstChild("Gun"))
+            else
+                WindUI:Notify({
+                    Title = "你没有枪",
+                    Duration = 1
+                })
+                return
+            end
+        end
+        local murdererHRP = murderer.Character:FindFirstChild("HumanoidRootPart")
+        if not murdererHRP then 
+            WindUI:Notify({
+                Title = "找不到杀手的身体部位",
+                Duration = 1
+            })
+            return 
+        end
+        local predictedPosition = getPredictedPosition(murderer, TaffyshootTChina)
+        local args = {[1] = 1, [2] = predictedPosition, [3] = "AH2"}
+        localPlayer.Character.Gun.KnifeLocal.CreateBeam.RemoteFunction:InvokeServer(unpack(args))
+        WindUI:Notify({
+            Title = "已射击杀手",
+            Duration = 1
+        })
+    end
+})
+Linni.Mr:Toggle({
+    Title = "防失败[秒完成互动]",
+    Desc = "平民和警长通用",
+    Value = false,
+    Callback = function(state)
+        antifail = state
+        if state then
+        
+        else
+        
+        end
+    end
+})
+local LinniSection = Linni.Mr:Section({
+    Title = "[ 自动射击调节参数 ] - 打开方法→",
+})
+LinniSection:Input({
+    Title = "射击偏移量",
+    Value = "2.8",
+    Placeholder = "推荐2.8",
+    Callback = function(input)
+        if not tonumber(input) then return end
+        TaffyshootTChina = tonumber(input)
+    end
+})
+LinniSection:Input({
+    Title = "偏移量到ping乘数",
+    Value = "1",
+    Placeholder = "默认1",
+    Callback = function(input)
+        if not tonumber(input) then return end
+        TaffyPing = tonumber(input)
+    end
+})
+
+Linni.Killer:Paragraph({
+    Title = [[
+UI正常报错提示,脚本正常使用.
+提示:当杀手最好玩了,可以调教所有人.]],
+    Image = "file-text",
+    ImageSize = 20,   
+    Color = "White"
+})
+Linni.Killer:Toggle({
+    Title = "杀戮光环",
+    Value = false,
+    Callback = function(state)
+        TaffyAu = state
+        if state then
+            if TaffyAuChina then TaffyAuChina:Disconnect() end
+            
+            TaffyAuChina = RunService.Heartbeat:Connect(function()
+                if findMurderer() ~= localPlayer then return end
+                
+                for _, player in ipairs(Players:GetPlayers()) do
+                    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player ~= localPlayer then
+                        local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+                        if (hrp.Position - localPlayer.Character:FindFirstChild("HumanoidRootPart").Position).Magnitude < 7 then
+                            hrp.Anchored = true
+                            hrp.CFrame = localPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame + localPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame.LookVector * 2
+                            
+                            task.wait(0.1)
+                            local args = {[1] = "Slash"}
+                            
+                            if localPlayer.Character:FindFirstChild("Knife") then
+                                localPlayer.Character.Knife.Stab:FireServer(unpack(args))
+                            elseif localPlayer.Backpack:FindFirstChild("Knife") then
+                                localPlayer.Character.Humanoid:EquipTool(localPlayer.Backpack:FindFirstChild("Knife"))
+                                task.wait(0.2)
+                                localPlayer.Character.Knife.Stab:FireServer(unpack(args))
+                            end
+                            return	
+                        end
+                    end
+                end
+            end)
+            
+        else
+            if TaffyAuChina then 
+                TaffyAuChina:Disconnect() 
+            
+            end
+        end
+    end
+})
+Linni.Killer:Button({
+    Title = "甩飞警长",
+    Callback = function()
+        local sheriff = findSheriff()
+        if not sheriff then
+            WindUI:Notify({
+                Title = "找不到警长",
+                Duration = 1
+            })
+            return
+        end
+        if sheriff == localPlayer then
+            WindUI:Notify({
+                Title = "不能甩飞自己[因为你是杀手]",
+                Duration = 1
+            })
+            return
+        end
+        powerfulFling(sheriff)
+    end
+})
+Linni.Killer:Button({
+    Title = "杀死最近玩家",
+    Callback = function()
+        if findMurderer() ~= localPlayer then 
+            WindUI:Notify({
+                Title = "你不是杀手",
+                Duration = 1
+            })
+            return 
+        end
+        if not localPlayer.Character:FindFirstChild("Knife") then
+            local hum = localPlayer.Character:FindFirstChild("Humanoid")
+            if localPlayer.Backpack:FindFirstChild("Knife") then
+                localPlayer.Character:FindFirstChild("Humanoid"):EquipTool(localPlayer.Backpack:FindFirstChild("Knife"))
+            else
+                WindUI:Notify({
+                    Title = "你没有刀",
+                    Duration = 1
+                })
+                return
+            end
+        end
+        local nearestPlayer = findNearestPlayer()
+        if not nearestPlayer or not nearestPlayer.Character then
+            WindUI:Notify({
+                Title = "找不到玩家",
+                Duration = 1
+            })
+            return
+        end
+        local nearestHRP = nearestPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if not nearestHRP then
+            WindUI:Notify({
+                Title = "找不到玩家的身体部位",
+                Duration = 1
+            })
+            return
+        end
+        if not localPlayer.Character:FindFirstChild("HumanoidRootPart") then 
+            WindUI:Notify({
+                Title = "你的角色无效",
+                Duration = 1
+            })
+            return 
+        end
+        if not TaffyMooKnife then
+            nearestHRP.Anchored = true
+            nearestHRP.CFrame = localPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame + localPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame.LookVector * 2
+            task.wait(0.1)
+            local args = {[1] = "Slash"}
+            localPlayer.Character.Knife.Stab:FireServer(unpack(args))
+        else
+            local lpknife = localPlayer.Character:FindFirstChild("Knife")
+            if not lpknife then return end
+
+            local raycastParams = RaycastParams.new()
+            raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+            raycastParams.FilterDescendantsInstances = {localPlayer.Character}
+            local toThrow = nearestHRP.Position
+
+            local args = {
+                [1] = lpknife:GetPivot(), 
+                [2] = toThrow
+            }
+
+            localPlayer.Character.Knife.Throw:FireServer(unpack(args))
+        end
+        
+        WindUI:Notify({
+            Title = "已杀死最近玩家",
+            Duration = 1
+        })
+    end
+})
+
+Linni.Killer:Button({
+    Title = "杀死所有人",
+    Callback = function()
+        if findMurderer() ~= localPlayer then 
+            WindUI:Notify({
+                Title = "你不是杀手",
+                Duration = 1
+            })
+            return 
+        end
+        if not localPlayer.Character:FindFirstChild("Knife") then
+            local hum = localPlayer.Character:FindFirstChild("Humanoid")
+            if localPlayer.Backpack:FindFirstChild("Knife") then
+                localPlayer.Character:FindFirstChild("Humanoid"):EquipTool(localPlayer.Backpack:FindFirstChild("Knife"))
+            else
+                WindUI:Notify({
+                    Title = "你没有刀",
+                    Duration = 1
+                })
+                return
+            end
+        end
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player ~= localPlayer then
+                player.Character:FindFirstChild("HumanoidRootPart").Anchored = true
+                player.Character:FindFirstChild("HumanoidRootPart").CFrame = localPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame + localPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame.LookVector * 1 
+            end	
+        end
+        local args = {[1] = "Slash"}
+        localPlayer.Character.Knife.Stab:FireServer(unpack(args))
+        WindUI:Notify({
+            Title = "已尝试杀死所有人",
+            Duration = 1
+        })
+    end
+})
+Linni.Killer:Button({
+    Title = "把所有人都扣为人质",
+    Callback = function()
+        if findMurderer() ~= localPlayer then 
+            WindUI:Notify({
+                Title = "你不是杀手",
+                Duration = 1
+            })
+            return 
+        end
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player ~= localPlayer then
+                player.Character:FindFirstChild("HumanoidRootPart").Anchored = true
+                player.Character:FindFirstChild("HumanoidRootPart").CFrame = localPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame + localPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame.LookVector * 5
+            end	
+        end
+        WindUI:Notify({
+            Title = "已把所有人扣为人质",
+            Duration = 1.5
+        })
+    end
+})
+Linni.Killer:Toggle({
+    Title = "模拟飞刀击杀",
+    Desc = "有稳定性,但是实用性较低",
+    Value = false,
+    Callback = function(state)
+        TaffyMooKnife = state
+        if state then
+        
+        end
+    end
+})
+
+Linni.Auto:Toggle({
+    Title = "自动拾取金币[现在是糖果]",
+    Value = false,
+    Callback = function(state)
+        coinTaffy = state
+    end
+})
+Linni.Auto:Toggle({
+    Title = "自动拾取枪支",
+    Value = false,
+    Callback = function(state)
+        TaffyGetGun = state
+    end
+})
+Linni.Tl:Toggle({
+    Title = "忽略飞刀",
+    Value = false,
+    Callback = function(state)
+        TaffyChinaknife = state
+    end
+})
+Linni.Tl:Button({
+    Title = "上帝模式",
+    Callback = function()
+        local Cam = workspace.CurrentCamera
+        local Char = localPlayer.Character
+        local Human = Char and Char:FindFirstChildOfClass("Humanoid")
+        if not Human then 
+            WindUI:Notify({
+                Title = "找不到本人角色的玩家",
+                Duration = 1
+            })
+            return 
+        end
+        
+        local nHuman = Human:Clone()
+        nHuman.Parent = Char
+        localPlayer.Character = nil
+        
+        nHuman:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
+        nHuman:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+        nHuman:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+        
+        nHuman.BreakJointsOnDeath = false
+        Human:Destroy()
+        
+        localPlayer.Character = Char
+        Cam.CameraSubject = nHuman
+        
+        nHuman.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+        
+        local Script = Char:FindFirstChild("Animate")
+        if Script then
+            Script.Disabled = true
+            task.wait(0.1)
+            Script.Disabled = false
+        end
+        
+        nHuman.Health = nHuman.MaxHealth
+        
+        WindUI:Notify({
+            Title = "上帝模式已开启",
+            Duration = 1.5
+        })
+    end
+})
+Linni.Tl:Button({
+    Title = "在聊天中发送警长和杀手的名字",
+    Desc = "你在大厅执行是检测不到警长和杀手",
+    Callback = function()
+        local textchannels = game:GetService("TextChatService"):WaitForChild("TextChannels"):GetChildren()
+        for _, textchannel in ipairs(textchannels) do
+            if textchannel.Name == "RBXSystem" then continue end
+            local murd = findMurderer()
+            local sher = findSheriff()
+            
+            local murdName = "[已检测到你在大厅]"
+            local sherName = "[已检测到你在大厅]"
+            if murd then murdName = murd.Name end
+            if sher then sherName = sher.Name end
+            local message = string.format([[警长:%s | 杀手:%s Linni ]], murdName, sherName)
+            textchannel:SendAsync(message)
+        end
+        
+        WindUI:Notify({
+            Title = "已发送信息到聊天框",
+            Duration = 1
+        })
+    end
+})
+Linni.Tl:Button({
+    Title = "传送到大厅",
+    Callback = function()
+        localPlayer.Character:MoveTo(Vector3.new(-4985.83203125, 308.9087829589844, 7.557879447937012))
+    end
+})
+Linni.Tl:Button({
+    Title = "传送到地图[局内]",
+    Desc = "[有bug,执行后不能移动需要调一下玩家属性,并且每回合都要]",
+    Callback = function()
+        local map = getMap()
+        if not map then
+            WindUI:Notify({
+                Title = "找不到地图",
+                Duration = 1
+            })
+            return
+        end
+        
+        local spawnsFolder = map:FindFirstChild("Spawns")
+        if spawnsFolder and #spawnsFolder:GetChildren() > 0 then
+            local spawns = spawnsFolder:GetChildren()
+            local randomSpawn = spawns[math.random(1, #spawns)]
+            
+            if localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                localPlayer.Character:MoveTo(randomSpawn.Position)
+                
+            end
+        else
+            WindUI:Notify({
+                Title = "找不到生成点",
+                Duration = 1
+            })
+        end
+    end
+})
+Linni.Tl:Button({
+    Title = "传送到掉落的枪",
+    Callback = function()
+        local map = getMap()
+        if not map or not map:FindFirstChild("GunDrop") then 
+            WindUI:Notify({
+                Title = "没有可传送到的掉落枪支",
+                Duration = 1
+            })
+            return 
+        end
+        
+        local gunDrop = map:FindFirstChild("GunDrop")
+        if localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local previousPosition = localPlayer.Character.HumanoidRootPart.CFrame
+            localPlayer.Character.HumanoidRootPart.CFrame = gunDrop:GetPivot()
+            local connection
+            connection = localPlayer.Backpack.ChildAdded:Connect(function(child)
+                if child.Name == "Gun" then
+                    connection:Disconnect()
+                    task.wait(0.5)
+                    localPlayer.Character.HumanoidRootPart.CFrame = previousPosition
+                end
+            end)
+            task.delay(5, function()
+                if connection then
+                    connection:Disconnect()
+                    localPlayer.Character.HumanoidRootPart.CFrame = previousPosition
+                end
+            end)
+         
+        end
+    end
+})
+
+local CtSection = Linni.Cata:Section({
+    Title = "[范围] - 打开方式→"
+})
+CtSection:Input({
+    Title = "范围[ui报错,可以正常输入]",
+    Value = "1",
+    Placeholder = "",
+    Callback = function(input)
+        Taffyhit = tonumber(input) or 1
+        local players = Players:GetPlayers()
+        for i,v in ipairs(players) do
+            if v ~= localPlayer and v.Character:FindFirstChild('HumanoidRootPart') then
+                local sizeArg = tonumber(input)
+                local Size = Vector3.new(sizeArg,sizeArg,sizeArg)
+                if TaffyBox then
+                    for _, part in ipairs(v.Character:GetChildren()) do
+                        if part:IsA("BasePart") then
+                            if not input or sizeArg == 1 then
+                                part.Size = Vector3.new(2,1,1)
+                                part.Transparency = 0.2
+                            else
+                                part.Size = Size
+                                part.Transparency = 0.2
+                            end
+                        end
+                    end
+                else
+                    local Root = v.Character:FindFirstChild('HumanoidRootPart')
+                    if Root:IsA("BasePart") then
+                        if not input or sizeArg == 1 then
+                            Root.Size = Vector3.new(2,1,1)
+                            Root.Transparency = 0.2
+                        else
+                            Root.Size = Size
+                            Root.Transparency = 0.2
+                        end
+                        Root.CanCollide = false
+                    end
+                end
+            end
+        end
+        
+    end
+})
+CtSection:Toggle({
+    Title = "范围[不可关闭]",
+    Value = false,
+    Callback = function(state)
+        if state then
+            loopTaffyhit = RunService.Heartbeat:Connect(function()
+                local players = Players:GetPlayers()
+                for i,v in ipairs(players) do
+                    if v ~= localPlayer and v.Character:FindFirstChild('HumanoidRootPart') then
+                        local sizeArg = tonumber(Taffyhit)
+                        local Size = Vector3.new(sizeArg,sizeArg,sizeArg)
+                        local Root = v.Character:FindFirstChild('HumanoidRootPart')
+                        if TaffyBox then
+                            for _, part in ipairs(v.Character:GetChildren()) do
+                                if part:IsA("BasePart") then
+                                    if not Taffyhit or sizeArg == 1 then
+                                        part.Size = Vector3.new(2,1,1)
+                                        part.Transparency = 0.2
+                                    else
+                                        part.Size = Size
+                                        part.Transparency = 0.2
+                                    end
+                                end
+                            end
+                        else
+                            local Root = v.Character:FindFirstChild('HumanoidRootPart')
+                            if Root:IsA("BasePart") then
+                                if not Taffyhit or sizeArg == 1 then
+                                    Root.Size = Vector3.new(2,1,1)
+                                    Root.Transparency = 0.2
+                                else
+                                    Root.Size = Size
+                                    Root.Transparency = 0.2
+                                end
+                                Root.CanCollide = false
+                            end
+                        end
+                    end
+                end
+            end)
+        else
+            if loopTaffyhit then
+                loopTaffyhit:Disconnect()
+            end
+        end
+    end
+})
+CtSection:Toggle({
+    Title = "范围[所有部位,不可关闭]",
+    Value = false,
+    Callback = function(state)
+        TaffyBox = state
+    end
+})
+local AmSection = Linni.Cata:Section({
+    Title = "[瞄准] - 打开方式→"
+})
+AmSection:Input({
+    Title = "目标玩家",
+    Value = "",
+    Placeholder = "",
+    Callback = function(input)
+        if not Players:FindFirstChild(getPlayer(input, localPlayer)) then
+            WindUI:Notify({
+                Title = "玩家未找到",
+                Duration = 1
+            })
+            return
+        end
+        WindUI:Notify({
+            Title = "目标设置为 " .. Players:FindFirstChild(getPlayer(input, localPlayer)).Name,
+            Duration = 1
+        })
+        target = Players:FindFirstChild(getPlayer(input, localPlayer))
+    end
+})
+AmSection:Button({
+    Title = "瞄准锁定",
+    Callback = function()
+        if Taffyaim then return end
+        if Taffyaimrscon then Taffyaimrscon:Disconnect() end
+        if not target then 
+            WindUI:Notify({
+                Title = "没有输入玩家名字",
+                Duration = 1
+            })
+            return 
+        end
+        Taffyaimrscon = RunService.RenderStepped:Connect(function()
+            if not target then 
+                WindUI:Notify({
+                    Title = "玩家名字错误或者不在",
+                    Duration = 1
+                })
+                Taffyaimrscon:Disconnect() 
+                return 
+            end
+            if not target.Character then return end
+            if not target.Character:FindFirstChild("HumanoidRootPart") then return end
+            workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, target.Character:FindFirstChild("HumanoidRootPart").Position)
+        end)
+        Taffyaim = true
+    end
+})
+AmSection:Button({
+    Title = "取消瞄准锁定",
+    Callback = function()
+        if not Taffyaim then return end
+        Taffyaim = false
+        if Taffyaimrscon then Taffyaimrscon:Disconnect() end
+    end
+})
+
+local FgSection = Linni.Cata:Section({
+    Title = "[甩飞] - 打开方式→"
+})
+FgSection:Input({
+    Title = "输入需要甩飞的目标",
+    Value = "",
+    Placeholder = "",
+    Callback = function(input)
+        if not Players:FindFirstChild(getPlayer(input, localPlayer)) then
+            WindUI:Notify({
+                Title = "玩家未找到",
+                Duration = 1
+            })
+            return
+        end
+        WindUI:Notify({
+            Title = "甩飞目标设置为 " .. Players:FindFirstChild(getPlayer(input, localPlayer)).Name,
+            Duration = 1
+        })
+        TaffyplayerFt = Players:FindFirstChild(getPlayer(input, localPlayer))
+    end
+})
+FgSection:Button({
+    Title = "甩飞指定玩家",
+    Callback = function()
+        if not TaffyplayerFt then
+            WindUI:Notify({
+                Title = "请先设置甩飞目标",
+                Duration = 1
+            })
+            return
+        end
+        
+        if not Players:FindFirstChild(TaffyplayerFt.Name) then
+            WindUI:Notify({
+                Title = "目标玩家不存在",
+                Duration = 1
+            })
+            return
+        end
+        
+        if TaffyplayerFt == localPlayer then
+            WindUI:Notify({
+                Title = "不能甩飞自己",
+                Duration = 1
+            })
+            return
+        end
+        
+        powerfulFling(TaffyplayerFt)
+    end
+})
+FgSection:Toggle({
+    Title = "防甩飞",
+    Value = false,
+    Callback = function(state)
+        TaffyantiFly = state
+        if state then
+            flingDetectionCon = RunService.Heartbeat:Connect(function()
+                for _, pl in ipairs(Players:GetPlayers()) do
+                    if pl.Character:IsDescendantOf(workspace) then
+                        if pl.Character.PrimaryPart.AssemblyAngularVelocity.Magnitude > 50 or pl.Character.PrimaryPart.AssemblyLinearVelocity.Magnitude > 100 then
+                            if not detectedPlayers[pl.Name] then
+                                WindUI:Notify({
+                                    Title = "检测到甩飞者: " .. pl.Name,
+                                    Duration = 1.5
+                                })
+                                detectedPlayers[pl.Name] = true	
+                            end
+
+                            for _, p in ipairs(pl.Character:GetDescendants()) do
+                                if p:IsA("BasePart") then
+                                    p.CanCollide = false
+                                    p.AssemblyAngularVelocity = Vector3.zero
+                                    p.AssemblyLinearVelocity = Vector3.zero
+                                    p.CustomPhysicalProperties = PhysicalProperties.new(0,0,0)
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+            flingNeutralizerCon = RunService.Heartbeat:Connect(function()
+                if localPlayer.Character and localPlayer.Character.PrimaryPart then
+                    if localPlayer.Character.PrimaryPart.AssemblyLinearVelocity.Magnitude > 250 or  localPlayer.Character.PrimaryPart.AssemblyAngularVelocity.Magnitude > 250 then
+                        WindUI:Notify({
+                            Title = "你被甩飞了！正在调整速度",
+                            Duration = 1
+                        })
+                        localPlayer.Character.PrimaryPart.AssemblyLinearVelocity = Vector3.zero
+                        localPlayer.Character.PrimaryPart.AssemblyAngularVelocity = Vector3.zero
+                        if TaffyantiFlyLastPos ~= Vector3.zero then
+                            localPlayer.Character.PrimaryPart.CFrame = CFrame.new(TaffyantiFlyLastPos)
+                        end
+                    else
+                        TaffyantiFlyLastPos = localPlayer.Character.PrimaryPart.Position
+                    end
+                end
+            end)
+        else
+            if flingDetectionCon then flingDetectionCon:Disconnect() end
+            if flingNeutralizerCon then flingNeutralizerCon:Disconnect() end
+            detectedPlayers = {}
+            
+        end
+    end
+})
+workspace.ChildAdded:Connect(function(ch)
+    if ch == getMap() and playerESP then
+        WindUI:Notify({
+            Title = "地图已加载等待分配角色...",
+            Duration = 1.5
+        })
+        repeat
+            task.wait(1)
+        until findMurderer()
+        WindUI:Notify({
+            Title = "玩家ESP已移除,请重新开启",
+            Duration = 1
+        })
+    end
+end)
+workspace.ChildRemoved:Connect(function(ch)
+    if ch == getMap() and playerESP then
+        WindUI:Notify({
+            Title = "游戏结束移除玩家ESP",
+            Duration = 1
+        })
+        playerData = {}
+        for _, v in ipairs(workspace:GetChildren()) do if v.Name == "PlayerESP" then v:Destroy() end end
+    end
+end)
+workspace.DescendantAdded:Connect(function(ch)
+    if TaffyDete and ch.Name == "Trap" and ch.Parent:IsDescendantOf(workspace) then
+        ch.Transparency = 0
+        local trapesp = trapESP:Clone()
+        trapesp.Parent = workspace
+        trapesp.Adornee = ch
+        WindUI:Notify({
+            Title = "杀手放置了陷阱",
+            Duration = 1
+        })
+    end
+    if TaffygunESP and ch.Name == "GunDrop" then
+        if not workspace:FindFirstChild("GunESP") then
+            local gunesp = Instance.new("Highlight", workspace)
+            gunesp.OutlineTransparency = 1
+            gunesp.FillColor = Color3.fromRGB(255, 255, 0)
+            gunesp.Name = "GunESP"
+            gunesp.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+            gunesp.Adornee = ch
+            gunesp.Enabled = true
+        end
+        workspace:FindFirstChild("GunESP").Adornee = ch
+        workspace:FindFirstChild("GunESP").Enabled = true
+        WindUI:Notify({
+            Title = "枪已掉落,寻找黄色透视物品",
+            Duration = 1.5
+        })
+        if TaffyGetGun then
+            WindUI:Notify({
+                Title = "请等待.",
+                Duration = 1
+            })
+            task.wait(0.01)
+            if not getMap():FindFirstChild("GunDrop") then 
+                WindUI:Notify({
+                    Title = "没有可传送到的掉落枪支",
+                    Duration = 1
+                })
+                return 
+            end
+            local previousPosition = localPlayer.Character:GetPivot()
+            localPlayer.Character:MoveTo(getMap():FindFirstChild("GunDrop").Position)
+            localPlayer.Backpack.ChildAdded:Wait()
+            localPlayer.Character:PivotTo(previousPosition)
+        end
+    end
+end)
+workspace.DescendantRemoving:Connect(function(ch)
+    if TaffygunESP and ch.Name == "GunDrop" then
+        if workspace:FindFirstChild("GunESP") then
+            workspace:FindFirstChild("GunESP"):Destroy()
+        end
+        WindUI:Notify({
+            Title = "有人拿走了掉落的枪",
+            Duration = 1
+        })
+        task.wait(0.6)
+        local sheriff = findSheriff()
+        if sheriff then
+            WindUI:Notify({
+                Title = "警长是 " .. sheriff.DisplayName,
+                Duration = 1.5
+            })
+        end
+    end
+end)
+game.Workspace.ChildAdded:Connect(function(chi)
+    if chi.Name == "ThrowingKnife" and TaffyChinaknife then
+        chi:Destroy()
+    end
+end)
+task.spawn(function()
+    while task.wait(1) do
+        if findSheriff() == localPlayer and TaffyShoot then
+            WindUI:Notify({
+                Title = "自动射击已开启",
+                Duration = 1
+            })
+            repeat
+                task.wait(0.1)
+                local murderer = findMurderer()
+                if not murderer then continue end
+                local murdererPosition = murderer.Character.HumanoidRootPart.Position
+                local characterRootPart = localPlayer.Character.HumanoidRootPart
+                local rayDirection = murdererPosition - characterRootPart.Position
+
+                local raycastParams = RaycastParams.new()
+                raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+                raycastParams.FilterDescendantsInstances = {localPlayer.Character}
+
+                local hit = workspace:Raycast(characterRootPart.Position, rayDirection, raycastParams)
+                if not hit or hit.Instance.Parent == murderer.Character then 
+                    WindUI:Notify({
+                        Title = "自动射击中……",
+                        Duration = 1
+                    })
+                    if not localPlayer.Character:FindFirstChild("Gun") then
+                        local hum = localPlayer.Character:FindFirstChild("Humanoid")
+                        if localPlayer.Backpack:FindFirstChild("Gun") then
+                            localPlayer.Character:FindFirstChild("Humanoid"):EquipTool(localPlayer.Backpack:FindFirstChild("Gun"))
+                        else
+                            WindUI:Notify({
+                                Title = "你没有枪",
+                                Duration = 1
+                            })
+                            return
+                        end
+                    end
+                    local murdererHRP = murderer.Character:FindFirstChild("HumanoidRootPart")
+                    if not murdererHRP then
+                        WindUI:Notify({
+                            Title = "找不到杀手的身体部位",
+                            Duration = 1
+                        })
+                        return
+                    end
+
+                    local predictedPosition = getPredictedPosition(murderer, TaffyshootTChina)
+
+                    local args = {[1] = 1, [2] = predictedPosition, [3] = "AH2"}
+                    localPlayer.Character.Gun.KnifeLocal.CreateBeam.RemoteFunction:InvokeServer(unpack(args))
+                end
+            until findSheriff() ~= localPlayer or not TaffyShoot
+        end
+    end
+end)
+localPlayer.CharacterAdded:Connect(function(character)
+    character:WaitForChild("Humanoid")
+    task.wait(0.5)
+    if LinniWs ~= 16 then
+        character:FindFirstChild("Humanoid").WalkSpeed = LinniWs
+    end
+    if LinniJumpPower ~= 50 then
+        character:FindFirstChild("Humanoid").JumpPower = LinniJumpPower
+    end
+end)
+task.spawn(function()
+    while task.wait(0.01) do
+        if not coinTaffy then continue end
+        if getMap() then
+            if getMap():FindFirstChild("CoinContainer") and #getMap():FindFirstChild("CoinContainer"):GetChildren() > 1 then
+                local closestCoin = getClosestModelToPlayer(localPlayer, getMap():FindFirstChild("CoinContainer"):GetChildren())
+                if closestCoin then
+                    if not localPlayer.Character:FindFirstChild("HumanoidRootPart") then continue end
+                    local distance = (localPlayer.Character:FindFirstChild("HumanoidRootPart").Position - closestCoin:GetPivot().Position).Magnitude
+                    local toclosestcoin = TweenService:Create(localPlayer.Character:FindFirstChild("HumanoidRootPart"), TweenInfo.new(distance*0.05, Enum.EasingStyle.Linear), {
+                        CFrame = closestCoin:GetPivot()
+                    })
+                    toclosestcoin:Play()
+                    toclosestcoin.Completed:Wait()
+                    task.wait(0.01)
+                    closestCoin:Destroy()
+                    claimedCoins[closestCoin] = true
+                end
+            end
+        end
+    end
+end)
+task.spawn(function() 
+    if game:GetService("RunService"):IsStudio() then return end
+    local OldNameCall = nil
+    OldNameCall = hookmetamethod(game, "__namecall", function(Self, ...)
+        local Args = {...}
+        local NamecallMethod = getnamecallmethod()
+        if antifail and NamecallMethod == "FireServer" and Args[1] == "SetPlayerMinigameResult" then
+            Args[2] = true
+        end
+        return OldNameCall(Self, unpack(Args))
+    end)
+end)
+
+
+
+
+
+
+Window:Divider()
+local SettingsTab = Window:Tab({
+    Title = "Ui设置",
+    Desc = "Ui美术设置", -- 可选
+    Icon = "settings", -- lucide 图标 或 "rbxassetid://" 或 URL，可选
+    IconThemed = true, -- 使用主题颜色，可选
+    Locked = false, -- 禁用标签页交互，可选
+    ShowTabTitle = false, -- 在标签页内显示标题，可选
+    Border = true, -- 在标签页周围添加边框，可选
+})
+
+local ThemeSelectDropdown = SettingsTab:Dropdown({
+    Title = "选择主题",
+    Multi = false,
+    AllowNone = false,
+    Value = nil,
+    Values = {"AF Hub", "月夜", "冬日霜雪", "月渊"},
+    Callback = function(theme)
+        WindUI:SetTheme(theme)
+    end
+})
+
+
+SettingsTab:Divider()
+SettingsTab:Section({ 
+    Title = "背景选择",
+    TextXAlignment = "Center",
+    TextSize = 20,
+})
+
+local Dropdown = SettingsTab:Dropdown({
+    Title = "切换背景图",
+    Values = {
+        {
+            Title = "无背景",
+            Icon = "app-window",
+            Callback = function()
+                -- 清除背景图
+                Window:SetBackgroundImage("rbxassetid://0")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换为无背景",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图1(默认)",
+            Desc = "秋词提供",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://136059273188532")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图1",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图2",
+            Icon = "app-window",
+            Callback = function()
+       Window:SetBackgroundImage("rbxassetid://101182501948173")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图2",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图3",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://90514823373955")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图3",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图4",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://103858984350097")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图4",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图5",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://137662774446930")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图5",
+                    Duration = 3
+                })
+            end
+        },
+                {
+            Title = "背景图6",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://73618579935939")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图6",
+                    Duration = 3
+                })
+            end
+        },
+                {
+            Title = "背景图7",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://131845772886226")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图7",
+                    Duration = 3
+                })
+            end
+        },
+                {
+            Title = "背景图8",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://92388982051300")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图8",
+                    Duration = 3
+                })
+            end
+        },
+                        {
+            Title = "背景图9",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://103197377834563")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图9",
+                    Duration = 3
+                })
+            end
+        },
+                        {
+            Title = "背景图10",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://123887383447725")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图10",
+                    Duration = 3
+                })
+            end
+        },
+                        {
+            Title = "背景图11",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://84371548883810")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图11",
+                    Duration = 3
+                })
+            end
+        },
+    }
+})
+
+SettingsTab:Section({ 
+    Title = "自定义背景",
+    TextXAlignment = "Center",
+    TextSize = 20,
+})
+SettingsTab:Divider()
+
+local CustomBackground = SettingsTab:Input({
+    Title = "背景 ID",
+    Type = "Input",
+    Placeholder = "输入图片ID",
+    Callback = function(input)
+        if input ~= "" then
+            _G.BackgroundImage = "rbxassetid://" .. input
+            Window:SetBackgroundImage(_G.BackgroundImage)
+        end
+    end
+})
+
+local Keybind = SettingsTab:Keybind({
+    Title = "关闭界面的快捷键",
+    Value = "G",
+    Callback = function(v)
+        Window:SetToggleKey(Enum.KeyCode[v])
+    end
+})
