@@ -1,0 +1,1805 @@
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/YIRDEX/Miscs/refs/heads/main/YXWindUI.lua"))()
+
+WindUI:AddTheme({
+    Name = "AF Hub", 
+    Accent = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#FF4C4C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#FF1A1A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#CC0000"), Transparency = 0}
+    }, {Rotation = 90}),
+    Background = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#FF4C4C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#FF1A1A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#CC0000"), Transparency = 0}
+    }, {Rotation = 90}),
+    Outline = Color3.fromHex("#FF6666"),
+    Text = Color3.fromHex("#FFFFFF"),
+    Placeholder = Color3.fromHex("#AAAAAA"),
+    Button = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#FF4C4C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#FF1A1A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#CC0000"), Transparency = 0}
+    }, {Rotation = 90}),
+    Icon = Color3.fromHex("#FF6666")
+})
+
+-- 月夜
+WindUI:AddTheme({
+    Name = "月夜",
+    Accent = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#232526"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#636363"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#E0E0E0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Dialog = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#1C1C1C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#3A3A3A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#636363"), Transparency = 0}
+    }, {Rotation = 90}),
+    Outline = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#B0B0B0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#C0C0C0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#E0E0E0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Text = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#FFFFFF"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#D9D9D9"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#BFBFBF"), Transparency = 0}
+    }, {Rotation = 90}),
+    Placeholder = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#A0A0A0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#B0B0B0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#C0C0C0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Background = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#101010"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#3A3A3A"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#636363"), Transparency = 0}
+    }, {Rotation = 90}),
+    Button = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#3A3A3A"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#636363"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#A2A2A2"), Transparency = 0}
+    }, {Rotation = 90}),
+    Icon = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#C0C0C0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#E0E0E0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#FFFFFF"), Transparency = 0}
+    }, {Rotation = 90})
+})
+
+-- 冬日霜雪
+WindUI:AddTheme({
+    Name = "冬日霜雪",
+    Accent = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#D0E8F2"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#A0D4F2"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#70C0F2"), Transparency = 0}
+    }, {Rotation = 45}),
+    Dialog = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#E0F7FF"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#B0EFFF"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#80E7FF"), Transparency = 0}
+    }, {Rotation = 45}),
+    Outline = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#70C0F2"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#50B0E0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#30A0D0"), Transparency = 0}
+    }, {Rotation = 45}),
+    Text = Color3.fromHex("#000000"),
+    Placeholder = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#7FB3D5"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#5FA2C5"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#3F91B5"), Transparency = 0}
+    }, {Rotation = 45}),
+    Background = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#E6F0FA"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#CDE0F5"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#B4D1F0"), Transparency = 0}
+    }, {Rotation = 45}),
+    Button = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#50B0E0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#30A0D0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#108FC0"), Transparency = 0}
+    }, {Rotation = 45}),
+    Icon = Color3.fromHex("#00FFFF")
+})
+
+-- 月渊
+WindUI:AddTheme({
+    Name = "月渊",
+    Accent = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#0D0D1A"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#1A1A33"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#2E2E5C"), Transparency = 0}
+    }, {Rotation = 90}),
+    Dialog = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#101026"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#1A1A3D"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#333366"), Transparency = 0}
+    }, {Rotation = 90}),
+    Outline = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#2E2E5C"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#404080"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#5050A0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Text = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#A0A0FF"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#C0C0FF"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#E0E0FF"), Transparency = 0}
+    }, {Rotation = 90}),
+    Placeholder = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#6060A0"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#8080C0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#A0A0E0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Background = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#0A0A1A"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#1A1A33"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#2E2E5C"), Transparency = 0}
+    }, {Rotation = 90}),
+    Button = WindUI:Gradient({
+        ["0"] = {Color = Color3.fromHex("#404080"), Transparency = 0},
+        ["50"] = {Color = Color3.fromHex("#5050A0"), Transparency = 0},
+        ["100"] = {Color = Color3.fromHex("#6060C0"), Transparency = 0}
+    }, {Rotation = 90}),
+    Icon = Color3.fromHex("#00FFFF")
+})
+
+WindUI:SetFont("rbxassetid://12187369639")
+
+local Window = WindUI:CreateWindow({
+    Title = '<font color="#FF0000">A</font><font color="#00F0FF">F</font><font color="#00E5FF">-</font><font color="#00D5FF">H</font><font color="#00C8FF">U</font><font color="#00BBFF">B</font>', -- 窗口标题
+    Icon = "rbxassetid://82225829203828", 
+    Author = "@秋辞", -- 窗口副标题，可选
+    Folder = "YX-Hub文件夹", -- 保存密钥和图片的文件夹
+    Size = UDim2.fromOffset(520, 400), -- 窗口大小
+    MinSize = Vector2.new(560, 350), -- 窗口最小尺寸
+    MaxSize = Vector2.new(850, 560), -- 窗口最大尺寸
+    Transparent = true, -- 窗口透明度
+    Theme = "冬日霜雪", 
+    Resizable = true, -- 是否可调整窗口大小
+    SideBarWidth = 150, -- 侧边栏（标签页）宽度
+    HideSearchBar = false, -- 隐藏搜索栏
+    ScrollBarEnabled = true, -- 位于滚动框右侧的滚动条
+Background = "rbxassetid://136059273188532",
+    
+    User = { -- 位于左下角的用户信息
+        Enabled = false,
+        Anonymous = false,
+        Callback = function() -- 点击时的回调函数，可选，可移除
+            print("点击")
+        end,
+    },
+})
+
+
+
+-- 编辑窗口展开按钮配置
+Window:EditOpenButton({
+    Title = '<font color="#FF0000">A</font><font color="#00F0FF">F</font><font color="#00E5FF">-</font><font color="#00D5FF">H</font><font color="#00C8FF">U</font><font color="#00BBFF">B</font>',
+    Icon = "snowflake",
+    CornerRadius = UDim.new(99,99),
+    StrokeThickness = 3,
+    IconSize = 30,
+    Color = ColorSequence.new(Color3.fromHex("00FFFF"), Color3.fromHex("00BBFF")),
+    OnlyMobile = false,
+    Enabled = true,
+    Draggable = true,
+})
+
+local COLOR_SCHEMES = {
+    ["彩虹颜色"] = {ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromHex("00FFFF")),
+        ColorSequenceKeypoint.new(1, Color3.fromHex("0000FF"))
+    }), "palette"},
+}
+
+local borderAnimation
+local animationSpeed = 5
+
+local function createRainbowBorder(window, colorScheme)
+    local mainFrame = window.UIElements.Main
+    if not mainFrame then return nil end
+
+    local existingStroke = mainFrame:FindFirstChild("RainbowStroke")
+    if existingStroke then existingStroke:Destroy() end
+
+    if not mainFrame:FindFirstChildOfClass("UICorner") then
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 16)
+        corner.Parent = mainFrame
+    end
+
+    local rainbowStroke = Instance.new("UIStroke")
+    rainbowStroke.Name = "RainbowStroke"
+    rainbowStroke.Thickness = 2
+    rainbowStroke.Color = Color3.new(1, 1, 1)
+    rainbowStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    rainbowStroke.LineJoinMode = Enum.LineJoinMode.Round
+    rainbowStroke.Parent = mainFrame
+
+    local glowEffect = Instance.new("UIGradient")
+    glowEffect.Name = "GlowEffect"
+    local schemeData = COLOR_SCHEMES[colorScheme or "彩虹颜色"]
+    glowEffect.Color = schemeData and schemeData[1] or COLOR_SCHEMES["彩虹颜色"][1]
+    glowEffect.Rotation = 0
+    glowEffect.Parent = rainbowStroke
+
+    return rainbowStroke
+end
+
+local function startBorderAnimation(window, speed)
+    local mainFrame = window.UIElements.Main
+    if not mainFrame then return nil end
+    local rainbowStroke = mainFrame:FindFirstChild("RainbowStroke")
+    if not rainbowStroke then return nil end
+    local glowEffect = rainbowStroke:FindFirstChild("GlowEffect")
+    if not glowEffect then return nil end
+
+    return game:GetService("RunService").Heartbeat:Connect(function()
+        if not rainbowStroke or rainbowStroke.Parent == nil then return end
+        glowEffect.Rotation = (tick() * speed * 10) % 360
+    end)
+end
+
+local rainbowStroke = createRainbowBorder(Window, "彩虹颜色")
+if rainbowStroke then
+    borderAnimation = startBorderAnimation(Window, animationSpeed)
+end
+
+local Lighting = game:GetService("Lighting")
+local TweenServiceBlur = game:GetService("TweenService")
+
+local blur = Lighting:FindFirstChildOfClass("BlurEffect")
+if not blur then
+    blur = Instance.new("BlurEffect")
+    blur.Size = 0
+    blur.Parent = Lighting
+end
+
+task.spawn(function()
+    local wasOpen = false
+    while true do
+        task.wait(0.1)
+        local mainFrame = Window.UIElements and Window.UIElements.Main
+        local isOpen = mainFrame and mainFrame.Visible or false
+        
+        if isOpen ~= wasOpen then
+            wasOpen = isOpen
+            TweenServiceBlur:Create(blur, TweenInfo.new(0.3), {
+                Size = isOpen and 20 or 0
+            }):Play()
+        end
+    end
+end)
+
+local info = Window:Section({
+    Title = "主页",
+    Icon = "star",
+    Opened = true
+})
+
+local Tab1 = info:Tab({
+    Title = "信息",
+    Icon = "info", -- optional
+    Locked = false,
+})
+
+
+
+local Paragraph = Tab1:Paragraph({
+    Title = 'AF Hub',
+    Desc = '欢迎使用YX-HUB脚本(＾ν＾)',
+    Thumbnail = "rbxassetid://100781334247855",
+    ThumbnailSize = 200,
+    Locked = false,
+})
+
+local Paragraph1 = Tab1:Paragraph({
+    Title = 'AF Hun',
+    Desc = '主打缝合 :D',
+    Thumbnail = "rbxassetid://72531855816776",
+    ThumbnailSize = 200,
+    Locked = false,
+})
+
+Tab1:Section({ 
+    Title = "开发者",
+    TextXAlignment = "Center",
+    TextSize = 20,
+})
+
+local Paragraph = Tab1:Paragraph({
+    Title = "秋词",
+    Desc = "AF Hub作者",
+    Image = "rbxassetid://138882879525986",
+    ImageSize = 60,
+    Locked = false,
+})
+
+local Paragraph = Tab1:Paragraph({
+    Title = "YirdeX",
+    Desc = "ui背景设计者",
+    Image = "rbxassetid://90051928527603",
+    ImageSize = 60,
+    Locked = false,
+})
+
+local Tab3 = info:Tab({
+    Title = "复制",
+    Icon = "file-code",
+    Locked = false,
+})
+
+local Button1 = Tab3:Button({
+    Title = "复制主群",
+    Desc = "复制作者QQ群", -- 可选参数
+    Icon = "file-code", -- 图标名称 或 资源ID链接，可选参数
+    IconAlign = "Left",
+    Locked = false, -- 是否禁用按钮，可选参数
+    LockedTitle = "已锁定", -- 按钮禁用时显示的文字，可选参数
+    Callback = function()
+setclipboard("938714427")
+    end
+})
+
+local Tab2 = info:Tab({
+    Title = "公告",
+    Icon = "menu",
+    Locked = false,
+})
+local Section1 = Tab2:Section({
+    Title = "AF Hub[公告]", -- 分区标题
+    Icon = "component", -- 图标，支持图标名称或资源ID（可选）
+    TextSize = 30, -- 标题文字大小（可选）
+    TextXAlignment = "Left", -- 文字水平对齐方式：左对齐/居中/右对齐（可选）
+    Box = true, -- 是否显示分区外框（可选）
+    BoxBorder = true, -- 是否显示外框边框（可选）
+    Opened = true, -- 分区默认是否展开（可选）
+    FontWeight = Enum.FontWeight.SemiBold, -- 标题字体粗细（可选）
+    DescFontWeight = Enum.FontWeight.Medium, -- 描述文字字体粗细（可选）
+    TextTransparency = 0, -- 标题文字透明度（可选）
+    DescTextTransparency = 0, -- 描述文字透明度（可选）
+})
+
+Section1:Paragraph({
+    Title = "这个是公告？",
+    TextSize = 30, 
+    Thumbnail = "rbxassetid://85076999766387",
+    ThumbnailSize = 100,
+})
+
+
+
+
+
+
+Window:Divider()
+local functiond = Window:Section({
+    Title = "功能区",
+    Icon = "folder-cog",
+    Opened = true,
+})
+local Lighting = game:GetService("Lighting")
+local TweenServiceBlur = game:GetService("TweenService")
+
+local blur = Lighting:FindFirstChildOfClass("BlurEffect")
+if not blur then
+    blur = Instance.new("BlurEffect")
+    blur.Size = 0
+    blur.Parent = Lighting
+end
+
+task.spawn(function()
+    local wasOpen = false
+    while true do
+        task.wait(0.1)
+        local mainFrame = Window.UIElements and Window.UIElements.Main
+        local isOpen = mainFrame and mainFrame.Visible or false
+        
+        if isOpen ~= wasOpen then
+            wasOpen = isOpen
+            TweenServiceBlur:Create(blur, TweenInfo.new(0.3), {
+                Size = isOpen and 20 or 0
+            }):Play()
+        end
+    end
+end)
+
+local CombatTab = Window:Tab({ Title = "战斗", Icon = "sword" })
+local MainTab = Window:Tab({ Title = "自动任务", Icon = "home" })
+local ShopTab = Window:Tab({ Title = "商店/开箱", Icon = "shopping-cart" })
+local AbilityTab = Window:Tab({ Title = "技能/点数", Icon = "zap" })
+local EquipTab = Window:Tab({ Title = "自动装备", Icon = "package" })
+local TeleportTab = Window:Tab({ Title = "传送", Icon = "map-pin" })
+local UITab = Window:Tab({ Title = "UI设置", Icon = "settings" })
+Window:SelectTab(1)
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+local VirtualUser = game:GetService("VirtualUser")
+local lp = Players.LocalPlayer
+
+game.Players.LocalPlayer.Idled:Connect(function()
+    VirtualUser:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+    wait(1)
+    VirtualUser:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+end)
+
+local combatSystem = ReplicatedStorage:FindFirstChild("CombatSystem")
+local combatRemotes = combatSystem and combatSystem:FindFirstChild("Remotes")
+local requestHitRemote = combatRemotes and combatRemotes:FindFirstChild("RequestHit")
+local remoteEventsFolder = ReplicatedStorage:FindFirstChild("RemoteEvents")
+local questAcceptRemote = remoteEventsFolder and remoteEventsFolder:FindFirstChild("QuestAccept")
+local questProgressRemote = remoteEventsFolder and remoteEventsFolder:FindFirstChild("QuestProgress")
+local questUIUpdateRemote = remoteEventsFolder and remoteEventsFolder:FindFirstChild("QuestUIUpdate")
+local questCompleteRemote = remoteEventsFolder and remoteEventsFolder:FindFirstChild("QuestComplete")
+local useItemRemote = ReplicatedStorage:FindFirstChild("Remotes") and ReplicatedStorage.Remotes:FindFirstChild("UseItem")
+local abilitySystem = ReplicatedStorage:FindFirstChild("AbilitySystem")
+local requestAbilityRemote = abilitySystem and abilitySystem:FindFirstChild("Remotes") and abilitySystem.Remotes:FindFirstChild("RequestAbility")
+local allocateStatRemote = remoteEventsFolder and remoteEventsFolder:FindFirstChild("AllocateStat")
+local resetStatsRemote = remoteEventsFolder and remoteEventsFolder:FindFirstChild("ResetStats")
+local getPlayerStatsRemote = remoteEventsFolder and remoteEventsFolder:FindFirstChild("GetPlayerStats")
+local globalRemotes = ReplicatedStorage:FindFirstChild("Remotes")
+local equipWeaponRemote = globalRemotes and globalRemotes:FindFirstChild("EquipWeapon")
+local basicRemotes = ReplicatedStorage:FindFirstChild("Remotes")
+local hakiRemote = basicRemotes and basicRemotes:FindFirstChild("HakiRemote")
+local observationHakiRemote = basicRemotes and basicRemotes:FindFirstChild("ObservationHakiRemote")
+local conquerorHakiRemote = basicRemotes and basicRemotes:FindFirstChild("ConquerorHakiRemote")
+
+local enemiesFolder = workspace:FindFirstChild("NPCs")
+local serviceNpcsFolder = workspace:FindFirstChild("ServiceNPCs")
+
+local QuestMap = {
+    ["Quest1"] = { npc = "QuestNPC1", mobType = "Thief", amount = 5, specificMobs = {"Thief1","Thief2","Thief3","Thief4","Thief5"} },
+    ["Quest2"] = { npc = "QuestNPC2", mobType = "ThiefBoss", amount = 1, specificMobs = nil },
+    ["Quest3"] = { npc = "QuestNPC3", mobType = "Monkey", amount = 5, specificMobs = nil },
+    ["Quest4"] = { npc = "QuestNPC4", mobType = "MonkeyBoss", amount = 1, specificMobs = nil },
+    ["Quest5"] = { npc = "QuestNPC5", mobType = "DesertBandit", amount = 5, specificMobs = nil },
+    ["Quest6"] = { npc = "QuestNPC6", mobType = "DesertBoss", amount = 1, specificMobs = nil },
+    ["Quest7"] = { npc = "QuestNPC7", mobType = "FrostRogue", amount = 5, specificMobs = nil },
+    ["Quest8"] = { npc = "QuestNPC8", mobType = "SnowBoss", amount = 1, specificMobs = nil },
+    ["Quest9"] = { npc = "QuestNPC9", mobType = "Sorcerer", amount = 5, specificMobs = nil },
+    ["Quest10"] = { npc = "QuestNPC10", mobType = "PandaMiniBoss", amount = 1, specificMobs = nil },
+    ["Quest11"] = { npc = "QuestNPC11", mobType = "Hollow", amount = 5, specificMobs = nil },
+    ["Quest12"] = { npc = "QuestNPC12", mobType = "StrongSorcerer", amount = 5, specificMobs = nil },
+    ["Quest13"] = { npc = "QuestNPC13", mobType = "Curse", amount = 5, specificMobs = nil },
+    ["Quest14"] = { npc = "QuestNPC14", mobType = "SlimeWarrior", amount = 5, specificMobs = nil },
+    ["Quest15"] = { npc = "QuestNPC15", mobType = "AcademyTeacher", amount = 5, specificMobs = nil },
+    ["Quest16"] = { npc = "QuestNPC16", mobType = "Swordsman", amount = 5, specificMobs = nil },
+    ["Quest17"] = { npc = "QuestNPC17", mobType = "Quincy", amount = 5, specificMobs = nil },
+    ["Quest18"] = { npc = "QuestNPC18", mobType = "Ninja", amount = 5, specificMobs = nil },
+    ["Quest19"] = { npc = "QuestNPC19", mobType = "ArenaFighter", amount = 5, specificMobs = nil },
+}
+
+local FarmMobs = {
+    { name = "Thief [Level 15]", mobs = {"Thief1","Thief2","Thief3","Thief4","Thief5"} },
+    { name = "ThiefBoss [Level 50]", mobs = {"ThiefBoss"} },
+    { name = "Monkey [Level 250]", mobs = {"Monkey1","Monkey2","Monkey3","Monkey4","Monkey5"} },
+    { name = "MonkeyBoss [Level 500]", mobs = {"MonkeyBoss"} },
+    { name = "DesertBandit [Level 750]", mobs = {"DesertBandit1","DesertBandit2","DesertBandit3","DesertBandit4","DesertBandit5"} },
+    { name = "DesertBoss [Level 1000]", mobs = {"DesertBoss"} },
+    { name = "FrostRogue [Level 1500]", mobs = {"FrostRogue1","FrostRogue2","FrostRogue3","FrostRogue4","FrostRogue5"} },
+    { name = "SnowBoss [Level 2000]", mobs = {"SnowBoss"} },
+    { name = "Sorcerer [Level 3000]", mobs = {"Sorcerer1","Sorcerer2","Sorcerer3","Sorcerer4","Sorcerer5"} },
+    { name = "PandaMiniBoss [Level 5000]", mobs = {"PandaMiniBoss"} },
+    { name = "Hollow [Level 5500]", mobs = {"Hollow1","Hollow2","Hollow3","Hollow4","Hollow5"} },
+    { name = "StrongSorcerer [Level 6000]", mobs = {"StrongSorcerer1","StrongSorcerer2","StrongSorcerer3","StrongSorcerer4","StrongSorcerer5"} },
+    { name = "Curse [Level 7000]", mobs = {"Curse1","Curse2","Curse3","Curse4","Curse5"} },
+    { name = "SlimeWarrior [Level 8000]", mobs = {"Slime1","Slime2","Slime3","Slime4","Slime5"} },
+    { name = "AcademyTeacher [Level 9000]", mobs = {"AcademyTeacher1","AcademyTeacher2","AcademyTeacher3","AcademyTeacher4","AcademyTeacher5"} },
+    { name = "Swordsman [Level 10000]", mobs = {"Swordsman1","Swordsman2","Swordsman3","Swordsman4","Swordsman5"} },
+    { name = "Quincy [Level 10750]", mobs = {"Quincy1","Quincy2","Quincy3","Quincy4","Quincy5"} },
+    { name = "Ninja [Level 11500]", mobs = {"Ninja1","Ninja2","Ninja3","Ninja4","Ninja5"} },
+    { name = "ArenaFighter [Level 12000]", mobs = {"ArenaFighter1","ArenaFighter2","ArenaFighter3","ArenaFighter4","ArenaFighter5"} },
+}
+
+local BossMobs = {
+    { name = "Yuji", mobs = {"YujiBoss"} },
+    { name = "Sukuna", mobs = {"SukunaBoss"} },
+    { name = "Gojo", mobs = {"GojoBoss"} },
+    { name = "Yamato", mobs = {"YamatoBoss"} },
+    { name = "Jinwoo", mobs = {"JinwooBoss"} },
+    { name = "Aizen", mobs = {"AizenBoss"} },
+    { name = "Alucard", mobs = {"AlucardBoss"} },
+}
+
+local TimedBosses = {
+    "GojoBoss", "SukunaBoss", "YujiBoss", "AizenBoss", "JinwooBoss", "AlucardBoss"
+}
+
+local ShopItems = {
+    { name = "Kanata [1500 Gold]", type = "Kanata", position = Vector3.new(105.85, 10.04, -261.03) },
+    { name = "DarkBlade [250K Gold+150 Gems]", type = "DarkBlade", position = Vector3.new(-137.16, 13.23, -1093.29) },
+    { name = "Observation Haki [250k+300 Gems]", type = "ObservationHaki", position = Vector3.new(-713.71, 12.13, -523.93) },
+}
+
+local ChestTypes = {"Common Chest","Rare Chest","Legendary Chest","Mythic Chest"}
+
+local Islands = {
+    "Academy Island", "Boss Island", "Desert Island", "Dungeon Island", "Hueco Mundo",
+    "Jungle Island", "Sailor Island", "Shibuya Station", "Shinjuku Island", "Slime Island",
+    "Snow Island", "Starter Island", "Valentine Island"
+}
+
+local Config = {
+    Enabled = false, AttackHeight = 15, SelectedQuest = "Quest1",
+    FarmEnabled = false, SelectedFarmMob = "Thief [Level 15]",
+    SelectedItem = "Kanata [1500 Gold]",
+    ChestEnabled = false, SelectedChest = "Common Chest", ChestSpeed = 0.1, ChestBatch = 1, ChestAmountEnabled = false, ChestAmount = 1,
+    AbilityZEnabled = false, AbilityZCooldown = 1,
+    AbilityXEnabled = false, AbilityXCooldown = 1,
+    AbilityCEnabled = false, AbilityCCooldown = 1,
+    AbilityVEnabled = false, AbilityVCooldown = 1,
+    StatMeleeEnabled = false, StatMeleeSpeed = 0.1, StatMeleeAmountEnabled = false, StatMeleeAmount = 1, StatMeleeBatch = 1,
+    StatDefenseEnabled = false, StatDefenseSpeed = 0.1, StatDefenseAmountEnabled = false, StatDefenseAmount = 1, StatDefenseBatch = 1,
+    StatSwordEnabled = false, StatSwordSpeed = 0.1, StatSwordAmountEnabled = false, StatSwordAmount = 1, StatSwordBatch = 1,
+    StatPowerEnabled = false, StatPowerSpeed = 0.1, StatPowerAmountEnabled = false, StatPowerAmount = 1, StatPowerBatch = 1,
+    BossFarmEnabled = false, SelectedBoss = "Yuji", BossAttackHeight = 15,
+    MoveMode = "传送", MoveSpeed = 50,
+    KillAuraEnabled = false, KillAuraRange = 200,
+    AutoHakiEnabled = false, AutoHakiArmament = true, AutoHakiObservation = true, AutoHakiConqueror = false, HakiInterval = 30,
+    AutoTimedBossEnabled = false, SelectedTimedBosses = {"All"}, TimedBossAttackHeight = 15, TimedBossRange = 300,
+    AutoStatsEnabled = false, SelectedStat = "Melee", StatsPointsPerCycle = 1, StatsInterval = 0.5,
+}
+
+local questCompleted = false
+local questKills = 0
+local questRequired = 0
+local farmThread, autoFarmThread, autoChestThread = nil, nil, nil
+local abilityZThread, abilityXThread, abilityCThread, abilityVThread = nil, nil, nil, nil
+local statMeleeThread, statDefenseThread, statSwordThread, statPowerThread = nil, nil, nil, nil
+local bossFarmThread = nil
+local killAuraThread = nil
+local autoHakiThread = nil
+local autoTimedBossThread = nil
+local autoStatsThread = nil
+local originalPosition = nil
+local slots = {}
+local slotThreads = {}
+
+if questProgressRemote then
+    questProgressRemote.OnClientEvent:Connect(function(data)
+        if not data then questCompleted = true return end
+        local req = data.requirements and data.requirements[1]
+        if not req then return end
+        local prog = tonumber(req.progress or 0)
+        local amt = tonumber(req.amount or 1)
+        questKills = prog
+        questRequired = amt
+        if prog >= amt then questCompleted = true end
+    end)
+end
+
+if questUIUpdateRemote then
+    questUIUpdateRemote.OnClientEvent:Connect(function(data)
+        if not data then questCompleted = true return end
+        local req = data.requirements and data.requirements[1]
+        if not req then return end
+        local prog = tonumber(req.progress or 0)
+        local amt = tonumber(req.amount or 1)
+        questKills = prog
+        questRequired = amt
+        if prog >= amt then questCompleted = true end
+    end)
+end
+
+if questCompleteRemote then
+    questCompleteRemote.OnClientEvent:Connect(function()
+        questCompleted = true
+    end)
+end
+
+local function GetHRP()
+    local char = lp.Character
+    return char and char:FindFirstChild("HumanoidRootPart")
+end
+
+local function SaveOriginalPosition()
+    local hrp = GetHRP()
+    if hrp then originalPosition = hrp.CFrame end
+end
+
+local function TeleportToPosition(cf)
+    local hrp = GetHRP()
+    if not hrp or not cf then return end
+    if Config.MoveMode == "传送" then
+        hrp.CFrame = cf
+    else
+        local distance = (hrp.Position - cf.Position).Magnitude
+        local duration = math.clamp(distance / Config.MoveSpeed, 0.05, 2)
+        TweenService:Create(hrp, TweenInfo.new(duration, Enum.EasingStyle.Linear), {CFrame = cf}):Play()
+    end
+end
+
+local function TeleportToNPC(npcObj)
+    local hrp = GetHRP()
+    if not hrp or not npcObj then return end
+    local cf = npcObj:IsA("Model") and npcObj:GetPivot() or npcObj.CFrame
+    TeleportToPosition(cf * CFrame.new(0, 0, -3))
+end
+
+local function FindClosestMob(mobType, specificMobs)
+    if not enemiesFolder then return nil end
+    local keyword = mobType:lower()
+    local hrp = GetHRP()
+    local closest, closestPrimary = nil, nil
+    local closestDist = math.huge
+    for _, v in pairs(enemiesFolder:GetChildren()) do
+        if specificMobs then
+            local isSpecific = false
+            for _, mobName in ipairs(specificMobs) do
+                if v.Name == mobName then isSpecific = true break end
+            end
+            if not isSpecific then
+            end
+        else
+            if not string.find(v.Name:lower(), keyword, 1, true) then
+            end
+        end
+        local hum = v:FindFirstChildOfClass("Humanoid")
+        local primary = v.PrimaryPart or v:FindFirstChild("HumanoidRootPart")
+        if hum and hum.Health > 0 and primary then
+            if hrp then
+                local dist = (primary.Position - hrp.Position).Magnitude
+                if dist < closestDist then
+                    closestDist = dist
+                    closest = v
+                    closestPrimary = primary
+                end
+            else
+                return v, primary
+            end
+        end
+    end
+    return closest, closestPrimary
+end
+
+local function FindClosestFarmMob(mobNames)
+    if not enemiesFolder then return nil end
+    local hrp = GetHRP()
+    local closest, closestPrimary = nil, nil
+    local closestDist = math.huge
+    for _, mobName in ipairs(mobNames) do
+        for _, v in pairs(enemiesFolder:GetChildren()) do
+            if string.find(v.Name:lower(), mobName:lower(), 1, true) then
+                local hum = v:FindFirstChildOfClass("Humanoid")
+                local primary = v.PrimaryPart or v:FindFirstChild("HumanoidRootPart")
+                if hum and hum.Health > 0 and primary then
+                    if hrp then
+                        local dist = (primary.Position - hrp.Position).Magnitude
+                        if dist < closestDist then
+                            closestDist = dist
+                            closest = v
+                            closestPrimary = primary
+                        end
+                    else
+                        return v, primary
+                    end
+                end
+            end
+        end
+    end
+    return closest, closestPrimary
+end
+
+local function FindClosestTimedBoss()
+    if not enemiesFolder then return nil end
+    local hrp = GetHRP()
+    local closest, closestPrimary = nil, nil
+    local closestDist = math.huge
+    for _, v in pairs(enemiesFolder:GetChildren()) do
+        local bossName = v.Name
+        local isSelected = false
+        if type(Config.SelectedTimedBosses) == "table" then
+            if table.find(Config.SelectedTimedBosses, "All") then
+                isSelected = table.find(TimedBosses, bossName) ~= nil
+            else
+                isSelected = table.find(Config.SelectedTimedBosses, bossName) ~= nil
+            end
+        else
+            isSelected = Config.SelectedTimedBosses == "All" and table.find(TimedBosses, bossName) ~= nil or Config.SelectedTimedBosses == bossName
+        end
+        if isSelected then
+            local hum = v:FindFirstChildOfClass("Humanoid")
+            local primary = v.PrimaryPart or v:FindFirstChild("HumanoidRootPart")
+            if hum and hum.Health > 0 and primary and hrp then
+                local dist = (primary.Position - hrp.Position).Magnitude
+                if dist < closestDist then
+                    closestDist = dist
+                    closest = v
+                    closestPrimary = primary
+                end
+            end
+        end
+    end
+    return closest, closestPrimary
+end
+
+local function AttackMob(mob, primary)
+    local hrp = GetHRP()
+    if not hrp or not requestHitRemote then return end
+    local pos = primary.Position
+    hrp.CFrame = CFrame.lookAt(pos + Vector3.new(0, Config.AttackHeight, 0), pos)
+    hrp.AssemblyLinearVelocity = Vector3.zero
+    requestHitRemote:FireServer(mob)
+end
+
+local function AttackMobWithHeight(mob, primary, height)
+    local hrp = GetHRP()
+    if not hrp or not requestHitRemote then return end
+    local pos = primary.Position
+    hrp.CFrame = CFrame.lookAt(pos + Vector3.new(0, height, 0), pos)
+    hrp.AssemblyLinearVelocity = Vector3.zero
+    requestHitRemote:FireServer(mob)
+end
+
+local function StopFarm()
+    if farmThread then task.cancel(farmThread) farmThread = nil end
+end
+local function StopAutoFarm()
+    if autoFarmThread then task.cancel(autoFarmThread) autoFarmThread = nil end
+end
+local function StopBossFarm()
+    if bossFarmThread then task.cancel(bossFarmThread) bossFarmThread = nil end
+end
+local function StopAutoChest()
+    if autoChestThread then task.cancel(autoChestThread) autoChestThread = nil end
+end
+local function StopAutoAbilities()
+    if abilityZThread then task.cancel(abilityZThread) abilityZThread = nil end
+    if abilityXThread then task.cancel(abilityXThread) abilityXThread = nil end
+    if abilityCThread then task.cancel(abilityCThread) abilityCThread = nil end
+    if abilityVThread then task.cancel(abilityVThread) abilityVThread = nil end
+end
+local function StopAutoStats()
+    if statMeleeThread then task.cancel(statMeleeThread) statMeleeThread = nil end
+    if statDefenseThread then task.cancel(statDefenseThread) statDefenseThread = nil end
+    if statSwordThread then task.cancel(statSwordThread) statSwordThread = nil end
+    if statPowerThread then task.cancel(statPowerThread) statPowerThread = nil end
+end
+local function StopKillAura()
+    if killAuraThread then task.cancel(killAuraThread) killAuraThread = nil end
+end
+local function StopAutoHaki()
+    if autoHakiThread then task.cancel(autoHakiThread) autoHakiThread = nil end
+end
+local function StopAutoTimedBoss()
+    if autoTimedBossThread then task.cancel(autoTimedBossThread) autoTimedBossThread = nil end
+end
+local function StopAutoStatsAll()
+    if autoStatsThread then task.cancel(autoStatsThread) autoStatsThread = nil end
+end
+
+local function StartFarm()
+    if not serviceNpcsFolder or not questAcceptRemote then return end
+    StopFarm()
+    farmThread = task.spawn(function()
+        while Config.Enabled do
+            local questInfo = QuestMap[Config.SelectedQuest]
+            if not questInfo then task.wait(1) end
+            questCompleted = false
+            questKills = 0
+            questRequired = questInfo.amount
+            local npcObj = serviceNpcsFolder:FindFirstChild(questInfo.npc)
+            if not npcObj then
+                WindUI:Notify({Title = "错误", Content = "未找到NPC: " .. questInfo.npc, Duration = 3})
+                task.wait(2)
+            end
+            TeleportToNPC(npcObj)
+            task.wait(0.5)
+            questAcceptRemote:FireServer(questInfo.npc)
+            task.wait(0.5)
+            WindUI:Notify({Title = Config.SelectedQuest, Content = "已接受!", Duration = 2})
+            while Config.Enabled do
+                if questCompleted then
+                    WindUI:Notify({Title = Config.SelectedQuest, Content = "已完成! 重新接取...", Duration = 2})
+                    task.wait(1)
+                    break
+                end
+                local mob, primary = FindClosestMob(questInfo.mobType, questInfo.specificMobs)
+                if mob and primary then
+                    AttackMob(mob, primary)
+                    RunService.Heartbeat:Wait()
+                else
+                    task.wait(0.3)
+                end
+            end
+        end
+    end)
+end
+
+local function StartAutoFarm()
+    StopAutoFarm()
+    autoFarmThread = task.spawn(function()
+        local farmInfo = nil
+        for _, info in ipairs(FarmMobs) do
+            if info.name == Config.SelectedFarmMob then farmInfo = info break end
+        end
+        if not farmInfo then return end
+        while Config.FarmEnabled do
+            local mob, primary = FindClosestFarmMob(farmInfo.mobs)
+            if mob and primary then
+                AttackMob(mob, primary)
+                RunService.Heartbeat:Wait()
+            else
+                task.wait(0.5)
+            end
+        end
+    end)
+end
+
+local function StartBossFarm()
+    StopBossFarm()
+    bossFarmThread = task.spawn(function()
+        local bossInfo = nil
+        for _, info in ipairs(BossMobs) do
+            if info.name == Config.SelectedBoss then bossInfo = info break end
+        end
+        if not bossInfo then return end
+        while Config.BossFarmEnabled do
+            local mob, primary = FindClosestFarmMob(bossInfo.mobs)
+            if mob and primary then
+                local pos = primary.Position
+                local hrp = GetHRP()
+                if hrp then
+                    hrp.CFrame = CFrame.lookAt(pos + Vector3.new(0, Config.BossAttackHeight, 0), pos)
+                    hrp.AssemblyLinearVelocity = Vector3.zero
+                    if requestHitRemote then requestHitRemote:FireServer(mob) end
+                end
+                RunService.Heartbeat:Wait()
+            else
+                task.wait(0.5)
+            end
+        end
+    end)
+end
+
+local function StartAutoChest()
+    if not useItemRemote then return end
+    StopAutoChest()
+    autoChestThread = task.spawn(function()
+        local totalOpened = 0
+        while Config.ChestEnabled do
+            useItemRemote:FireServer("Use", Config.SelectedChest, Config.ChestBatch, false)
+            totalOpened = totalOpened + Config.ChestBatch
+            if Config.ChestAmountEnabled and totalOpened >= Config.ChestAmount then
+                Config.ChestEnabled = false
+                WindUI:Notify({Title = "宝箱", Content = "已完成开启 " .. Config.ChestAmount .. " 个宝箱", Duration = 3})
+                break
+            end
+            task.wait(Config.ChestSpeed)
+        end
+    end)
+end
+
+local function StartAbilityZ()
+    if abilityZThread then task.cancel(abilityZThread) end
+    abilityZThread = task.spawn(function()
+        while Config.AbilityZEnabled do if requestAbilityRemote then requestAbilityRemote:FireServer(1) end task.wait(Config.AbilityZCooldown) end
+    end)
+end
+local function StartAbilityX()
+    if abilityXThread then task.cancel(abilityXThread) end
+    abilityXThread = task.spawn(function()
+        while Config.AbilityXEnabled do if requestAbilityRemote then requestAbilityRemote:FireServer(2) end task.wait(Config.AbilityXCooldown) end
+    end)
+end
+local function StartAbilityC()
+    if abilityCThread then task.cancel(abilityCThread) end
+    abilityCThread = task.spawn(function()
+        while Config.AbilityCEnabled do if requestAbilityRemote then requestAbilityRemote:FireServer(3) end task.wait(Config.AbilityCCooldown) end
+    end)
+end
+local function StartAbilityV()
+    if abilityVThread then task.cancel(abilityVThread) end
+    abilityVThread = task.spawn(function()
+        while Config.AbilityVEnabled do if requestAbilityRemote then requestAbilityRemote:FireServer(4) end task.wait(Config.AbilityVCooldown) end
+    end)
+end
+
+local function StartStatMelee()
+    if statMeleeThread then task.cancel(statMeleeThread) end
+    statMeleeThread = task.spawn(function()
+        local allocated = 0
+        while Config.StatMeleeEnabled and allocateStatRemote do
+            allocateStatRemote:FireServer("Melee", Config.StatMeleeBatch)
+            allocated = allocated + Config.StatMeleeBatch
+            if Config.StatMeleeAmountEnabled and allocated >= Config.StatMeleeAmount then
+                Config.StatMeleeEnabled = false
+                WindUI:Notify({Title = "Melee", Content = "点数分配完成", Duration = 3})
+                break
+            end
+            task.wait(Config.StatMeleeSpeed)
+        end
+    end)
+end
+local function StartStatDefense()
+    if statDefenseThread then task.cancel(statDefenseThread) end
+    statDefenseThread = task.spawn(function()
+        local allocated = 0
+        while Config.StatDefenseEnabled and allocateStatRemote do
+            allocateStatRemote:FireServer("Defense", Config.StatDefenseBatch)
+            allocated = allocated + Config.StatDefenseBatch
+            if Config.StatDefenseAmountEnabled and allocated >= Config.StatDefenseAmount then
+                Config.StatDefenseEnabled = false
+                WindUI:Notify({Title = "Defense", Content = "点数分配完成", Duration = 3})
+                break
+            end
+            task.wait(Config.StatDefenseSpeed)
+        end
+    end)
+end
+local function StartStatSword()
+    if statSwordThread then task.cancel(statSwordThread) end
+    statSwordThread = task.spawn(function()
+        local allocated = 0
+        while Config.StatSwordEnabled and allocateStatRemote do
+            allocateStatRemote:FireServer("Sword", Config.StatSwordBatch)
+            allocated = allocated + Config.StatSwordBatch
+            if Config.StatSwordAmountEnabled and allocated >= Config.StatSwordAmount then
+                Config.StatSwordEnabled = false
+                WindUI:Notify({Title = "Sword", Content = "点数分配完成", Duration = 3})
+                break
+            end
+            task.wait(Config.StatSwordSpeed)
+        end
+    end)
+end
+local function StartStatPower()
+    if statPowerThread then task.cancel(statPowerThread) end
+    statPowerThread = task.spawn(function()
+        local allocated = 0
+        while Config.StatPowerEnabled and allocateStatRemote do
+            allocateStatRemote:FireServer("Power", Config.StatPowerBatch)
+            allocated = allocated + Config.StatPowerBatch
+            if Config.StatPowerAmountEnabled and allocated >= Config.StatPowerAmount then
+                Config.StatPowerEnabled = false
+                WindUI:Notify({Title = "Power", Content = "点数分配完成", Duration = 3})
+                break
+            end
+            task.wait(Config.StatPowerSpeed)
+        end
+    end)
+end
+
+local function StartKillAura()
+    StopKillAura()
+    killAuraThread = task.spawn(function()
+        while Config.KillAuraEnabled do
+            pcall(function()
+                local hrp = GetHRP()
+                if not hrp then task.wait(0.5) end
+                local closest, primary = nil, nil
+                local closestDist = Config.KillAuraRange
+                if enemiesFolder then
+                    for _, v in pairs(enemiesFolder:GetChildren()) do
+                        local hum = v:FindFirstChildOfClass("Humanoid")
+                        local primaryPart = v.PrimaryPart or v:FindFirstChild("HumanoidRootPart")
+                        if hum and hum.Health > 0 and primaryPart and hrp then
+                            local dist = (primaryPart.Position - hrp.Position).Magnitude
+                            if dist < closestDist then
+                                closestDist = dist
+                                closest = v
+                                primary = primaryPart
+                            end
+                        end
+                    end
+                end
+                if closest and primary and requestHitRemote then
+                    local pos = primary.Position
+                    hrp.CFrame = CFrame.lookAt(pos + Vector3.new(0, Config.AttackHeight, 0), pos)
+                    hrp.AssemblyLinearVelocity = Vector3.zero
+                    requestHitRemote:FireServer(closest)
+                end
+            end)
+            task.wait(0.05)
+        end
+    end)
+end
+
+local function StartAutoHaki()
+    StopAutoHaki()
+    autoHakiThread = task.spawn(function()
+        while Config.AutoHakiEnabled do
+            pcall(function()
+                if Config.AutoHakiArmament and hakiRemote then
+                    hakiRemote:FireServer()
+                end
+                task.wait(0.5)
+                if Config.AutoHakiObservation and observationHakiRemote then
+                    observationHakiRemote:FireServer()
+                end
+                task.wait(0.5)
+                if Config.AutoHakiConqueror and conquerorHakiRemote then
+                    conquerorHakiRemote:FireServer()
+                end
+            end)
+            task.wait(Config.HakiInterval)
+        end
+    end)
+end
+
+local function StartAutoTimedBoss()
+    StopAutoTimedBoss()
+    autoTimedBossThread = task.spawn(function()
+        while Config.AutoTimedBossEnabled do
+            pcall(function()
+                local mob, primary = FindClosestTimedBoss()
+                if mob and primary then
+                    AttackMobWithHeight(mob, primary, Config.TimedBossAttackHeight)
+                    RunService.Heartbeat:Wait()
+                else
+                    task.wait(1)
+                end
+            end)
+            task.wait(0.1)
+        end
+    end)
+end
+
+local function StartAutoStatsAll()
+    StopAutoStatsAll()
+    autoStatsThread = task.spawn(function()
+        while Config.AutoStatsEnabled and allocateStatRemote do
+            pcall(function()
+                allocateStatRemote:FireServer(Config.SelectedStat, Config.StatsPointsPerCycle)
+            end)
+            task.wait(Config.StatsInterval)
+        end
+    end)
+end
+
+local function getWeaponList()
+    local weapons = {}
+    local backpack = lp:FindFirstChild("Backpack")
+    if backpack then
+        for _, v in ipairs(backpack:GetChildren()) do
+            if v:IsA("Tool") then table.insert(weapons, v.Name) end
+        end
+    end
+    return weapons
+end
+
+local function getToolByName(name)
+    local backpack = lp:FindFirstChild("Backpack")
+    if not backpack then return nil end
+    for _, v in ipairs(backpack:GetChildren()) do
+        if v:IsA("Tool") and v.Name == name then return v end
+    end
+    return nil
+end
+
+local function equipSlot(slotIndex)
+    local slot = slots[slotIndex]
+    if not slot or not slot.enabled then return end
+    local char = lp.Character
+    if not char then return end
+    local humanoid = char:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+    local tool = getToolByName(slot.selectedWeapon)
+    if not tool then return end
+    local equipped = char:FindFirstChildOfClass("Tool")
+    if equipped and equipped.Name == tool.Name then return end
+    if equipWeaponRemote then
+        equipWeaponRemote:FireServer(tool)
+    else
+        humanoid:EquipTool(tool)
+    end
+end
+
+local function startSlotThread(slotIndex)
+    if slotThreads[slotIndex] then task.cancel(slotThreads[slotIndex]) end
+    local slot = slots[slotIndex]
+    if not slot or not slot.enabled then return end
+    slotThreads[slotIndex] = task.spawn(function()
+        while slot.enabled do
+            equipSlot(slotIndex)
+            task.wait(slot.interval)
+        end
+    end)
+end
+
+local function BuyItem()
+    local hrp = GetHRP()
+    if not hrp then WindUI:Notify({Title = "错误", Content = "无法获取角色位置", Duration = 3}) return end
+    SaveOriginalPosition()
+    local selectedItem = nil
+    for _, item in ipairs(ShopItems) do
+        if item.name == Config.SelectedItem then selectedItem = item break end
+    end
+    if not selectedItem then WindUI:Notify({Title = "错误", Content = "未找到物品信息", Duration = 3}) return end
+    TeleportToPosition(CFrame.new(selectedItem.position))
+    task.wait(0.5)
+    if selectedItem.type == "Kanata" then
+        local npc = workspace.ServiceNPCs and workspace.ServiceNPCs:FindFirstChild("Katana")
+        if npc and npc.HumanoidRootPart then
+            local prompt = npc.HumanoidRootPart:FindFirstChild("KatanaShopPrompt")
+            if prompt then fireproximityprompt(prompt) end
+        end
+    elseif selectedItem.type == "DarkBlade" then
+        local npc = workspace.ServiceNPCs and workspace.ServiceNPCs:FindFirstChild("DarkBladeNPC")
+        if npc and npc.HumanoidRootPart then
+            local prompt = npc.HumanoidRootPart:FindFirstChild("DarkBladeShopPrompt")
+            if prompt then fireproximityprompt(prompt) end
+        end
+    elseif selectedItem.type == "ObservationHaki" then
+        local npc = workspace.ServiceNPCs and workspace.ServiceNPCs:FindFirstChild("ObservationBuyer")
+        if npc and npc.HumanoidRootPart then
+            local prompt = npc.HumanoidRootPart:FindFirstChild("ObservationHakiPrompt")
+            if prompt then fireproximityprompt(prompt) end
+        end
+    end
+    task.wait(1)
+    if originalPosition then TeleportToPosition(originalPosition) end
+    WindUI:Notify({Title = "购买", Content = "已完成", Duration = 2})
+end
+
+local MoveSection = MainTab:Section({ Title = "移动设置" })
+MoveSection:Dropdown({
+    Title = "移动方式",
+    Values = {"传送", "平滑传送"},
+    Value = "传送",
+    Callback = function(v) Config.MoveMode = v end
+})
+MoveSection:Slider({
+    Title = "平滑传送速度",
+    Value = {Min = 10, Max = 200, Default = 50},
+    Callback = function(v) Config.MoveSpeed = v end
+})
+
+local QuestSection = MainTab:Section({ Title = "自动任务" })
+QuestSection:Toggle({
+    Title = "自动任务",
+    Value = false,
+    Callback = function(v)
+        Config.Enabled = v
+        if v then StartFarm() else StopFarm() end
+    end
+})
+local questOptions = {"Quest1","Quest2","Quest3","Quest4","Quest5","Quest6","Quest7","Quest8","Quest9","Quest10","Quest11","Quest12","Quest13","Quest14","Quest15","Quest16","Quest17","Quest18","Quest19"}
+QuestSection:Dropdown({
+    Title = "选择任务",
+    Values = questOptions,
+    Value = "Quest1",
+    Callback = function(v)
+        Config.SelectedQuest = v
+        if Config.Enabled then questCompleted = true end
+    end
+})
+QuestSection:Slider({
+    Title = "攻击高度",
+    Value = {Min = 5, Max = 50, Default = 15},
+    Callback = function(v) Config.AttackHeight = v end
+})
+
+local FarmSection = MainTab:Section({ Title = "自动刷怪" })
+local farmOptions = {}
+for _, info in ipairs(FarmMobs) do table.insert(farmOptions, info.name) end
+FarmSection:Toggle({
+    Title = "自动刷怪",
+    Value = false,
+    Callback = function(v)
+        Config.FarmEnabled = v
+        if v then StartAutoFarm() else StopAutoFarm() end
+    end
+})
+FarmSection:Dropdown({
+    Title = "选择怪物",
+    Values = farmOptions,
+    Value = "Thief [Level 15]",
+    Callback = function(v)
+        Config.SelectedFarmMob = v
+        if Config.FarmEnabled then StopAutoFarm() StartAutoFarm() end
+    end
+})
+
+local BossSection = MainTab:Section({ Title = "自动刷Boss" })
+local bossOptions = {}
+for _, info in ipairs(BossMobs) do table.insert(bossOptions, info.name) end
+BossSection:Toggle({
+    Title = "自动刷Boss",
+    Value = false,
+    Callback = function(v)
+        Config.BossFarmEnabled = v
+        if v then StartBossFarm() else StopBossFarm() end
+    end
+})
+BossSection:Dropdown({
+    Title = "选择Boss",
+    Values = bossOptions,
+    Value = "Yuji",
+    Callback = function(v)
+        Config.SelectedBoss = v
+        if Config.BossFarmEnabled then StopBossFarm() StartBossFarm() end
+    end
+})
+BossSection:Slider({
+    Title = "Boss攻击高度",
+    Value = {Min = -5, Max = 30, Default = 15},
+    Callback = function(v) Config.BossAttackHeight = v end
+})
+
+local KillAuraSection = CombatTab:Section({ Title = "杀戮光环" })
+KillAuraSection:Toggle({
+    Title = "启用杀戮光环",
+    Value = false,
+    Callback = function(v)
+        Config.KillAuraEnabled = v
+        if v then StartKillAura() else StopKillAura() end
+    end
+})
+KillAuraSection:Slider({
+    Title = "攻击范围",
+    Value = {Min = 50, Max = 500, Default = 200},
+    Callback = function(v) Config.KillAuraRange = v end
+})
+
+local AutoHakiSection = CombatTab:Section({ Title = "自动霸气" })
+AutoHakiSection:Toggle({
+    Title = "启用自动霸气",
+    Value = false,
+    Callback = function(v)
+        Config.AutoHakiEnabled = v
+        if v then StartAutoHaki() else StopAutoHaki() end
+    end
+})
+AutoHakiSection:Toggle({
+    Title = "武装色霸气",
+    Value = true,
+    Callback = function(v) Config.AutoHakiArmament = v end
+})
+AutoHakiSection:Toggle({
+    Title = "见闻色霸气",
+    Value = true,
+    Callback = function(v) Config.AutoHakiObservation = v end
+})
+AutoHakiSection:Toggle({
+    Title = "霸王色霸气",
+    Value = false,
+    Callback = function(v) Config.AutoHakiConqueror = v end
+})
+AutoHakiSection:Slider({
+    Title = "霸气激活间隔(秒)",
+    Value = {Min = 5, Max = 120, Default = 30},
+    Callback = function(v) Config.HakiInterval = v end
+})
+
+local AutoTimedBossSection = CombatTab:Section({ Title = "自动定时Boss" })
+AutoTimedBossSection:Toggle({
+    Title = "启用自动定时Boss",
+    Value = false,
+    Callback = function(v)
+        Config.AutoTimedBossEnabled = v
+        if v then StartAutoTimedBoss() else StopAutoTimedBoss() end
+    end
+})
+AutoTimedBossSection:Dropdown({
+    Title = "选择Boss",
+    Values = {"All", "GojoBoss", "SukunaBoss", "YujiBoss", "AizenBoss", "JinwooBoss", "AlucardBoss"},
+    Value = "All",
+    Multi = true,
+    Callback = function(v)
+        if type(v) == "table" then
+            Config.SelectedTimedBosses = v
+        else
+            Config.SelectedTimedBosses = {v}
+        end
+    end
+})
+AutoTimedBossSection:Slider({
+    Title = "攻击高度",
+    Value = {Min = 5, Max = 50, Default = 15},
+    Callback = function(v) Config.TimedBossAttackHeight = v end
+})
+AutoTimedBossSection:Slider({
+    Title = "攻击范围",
+    Value = {Min = 100, Max = 500, Default = 300},
+    Callback = function(v) Config.TimedBossRange = v end
+})
+
+local shopOptions = {}
+for _, item in ipairs(ShopItems) do table.insert(shopOptions, item.name) end
+
+local ShopSection = ShopTab:Section({ Title = "购买物品" })
+ShopSection:Dropdown({
+    Title = "选择物品",
+    Values = shopOptions,
+    Value = "Kanata [1500 Gold]",
+    Callback = function(v) Config.SelectedItem = v end
+})
+ShopSection:Button({
+    Title = "购买",
+    Icon = "shopping-cart",
+    Callback = function() BuyItem() end
+})
+
+local ChestSection = ShopTab:Section({ Title = "自动开箱" })
+ChestSection:Toggle({
+    Title = "自动开箱",
+    Value = false,
+    Callback = function(v)
+        Config.ChestEnabled = v
+        if v then StartAutoChest() else StopAutoChest() end
+    end
+})
+ChestSection:Dropdown({
+    Title = "选择宝箱",
+    Values = ChestTypes,
+    Value = "Common Chest",
+    Callback = function(v) Config.SelectedChest = v end
+})
+ChestSection:Slider({
+    Title = "开箱速度",
+    Value = {Min = 0.001, Max = 10, Default = 0.1},
+    Step = 0.001,
+    Callback = function(v) Config.ChestSpeed = v end
+})
+ChestSection:Slider({
+    Title = "一次性开箱数量",
+    Value = {Min = 1, Max = 100, Default = 1},
+    Callback = function(v) Config.ChestBatch = v end
+})
+ChestSection:Toggle({
+    Title = "限制开箱数量",
+    Value = false,
+    Callback = function(v) Config.ChestAmountEnabled = v end
+})
+ChestSection:Slider({
+    Title = "开箱数量(多少停止)",
+    Value = {Min = 1, Max = 1000, Default = 1},
+    Callback = function(v) Config.ChestAmount = v end
+})
+
+local AbilitySection = AbilityTab:Section({ Title = "自动技能" })
+AbilitySection:Toggle({
+    Title = "Z技能",
+    Value = false,
+    Callback = function(v)
+        Config.AbilityZEnabled = v
+        if v then StartAbilityZ() elseif abilityZThread then task.cancel(abilityZThread) abilityZThread=nil end
+    end
+})
+AbilitySection:Slider({ Title = "Z技能冷却时间", Value = {Min = 1, Max = 30, Default = 1}, Callback = function(v) Config.AbilityZCooldown = v end })
+AbilitySection:Toggle({
+    Title = "X技能",
+    Value = false,
+    Callback = function(v)
+        Config.AbilityXEnabled = v
+        if v then StartAbilityX() elseif abilityXThread then task.cancel(abilityXThread) abilityXThread=nil end
+    end
+})
+AbilitySection:Slider({ Title = "X技能冷却时间", Value = {Min = 1, Max = 30, Default = 1}, Callback = function(v) Config.AbilityXCooldown = v end })
+AbilitySection:Toggle({
+    Title = "C技能",
+    Value = false,
+    Callback = function(v)
+        Config.AbilityCEnabled = v
+        if v then StartAbilityC() elseif abilityCThread then task.cancel(abilityCThread) abilityCThread=nil end
+    end
+})
+AbilitySection:Slider({ Title = "C技能冷却时间", Value = {Min = 1, Max = 30, Default = 1}, Callback = function(v) Config.AbilityCCooldown = v end })
+AbilitySection:Toggle({
+    Title = "V技能",
+    Value = false,
+    Callback = function(v)
+        Config.AbilityVEnabled = v
+        if v then StartAbilityV() elseif abilityVThread then task.cancel(abilityVThread) abilityVThread=nil end
+    end
+})
+AbilitySection:Slider({ Title = "V技能冷却时间", Value = {Min = 1, Max = 30, Default = 1}, Callback = function(v) Config.AbilityVCooldown = v end })
+
+local StatSection = AbilityTab:Section({ Title = "自动点数分配" })
+StatSection:Toggle({
+    Title = "自动点数分配",
+    Value = false,
+    Callback = function(v)
+        Config.AutoStatsEnabled = v
+        if v then StartAutoStatsAll() else StopAutoStatsAll() end
+    end
+})
+StatSection:Dropdown({
+    Title = "选择属性",
+    Values = {"Melee", "Defense", "Sword", "Power"},
+    Value = "Melee",
+    Callback = function(v) Config.SelectedStat = v end
+})
+StatSection:Slider({
+    Title = "单次分配点数",
+    Value = {Min = 1, Max = 10, Default = 1},
+    Callback = function(v) Config.StatsPointsPerCycle = v end
+})
+StatSection:Slider({
+    Title = "分配间隔(秒)",
+    Value = {Min = 0.1, Max = 5, Default = 0.5},
+    Callback = function(v) Config.StatsInterval = v end
+})
+StatSection:Button({
+    Title = "重置所有属性",
+    Icon = "refresh-cw",
+    Callback = function()
+        if resetStatsRemote then
+            resetStatsRemote:FireServer()
+            WindUI:Notify({Title = "属性重置", Content = "已重置所有属性点", Duration = 3})
+        end
+    end
+})
+
+for i = 1, 4 do
+    local weaponList = getWeaponList()
+    slots[i] = {
+        enabled = false,
+        selectedWeapon = #weaponList > 0 and weaponList[1] or "",
+        interval = 0.3,
+    }
+    local SlotSection = EquipTab:Section({ Title = "装备栏 Slot " .. i })
+    SlotSection:Toggle({
+        Title = "自动装备",
+        Value = false,
+        Callback = function(v)
+            slots[i].enabled = v
+            if v then startSlotThread(i) elseif slotThreads[i] then task.cancel(slotThreads[i]) end
+        end
+    })
+    local dropdown = SlotSection:Dropdown({
+        Title = "选择武器",
+        Values = weaponList,
+        Value = #weaponList > 0 and weaponList[1] or "",
+        Callback = function(v)
+            slots[i].selectedWeapon = v
+            if slots[i].enabled then startSlotThread(i) end
+        end
+    })
+    SlotSection:Slider({
+        Title = "装备间隔(秒)",
+        Value = {Min = 0.1, Max = 5, Default = 0.3},
+        Callback = function(v)
+            slots[i].interval = v
+            if slots[i].enabled then startSlotThread(i) end
+        end
+    })
+    SlotSection:Button({
+        Title = "刷新武器列表",
+        Icon = "refresh-cw",
+        Callback = function()
+            local newList = getWeaponList()
+            dropdown:SetValues(newList)
+            if #newList > 0 then
+                if not table.find(newList, slots[i].selectedWeapon) then
+                    dropdown:SetValue(newList[1])
+                    slots[i].selectedWeapon = newList[1]
+                end
+                WindUI:Notify({Title = "Slot " .. i, Content = "武器列表已刷新", Duration = 2})
+            else
+                WindUI:Notify({Title = "Slot " .. i, Content = "背包无武器", Duration = 2})
+            end
+        end
+    })
+end
+
+lp.CharacterAdded:Connect(function()
+    task.wait(1)
+    for i = 1, 4 do
+        if slots[i] and slots[i].enabled then startSlotThread(i) end
+    end
+end)
+
+local TeleportGroup = TeleportTab:Section({ Title = "岛屿传送" })
+TeleportGroup:Dropdown({
+    Title = "选择岛屿",
+    Values = Islands,
+    Value = "Starter Island",
+    Callback = function(v) Config.SelectedIsland = v end
+})
+TeleportGroup:Button({
+    Title = "传送至岛屿",
+    Icon = "map-pin",
+    Callback = function()
+        local islandName = Config.SelectedIsland:gsub(" ", "")
+        local island = workspace:FindFirstChild(islandName)
+        if island then
+            local hrp = GetHRP()
+            if hrp then
+                TeleportToPosition(island:GetPivot() * CFrame.new(0, 10, 0))
+                WindUI:Notify({Title = "传送", Content = "已传送至 " .. Config.SelectedIsland, Duration = 2})
+            end
+        else
+            WindUI:Notify({Title = "错误", Content = "未找到岛屿: " .. Config.SelectedIsland, Duration = 3})
+        end
+    end
+})
+TeleportGroup:Button({
+    Title = "传送至重生点",
+    Icon = "home",
+    Callback = function()
+        local spawnFolder = workspace:FindFirstChild("Spawns")
+        if spawnFolder then
+            local spawns = spawnFolder:GetChildren()
+            if #spawns > 0 then
+                TeleportToPosition(spawns[1].CFrame)
+                WindUI:Notify({Title = "传送", Content = "已传送至重生点", Duration = 2})
+            end
+        end
+    end
+})
+TeleportGroup:Button({
+    Title = "保存当前位置",
+    Icon = "save",
+    Callback = function()
+        local hrp = GetHRP()
+        if hrp then
+            originalPosition = hrp.CFrame
+            WindUI:Notify({Title = "保存", Content = "位置已保存", Duration = 2})
+        end
+    end
+})
+TeleportGroup:Button({
+    Title = "传送至保存位置",
+    Icon = "target",
+    Callback = function()
+        if originalPosition then
+            TeleportToPosition(originalPosition)
+            WindUI:Notify({Title = "传送", Content = "已传送至保存位置", Duration = 2})
+        else
+            WindUI:Notify({Title = "错误", Content = "没有保存的位置", Duration = 2})
+        end
+    end
+})
+
+local UISection = UITab:Section({ Title = "菜单设置" })
+UISection:Button({
+    Title = "卸载脚本",
+    Icon = "trash-2",
+    Callback = function()
+        Config.Enabled = false Config.FarmEnabled = false Config.BossFarmEnabled = false
+        Config.ChestEnabled = false Config.AbilityZEnabled = false Config.AbilityXEnabled = false
+        Config.AbilityCEnabled = false Config.AbilityVEnabled = false
+        Config.StatMeleeEnabled = false Config.StatDefenseEnabled = false
+        Config.StatSwordEnabled = false Config.StatPowerEnabled = false
+        Config.KillAuraEnabled = false Config.AutoHakiEnabled = false
+        Config.AutoTimedBossEnabled = false Config.AutoStatsEnabled = false
+        for i = 1, 4 do
+            if slots[i] then slots[i].enabled = false end
+            if slotThreads[i] then task.cancel(slotThreads[i]) end
+        end
+        StopFarm() StopAutoFarm() StopBossFarm() StopAutoChest() StopAutoAbilities() StopAutoStats()
+        StopKillAura() StopAutoHaki() StopAutoTimedBoss() StopAutoStatsAll()
+        if Window and Window.Destroy then Window:Destroy() end
+    end
+})
+
+Window:OnDestroy(function()
+    windowOpen = false
+    Config.Enabled = false Config.FarmEnabled = false Config.BossFarmEnabled = false
+    Config.ChestEnabled = false Config.AbilityZEnabled = false Config.AbilityXEnabled = false
+    Config.AbilityCEnabled = false Config.AbilityVEnabled = false
+    Config.StatMeleeEnabled = false Config.StatDefenseEnabled = false
+    Config.StatSwordEnabled = false Config.StatPowerEnabled = false
+    Config.KillAuraEnabled = false Config.AutoHakiEnabled = false
+    Config.AutoTimedBossEnabled = false Config.AutoStatsEnabled = false
+    for i = 1, 4 do
+        if slots[i] then slots[i].enabled = false end
+        if slotThreads[i] then task.cancel(slotThreads[i]) end
+    end
+    StopFarm() StopAutoFarm() StopBossFarm() StopAutoChest() StopAutoAbilities() StopAutoStats()
+    StopKillAura() StopAutoHaki() StopAutoTimedBoss() StopAutoStatsAll()
+    if borderAnimation then borderAnimation:Disconnect() borderAnimation = nil end
+    for _, animation in pairs(fontColorAnimations) do animation:Disconnect() end
+    fontColorAnimations = {}
+end)
+
+
+
+
+
+
+Window:Divider()
+local SettingsTab = Window:Tab({
+    Title = "Ui设置",
+    Desc = "Ui美术设置", -- 可选
+    Icon = "settings", -- lucide 图标 或 "rbxassetid://" 或 URL，可选
+    IconThemed = true, -- 使用主题颜色，可选
+    Locked = false, -- 禁用标签页交互，可选
+    ShowTabTitle = false, -- 在标签页内显示标题，可选
+    Border = true, -- 在标签页周围添加边框，可选
+})
+
+local ThemeSelectDropdown = SettingsTab:Dropdown({
+    Title = "选择主题",
+    Multi = false,
+    AllowNone = false,
+    Value = nil,
+    Values = {"AF Hub", "月夜", "冬日霜雪", "月渊"},
+    Callback = function(theme)
+        WindUI:SetTheme(theme)
+    end
+})
+
+
+SettingsTab:Divider()
+SettingsTab:Section({ 
+    Title = "背景选择",
+    TextXAlignment = "Center",
+    TextSize = 20,
+})
+
+local Dropdown = SettingsTab:Dropdown({
+    Title = "切换背景图",
+    Values = {
+        {
+            Title = "无背景",
+            Icon = "app-window",
+            Callback = function()
+                -- 清除背景图
+                Window:SetBackgroundImage("rbxassetid://0")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换为无背景",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图1(默认)",
+            Desc = "秋词提供",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://136059273188532")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图1",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图2",
+            Icon = "app-window",
+            Callback = function()
+       Window:SetBackgroundImage("rbxassetid://101182501948173")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图2",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图3",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://90514823373955")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图3",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图4",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://103858984350097")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图4",
+                    Duration = 3
+                })
+            end
+        },
+        {
+            Title = "背景图5",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://137662774446930")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图5",
+                    Duration = 3
+                })
+            end
+        },
+                {
+            Title = "背景图6",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://73618579935939")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图6",
+                    Duration = 3
+                })
+            end
+        },
+                {
+            Title = "背景图7",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://131845772886226")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图7",
+                    Duration = 3
+                })
+            end
+        },
+                {
+            Title = "背景图8",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://92388982051300")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图8",
+                    Duration = 3
+                })
+            end
+        },
+                        {
+            Title = "背景图9",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://103197377834563")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图9",
+                    Duration = 3
+                })
+            end
+        },
+                        {
+            Title = "背景图10",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://123887383447725")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图10",
+                    Duration = 3
+                })
+            end
+        },
+                        {
+            Title = "背景图11",
+            Icon = "app-window",
+            Callback = function()
+ Window:SetBackgroundImage("rbxassetid://84371548883810")
+                WindUI:Notify({
+                    Title = "AF Hub",
+                    Content = "已切换背景图11",
+                    Duration = 3
+                })
+            end
+        },
+    }
+})
+
+SettingsTab:Section({ 
+    Title = "自定义背景",
+    TextXAlignment = "Center",
+    TextSize = 20,
+})
+SettingsTab:Divider()
+
+local CustomBackground = SettingsTab:Input({
+    Title = "背景 ID",
+    Type = "Input",
+    Placeholder = "输入图片ID",
+    Callback = function(input)
+        if input ~= "" then
+            _G.BackgroundImage = "rbxassetid://" .. input
+            Window:SetBackgroundImage(_G.BackgroundImage)
+        end
+    end
+})
+
+local Keybind = SettingsTab:Keybind({
+    Title = "关闭界面的快捷键",
+    Value = "G",
+    Callback = function(v)
+        Window:SetToggleKey(Enum.KeyCode[v])
+    end
+})
