@@ -1,0 +1,937 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local HttpService = game:GetService("HttpService")
+
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+local secureParent = pcall(function() return CoreGui end) and CoreGui or LocalPlayer:WaitForChild("PlayerGui")
+
+local req = (syn and syn.request) or (http and http.request) or http_request or request
+local getasset = getcustomasset or getsynasset
+
+if not req or not getasset or not writefile then
+    warn("环境缺失高级API！无法运行此脚本。") return
+end
+
+local ConfigFolder = "NeteaseData_Vision"
+if not isfolder(ConfigFolder) then makefolder(ConfigFolder) end
+
+if getgenv()._CleanHoloLib then getgenv()._CleanHoloLib() end
+
+local HoloLib = {}
+local UI_Instances = {}
+
+local AttachTarget = nil
+
+local function GetPlayerFromString(str)
+    if not str or str == "" then return nil end
+    str = string.lower(str)
+    if str == "me" then return LocalPlayer end
+    for _, p in ipairs(Players:GetPlayers()) do
+        if string.find(string.lower(p.Name), str) or string.find(string.lower(p.DisplayName), str) then
+            return p
+        end
+    end
+    return nil
+end
+
+local AppleTheme = {
+    GlassBG = Color3.fromRGB(15, 15, 18),
+    GlassTransparency = 0.35,
+    Stroke = Color3.fromRGB(255, 255, 255),
+    StrokeTransparency = 0.88,
+    Accent = Color3.fromRGB(10, 132, 255),
+    ComponentBG = Color3.fromRGB(45, 45, 50),
+    TextPrimary = Color3.fromRGB(245, 245, 245),
+    TextSecondary = Color3.fromRGB(150, 150, 155),
+    Corner = UDim.new(0, 16)
+}
+
+local function CreateSpatialPanel(title, initialOffset, isMain)
+    local isVisible = isMain 
+    local isPinned = false
+    local pinnedPosition = Vector3.new()
+    local currentHoloOffset = initialOffset
+    
+    local PanelPart = Instance.new("Part")
+    PanelPart.Size = Vector3.new(3.2, 4.0, 0.01)
+    PanelPart.Anchored = true
+    PanelPart.CanCollide = false
+    PanelPart.Transparency = 1 
+    PanelPart.Parent = workspace
+    table.insert(UI_Instances, PanelPart)
+
+    local SurfaceUI = Instance.new("SurfaceGui")
+    SurfaceUI.Adornee = PanelPart
+    SurfaceUI.Face = Enum.NormalId.Back 
+    SurfaceUI.AlwaysOnTop = true 
+    SurfaceUI.LightInfluence = 0 
+    SurfaceUI.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud 
+    SurfaceUI.PixelsPerStud = 100 
+    SurfaceUI.Enabled = isVisible
+    SurfaceUI.Parent = secureParent
+    table.insert(UI_Instances, SurfaceUI)
+
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Size = UDim2.new(1, 0, 1, 0)
+    MainFrame.BackgroundColor3 = AppleTheme.GlassBG
+    MainFrame.BackgroundTransparency = AppleTheme.GlassTransparency
+    MainFrame.BorderSizePixel = 0
+    MainFrame.Parent = SurfaceUI
+    Instance.new("UICorner", MainFrame).CornerRadius = AppleTheme.Corner
+    local uiStroke = Instance.new("UIStroke", MainFrame)
+    uiStroke.Color = AppleTheme.Stroke
+    uiStroke.Transparency = AppleTheme.StrokeTransparency
+    uiStroke.Thickness = 1.5
+
+    local TopBar = Instance.new("Frame")
+    TopBar.Size = UDim2.new(1, 0, 0, 40)
+    TopBar.BackgroundTransparency = 1
+    TopBar.Parent = MainFrame
+
+    local DragBar = Instance.new("TextButton")
+    DragBar.Size = UDim2.new(1, -50, 1, 0)
+    DragBar.BackgroundTransparency = 1
+    DragBar.Text = "  " .. title
+    DragBar.TextColor3 = AppleTheme.TextPrimary
+    DragBar.Font = Enum.Font.GothamBold
+    DragBar.TextSize = 16
+    DragBar.TextXAlignment = Enum.TextXAlignment.Left
+    DragBar.Parent = TopBar
+
+    local PinBtn = Instance.new("TextButton")
+    PinBtn.Size = UDim2.new(0, 30, 0, 30)
+    PinBtn.Position = UDim2.new(1, -40, 0, 5)
+    PinBtn.BackgroundColor3 = AppleTheme.ComponentBG
+    PinBtn.BackgroundTransparency = 0.5
+    PinBtn.Text = "📍"
+    PinBtn.TextSize = 16
+    PinBtn.Parent = TopBar
+    Instance.new("UICorner", PinBtn).CornerRadius = UDim.new(1, 0)
+
+    PinBtn.MouseButton1Click:Connect(function()
+        isPinned = not isPinned
+        if isPinned then
+            pinnedPosition = PanelPart.Position
+            TweenService:Create(PinBtn, TweenInfo.new(0.3), {BackgroundColor3 = AppleTheme.Accent, BackgroundTransparency = 0}):Play()
+            PinBtn.Text = "📌"
+        else
+            TweenService:Create(PinBtn, TweenInfo.new(0.3), {BackgroundColor3 = AppleTheme.ComponentBG, BackgroundTransparency = 0.5}):Play()
+            PinBtn.Text = "📍"
+        end
+    end)
+
+    local isDraggingHolo, initTouch, initOffset = false, Vector2.new(), CFrame.new()
+    DragBar.InputBegan:Connect(function(input)
+        if not AttachTarget and not isPinned and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+            isDraggingHolo = true; initTouch = input.Position; initOffset = currentHoloOffset
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if isDraggingHolo and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - initTouch
+            currentHoloOffset = CFrame.new(
+                math.clamp(initOffset.X - (delta.X * 0.005), -6, 6),
+                math.clamp(initOffset.Y - (delta.Y * 0.005), -3, 4),
+                initOffset.Z
+            )
+        end
+    end)
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then isDraggingHolo = false end
+    end)
+
+    local ScrollFrame = Instance.new("ScrollingFrame")
+    ScrollFrame.Size = UDim2.new(1, -30, 1, -55)
+    ScrollFrame.Position = UDim2.new(0, 15, 0, 40)
+    ScrollFrame.BackgroundTransparency = 1
+    ScrollFrame.ScrollBarThickness = 3
+    ScrollFrame.ScrollBarImageColor3 = AppleTheme.TextSecondary
+    ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+    ScrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    ScrollFrame.Parent = MainFrame
+
+    local UIListLayout = Instance.new("UIListLayout")
+    UIListLayout.Padding = UDim.new(0, 12)
+    UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    UIListLayout.Parent = ScrollFrame
+
+    local followConn = RunService.RenderStepped:Connect(function(dt)
+        if not isVisible then 
+            PanelPart.CFrame = CFrame.new(0, -9999, 0)
+            return 
+        end
+        
+        if AttachTarget and AttachTarget.Character and AttachTarget.Character:FindFirstChild("HumanoidRootPart") then
+            local hrp = AttachTarget.Character.HumanoidRootPart
+            local baseCFrame = hrp.CFrame * CFrame.new(0, 1.5, 3.5) 
+            if isMain then
+                PanelPart.CFrame = PanelPart.CFrame:Lerp(baseCFrame * CFrame.new(-1.8, 0, 0), dt * 10)
+            else
+                PanelPart.CFrame = PanelPart.CFrame:Lerp(baseCFrame * CFrame.new(-5.2, 0, 0), dt * 10)
+            end
+        elseif not isPinned then
+            PanelPart.CFrame = PanelPart.CFrame:Lerp(Camera.CFrame * currentHoloOffset, dt * 15)
+        else
+            local targetRot = CFrame.lookAt(pinnedPosition, Camera.CFrame.Position) * CFrame.Angles(0, math.pi, 0)
+            PanelPart.CFrame = PanelPart.CFrame:Lerp(targetRot, dt * 10)
+        end
+    end)
+    table.insert(UI_Instances, followConn)
+
+    local PanelAPI = {}
+    function PanelAPI:GetBasePart() return PanelPart end
+    function PanelAPI:IsVisible() return isVisible end
+
+    function PanelAPI:SetVisible(state)
+        isVisible = state; SurfaceUI.Enabled = state
+        if state and isPinned then
+            isPinned = false; PinBtn.Text = "📍"
+            TweenService:Create(PinBtn, TweenInfo.new(0.3), {BackgroundColor3 = AppleTheme.ComponentBG, BackgroundTransparency = 0.5}):Play()
+            PanelPart.CFrame = Camera.CFrame * currentHoloOffset
+        end
+    end
+
+    function PanelAPI:ToggleVisible() self:SetVisible(not isVisible) end
+
+    function PanelAPI:CreateLabel(text, center)
+        local Label = Instance.new("TextLabel")
+        Label.Size = UDim2.new(1, 0, 0, 20)
+        Label.BackgroundTransparency = 1
+        Label.Text = text
+        Label.TextColor3 = AppleTheme.TextSecondary
+        Label.Font = Enum.Font.GothamMedium
+        Label.TextSize = 13
+        Label.TextWrapped = true
+        Label.TextXAlignment = center and Enum.TextXAlignment.Center or Enum.TextXAlignment.Left
+        Label.Parent = ScrollFrame
+        return Label
+    end
+
+    function PanelAPI:CreateButton(text, callback)
+        local Btn = Instance.new("TextButton")
+        Btn.Size = UDim2.new(1, 0, 0, 40)
+        Btn.BackgroundColor3 = AppleTheme.ComponentBG
+        Btn.BackgroundTransparency = 0.4
+        Btn.Text = text
+        Btn.TextColor3 = AppleTheme.TextPrimary
+        Btn.Font = Enum.Font.GothamMedium
+        Btn.TextSize = 14
+        Btn.Parent = ScrollFrame
+        Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 10)
+        
+        Btn.MouseButton1Click:Connect(function()
+            TweenService:Create(Btn, TweenInfo.new(0.1), {BackgroundColor3 = AppleTheme.Accent}):Play()
+            pcall(callback)
+            task.wait(0.1)
+            TweenService:Create(Btn, TweenInfo.new(0.3), {BackgroundColor3 = AppleTheme.ComponentBG}):Play()
+        end)
+        return Btn
+    end
+
+    function PanelAPI:CreateInput(placeholder, callback)
+        local InputFrame = Instance.new("Frame")
+        InputFrame.Size = UDim2.new(1, 0, 0, 40)
+        InputFrame.BackgroundColor3 = AppleTheme.ComponentBG
+        InputFrame.BackgroundTransparency = 0.6
+        InputFrame.Parent = ScrollFrame
+        Instance.new("UICorner", InputFrame).CornerRadius = UDim.new(0, 10)
+
+        local TextBox = Instance.new("TextBox")
+        TextBox.Size = UDim2.new(1, -20, 1, 0)
+        TextBox.Position = UDim2.new(0, 10, 0, 0)
+        TextBox.BackgroundTransparency = 1
+        TextBox.PlaceholderText = placeholder
+        TextBox.Text = ""
+        TextBox.TextColor3 = AppleTheme.TextPrimary
+        TextBox.PlaceholderColor3 = AppleTheme.TextSecondary
+        TextBox.Font = Enum.Font.GothamMedium
+        TextBox.TextSize = 13
+        TextBox.TextXAlignment = Enum.TextXAlignment.Left
+        TextBox.ClearTextOnFocus = false
+        TextBox.Parent = InputFrame
+
+        TextBox.FocusLost:Connect(function(enterPressed)
+            if enterPressed then pcall(callback, TextBox.Text) end
+        end)
+        return TextBox
+    end
+
+    function PanelAPI:CreateSlider(text, min, max, default, callback)
+        local val = math.clamp(default or min, min, max)
+        
+        local SliderFrame = Instance.new("Frame")
+        SliderFrame.Size = UDim2.new(1, 0, 0, 55)
+        SliderFrame.BackgroundColor3 = AppleTheme.ComponentBG
+        SliderFrame.BackgroundTransparency = 0.6
+        SliderFrame.Parent = ScrollFrame
+        Instance.new("UICorner", SliderFrame).CornerRadius = UDim.new(0, 12)
+
+        local Title = Instance.new("TextLabel")
+        Title.Size = UDim2.new(1, -30, 0, 25)
+        Title.Position = UDim2.new(0, 15, 0, 5)
+        Title.BackgroundTransparency = 1
+        Title.Text = text .. " : " .. tostring(val)
+        Title.TextColor3 = AppleTheme.TextPrimary
+        Title.Font = Enum.Font.GothamMedium
+        Title.TextSize = 13
+        Title.TextXAlignment = Enum.TextXAlignment.Left
+        Title.Parent = SliderFrame
+
+        local Track = Instance.new("TextButton")
+        Track.Size = UDim2.new(1, -30, 0, 4)
+        Track.Position = UDim2.new(0, 15, 0, 38)
+        Track.BackgroundColor3 = Color3.fromRGB(80, 80, 85)
+        Track.Text = ""
+        Track.Parent = SliderFrame
+        Instance.new("UICorner", Track).CornerRadius = UDim.new(1, 0)
+
+        local Fill = Instance.new("Frame")
+        Fill.Size = UDim2.new((val - min) / (max - min), 0, 1, 0)
+        Fill.BackgroundColor3 = AppleTheme.Accent
+        Fill.Parent = Track
+        Instance.new("UICorner", Fill).CornerRadius = UDim.new(1, 0)
+
+        local Thumb = Instance.new("Frame")
+        Thumb.Size = UDim2.new(0, 16, 0, 16)
+        Thumb.Position = UDim2.new(1, -8, 0.5, -8)
+        Thumb.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        Thumb.Parent = Fill
+        Instance.new("UICorner", Thumb).CornerRadius = UDim.new(1, 0)
+
+        local dragging = false
+        local function UpdateSlider(input)
+            local relX = math.clamp(input.Position.X - Track.AbsolutePosition.X, 0, Track.AbsoluteSize.X)
+            local percent = relX / Track.AbsoluteSize.X
+            val = math.floor(min + (max - min) * percent)
+            Title.Text = text .. " : " .. tostring(val)
+            TweenService:Create(Fill, TweenInfo.new(0.1), {Size = UDim2.new(percent, 0, 1, 0)}):Play()
+            pcall(callback, val)
+        end
+
+        Track.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                dragging = true; UpdateSlider(input)
+            end
+        end)
+        UserInputService.InputChanged:Connect(function(input)
+            if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+                UpdateSlider(input)
+            end
+        end)
+        UserInputService.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = false end
+        end)
+        
+        pcall(callback, val)
+    end
+
+    -- ==========================================
+    -- 【全新超长环绕领域算法】
+    -- ==========================================
+    function PanelAPI:Create3DAudioVisualizer(audioObject)
+        local bars = {}
+        local numBars = 72  -- 数量暴增，圈圈更细密
+        local radius = 6.0  -- 包围人物的半径
+
+        for i = 1, numBars do
+            local bar = Instance.new("Part")
+            bar.Anchored = true
+            bar.CanCollide = false
+            bar.Material = Enum.Material.Neon
+            bar.Color = AppleTheme.Accent
+            -- 调整柱子粗细以适应庞大的数量
+            bar.Size = Vector3.new(0.1, 0.1, 0.1)
+            
+            local mesh = Instance.new("BlockMesh", bar)
+            bar.Parent = workspace
+            table.insert(UI_Instances, bar)
+            table.insert(bars, bar)
+        end
+
+        local conn = RunService.RenderStepped:Connect(function()
+            if not isVisible or not audioObject or not audioObject.Parent then 
+                for _, bar in ipairs(bars) do bar.CFrame = CFrame.new(0, -9999, 0) end
+                return 
+            end
+            
+            local loudness = audioObject.PlaybackLoudness
+            local normalized = math.clamp(loudness / 400, 0.05, 1)
+            
+            -- 核心：锁定中心点。有吸附目标就包围目标，没有就默认包围自己
+            local targetPlayer = AttachTarget or LocalPlayer
+            local centerCFrame = CFrame.new(0, -9999, 0)
+            
+            if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                -- 沉降一点，让声波阵列贴地环绕
+                centerCFrame = targetPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, -2, 0)
+            end
+            
+            -- 让整个圈慢慢自转，更有科幻感
+            local globalRotation = tick() * 0.8
+            
+            for i, bar in ipairs(bars) do
+                -- 柏林噪声，让每根柱子的跳动都不一样，形成波浪
+                local noise = math.noise(tick() * 4, i * 0.15, 0)
+                local scale = math.clamp(normalized + (noise * normalized * 0.6), 0.05, 1)
+                
+                local targetHeight = scale * 5.0 -- 动态高度拉满
+                bar.Size = bar.Size:Lerp(Vector3.new(0.15, targetHeight, 0.15), 0.3)
+                
+                -- 极坐标计算：将第 i 根柱子均匀分布在圆周上
+                local angle = (i / numBars) * math.pi * 2 + globalRotation
+                local offsetX = math.cos(angle) * radius
+                local offsetZ = math.sin(angle) * radius
+                
+                -- 定位：中心点 + XZ 偏移
+                local barPos = centerCFrame.Position + Vector3.new(offsetX, 0, offsetZ)
+                
+                -- 角度：让每根柱子的正面都死死盯着中间的玩家，并且保持垂直不歪斜
+                local lookAtPos = Vector3.new(centerCFrame.Position.X, barPos.Y, centerCFrame.Position.Z)
+                local targetCFrame = CFrame.lookAt(barPos, lookAtPos)
+                
+                bar.CFrame = bar.CFrame:Lerp(targetCFrame, 0.4)
+                
+                -- 高亮白光闪烁效果
+                local highlightColor = Color3.new(1, 1, 1)
+                bar.Color = AppleTheme.Accent:Lerp(highlightColor, scale - 0.3)
+            end
+        end)
+        table.insert(UI_Instances, conn)
+    end
+
+    function PanelAPI:CreateSubTab(subTitle)
+        local subOffset = currentHoloOffset * CFrame.new(2.8, 0, 0)
+        local SubPanel = CreateSpatialPanel(subTitle, subOffset, false)
+        
+        local Btn = Instance.new("TextButton")
+        Btn.Size = UDim2.new(1, 0, 0, 45)
+        Btn.BackgroundColor3 = AppleTheme.ComponentBG
+        Btn.BackgroundTransparency = 0.4
+        Btn.Text = subTitle .. "  ➡️"
+        Btn.TextColor3 = AppleTheme.TextPrimary
+        Btn.Font = Enum.Font.GothamMedium
+        Btn.TextSize = 14
+        Btn.Parent = ScrollFrame
+        Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 10)
+        
+        Btn.MouseButton1Click:Connect(function()
+            TweenService:Create(Btn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(80, 80, 90)}):Play()
+            SubPanel:ToggleVisible() 
+            task.wait(0.1)
+            TweenService:Create(Btn, TweenInfo.new(0.3), {BackgroundColor3 = AppleTheme.ComponentBG}):Play()
+        end)
+        return SubPanel
+    end
+
+    return PanelAPI
+end
+
+function HoloLib:CreateWindow(config)
+    local title = config.Title or "Vision UI"
+    local MainPanel = CreateSpatialPanel(title, CFrame.new(-1.2, -0.2, -3.2), true)
+
+    local MobileUI = Instance.new("ScreenGui")
+    MobileUI.ResetOnSpawn = false
+    MobileUI.Parent = secureParent
+    table.insert(UI_Instances, MobileUI)
+
+    local ToggleBtn = Instance.new("TextButton")
+    ToggleBtn.Size = UDim2.new(0, 45, 0, 45)
+    ToggleBtn.Position = UDim2.new(0.5, -22, 0.05, 0)
+    ToggleBtn.BackgroundColor3 = AppleTheme.GlassBG
+    ToggleBtn.BackgroundTransparency = 0.2
+    ToggleBtn.Text = "🎵"
+    ToggleBtn.TextColor3 = AppleTheme.TextPrimary
+    ToggleBtn.TextSize = 20
+    ToggleBtn.Parent = MobileUI
+    Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(1, 0)
+    local stroke = Instance.new("UIStroke", ToggleBtn)
+    stroke.Color = AppleTheme.Stroke
+    stroke.Transparency = 0.5
+    stroke.Thickness = 1.5
+
+    local dragToggle, dragStart, startPos
+    ToggleBtn.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragToggle = true; dragStart = input.Position; startPos = ToggleBtn.Position
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if dragToggle and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStart
+            ToggleBtn.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragToggle = false end
+    end)
+
+    ToggleBtn.MouseButton1Click:Connect(function()
+        if AttachTarget then AttachTarget = nil end
+        MainPanel:ToggleVisible()
+    end)
+
+    return MainPanel
+end
+
+getgenv()._CleanHoloLib = function()
+    for _, item in ipairs(UI_Instances) do
+        if typeof(item) == "RBXScriptConnection" then item:Disconnect() else item:Destroy() end
+    end
+    UI_Instances = {}
+end
+
+local State = {
+    IsPlaying = false,
+    CurrentSong = nil,
+    Lyrics = {},
+    LyricLabels = {},
+    CurrentLyricIndex = 0,
+    Source = "网易云",
+    Sources = {"网易云", "QQ", "酷我", "Tidal", "Qobuz", "JOOX", "B站", "苹果", "油管", "Spotify"},
+    LoopMode = 1,
+    CurrentQuery = "",
+    CurrentPage = 1,
+    Limit = 15
+}
+
+local Audio = Instance.new("Sound")
+Audio.Parent = secureParent
+Audio.Volume = 0.8
+table.insert(UI_Instances, Audio)
+
+Audio.Ended:Connect(function()
+    if State.LoopMode == 2 and State.IsPlaying then
+        Audio.TimePosition = 0
+        Audio:Play()
+    end
+end)
+
+local UI = HoloLib:CreateWindow({ Title = "🎵 Vision Audio Pro" })
+
+local InfoLabel = UI:CreateLabel("▶ 播放控制板", true)
+local SongLabel = UI:CreateLabel("当前未播放歌曲", true)
+SongLabel.TextColor3 = AppleTheme.Accent
+SongLabel.Font = Enum.Font.GothamBold
+
+UI:Create3DAudioVisualizer(Audio)
+
+local LyricPanelPart = Instance.new("Part")
+LyricPanelPart.Size = Vector3.new(4.5, 5.0, 0.01)
+LyricPanelPart.Anchored = true
+LyricPanelPart.CanCollide = false
+LyricPanelPart.Transparency = 1 
+LyricPanelPart.Parent = workspace
+table.insert(UI_Instances, LyricPanelPart)
+
+local LyricUI = Instance.new("SurfaceGui", secureParent)
+LyricUI.Adornee = LyricPanelPart
+LyricUI.Face = Enum.NormalId.Back 
+LyricUI.AlwaysOnTop = true
+LyricUI.LightInfluence = 0
+LyricUI.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
+LyricUI.PixelsPerStud = 100
+table.insert(UI_Instances, LyricUI)
+
+local LyricMainFrame = Instance.new("Frame", LyricUI)
+LyricMainFrame.Size = UDim2.new(1, 0, 1, 0)
+LyricMainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
+LyricMainFrame.BackgroundTransparency = 0.45 
+LyricMainFrame.BorderSizePixel = 0
+Instance.new("UICorner", LyricMainFrame).CornerRadius = UDim.new(0, 16)
+
+local LyricScroll = Instance.new("ScrollingFrame", LyricMainFrame)
+LyricScroll.Size = UDim2.new(1, 0, 1, 0)
+LyricScroll.BackgroundTransparency = 1 
+LyricScroll.ScrollBarThickness = 0
+LyricScroll.ClipsDescendants = true
+LyricScroll.ScrollingEnabled = false 
+
+local LyricLayout = Instance.new("UIListLayout", LyricScroll)
+LyricLayout.Padding = UDim.new(0, 10)
+LyricLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+LyricLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+local LyricPadding = Instance.new("UIPadding", LyricScroll)
+LyricPadding.PaddingTop = UDim.new(0, 220)
+LyricPadding.PaddingBottom = UDim.new(0, 220)
+
+LyricLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    LyricScroll.CanvasSize = UDim2.new(0, 0, 0, LyricLayout.AbsoluteContentSize.Y)
+end)
+
+local defaultLbl = Instance.new("TextLabel", LyricScroll)
+defaultLbl.Size = UDim2.new(1, -20, 0, 50)
+defaultLbl.BackgroundTransparency = 1
+defaultLbl.Text = "📺 歌词副屏已就绪 (等待播放)"
+defaultLbl.TextColor3 = Color3.fromRGB(220, 220, 225)
+defaultLbl.Font = Enum.Font.GothamBold
+defaultLbl.TextSize = 22
+
+local fixedLyricCFrame = CFrame.new(0, -9999, 0)
+
+local function SummonLyrics()
+    local basePart = UI:GetBasePart()
+    if basePart then
+        fixedLyricCFrame = basePart.CFrame * CFrame.new(4.0, 0, 0)
+    end
+end
+SummonLyrics()
+
+local followTrackConn = RunService.RenderStepped:Connect(function(dt)
+    local isVis = UI:IsVisible()
+    LyricUI.Enabled = isVis
+    
+    if AttachTarget and AttachTarget.Character and AttachTarget.Character:FindFirstChild("HumanoidRootPart") then
+        local hrp = AttachTarget.Character.HumanoidRootPart
+        local targetCFrame = hrp.CFrame * CFrame.new(2.8, 1.5, 3.5)
+        LyricPanelPart.CFrame = LyricPanelPart.CFrame:Lerp(targetCFrame, dt * 8)
+    elseif isVis and fixedLyricCFrame.Y > -9000 then
+        LyricPanelPart.CFrame = LyricPanelPart.CFrame:Lerp(fixedLyricCFrame, dt * 8)
+    else
+        LyricPanelPart.CFrame = CFrame.new(0, -9999, 0)
+    end
+end)
+table.insert(UI_Instances, followTrackConn)
+
+local IsGameMuted = false
+local MuteBtn
+MuteBtn = UI:CreateButton("🔊 状态: 允许游戏声音", function()
+    IsGameMuted = not IsGameMuted
+    if IsGameMuted then
+        MuteBtn.Text = "🔇 状态: 已屏蔽游戏原声 (独享音乐)"
+        MuteBtn.TextColor3 = Color3.fromRGB(255, 100, 100) 
+        
+        task.spawn(function()
+            while IsGameMuted do
+                pcall(function()
+                    for _, v in ipairs(workspace:GetDescendants()) do
+                        if v:IsA("Sound") and v ~= Audio then v.Volume = 0 end
+                    end
+                    for _, v in ipairs(game:GetService("SoundService"):GetDescendants()) do
+                        if v:IsA("Sound") and v ~= Audio then v.Volume = 0 end
+                    end
+                end)
+                task.wait(1) 
+            end
+        end)
+    else
+        MuteBtn.Text = "🔊 状态: 允许游戏声音"
+        MuteBtn.TextColor3 = AppleTheme.TextPrimary
+    end
+end)
+
+local PlayBtn
+PlayBtn = UI:CreateButton("⏸ 播放/暂停", function()
+    if Audio.IsPlaying then 
+        Audio:Pause()
+        PlayBtn.Text = "▶ 继续播放"
+    else 
+        if Audio.TimeLength > 0 then
+            Audio:Resume()
+            PlayBtn.Text = "⏸ 暂停"
+        end
+    end
+end)
+
+UI:CreateInput("🎯 输入玩家名/缩写 粘在背后 (留空取消)", function(text)
+    if text == "" then
+        AttachTarget = nil
+        SongLabel.Text = "✅ 已解除吸附，UI已归位"
+        return
+    end
+    local target = GetPlayerFromString(text)
+    if target then
+        AttachTarget = target
+        SongLabel.Text = "🎯 已成功粘在 [" .. target.DisplayName .. "] 背后!"
+    else
+        SongLabel.Text = "❌ 找不到该玩家"
+    end
+end)
+
+
+UI:CreateButton("📍 将歌词面板对齐到主UI右侧", function()
+    SummonLyrics()
+end)
+
+local LoopBtn
+LoopBtn = UI:CreateButton("🔁 循环: 列表", function()
+    State.LoopMode = State.LoopMode == 1 and 2 or 1
+    LoopBtn.Text = State.LoopMode == 2 and "🔂 循环: 单曲" or "🔁 循环: 列表"
+end)
+
+local SourceBtn
+SourceBtn = UI:CreateButton("🌐 源: 网易云", function()
+    local idx = 1
+    for i, v in ipairs(State.Sources) do if v == State.Source then idx = i break end end
+    idx = (idx % #State.Sources) + 1
+    State.Source = State.Sources[idx]
+    SourceBtn.Text = "🌐 源: " .. State.Source
+end)
+
+UI:CreateSlider("🔊 本地音乐音量", 0, 100, 80, function(value)
+    Audio.Volume = value / 100
+end)
+
+local SearchPanel = UI:CreateSubTab("🔍 搜索与列表")
+local StatusLabel = SearchPanel:CreateLabel("输入歌名按回车键进行搜索")
+SearchPanel:CreateInput("输入歌名... (Enter确认)", function(text)
+    if text and text ~= "" then 
+        DoSearch(text, 1) 
+    end
+end)
+
+local PageControls = SearchPanel:CreateButton("⏬ 下一页", function()
+    if State.CurrentQuery ~= "" then
+        DoSearch(State.CurrentQuery, State.CurrentPage + 1)
+    end
+end)
+
+local SearchResultElements = {}
+local function ClearSearchResults()
+    for _, btn in ipairs(SearchResultElements) do
+        btn:Destroy()
+    end
+    SearchResultElements = {}
+end
+
+local ServerMap = {
+    ["QQ"] = "tencent",
+    ["酷我"] = "kuwo", 
+    ["酷狗"] = "kugou",
+    ["B站"] = "bilibili"
+}
+
+local ApiNodes = {
+    "https://api.injahow.cn/meting/",
+    "https://meting.qjqq.cn/",
+    "https://api.xhboke.com/meting/"
+}
+
+local FakeHeaders = {
+    ["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+}
+
+local function PlaySong(songData)
+    Audio:Stop()
+    Audio.SoundId = "" 
+    SongLabel.Text = "正在解析 [" .. State.Source .. "] 源..."
+    State.IsPlaying = false
+    
+    for _, v in ipairs(LyricScroll:GetChildren()) do
+        if v:IsA("TextLabel") then v:Destroy() end
+    end
+    State.LyricLabels = {}
+    State.CurrentLyricIndex = 0
+    LyricScroll.CanvasPosition = Vector2.new(0, 0)
+    
+    task.spawn(function()
+        local s, e = pcall(function()
+            local audioUrl, songName, artistName
+            local lrcText = ""
+            
+            if songData.id and not songData.url then
+                audioUrl = "http://music.163.com/song/media/outer/url?id=" .. songData.id .. ".mp3"
+                songName = songData.name
+                artistName = songData.artists and songData.artists[1].name or "未知"
+                
+                local lrcApi = "http://music.163.com/api/song/lyric?id=" .. songData.id .. "&lv=-1"
+                local s2, lres = pcall(function() return req({Url = lrcApi, Method = "GET", Headers = FakeHeaders}) end)
+                if s2 and lres.StatusCode == 200 then
+                    local decoded = HttpService:JSONDecode(lres.Body)
+                    if decoded and decoded.lrc and decoded.lrc.lyric then
+                        lrcText = decoded.lrc.lyric
+                    end
+                end
+            else
+                audioUrl = songData.url
+                songName = songData.name
+                artistName = type(songData.artist) == "table" and songData.artist[1] or tostring(songData.artist or "未知")
+                
+                if songData.lrc and songData.lrc ~= "" then
+                    if string.find(songData.lrc, "^http") then
+                        local s2, lres = pcall(function() return req({Url = songData.lrc, Method = "GET", Headers = FakeHeaders}) end)
+                        if s2 and lres.StatusCode == 200 then
+                            lrcText = lres.Body
+                        end
+                    else
+                        lrcText = songData.lrc
+                    end
+                end
+            end
+
+            local res = req({Url = audioUrl, Method = "GET", Headers = FakeHeaders})
+            
+            if res.StatusCode == 200 and #res.Body > 1000 then
+                local fileName = ConfigFolder .. "/Track_" .. tostring(math.floor(tick())) .. ".mp3"
+                writefile(fileName, res.Body)
+                Audio.SoundId = getasset(fileName)
+                
+                State.Lyrics = {}
+                for m, sec, t in lrcText:gmatch("%[(%d+):(%d+%.?%d*)%]([^\r\n]*)") do
+                    table.insert(State.Lyrics, {time = tonumber(m)*60+tonumber(sec), text = t})
+                end
+                table.sort(State.Lyrics, function(a, b) return a.time < b.time end)
+                
+                if #State.Lyrics > 0 then
+                    for i, lrc in ipairs(State.Lyrics) do
+                        local lbl = Instance.new("TextLabel")
+                        lbl.Size = UDim2.new(1, -20, 0, 50)
+                        lbl.BackgroundTransparency = 1
+                        lbl.Text = lrc.text == "" and " 🎵 " or lrc.text
+                        lbl.TextColor3 = Color3.fromRGB(220, 220, 225)
+                        lbl.TextTransparency = 0.6
+                        lbl.Font = Enum.Font.GothamMedium
+                        lbl.TextSize = 22  
+                        lbl.TextWrapped = true
+                        lbl.LayoutOrder = i
+                        
+                        local stroke = Instance.new("UIStroke", lbl)
+                        stroke.Color = Color3.new(0, 0, 0)
+                        stroke.Transparency = 0.3
+                        stroke.Thickness = 1.5
+                        
+                        lbl.Parent = LyricScroll
+                        table.insert(State.LyricLabels, lbl)
+                    end
+                else
+                    local lbl = Instance.new("TextLabel", LyricScroll)
+                    lbl.Size = UDim2.new(1, -20, 0, 50)
+                    lbl.BackgroundTransparency = 1
+                    lbl.Text = "🎵 此源暂无滚动歌词"
+                    lbl.TextColor3 = Color3.fromRGB(220, 220, 225)
+                    lbl.Font = Enum.Font.GothamMedium
+                    lbl.TextSize = 22
+                    Instance.new("UIStroke", lbl).Thickness = 1.5
+                end
+
+                Audio:Play()
+                State.IsPlaying = true
+                PlayBtn.Text = "⏸ 暂停"
+                SongLabel.Text = songName .. " - " .. artistName
+                
+                SummonLyrics()
+            else
+                SongLabel.Text = "❌ 解析失败: 音频无效或需 VIP"
+            end
+        end)
+        
+        if not s then
+            SongLabel.Text = "❌ 发生致命错误: " .. tostring(e)
+        end
+    end)
+end
+
+function DoSearch(query, page)
+    if query == "" then return end
+    State.CurrentQuery = query
+    State.CurrentPage = page
+    StatusLabel.Text = "搜索中... [" .. State.Source .. "]"
+    
+    ClearSearchResults()
+
+    task.spawn(function()
+        local success = false
+        local resultData = nil
+
+        local server = ServerMap[State.Source]
+        
+        if not server then
+            local offset = (page - 1) * State.Limit
+            local searchUrl = "http://music.163.com/api/search/get/web?s=" .. HttpService:UrlEncode(query) .. "&type=1&limit=" .. State.Limit .. "&offset=" .. offset
+            local s, res = pcall(function() return req({Url = searchUrl, Method = "GET", Headers = FakeHeaders}) end)
+            if s and res.StatusCode == 200 then
+                local d = HttpService:JSONDecode(res.Body)
+                if d.result and d.result.songs then
+                    resultData = d.result.songs
+                    success = true
+                end
+            end
+        else
+            for _, nodeUrl in ipairs(ApiNodes) do
+                local searchUrl = nodeUrl .. "?server=" .. server .. "&type=search&id=" .. HttpService:UrlEncode(query)
+                local s, res = pcall(function() return req({Url = searchUrl, Method = "GET", Headers = FakeHeaders}) end)
+                if s and res.StatusCode == 200 then
+                    local d = HttpService:JSONDecode(res.Body)
+                    if type(d) == "table" and #d > 0 then
+                        resultData = d
+                        success = true
+                        break 
+                    end
+                end
+            end
+        end
+
+        if not success or not resultData then
+            StatusLabel.Text = "该源未找到歌曲或 API 节点暂时限流！"
+            return
+        end
+
+        StatusLabel.Text = "搜索结果: [" .. State.Source .. "]"
+        local limit = math.min(State.Limit, #resultData)
+        
+        for i = 1, limit do
+            local sData = resultData[i]
+            local artistName = ""
+            
+            if sData.artists then
+                artistName = sData.artists[1].name
+            else
+                artistName = type(sData.artist) == "table" and sData.artist[1] or tostring(sData.artist or "未知")
+            end
+            
+            local btnText = "▶ " .. sData.name .. " - " .. artistName
+            local btn = SearchPanel:CreateButton(btnText, function()
+                PlaySong(sData)
+            end)
+            table.insert(SearchResultElements, btn)
+        end
+    end)
+end
+
+local lyricConn = RunService.RenderStepped:Connect(function()
+    if Audio.IsPlaying and Audio.TimeLength > 0 then
+        local cur = Audio.TimePosition + 0.2 
+        local newIndex = 0
+        
+        for i = #State.Lyrics, 1, -1 do
+            if cur >= State.Lyrics[i].time then
+                newIndex = i
+                break
+            end
+        end
+
+        if newIndex > 0 and newIndex ~= State.CurrentLyricIndex then
+            local oldIndex = State.CurrentLyricIndex
+            State.CurrentLyricIndex = newIndex
+
+            if oldIndex > 0 and State.LyricLabels[oldIndex] then
+                TweenService:Create(State.LyricLabels[oldIndex], TweenInfo.new(0.4), {
+                    TextSize = 22,
+                    TextColor3 = Color3.fromRGB(220, 220, 225),
+                    TextTransparency = 0.6
+                }):Play()
+            end
+
+            local newLbl = State.LyricLabels[newIndex]
+            if newLbl then
+                TweenService:Create(newLbl, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+                    TextSize = 36,
+                    TextColor3 = AppleTheme.Accent,
+                    TextTransparency = 0 
+                }):Play()
+
+                local targetY = (newIndex - 1) * 60
+                TweenService:Create(LyricScroll, TweenInfo.new(0.4, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {
+                    CanvasPosition = Vector2.new(0, targetY)
+                }):Play()
+            end
+        end
+    end
+end)
+table.insert(UI_Instances, lyricConn)
