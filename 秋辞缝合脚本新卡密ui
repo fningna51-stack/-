@@ -1515,8 +1515,8 @@ RightGroup:AddButton({Text="音乐播放器脚本",Func=function()
                 Func();
         end
 end});
-RightGroup:AddButton({Text="秋辞音乐播放器(正在开发)",Func=function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%A7%8B%E8%BE%9E%E7%BA%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%84%9A%E6%9C%AC"))()
+RightGroup:AddButton({Text="秋辞音乐播放器（绕过反作弊墨水可用）",Func=function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/fningna51-stack/-/main/AF%20%E9%9F%B3%E4%B9%90%E8%84%9A%E6%9C%AC"))()
         local Func = loadstring(ScriptContent);
         if Func then
                 Func();
