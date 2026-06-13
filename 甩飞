@@ -1,0 +1,227 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+
+local LocalPlayer = Players.LocalPlayer
+local Workspace = game:GetService("Workspace")
+
+local BLACKHOLE_RANGE = 100000000
+
+local currentCharacter = nil
+local currentHumanoidRootPart = nil
+
+local function updateCharacter()
+    currentCharacter = LocalPlayer.Character
+    if currentCharacter then
+        currentHumanoidRootPart = currentCharacter:WaitForChild("HumanoidRootPart")
+    end
+end
+
+LocalPlayer.CharacterAdded:Connect(function(char)
+    currentCharacter = char
+    currentHumanoidRootPart = char:WaitForChild("HumanoidRootPart")
+end)
+updateCharacter()
+
+local Folder = Instance.new("Folder", Workspace)
+local Part = Instance.new("Part", Folder)
+local Attachment1 = Instance.new("Attachment", Part)
+Part.Anchored = true
+Part.CanCollide = false
+Part.Transparency = 1
+
+if not getgenv().Network then
+    getgenv().Network = {
+        BaseParts = {},
+        Velocity = Vector3.new(14.46262424,14.46262424,14.46262424)
+    }
+
+    Network.RetainPart = function(Part)
+        if typeof(Part) == "Instance" and Part:IsA("BasePart") and Part:IsDescendantOf(Workspace) then
+            table.insert(Network.BaseParts, Part)
+            Part.CustomPhysicalProperties = PhysicalProperties.new(0, 0, 0, 0, 0)
+            Part.CanCollide = false
+        end
+    end
+
+    local function EnablePartControl()
+        LocalPlayer.ReplicationFocus = Workspace
+        RunService.Heartbeat:Connect(function()
+            pcall(function() sethiddenproperty(LocalPlayer, "SimulationRadius", math.huge) end)
+            for _, Part in pairs(Network.BaseParts) do
+                if Part:IsDescendantOf(Workspace) then
+                    Part.Velocity = Network.Velocity
+                end
+            end
+        end)
+    end
+
+    EnablePartControl()
+end
+
+local function ForcePart(v)
+    if not currentHumanoidRootPart then return end
+    
+    if v:IsA("BasePart") and not v.Anchored 
+       and not (currentCharacter and v:IsDescendantOf(currentCharacter))
+       and v.Name ~= "Handle"
+       and (v.Position - currentHumanoidRootPart.Position).Magnitude < BLACKHOLE_RANGE
+    then
+        for _, x in next, v:GetChildren() do
+            if x:IsA("BodyAngularVelocity") or x:IsA("BodyForce") or x:IsA("BodyGyro") or x:IsA("BodyPosition") or x:IsA("BodyThrust") or x:IsA("BodyVelocity") or x:IsA("RocketPropulsion") then
+                x:Destroy()
+            end
+        end
+        if v:FindFirstChild("Attachment") then v:FindFirstChild("Attachment"):Destroy() end
+        if v:FindFirstChild("AlignPosition") then v:FindFirstChild("AlignPosition"):Destroy() end
+        if v:FindFirstChild("Torque") then v:FindFirstChild("Torque"):Destroy() end
+        
+        v.CanCollide = false
+        local Torque = Instance.new("Torque", v)
+        Torque.Torque = Vector3.new(99999999, 99999999, 99999999)
+        local AlignPosition = Instance.new("AlignPosition", v)
+        local Attachment2 = Instance.new("Attachment", v)
+        
+        Torque.Attachment0 = Attachment2
+        AlignPosition.MaxForce = 9999999999999999
+        AlignPosition.MaxVelocity = math.huge
+        AlignPosition.Responsiveness = 200
+        AlignPosition.Attachment0 = Attachment2
+        AlignPosition.Attachment1 = Attachment1
+
+        Network.RetainPart(v)
+    end
+end
+
+local blackHoleActive = false
+local blackHoleConnection = nil
+local updateConnection = nil
+
+local function toggleBlackHole()
+    blackHoleActive = not blackHoleActive
+    if blackHoleActive then
+        for _, v in next, Workspace:GetDescendants() do
+            ForcePart(v)
+        end
+
+        if blackHoleConnection then blackHoleConnection:Disconnect() end
+        blackHoleConnection = Workspace.DescendantAdded:Connect(function(v)
+            if blackHoleActive then
+                ForcePart(v)
+            end
+        end)
+
+        if updateConnection then updateConnection:Disconnect() end
+        updateConnection = RunService.RenderStepped:Connect(function()
+            if blackHoleActive then
+                if currentCharacter and currentHumanoidRootPart then
+                    Attachment1.WorldCFrame = currentHumanoidRootPart.CFrame * CFrame.new(0, 0, -8)
+                end
+            end
+        end)
+    else
+        if blackHoleConnection then blackHoleConnection:Disconnect() end
+        if updateConnection then updateConnection:Disconnect() end
+    end
+end
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = LocalPlayer.PlayerGui
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 220, 0, 130)
+mainFrame.Position = UDim2.new(0.5, -110, 0.3, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 12)
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -60, 0, 30)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "甩飞"
+title.TextColor3 = Color3.fromRGB(0,170,255)
+title.Font = Enum.Font.GothamBold
+title.Parent = mainFrame
+
+local minBtn = Instance.new("TextButton")
+minBtn.Size = UDim2.new(0, 25, 0, 25)
+minBtn.Position = UDim2.new(1, -60, 0, 2)
+minBtn.Text = "−"
+minBtn.TextColor3 = Color3.fromRGB(0,170,255)
+minBtn.BackgroundColor3 = Color3.fromRGB(30,30,30)
+minBtn.Parent = mainFrame
+Instance.new("UICorner", minBtn)
+
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 25, 0, 25)
+closeBtn.Position = UDim2.new(1, -30, 0, 2)
+closeBtn.Text = "x"
+closeBtn.TextColor3 = Color3.fromRGB(0,170,255)
+closeBtn.BackgroundColor3 = Color3.fromRGB(30,30,30)
+closeBtn.Parent = mainFrame
+Instance.new("UICorner", closeBtn)
+
+local toggleBtn = Instance.new("TextButton")
+toggleBtn.Size = UDim2.new(0, 180, 0, 40)
+toggleBtn.Position = UDim2.new(0.5, -90, 0, 45)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(30,30,30)
+toggleBtn.Text = "开启"
+toggleBtn.TextColor3 = Color3.fromRGB(0,170,255)
+toggleBtn.Parent = mainFrame
+Instance.new("UICorner", toggleBtn)
+
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Size = UDim2.new(1, 0, 0, 22)
+statusLabel.Position = UDim2.new(0, 0, 0, 95)
+statusLabel.BackgroundTransparency = 1
+statusLabel.Text = "已关闭"
+statusLabel.TextColor3 = Color3.fromRGB(0,170,255)
+statusLabel.Parent = mainFrame
+
+local minimized = false
+local miniButton = nil
+
+minBtn.MouseButton1Click:Connect(function()
+    if minimized then return end
+    minimized = true
+    mainFrame.Visible = false
+
+    miniButton = Instance.new("TextButton")
+    miniButton.Size = UDim2.new(0, 40, 0, 40)
+    miniButton.Position = UDim2.new(0.8, 0, 0.8, 0)
+    miniButton.BackgroundColor3 = Color3.fromRGB(0,0,0)
+    miniButton.Text = " "
+    miniButton.TextColor3 = Color3.fromRGB(0,170,255)
+    miniButton.TextSize = 24
+    miniButton.Parent = screenGui
+    Instance.new("UICorner", miniButton).CornerRadius = UDim.new(1,0)
+
+    miniButton.MouseButton1Click:Connect(function()
+        mainFrame.Visible = true
+        miniButton:Destroy()
+        minimized = false
+    end)
+end)
+
+closeBtn.MouseButton1Click:Connect(function()
+    if blackHoleActive then
+        toggleBlackHole()
+    end
+    if miniButton then miniButton:Destroy() end
+    screenGui:Destroy()
+end)
+
+toggleBtn.MouseButton1Click:Connect(function()
+    toggleBlackHole()
+    if blackHoleActive then
+        toggleBtn.Text = "关闭"
+        statusLabel.Text = "已开启"
+    else
+        toggleBtn.Text = "开启"
+        statusLabel.Text = "已关闭"
+    end
+end)
