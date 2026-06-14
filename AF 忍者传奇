@@ -519,15 +519,22 @@ Auto:Toggle({
         end
     end
 })
+Auto:Toggle({
+    Title = "自动锻炼挥刀",
+    Default = false,
+    Callback = function(Value)
+        _G.AutoSwing = Value
 
-Auto:Dropdown({
-    Title = "目标模式",
-    Values = {"最近玩家", "指定玩家"},
-    Callback = function(v)
-        tpKillMode = v
+        if Value then
+            task.spawn(function()
+                while _G.AutoSwing do
+                    game:GetService("Players").LocalPlayer:WaitForChild("ninjaEvent"):FireServer("swingKatana")
+                    task.wait(0.0)
+                end
+            end)
+        end
     end
 })
-
 Auto:Input({
     Title = "击杀数修改",
     Value = "",
