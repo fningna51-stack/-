@@ -262,6 +262,8 @@ local Translations = {
 ["Auto Perfect Hit"]="自动完美命中",
 ["Killaura"]="杀戮光环",
 ["Free Parkour Atirst"]="自由跑酷达人",
+["Auto Teleport on Fall"] = "防坠落时自动传送",
+["Instant Interact"] = "瞬间交互",
 ["Refresh list"]="刷新列表"
 }
 
