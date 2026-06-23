@@ -721,6 +721,9 @@ local Translations = {
         ["Swing Speed"] = "移动速度",
         ["Guard"] = "守卫",
         ["Exclude"] = "不透视",
+        ["TP On Low Health"] = "低血量传送",
+        ["Min Health (%)"] = "最小血量(%)",
+        ["Max Health (%)"] = "最大血量(%)",
         ["Anti Injury"] = "移除受伤"
 }
 
