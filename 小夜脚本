@@ -177,7 +177,7 @@ Background = "rbxassetid://136059273188532",
 
 -- 编辑窗口展开按钮配置
 Window:EditOpenButton({
-    Title = '<font color="#FF0000">A</font><font color="#00F0FF">F</font><font color="#00E5FF">-</font><font color="#00D5FF">H</font><font color="#00C8FF">U</font><font color="#00BBFF">B</font>',
+    Title = '<font color="#FF0000">小</font><font color="#00F0FF">夜</font><font color="#00E5FF">-</font><font color="#00D5FF">小</font><font color="#00C8FF">夜</font><font color="#00BBFF">脚本</font>',
     Icon = "snowflake",
     CornerRadius = UDim.new(99,99),
     StrokeThickness = 3,
