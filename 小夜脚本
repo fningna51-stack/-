@@ -149,7 +149,7 @@ WindUI:AddTheme({
 WindUI:SetFont("rbxassetid://12187369639")
 
 local Window = WindUI:CreateWindow({
-    Title = '<font color="#FF0000">小</font><font color="#00F0FF">夜</font><font color="#00E5FF">-</font><font color="#00D5FF">小</font><font color="#00C8FF">夜</font><font color="#00BBFF">脚本</font>', -- 窗口标题
+    Title = '<font color="#FF0000">小</font><font color="#00F0FF">夜</font><font color="#00E5FF">-</font><font color="#00D5FF">测</font><font color="#00C8FF">试</font><font color="#00BBFF">版脚本</font>', -- 窗口标题
     Icon = "rbxassetid://82225829203828", 
     Author = "@小夜", -- 窗口副标题，可选
     Folder = "小夜脚本文件夹", -- 保存密钥和图片的文件夹
@@ -364,7 +364,8 @@ local Section1 = Tab2:Section({
 })
 
 Section1:Paragraph({
-    Title = "目前还没有功能 过几天就加😋",
+    Title = "目前还没有功能 过几天就加😋
+    感谢 AF Hub作者提供的界面😇",
     TextSize = 30, 
     Thumbnail = "rbxassetid://85076999766387",
     ThumbnailSize = 100,
@@ -377,12 +378,158 @@ Section1:Paragraph({
 
 Window:Divider()
 local functiond = Window:Section({
-    Title = "功能区",
+    Title = "服务器脚本",
+    Icon = "folder-cog",
+    Opened = true,
+})
+-- ========== 下面在这里加各种功能控件 ==========
+ -- 1. 普通按钮（点击执行一段脚本/功能）
+ functiond:Button("执行全部服务器脚本", function()
+     -- 这里写点击后运行的代码
+     print("已执行服务器全部脚本")
+     -- 示例：LoadServerScript()
+ end)
+ -- 2. 开关（true/false 切换，保存状态）
+ local autoRun = functiond:Toggle("进服自动加载脚本", false, function(state)
+     -- state = true 开启 / false 关闭
+     if state then
+         print("自动加载脚本已开启")
+     else
+         print("自动加载脚本已关闭")
+     end
+ end)
+ -- 3. 单行输入框（输入脚本路径/代码）
+ local scriptPath = functiond:Textbox("脚本文件路径", "输入xxx.lua")
+ -- 4. 下拉选择框（选择预设脚本）
+ local selectScript = functiond:Dropdown("选择预设脚本", {
+     "副本功能脚本",
+     "物品修改脚本",
+     "穿墙服务器脚本"
+ }, "请选择", function(selected)
+     print("选中脚本："..selected)
+ end)
+ -- 5. 数值滑块（延迟、倍率类参数）
+ local delayTime = functiond:Slider("脚本执行延迟", 0, 5, 1, function(val)
+     print("延迟："..val.."秒")
+ end)
+ -- 6. 分隔线（面板内细分区域）
+ functiond:Divider()
+ -- 7. 提示文本（说明文字，不可点击）
+ functiond:Label("提示：功能会慢点更新")
+Window:Divider()
+local functiond = Window:Section({
+    Title = "服务器脚本",
     Icon = "folder-cog",
     Opened = true,
 })
 
+-- 飞行开关变量
+local flyToggle = functiond:Toggle("开启飞行", false, function(state)
+    local player = game.Players.LocalPlayer
+    local char = player.Character
+    if not char then return end
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not hum or not root then return end
 
+    if state then
+        -- 开启飞行
+        hum.GravityScale = 0
+        hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+        hum:SetStateEnabled(Enum.HumanoidStateType.Jumping, false)
+        -- 持续飞行循环
+        task.spawn(function()
+            while flyToggle:GetState() and task.wait() do
+                local cam = workspace.CurrentCamera
+                local speed = 50
+                local moveVec = Vector3.new()
+                -- WASD移动
+                if userinputservice:IsKeyDown(Enum.KeyCode.W) then
+                    moveVec += cam.CFrame.LookVector
+                end
+                if userinputservice:IsKeyDown(Enum.KeyCode.S) then
+                    moveVec -= cam.CFrame.LookVector
+                end
+                if userinputservice:IsKeyDown(Enum.KeyCode.A) then
+                    moveVec -= cam.CFrame.RightVector
+                end
+                if userinputservice:IsKeyDown(Enum.KeyCode.D) then
+                    moveVec += cam.CFrame.RightVector
+                end
+                -- 空格上升、左Ctrl下降
+                if userinputservice:IsKeyDown(Enum.KeyCode.Space) then
+                    moveVec += Vector3.new(0,1,0)
+                end
+                if userinputservice:IsKeyDown(Enum.KeyCode.LeftControl) then
+                    moveVec -= Vector3.new(0,1,0)
+                end
+                moveVec = moveVec.Unit * speed
+                root.Velocity = moveVec * speed
+            end
+            -- 关闭飞行重置属性
+            hum.GravityScale = 1
+            hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, true)
+            hum:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
+            root.Velocity = Vector3.new(0,0,0)
+        end)
+    else
+        -- 关闭飞行自动恢复物理
+        hum.GravityScale = 1
+        hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, true)
+        hum:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
+        root.Velocity = Vector3.new(0,0,0)
+    end
+end)
+
+-- 飞行速度滑块
+local flySpeed = functiond:Slider("飞行速度", 10, 100, 50, function(val)
+    -- 上面代码里speed变量可以改成 flySpeed:GetValue()
+end)
+
+functiond:Label("操作按键：WASD移动｜空格上升｜左Ctrl下降")
+-- 隐身开关
+ local invisibleToggle = functiond:Toggle("全身隐身", false, function(state)
+     local Players = game:GetService("Players")
+     local LocalPlayer = Players.LocalPlayer
+     local Char = LocalPlayer.Character
+     if not Char then return end
+     local function SetVis(show)
+         -- 遍历所有零件、贴图
+         for _, obj in ipairs(Char:GetDescendants()) do
+             if obj:IsA("BasePart") then
+                 obj.Transparency = show and 0 or 1
+                 obj.CanCollide = show
+             end
+             if obj:IsA("Decal") or obj:IsA("Texture") then
+                 obj.Transparency = show and 0 or 1
+             end
+         end
+         -- 隐藏头顶名字
+         local Head = Char:FindFirstChild("Head")
+         if Head and Head:FindFirstChildOfClass("BillboardGui") then
+             Head.BillboardGui.Visible = show
+         end
+     end
+     if state then
+         SetVis(false)
+         -- 重生自动重新隐身
+         Char.DescendantAdded:Connect(function(obj)
+             if invisibleToggle:GetState() then
+                 task.wait(0.1)
+                 if obj:IsA("BasePart") then
+                     obj.Transparency = 1
+                     obj.CanCollide = false
+                 end
+                 if obj:IsA("Decal") or obj:IsA("Texture") then
+                     obj.Transparency = 1
+                 end
+             end
+         end)
+     else
+         SetVis(true)
+     end
+ end)
+ functiond:Label("隐身效果：全身透明、无碰撞、隐藏ID")
 
 
 
