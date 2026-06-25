@@ -149,10 +149,10 @@ WindUI:AddTheme({
 WindUI:SetFont("rbxassetid://12187369639")
 
 local Window = WindUI:CreateWindow({
-    Title = '<font color="#FF0000">A</font><font color="#00F0FF">F</font><font color="#00E5FF">-</font><font color="#00D5FF">H</font><font color="#00C8FF">U</font><font color="#00BBFF">B</font>', -- 窗口标题
+    Title = '<font color="#FF0000">小</font><font color="#00F0FF">夜</font><font color="#00E5FF">-</font><font color="#00D5FF">小</font><font color="#00C8FF">夜</font><font color="#00BBFF">脚本</font>', -- 窗口标题
     Icon = "rbxassetid://82225829203828", 
     Author = "@小夜", -- 窗口副标题，可选
-    Folder = "YX-Hub文件夹", -- 保存密钥和图片的文件夹
+    Folder = "小夜脚本文件夹", -- 保存密钥和图片的文件夹
     Size = UDim2.fromOffset(520, 400), -- 窗口大小
     MinSize = Vector2.new(560, 350), -- 窗口最小尺寸
     MaxSize = Vector2.new(850, 560), -- 窗口最大尺寸
