@@ -5633,16 +5633,12 @@ local scriptCategories = {
     {
         GroupName = "99夜",
         List = {
-            {Name = "虚空99夜脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/99%E5%A4%9C%E6%B1%89%E5%8C%96"},
             {Name = "99夜脚本可杀队友", Url = "https://raw.githubusercontent.com/358545698555/roblox-/refs/heads/main/%E5%8F%AF%E6%9D%80%E9%98%9F%E5%8F%8B99%E5%A4%9C"},
-            {Name = "99夜汉化脚本(无敌有效果)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%A7%8B%E8%BE%9E99%E5%A4%9C%E6%B1%89%E5%8C%96"},
-            {Name = "AF Hub 99夜", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/99%E5%A4%9C%E8%84%9A%E6%9C%AC"},
         }
     },
     {
         GroupName = "亡命速递",
         List = {
-            {Name = "亡命速递脚本无法使用", Url = "https://raw.githubusercontent.com/JanseJYC/Script/refs/heads/main/Deadly-Deliver.lua"},
             {Name = "亡命速递英文脚本", Url = "https://raw.githubusercontent.com/xxdaysheus01/RuneX/refs/heads/main/DeadlyDeliveryScript.lua"},
             {Name = "亡命速递", Url = "https://pandadevelopment.net/virtual/file/c96973c95ae3aaec"},
             {Name = "亡命速递汉化脚本", Url = "https://raw.githubusercontent.com/JanseJYC/Script/refs/heads/main/Deadly-Deliver.lua"},
@@ -5670,7 +5666,6 @@ local scriptCategories = {
     {
         GroupName = "doors",
         List = {
-            {Name = "Doors脚本", Url = "https://raw.githubusercontent.com/atnew2025/Chinese-scripts/refs/heads/main/mshax(prohax).txt"},
             {Name = "doors最新脚本", Url = "https://raw.githubusercontent.com/TheHunterSolo1/Scripts/refs/heads/main/Protected_2809220311826785.lua.txt"},
             {Name = "doorsDP汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/doors-DP-robot"},
             {Name = "doors abysall汉化脚本", Url = "https://raw.githubusercontent.com/atnew2025/Chinese-scripts/refs/heads/main/Abysallcn-hub"},
@@ -8162,28 +8157,43 @@ local ScriptCenterLeftGroup = Tabs.ScriptCenter:AddLeftGroupbox("脚本中心1")
 local ScriptCenterRightGroup = Tabs.ScriptCenter:AddRightGroupbox("脚本中心2");
 local leftIndex = 0;
 local rightIndex = 0;
+local function CreateScriptButton(group, scriptName, scriptUrl, isLeft)
+    local btn = group:AddButton({
+        Text = scriptName,
+        Func = function()
+            Library:Notify("秋辞正在努力加载: " .. scriptName, 3)
+            local success, result = pcall(function()
+                loadstring(game:HttpGet(scriptUrl))()
+            end)
+            if success then
+                Library:Notify("脚本加载成功: " .. scriptName, 3)
+            else
+                Library:Notify("加载失败: " .. tostring(result), 5)
+            end
+        end,
+        DoubleClick = false,
+    })
+    return btn
+end
+
 for _, category in ipairs(scriptCategories) do
-        local targetGroup = ((leftIndex <= rightIndex) and ScriptCenterLeftGroup) or ScriptCenterRightGroup;
-        if (((targetGroup == ScriptCenterLeftGroup) and (leftIndex > 0)) or ((targetGroup == ScriptCenterRightGroup) and (rightIndex > 0))) then
-                targetGroup:AddLabel("--------------------------------------------------------------------------------");
-        end
-        targetGroup:AddLabel(category.GroupName);
-        for _, btn in ipairs(category.List) do
-                targetGroup:AddButton({Text=btn.Name,Func=function()
-                        local success, err = pcall(function()
-                                local scriptContent = game:HttpGet(btn.Url);
-                                local func = loadstring(scriptContent);
-                                if func then
-                                        func();
-                                end
-                        end);
-                end});
-        end
-        if (targetGroup == ScriptCenterLeftGroup) then
-                leftIndex = leftIndex + 1;
-        else
-                rightIndex = rightIndex + 1;
-        end
+    local targetGroup = ((leftIndex <= rightIndex) and ScriptCenterLeftGroup) or ScriptCenterRightGroup;
+    
+    if (((targetGroup == ScriptCenterLeftGroup) and (leftIndex > 0)) or ((targetGroup == ScriptCenterRightGroup) and (rightIndex > 0))) then
+        targetGroup:AddLabel("--------------------------------------------------------------------------------");
+    end
+    
+    targetGroup:AddLabel(category.GroupName);
+    
+    for _, btn in ipairs(category.List) do
+        CreateScriptButton(targetGroup, btn.Name, btn.Url, (targetGroup == ScriptCenterLeftGroup));
+    end
+    
+    if (targetGroup == ScriptCenterLeftGroup) then
+        leftIndex = leftIndex + 1;
+    else
+        rightIndex = rightIndex + 1;
+    end
 end
 
 local MenuGroup = Tabs.Settings:AddLeftGroupbox("菜单")
