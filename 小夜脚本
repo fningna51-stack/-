@@ -290,7 +290,7 @@ local Tab1 = info:Tab({
 
 local Paragraph = Tab1:Paragraph({
     Title = 'AF Hub',
-    Desc = '欢迎使用YX-HUB脚本(＾ν＾)',
+    Desc = '欢迎使用小夜脚本(＾ν＾)',
     Thumbnail = "rbxassetid://100781334247855",
     ThumbnailSize = 200,
     Locked = false,
@@ -311,8 +311,8 @@ Tab1:Section({
 })
 
 local Paragraph = Tab1:Paragraph({
-    Title = "秋词",
-    Desc = "AF Hub作者",
+    Title = "小夜",
+    Desc = "小夜脚本作者",
     Image = "rbxassetid://138882879525986",
     ImageSize = 60,
     Locked = false,
@@ -364,7 +364,7 @@ local Section1 = Tab2:Section({
 })
 
 Section1:Paragraph({
-    Title = "这个是公告？",
+    Title = "目前还没有功能 过几天就加😋",
     TextSize = 30, 
     Thumbnail = "rbxassetid://85076999766387",
     ThumbnailSize = 100,
@@ -436,7 +436,7 @@ local Dropdown = SettingsTab:Dropdown({
         },
         {
             Title = "背景图1(默认)",
-            Desc = "秋词提供",
+            Desc = "小夜提供",
             Icon = "app-window",
             Callback = function()
  Window:SetBackgroundImage("rbxassetid://136059273188532")
