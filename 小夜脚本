@@ -1,7 +1,7 @@
 local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/YIRDEX/Miscs/refs/heads/main/YXWindUI.lua"))()
 
 WindUI:AddTheme({
-    Name = "AF Hub", 
+    Name = "小夜脚本", 
     Accent = WindUI:Gradient({
         ["0"] = {Color = Color3.fromHex("#FF4C4C"), Transparency = 0},
         ["50"] = {Color = Color3.fromHex("#FF1A1A"), Transparency = 0},
@@ -350,7 +350,7 @@ local Tab2 = info:Tab({
     Locked = false,
 })
 local Section1 = Tab2:Section({
-    Title = "AF Hub[公告]", -- 分区标题
+    Title = "小夜脚本[公告]", -- 分区标题
     Icon = "component", -- 图标，支持图标名称或资源ID（可选）
     TextSize = 30, -- 标题文字大小（可选）
     TextXAlignment = "Left", -- 文字水平对齐方式：左对齐/居中/右对齐（可选）
@@ -428,7 +428,7 @@ local Dropdown = SettingsTab:Dropdown({
                 -- 清除背景图
                 Window:SetBackgroundImage("rbxassetid://0")
                 WindUI:Notify({
-                    Title = "AF Hub",
+                    Title = "小夜脚本",
                     Content = "已切换为无背景",
                     Duration = 3
                 })
@@ -441,7 +441,7 @@ local Dropdown = SettingsTab:Dropdown({
             Callback = function()
  Window:SetBackgroundImage("rbxassetid://136059273188532")
                 WindUI:Notify({
-                    Title = "AF Hub",
+                    Title = "小夜脚本",
                     Content = "已切换背景图1",
                     Duration = 3
                 })
@@ -453,7 +453,7 @@ local Dropdown = SettingsTab:Dropdown({
             Callback = function()
        Window:SetBackgroundImage("rbxassetid://101182501948173")
                 WindUI:Notify({
-                    Title = "AF Hub",
+                    Title = "小夜脚本",
                     Content = "已切换背景图2",
                     Duration = 3
                 })
@@ -465,7 +465,7 @@ local Dropdown = SettingsTab:Dropdown({
             Callback = function()
  Window:SetBackgroundImage("rbxassetid://90514823373955")
                 WindUI:Notify({
-                    Title = "AF Hub",
+                    Title = "小夜脚本",
                     Content = "已切换背景图3",
                     Duration = 3
                 })
@@ -477,7 +477,7 @@ local Dropdown = SettingsTab:Dropdown({
             Callback = function()
  Window:SetBackgroundImage("rbxassetid://103858984350097")
                 WindUI:Notify({
-                    Title = "AF Hub",
+                    Title = "小夜脚本",
                     Content = "已切换背景图4",
                     Duration = 3
                 })
@@ -489,7 +489,7 @@ local Dropdown = SettingsTab:Dropdown({
             Callback = function()
  Window:SetBackgroundImage("rbxassetid://137662774446930")
                 WindUI:Notify({
-                    Title = "AF Hub",
+                    Title = "小夜脚本",
                     Content = "已切换背景图5",
                     Duration = 3
                 })
@@ -501,7 +501,7 @@ local Dropdown = SettingsTab:Dropdown({
             Callback = function()
  Window:SetBackgroundImage("rbxassetid://73618579935939")
                 WindUI:Notify({
-                    Title = "AF Hub",
+                    Title = "小夜脚本",
                     Content = "已切换背景图6",
                     Duration = 3
                 })
@@ -513,7 +513,7 @@ local Dropdown = SettingsTab:Dropdown({
             Callback = function()
  Window:SetBackgroundImage("rbxassetid://131845772886226")
                 WindUI:Notify({
-                    Title = "AF Hub",
+                    Title = "小夜脚本",
                     Content = "已切换背景图7",
                     Duration = 3
                 })
@@ -525,7 +525,7 @@ local Dropdown = SettingsTab:Dropdown({
             Callback = function()
  Window:SetBackgroundImage("rbxassetid://92388982051300")
                 WindUI:Notify({
-                    Title = "AF Hub",
+                    Title = "小夜脚本",
                     Content = "已切换背景图8",
                     Duration = 3
                 })
@@ -537,7 +537,7 @@ local Dropdown = SettingsTab:Dropdown({
             Callback = function()
  Window:SetBackgroundImage("rbxassetid://103197377834563")
                 WindUI:Notify({
-                    Title = "AF Hub",
+                    Title = "小夜脚本",
                     Content = "已切换背景图9",
                     Duration = 3
                 })
@@ -549,7 +549,7 @@ local Dropdown = SettingsTab:Dropdown({
             Callback = function()
  Window:SetBackgroundImage("rbxassetid://123887383447725")
                 WindUI:Notify({
-                    Title = "AF Hub",
+                    Title = "小夜脚本",
                     Content = "已切换背景图10",
                     Duration = 3
                 })
@@ -561,7 +561,7 @@ local Dropdown = SettingsTab:Dropdown({
             Callback = function()
  Window:SetBackgroundImage("rbxassetid://84371548883810")
                 WindUI:Notify({
-                    Title = "AF Hub",
+                    Title = "小夜脚本",
                     Content = "已切换背景图11",
                     Duration = 3
                 })
