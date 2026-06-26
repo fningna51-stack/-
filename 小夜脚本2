@@ -9,7 +9,7 @@ local Toggles = Library.Toggles
 local Window = Library:CreateWindow({
     Title = "小夜脚本《倒卖死全家》",
     Footer = "By 小夜🐧群：250742853",
-    Icon = 131153193945220,
+    Icon = 127418118514722,
     NotifySide = "Right",
     ShowCustomCursor = true,
 })
