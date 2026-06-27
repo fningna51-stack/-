@@ -29,7 +29,7 @@ local A25 = nil
 local A20 = false
 local CurrentCamera = workspace.CurrentCamera
 
-PlayerLeftGroup:AddSlider("WalkSpeedSlider",}
+PlayerLeftGroup:AddSlider("WalkSpeedSlider", {
     Text = "移动速度(可在墨水使用)",
     Default = 16,
     Min = 16,
