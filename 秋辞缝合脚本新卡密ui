@@ -60,6 +60,13 @@ local Sjgnfh = Tabs.Main:AddRightGroupbox("视觉功能")
 local Bofang = Tabs.Main:AddRightGroupbox("播放功能")
 local Yule = Tabs.Main:AddRightGroupbox("娱乐脚本功能")
 local RotationControlGroup = Tabs.Main:AddRightGroupbox("旋转控制")
+Tabs.Main:UpdateWarningBox({
+        Title = '脚本信息',
+        Text = '这里的功能请谨慎使用可能会被封禁 \n致辞：秋辞 脚本中心汉化者：有芙同享  人机[<font color=\"rgb(255, 0, 0)\">谢谢您的使用，感谢大家</font>]',
+        IsNormal = true,
+        Visible = true,
+        LockSize = true,
+    })
 local A17 = nil;
 local A18 = false;
 local A19 = false;
@@ -5619,12 +5626,10 @@ local scriptCategories = {
             {Name = "秋容脚本复刻版", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%A7%8B%E5%AE%B9%E8%84%9A%E6%9C%AC%E5%A4%8D%E5%88%BB%E7%89%88"},
             {Name = "叶脚本", Url = "https://raw.githubusercontent.com/roblox-ye/QQ515966991/refs/heads/main/ROBLOX-CNVIP-XIAOYE.lua"},
             {Name = "xk脚本", Url = "https://github.com/devslopo/DVES/raw/main/XK%20Hub"},
-            {Name = "新版XA脚本", Url = "https://github.com/YunLua/Lua/raw/main/XA_Hub.lua"},
             {Name = "皮脚本", Url = "https://raw.githubusercontent.com/xiaopi77/xiaopi77/main/QQ1002100032-Roblox-Pi-script.lua"},
             {Name = "落叶脚本", Url = "https://raw.githubusercontent.com/krlpl/Deciduous-center-LS/main/%E8%90%BD%E5%8F%B6%E4%B8%AD%E5%BF%83%E6%B7%B7%E6%B7%86.txt"},
             {Name = "Rb脚本中心＿汉化中心", Url = "https://api.luarmor.net/files/v3/loaders/4fe525637e43a1be8cb0cdf902d107c2.lua"},
             {Name = "NOL免费版", Url = "https://raw.githubusercontent.com/Syndromehsh/BETA2/refs/heads/main/NOL"},
-            {Name = "BS中心", Url = "https://gitee.com/BS_script/script/raw/master/黑洞中心(BS).txt"},
             {Name = "Rb脚本中心", Url = "https://raw.githubusercontent.com/Yungengxin/roblox/refs/heads/main/Rb-Hub"},
             {Name = "sa脚本", Url = "https://raw.githubusercontent.com/Bebo-Mods/BeboScripts/main/StandAwekening.lua"},
             {Name = "霖溺通用", Url = "https://raw.githubusercontent.com/ShenJiaoBen/Partial-Server-Ribbon/refs/heads/main/Linni_Universal.txt"},
@@ -5641,7 +5646,6 @@ local scriptCategories = {
         List = {
             {Name = "亡命速递英文脚本", Url = "https://raw.githubusercontent.com/xxdaysheus01/RuneX/refs/heads/main/DeadlyDeliveryScript.lua"},
             {Name = "亡命速递", Url = "https://pandadevelopment.net/virtual/file/c96973c95ae3aaec"},
-            {Name = "亡命速递汉化脚本", Url = "https://raw.githubusercontent.com/JanseJYC/Script/refs/heads/main/Deadly-Deliver.lua"},
             }
     },
     {
@@ -5650,7 +5654,6 @@ local scriptCategories = {
             {Name = "仿红叶脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E4%BB%BF%E7%BA%A2%E5%8F%B6%E8%84%9A%E6%9C%AC%E6%B1%89%E5%8C%96"},
             {Name = "红叶脚本", Url = "https://getnative.cc/script/loader"},
             {Name = "速通脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%AD%BB%E9%93%81%E8%BD%A8%E6%B1%89%E5%8C%96%E8%84%9A%E6%9C%AC"},
-            {Name = "死铁轨脚本", Url = "https://raw.githubusercontent.com/gumanba/Scripts/refs/heads/main/DeadRails"},
             {Name = "死铁轨脚本(好用)", Url = "https://raw.githubusercontent.com/kiciahook/kiciahook/refs/heads/main/loader.lua"},
         }
     },
@@ -5658,7 +5661,6 @@ local scriptCategories = {
         GroupName = "墨水游戏",
         List = {
             {Name = "AX-inggame 有芙同享汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/ax%E8%84%9A%E6%9C%AC%E7%A7%8B%E8%BE%9E%E6%B1%89%E5%8C%96"},
-            {Name = "墨水游戏天使之翼汉化(卡密在通用功能复制)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E5%A2%A8%E6%B0%B4inkgame%E6%B1%89%E5%8C%96"},
             {Name = "墨水Ringta汉化(无卡密)", Url = "https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/Ringta"},
             {Name = "Unm汉化，卡密ink50", Url = "https://raw.githubusercontent.com/Youfutongxiang1/unm-CN/refs/heads/main/README.md"},
         }
@@ -5666,7 +5668,6 @@ local scriptCategories = {
     {
         GroupName = "doors",
         List = {
-            {Name = "doors最新脚本", Url = "https://raw.githubusercontent.com/TheHunterSolo1/Scripts/refs/heads/main/Protected_2809220311826785.lua.txt"},
             {Name = "doorsDP汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/doors-DP-robot"},
             {Name = "doors abysall汉化脚本", Url = "https://raw.githubusercontent.com/atnew2025/Chinese-scripts/refs/heads/main/Abysallcn-hub"},
         }
@@ -5687,7 +5688,6 @@ local scriptCategories = {
     {
         GroupName = "被遗弃",
         List = {
-            {Name = "被遗弃无卡密超好用", Url = "https://rawscripts.net/raw/G666-Forsaken-Keyless-auto-gen-reach-autoblock-+-more-63283"},
             {Name = "被遗弃英文无卡密", Url = "https://github.com/shenxiuqi974/guesting-but-chinese/releases/download/hushwhw/default.txt"},
             {Name = "被遗弃英文无卡密(好用)", Url = "https://pastebin.com/raw/zH9Extzk"},
             {Name = "XA被遗弃脚本(无卡密中文)", Url = "https://raw.gitcode.com/XiaoYunUwU/XA/raw/main/Loader.lua"},
@@ -5703,14 +5703,12 @@ local scriptCategories = {
     {
     GroupName = "画我",
         List = {
-            {Name = "无卡密画我脚本", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/KENNY画我.lua"},
+            {Name = "无卡密画我脚本", Url = ""},
         }
     },
     {
         GroupName = "通缉脚本",
         List = {
-            {Name = "SX HUB", Url = "https://api.luarmor.net/files/v3/loaders/87a8a4f4c2d2ef535ccd1bdb949218fe.lua"},
-            {Name = "KENNY", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/KENNY通缉换服.lua"},
             {Name = "通缉", Url = "https://raw.githubusercontent.com/combatlegnd/combatlegnd/refs/heads/main/NH-Loader"},
         }
     },
@@ -5733,8 +5731,6 @@ local scriptCategories = {
     {
     GroupName = "偷走脑红",
         List = {
-            {Name = "偷走脑红脚本", Url = "https://raw.githubusercontent.com/DynaFetchy/Scripts/refs/heads/main/Loader.lua"},
-            {Name = "偷走脑红脚本2", Url = "https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/偷走脑红"},
             {Name = "偷走脑红KURD汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/Brainrot-KURD-robot"},
         }
     },
@@ -5745,15 +5741,9 @@ local scriptCategories = {
             }
     },
     {
-            GroupName = "chain脚本",
+    GroupName = "chain脚本",
         List = {
             {Name = "chain英文脚本", Url = "https://api.getpolsec.com/scripts/hosted/79fcede2ce14619990c741986e6123ddbc41cd9e4a25c4dc4da13c5f63a25f2b.lua"},
-            }
-    },
-    {
-            GroupName = "跳跃对决",
-        List = {
-            {Name = "跳跃对决脚本", Url = "https://raw.githubusercontent.com/solarastuff/sorryjimpee/refs/heads/main/Jumper.lua"},
             }
     },
     {
@@ -5773,7 +5763,6 @@ local scriptCategories = {
     GroupName = "逃脱海啸",
         List = {
             {Name = "逃脱海啸并带走红Merqur汉化脚本(要卡密)", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/EscapeTsunamiForBrinrots-Merqury-robot"},
-            {Name = "逃脱海啸并拿走脑红Solix汉化脚本(要卡密)", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/EscapeTsunamiForBrinrots-Solix-robot"},
             }
     },
     {
@@ -5817,15 +5806,8 @@ local scriptCategories = {
             }
     },
     {
-    GroupName = "餐厅大亨",
-        List = {
-            {Name = "餐厅大亨脚本(自动解卡无卡密)", Url = "https://rawscripts.net/raw/Universal-Script-Samuraa1-Hub-Best-Keyless-Script-For-EA-ByB-RT3-etc-88197"},
-            }
-    },
-    {
     GroupName = "恐鬼症",
         List = {
-            {Name = "恐鬼症脚本", Url = "https://raw.githubusercontent.com/longchneg/GAl/refs/heads/Dragon/%E6%81%90%E9%AC%BC%E7%97%87%20%E5%85%8D%E8%B4%B9%E7%89%88"},
             {Name = "恐鬼症付费脚本(免费用)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%81%90%E9%AC%BC%E7%97%87"},
             }
     },
@@ -5845,12 +5827,6 @@ local scriptCategories = {
     GroupName = "GB内脏与黑火药",
         List = {
             {Name = "GB汉化脚本(需要解卡和AX一样)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/AF%20%E7%A7%8B%E5%AE%B9GB"},
-            }
-    },
-    {
-    GroupName = "攻击泰坦革命",
-        List = {
-            {Name = "攻击泰坦革命脚本(英文版)", Url = "https://api.luarmor.net/files/v4/loaders/705e7fe7aa288f0fe86900cedb1119b1.lua"},
             }
     },
     {
@@ -8155,6 +8131,13 @@ Qczhdh:AddLabel("祝你每天开心！")
 
 local ScriptCenterLeftGroup = Tabs.ScriptCenter:AddLeftGroupbox("脚本中心1");
 local ScriptCenterRightGroup = Tabs.ScriptCenter:AddRightGroupbox("脚本中心2");
+Tabs.ScriptCenter:UpdateWarningBox({
+        Title = '脚本信息',
+        Text = '删除了大多数 无法使用的脚本 添加新的脚本[<font color=\"rgb(255, 0, 0)\">谢谢您的使用，感谢大家</font>]',
+        IsNormal = true,
+        Visible = true,
+        LockSize = true,
+    })
 local leftIndex = 0;
 local rightIndex = 0;
 local function CreateScriptButton(group, scriptName, scriptUrl, isLeft)
@@ -8258,5 +8241,5 @@ ThemeManager:SetFolder("MyScriptTheme")
 SaveManager:SetFolder("MyScriptConfig")
 SaveManager:BuildConfigSection(Tabs.Settings)
 ThemeManager:ApplyToTab(Tabs.Settings)
-Library:Notify("AF Hub - AF Hub墨水游戏 已加载", 3)
+Library:Notify("AF Hub - AF Hub脚本中心 已加载", 3)
 Library:Notify("尊贵的 " .. game.Players.LocalPlayer.Name .. " 欢迎使用", 3)
