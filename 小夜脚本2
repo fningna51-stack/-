@@ -7,7 +7,7 @@ local Options = Library.Options
 local Toggles = Library.Toggles
 
 local Window = Library:CreateWindow({
-    Title = "小夜脚本《倒卖死全家》",
+    Title = "XY 脚本《倒卖死全家》",
     Footer = "By 小夜🐧群：250742853",
     Icon = 127418118514722,
     NotifySide = "Right",
@@ -29,7 +29,7 @@ local A25 = nil
 local A20 = false
 local CurrentCamera = workspace.CurrentCamera
 
-PlayerLeftGroup:AddSlider("WalkSpeedSlider", {
+PlayerLeftGroup:AddSlider("WalkSpeedSlider",}
     Text = "移动速度(可在墨水使用)",
     Default = 16,
     Min = 16,
