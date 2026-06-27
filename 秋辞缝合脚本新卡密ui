@@ -1,3 +1,5 @@
+--该脚本为脚本中心免费使用不会加密
+--如果有人连这个都拿来圈钱请加Q群
 local repo = 'https://raw.githubusercontent.com/DevSloPo/obsidian_UI/main/'
 local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
 local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
@@ -1303,6 +1305,13 @@ do
 end
 
 --以上为自动汉化功能
+RightGroup:AddButton({Text="Dex工具",Func=function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/JsYb666/Developer-Tool/refs/heads/main/Dex-Explorer-TX-Fixed.lua"))()
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
 RightGroup:AddButton({Text="加载AX汉化",Func=function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%96%B0AX%E6%B1%89%E5%8C%96%E5%BA%93"))()
         local Func = loadstring(ScriptContent);
@@ -5623,6 +5632,7 @@ local scriptCategories = {
     {
         GroupName = "各大脚本",
         List = {
+            {Name = "YX脚本", Url = "https://raw.githubusercontent.com/YirdeX-Dev/scripts/refs/heads/main/YX-HubLoader.lua"},
             {Name = "秋容脚本复刻版", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%A7%8B%E5%AE%B9%E8%84%9A%E6%9C%AC%E5%A4%8D%E5%88%BB%E7%89%88"},
             {Name = "叶脚本", Url = "https://raw.githubusercontent.com/roblox-ye/QQ515966991/refs/heads/main/ROBLOX-CNVIP-XIAOYE.lua"},
             {Name = "xk脚本", Url = "https://github.com/devslopo/DVES/raw/main/XK%20Hub"},
@@ -5639,6 +5649,8 @@ local scriptCategories = {
         GroupName = "99夜",
         List = {
             {Name = "99夜脚本可杀队友", Url = "https://raw.githubusercontent.com/358545698555/roblox-/refs/heads/main/%E5%8F%AF%E6%9D%80%E9%98%9F%E5%8F%8B99%E5%A4%9C"},
+            {Name = "99夜脚本", Url = "https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/FoxnameHub.lua"},
+            {Name = "99夜脚本2", Url = "https://pastebin.com/raw/gHQGTNYH"},
         }
     },
     {
@@ -5646,6 +5658,7 @@ local scriptCategories = {
         List = {
             {Name = "亡命速递英文脚本", Url = "https://raw.githubusercontent.com/xxdaysheus01/RuneX/refs/heads/main/DeadlyDeliveryScript.lua"},
             {Name = "亡命速递", Url = "https://pandadevelopment.net/virtual/file/c96973c95ae3aaec"},
+            {Name = "亡命速递（霜溺）", Url = "https://raw.githubusercontent.com/ShenJiaoBen/ScriptLoader/refs/heads/main/Linni_FreeLoader.lua"},
             }
     },
     {
@@ -5670,6 +5683,7 @@ local scriptCategories = {
         List = {
             {Name = "doorsDP汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/doors-DP-robot"},
             {Name = "doors abysall汉化脚本", Url = "https://raw.githubusercontent.com/atnew2025/Chinese-scripts/refs/heads/main/Abysallcn-hub"},
+            {Name = "doors脚本", Url = "https://raw.githubusercontent.com/bocaj111004/Abysall/refs/heads/main/Loader.luau"},
         }
     },
     {
@@ -5691,11 +5705,13 @@ local scriptCategories = {
             {Name = "被遗弃英文无卡密", Url = "https://github.com/shenxiuqi974/guesting-but-chinese/releases/download/hushwhw/default.txt"},
             {Name = "被遗弃英文无卡密(好用)", Url = "https://pastebin.com/raw/zH9Extzk"},
             {Name = "XA被遗弃脚本(无卡密中文)", Url = "https://raw.gitcode.com/XiaoYunUwU/XA/raw/main/Loader.lua"},
+            {Name = "2026最新脚本", Url = "https://raw.githubusercontent.com/aibabylaugh/catsaken-real-script-not-assets/refs/heads/main/obfuscated-1448974601077002340.lua"},
         }
     },
     {
     GroupName = "俄亥俄州",
         List = {
+            {Name = "俄亥俄州KRC脚本", Url = "https://raw.githubusercontent.com/FakeW0rld/lagct/refs/heads/main/ohio.lua"},
             {Name = "俄亥俄州自动捡彩蛋脚本", Url = "https://pastebin.com/raw/TrPbSbkm"},
             {Name = "Rb脚本俄亥俄州", Url = "https://raw.githubusercontent.com/Yungengxin/roblox/refs/heads/main/RbHub-OHIO"},
         }
@@ -5703,7 +5719,7 @@ local scriptCategories = {
     {
     GroupName = "画我",
         List = {
-            {Name = "无卡密画我脚本", Url = ""},
+            {Name = "无卡密画我脚本", Url = "https://raw.githubusercontent.com/losermancracker-byte/scripts/refs/heads/main/draw%20me%20v1%20-%202"},
         }
     },
     {
@@ -5833,6 +5849,25 @@ local scriptCategories = {
     GroupName = "犯罪",
         List = {
             {Name = "犯罪脚本付费版(免费用)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%8A%AF%E7%BD%AA"},
+            }
+    },
+    {
+    GroupName = "穷小子打工记",
+        List = {
+            {Name = "神青穷小子打工记", Url = "https://raw.githubusercontent.com/gycgchgyfytdttr/QQ-9-2-8-9-50173/refs/heads/main/newsqnb.lua"},
+            }
+    },
+    {
+    GroupName = "恶魔学",
+        List = {
+            {Name = "恶魔学脚本", Url = "https://raw.githubusercontent.com/NUIke1/Sentinel/refs/heads/main/%E5%93%A8%E5%85%B5-%E6%81%B6%E9%AD%94%E5%AD%A6.lua"},
+            }
+    },
+    {
+    GroupName = "自然灾害",
+        List = {
+            {Name = "祖国人脚本", Url = "https://raw.githubusercontent.com/giobolqvvi1/homelander-by-GioBolqv1/refs/heads/main/homelander.lua"},
+            {Name = "全能侠脚本", Url = "https://raw.githubusercontent.com/giobolqvi1/Omni-man-fly-by-GioBolqv1/refs/heads/main/omniman.lua"},
             }
     },
     {
@@ -8133,7 +8168,7 @@ local ScriptCenterLeftGroup = Tabs.ScriptCenter:AddLeftGroupbox("脚本中心1")
 local ScriptCenterRightGroup = Tabs.ScriptCenter:AddRightGroupbox("脚本中心2");
 Tabs.ScriptCenter:UpdateWarningBox({
         Title = '脚本信息',
-        Text = '删除了大多数 无法使用的脚本 添加新的脚本[<font color=\"rgb(255, 0, 0)\">谢谢您的使用，感谢大家</font>]',
+        Text = '删除了大多数 无法使用的脚本 添加新的脚本\n有些功能需要在游戏当中执行谢谢\n[<font color=\"rgb(255, 0, 0)\">谢谢您的使用，感谢大家</font>]',
         IsNormal = true,
         Visible = true,
         LockSize = true,
