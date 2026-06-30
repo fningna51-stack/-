@@ -1,962 +1,702 @@
-local repo = 'https://raw.githubusercontent.com/DevSloPo/obsidian_UI/main/'
-local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
-local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
-local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
-
-local Options = Library.Options
-local Toggles = Library.Toggles
-
-local Window = Library:CreateWindow({
-    Title = "XY 脚本《倒卖死全家》",
-    Footer = "By 小夜🐧群：250742853",
-    Icon = 127418118514722,
-    NotifySide = "Right",
-    ShowCustomCursor = true,
-})
-
-local Tabs = {
-    Player = Window:AddTab("玩家功能", "user"),
-    ScriptCenter = Window:AddTab("脚本中心", "code"),
-    Settings = Window:AddTab("设置", "settings"),
-}
-
-local PlayerLeftGroup = Tabs.Player:AddLeftGroupbox("玩家功能")
-local PlayerRightGroup = Tabs.Player:AddRightGroupbox("高级功能")
-
-local A2 = game:GetService("Players").LocalPlayer
-local A6 = game:GetService("UserInputService")
-local A25 = nil
-local A20 = false
-local CurrentCamera = workspace.CurrentCamera
-
-PlayerLeftGroup:AddSlider("WalkSpeedSlider", {
-    Text = "移动速度(可在墨水使用)",
-    Default = 16,
-    Min = 16,
-    Max = 200,
-    Rounding = 0,
-    Compact = false,
-    Callback = function(Value)
-        if (A2 and A2.Character) then
-            local Humanoid = A2.Character:FindFirstChild("Humanoid")
-            if Humanoid then
-                Humanoid.WalkSpeed = Value
-            end
-        end
-    end
-})
-
-PlayerLeftGroup:AddInput("WalkSpeedInput", {
-    Text = "移动速度设置",
-    Default = "",
-    Placeholder = "输入移动速度值",
-    Numeric = true,
-    Finished = false,
-    Callback = function(Value)
-        local numValue = tonumber(Value)
-        if (numValue and A2 and A2.Character) then
-            local Humanoid = A2.Character:FindFirstChild("Humanoid")
-            if Humanoid then
-                Humanoid.WalkSpeed = numValue
-            end
-        end
-    end
-})
-
-PlayerLeftGroup:AddButton({
-    Text = "无限跳",
-    Func = function()
-        A20 = not A20
-        if A25 then
-            A25:Disconnect()
-            A25 = nil
-        end
-        if A20 then
-            A25 = A6.JumpRequest:Connect(function()
-                if A2.Character then
-                    local Humanoid = A2.Character:FindFirstChildOfClass("Humanoid")
-                    if Humanoid then
-                        Humanoid:ChangeState("Jumping")
-                    end
-                end
-            end)
-        end
-    end
-})
-
-local FlyingEnabled = false
-local SpinningEnabled = false
-local FlightSpeed = 50
-local SpinSpeed = 5
-
-local CurrentAO, CurrentLV, CurrentMoverAttachment
-local FlightConnection
-local Control = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
-
-local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-local Players = game:GetService("Players")
-
-local LocalPlayer = Players.LocalPlayer
-local Camera = workspace.CurrentCamera
-
-local function getControlModule()
-    local PlayerModule = LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")
-    return require(PlayerModule:WaitForChild("ControlModule"))
-end
-
-local function setupBodyMovers(character)
-    local hrp = character:WaitForChild("HumanoidRootPart")
-    local humanoid = character:WaitForChild("Humanoid")
-    local moverParent = workspace:FindFirstChildOfClass("Terrain") or workspace
-
-    local moverAttachment = Instance.new("Attachment", hrp)
-    moverAttachment.Name = "FlightAttachment"
-
-    local alignOrientation = Instance.new("AlignOrientation")
-    alignOrientation.Mode = Enum.OrientationAlignmentMode.OneAttachment
-    alignOrientation.RigidityEnabled = true
-    alignOrientation.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
-    alignOrientation.CFrame = hrp.CFrame
-    alignOrientation.Attachment0 = moverAttachment
-    alignOrientation.Parent = moverParent
-
-    local linearVelocity = Instance.new("LinearVelocity")
-    linearVelocity.VectorVelocity = Vector3.zero
-    linearVelocity.MaxForce = 9e9
-    linearVelocity.Attachment0 = moverAttachment
-    linearVelocity.Parent = moverParent
-
-    return alignOrientation, linearVelocity, humanoid, moverAttachment
-end
-
-local function getFlightVector(controlModule)
-    local moveVector = controlModule:GetMoveVector()
-
-    Control.F = -moveVector.Z
-    Control.B = moveVector.Z
-    Control.L = -moveVector.X
-    Control.R = moveVector.X
-    Control.Q = moveVector.Y
-    Control.E = -moveVector.Y
-
-    if UserInputService:IsKeyDown(Enum.KeyCode.W) then Control.F = 1 end
-    if UserInputService:IsKeyDown(Enum.KeyCode.S) then Control.B = 1 end
-    if UserInputService:IsKeyDown(Enum.KeyCode.A) then Control.L = 1 end
-    if UserInputService:IsKeyDown(Enum.KeyCode.D) then Control.R = 1 end
-    if UserInputService:IsKeyDown(Enum.KeyCode.Space) then Control.Q = 1 end
-    if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then Control.E = 1 end
-
-    local flightVector =
-        Camera.CFrame.LookVector * (Control.F - Control.B) +
-        Camera.CFrame.RightVector * (Control.R - Control.L) +
-        Vector3.new(0, 1, 0) * (Control.Q - Control.E)
-
-    return flightVector.Magnitude > 0 and flightVector.Unit or flightVector
-end
-
-local function startFlying()
-    if FlyingEnabled then return end
-
-    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-    if not character then return end
-
-    FlyingEnabled = true
-    SpinningEnabled = false
-
-    if CurrentAO then CurrentAO:Destroy() end
-    if CurrentLV then CurrentLV:Destroy() end
-    if CurrentMoverAttachment then CurrentMoverAttachment:Destroy() end
-
-    CurrentAO, CurrentLV, humanoid, CurrentMoverAttachment = setupBodyMovers(character)
-
-    local controlModule = getControlModule()
-
-    FlightConnection = RunService.Heartbeat:Connect(function()
-        if not FlyingEnabled or not CurrentLV or not CurrentAO then return end
-
-        local flightVector = getFlightVector(controlModule)
-
-        if flightVector.Magnitude > 0 then
-            CurrentLV.VelocityConstraintMode = Enum.VelocityConstraintMode.Vector
-            CurrentLV.VectorVelocity = flightVector * FlightSpeed
-        else
-            CurrentLV.VectorVelocity = Vector3.zero
-        end
-
-        if SpinningEnabled then
-            local targetPart = humanoid.SeatPart or character.HumanoidRootPart
-            CurrentAO.CFrame = targetPart.CFrame * CFrame.Angles(0, math.rad(SpinSpeed), 0)
-        else
-            CurrentAO.CFrame = Camera.CFrame
-        end
-
-        humanoid.PlatformStand = true
-    end)
-
-    character.AncestryChanged:Connect(function(_, parent)
-        if not parent and FlyingEnabled then
-            stopFlying()
-        end
-    end)
-end
-
-local function stopFlying()
-    if not FlyingEnabled then return end
-
-    FlyingEnabled = false
-    SpinningEnabled = false
-
-    if FlightConnection then
-        FlightConnection:Disconnect()
-        FlightConnection = nil
-    end
-
-    if CurrentAO then CurrentAO:Destroy() end
-    if CurrentLV then CurrentLV:Destroy() end
-    if CurrentMoverAttachment then CurrentMoverAttachment:Destroy() end
-
-    local character = LocalPlayer.Character
-    if character and character:FindFirstChild("Humanoid") then
-        character.Humanoid.PlatformStand = false
-    end
-end
-
-PlayerLeftGroup:AddToggle('FlightToggle', {
-    Text = '飞行模式(能在墨水使用可能会被反作弊击杀)',
-    Default = false,
-    Tooltip = '开启 / 关闭飞行功能',
-    Callback = function(Value)
-        if Value then
-            startFlying()
-        else
-            stopFlying()
-        end
-    end
-})
-
-PlayerLeftGroup:AddSlider('FlightSpeedSlider', {
-    Text = '飞行速度',
-    Default = 50,
-    Min = 1,
-    Max = 200,
-    Rounding = 0,
-    Suffix = '',
-    Compact = false,
-    Callback = function(Value)
-        FlightSpeed = Value
-    end
-})
-
-PlayerLeftGroup:AddSlider('UltraWideSlider', {
-    Text = "超广角设置(可在墨水使用)",
-    Default = 70,
-    Min = 20,
-    Max = 120,
-    Rounding = 0,
-    Suffix = "°",
-    Compact = false,
-    Callback = function(Value)
-        local fov = tonumber(Value)
-        if fov and CurrentCamera then
-            CurrentCamera.FieldOfView = fov
-        end
-    end
-})
-
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local lp = Players.LocalPlayer
-
-local Enabled = false
-local targetPlayer = nil
-
-local function findPlayer(text)
-    text = text:lower()
-    for _, plr in pairs(Players:GetPlayers()) do
-        if plr.Name:lower():find(text) or plr.DisplayName:lower():find(text) then
-            return plr
-        end
-    end
-end
-
-lp.Chatted:Connect(function(msg)
-    if not Enabled then return end
-
-    if msg:sub(1,6):lower() == ";kill " then
-        local name = msg:sub(7)
-        targetPlayer = findPlayer(name)
-    end
-end)
-
-task.spawn(function()
-    while task.wait(0.01) do
-        if not Enabled or not targetPlayer then continue end
-
-        local char = targetPlayer.Character
-        if not char or not char:FindFirstChild("HumanoidRootPart") then
-            targetPlayer = nil
-            continue
-        end
-
-        local hum = char.Humanoid
-        if hum.Health <= 0 then
-            targetPlayer = nil
-            continue
-        end
-
-        local myChar = lp.Character
-        local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
-        local targetHRP = char.HumanoidRootPart
-
-        if myHRP and targetHRP then
-            local offset = targetHRP.Velocity.Magnitude < 0.1 and 0 or 7
-            local goal =
-                targetHRP.CFrame
-                * CFrame.new(0, 0, -offset)
-                * CFrame.Angles(0, math.rad(-3), 0)
-
-            myHRP.CFrame = myHRP.CFrame:Lerp(goal, 0.4)
-            myHRP.Velocity = Vector3.zero
-            myHRP.RotVelocity = Vector3.zero
-        end
-    end
-end)
-
-task.spawn(function()
-    while task.wait() do
-        if not Enabled then continue end
-        local hum = lp.Character and lp.Character:FindFirstChild("Humanoid")
-        if hum then
-            hum:Move(Vector3.one * 1e31)
-        end
-    end
-end)
-
-PlayerLeftGroup:AddToggle("TouchKillToggle", {
-    Text = "碰飞(可在墨水使用)",
-    Default = false,
-    Callback = function(Value)
-        Enabled = Value
-        targetPlayer = nil
-
-        if Value then
-            warn("碰飞已开启")
-        else
-            warn("碰飞已关闭")
-        end
-    end
-})
-
-PlayerLeftGroup:AddToggle('AntiFlingToggle', {
-    Text = '防甩飞(可在墨水使用)',
-    Default = false,
-    Tooltip = '开启后防止玩家被甩飞',
-    Callback = function(state)
-        if state then
-            local Players = game:GetService("Players")
-            local RunService = game:GetService("RunService")
-            local LocalPlayer = Players.LocalPlayer
-
-            local ANTI_FLING_FORCE = 1e6
-            local UPDATE_RATE = 0.01
-
-            _G.ActiveHandles = {
-                Connections = {},
-                Constraints = {},
-                Alignments = {}
-            }
-
-            local function CreateSuperConstraint(part)
-                local bodyPos = Instance.new("BodyPosition")
-                bodyPos.P = ANTI_FLING_FORCE
-                bodyPos.D = ANTI_FLING_FORCE / 10
-                bodyPos.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-                bodyPos.Position = part.Position
-                bodyPos.Parent = part
-
-                local bodyGyro = Instance.new("BodyGyro")
-                bodyGyro.P = ANTI_FLING_FORCE
-                bodyGyro.D = ANTI_FLING_FORCE / 10
-                bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-                bodyGyro.CFrame = part.CFrame
-                bodyGyro.Parent = part
-
-                local alignPos = Instance.new("AlignPosition")
-                alignPos.RigidityEnabled = true
-                alignPos.MaxForce = ANTI_FLING_FORCE
-                alignPos.Responsiveness = ANTI_FLING_FORCE
-                alignPos.Parent = part
-
-                local alignOri = Instance.new("AlignOrientation")
-                alignOri.RigidityEnabled = true
-                alignOri.MaxTorque = ANTI_FLING_FORCE
-                alignOri.Responsiveness = ANTI_FLING_FORCE
-                alignOri.Parent = part
-
-                table.insert(_G.ActiveHandles.Constraints, bodyPos)
-                table.insert(_G.ActiveHandles.Constraints, bodyGyro)
-                table.insert(_G.ActiveHandles.Alignments, alignPos)
-                table.insert(_G.ActiveHandles.Alignments, alignOri)
-
-                return bodyPos, bodyGyro, alignPos, alignOri
-            end
-
-            local function ApplyUltimateProtection(character)
-                if not character then return end
-
-                local rootPart = character:FindFirstChild("HumanoidRootPart")
-                    or character:FindFirstChild("Torso")
-
-                if not rootPart then return end
-
-                local bodyPos, bodyGyro, alignPos, alignOri =
-                    CreateSuperConstraint(rootPart)
-
-                local updateConn = RunService.Heartbeat:Connect(function()
-                    if not character:IsDescendantOf(workspace) then return end
-
-                    bodyPos.Position = rootPart.Position
-                    bodyGyro.CFrame = rootPart.CFrame
-
-                    for _, part in ipairs(character:GetDescendants()) do
-                        if part:IsA("BasePart") then
-                            part.CanCollide = false
-                            part.CustomPhysicalProperties =
-                                PhysicalProperties.new(0, 0, 0)
-                            part.AssemblyAngularVelocity = Vector3.new()
-                            part.AssemblyLinearVelocity = Vector3.new()
-                            part.Velocity = Vector3.new()
-                            part.RotVelocity = Vector3.new()
-                            part:SetAttribute("LastPosition", part.Position)
-                        end
-                    end
-                end)
-
-                table.insert(_G.ActiveHandles.Connections, updateConn)
-
-                local velConn =
-                    rootPart:GetPropertyChangedSignal("AssemblyLinearVelocity")
-                        :Connect(function()
-                            rootPart.AssemblyLinearVelocity = Vector3.new()
-                            rootPart.Velocity = Vector3.new()
-                        end)
-
-                table.insert(_G.ActiveHandles.Connections, velConn)
-
-                local rotConn =
-                    rootPart:GetPropertyChangedSignal("AssemblyAngularVelocity")
-                        :Connect(function()
-                            rootPart.AssemblyAngularVelocity = Vector3.new()
-                            rootPart.RotVelocity = Vector3.new()
-                        end)
-
-                table.insert(_G.ActiveHandles.Connections, rotConn)
-
-                local posCheck = RunService.Heartbeat:Connect(function()
-                    if not character:IsDescendantOf(workspace) then return end
-
-                    local lastPos = rootPart:GetAttribute("LastPosition")
-                    if lastPos then
-                        local dist =
-                            (rootPart.Position - lastPos).Magnitude
-                        if dist > 5 then
-                            rootPart.CFrame = CFrame.new(lastPos)
-                        end
-                    end
-                    rootPart:SetAttribute("LastPosition", rootPart.Position)
-                end)
-
-                table.insert(_G.ActiveHandles.Connections, posCheck)
-            end
-
-            local function MonitorPlayer(player)
-                if player == LocalPlayer then return end
-
-                local function HandleCharacter(character)
-                    if not character then return end
-                    repeat task.wait() until
-                        character:FindFirstChild("HumanoidRootPart")
-                        or character:FindFirstChild("Torso")
-
-                    ApplyUltimateProtection(character)
-                end
-
-                if player.Character then
-                    HandleCharacter(player.Character)
-                end
-
-                local charConn =
-                    player.CharacterAdded:Connect(HandleCharacter)
-                table.insert(_G.ActiveHandles.Connections, charConn)
-            end
-
-            for _, player in ipairs(Players:GetPlayers()) do
-                MonitorPlayer(player)
-            end
-
-            local playerConn =
-                Players.PlayerAdded:Connect(MonitorPlayer)
-            table.insert(_G.ActiveHandles.Connections, playerConn)
-
-        else
-            for _, conn in ipairs(_G.ActiveHandles.Connections or {}) do
-                if conn.Connected then
-                    conn:Disconnect()
-                end
-            end
-
-            for _, constraint in ipairs(
-                _G.ActiveHandles.Constraints or {}
-            ) do
-                if constraint and constraint.Parent then
-                    constraint:Destroy()
-                end
-            end
-
-            for _, align in ipairs(
-                _G.ActiveHandles.Alignments or {}
-            ) do
-                if align and align.Parent then
-                    align:Destroy()
-                end
-            end
-
-            for _, player in ipairs(
-                game:GetService("Players"):GetPlayers()
-            ) do
-                if player ~= LocalPlayer and player.Character then
-                    for _, part in ipairs(
-                        player.Character:GetDescendants()
-                    ) do
-                        if part:IsA("BasePart") then
-                            part.CanCollide = true
-                            part.CustomPhysicalProperties = nil
-                            part.AssemblyAngularVelocity = Vector3.new()
-                            part.AssemblyLinearVelocity = Vector3.new()
-                            part:SetAttribute("LastPosition", nil)
-                        end
-                    end
-                end
-            end
-
-            _G.ActiveHandles = {
-                Connections = {},
-                Constraints = {},
-                Alignments = {}
-            }
-        end
-    end
-})
-
-PlayerRightGroup:AddCheckbox("ESP", {
-    Text = "透视[墨水可用]",
-    Default = false,
-    Callback = function(enabled)
-        local Players = game:GetService("Players")
-        local RunService = game:GetService("RunService")
-
-        local highlights = {}
-        local connections = {}
-
-        local function clearHighlights()
-            for _, plr in pairs(Players:GetPlayers()) do
-                if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-                    local hl = plr.Character.HumanoidRootPart:FindFirstChild("Highlight")
-                    if hl then
-                        hl:Destroy()
-                    end
-                end
-            end
-            for _, conn in pairs(connections) do
-                if typeof(conn) == "RBXScriptConnection" then
-                    conn:Disconnect()
-                end
-            end
-            table.clear(highlights)
-            table.clear(connections)
-        end
-
-        if enabled then
-            for _, plr in pairs(Players:GetPlayers()) do
-                task.spawn(function()
-                    repeat task.wait() until plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
-                    if not plr.Character.HumanoidRootPart:FindFirstChild("Highlight") then
-                        local highlight = Instance.new("Highlight")
-                        highlight.Name = "Highlight"
-                        highlight.Adornee = plr.Character
-                        highlight.Parent = plr.Character.HumanoidRootPart
-                        highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-                        highlight.FillColor = Color3.fromRGB(255, 0, 0)
-                        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-                        highlights[plr] = highlight
-                    end
-                end)
-            end
-
-            connections["PlayerAdded"] = Players.PlayerAdded:Connect(function(plr)
-                task.spawn(function()
-                    repeat task.wait() until plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
-                    if not plr.Character.HumanoidRootPart:FindFirstChild("Highlight") then
-                        local highlight = Instance.new("Highlight")
-                        highlight.Name = "Highlight"
-                        highlight.Adornee = plr.Character
-                        highlight.Parent = plr.Character.HumanoidRootPart
-                        highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-                        highlight.FillColor = Color3.fromRGB(255, 0, 0)
-                        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-                        highlights[plr] = highlight
-                    end
-                end)
-            end)
-
-            connections["PlayerRemoving"] = Players.PlayerRemoving:Connect(function(plr)
-                if highlights[plr] then
-                    highlights[plr]:Destroy()
-                    highlights[plr] = nil
-                end
-            end)
-
-        else
-            clearHighlights()
-        end
-    end
-})
-
-local ScriptLeftGroup = Tabs.ScriptCenter:AddLeftGroupbox("脚本中心1")
-local ScriptRightGroup = Tabs.ScriptCenter:AddRightGroupbox("脚本中心2")
-
-local scriptCategories = {
-    {
-        GroupName = "各大脚本🤫",
-        List = {
-            {Name = "秋容脚本复刻版", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%A7%8B%E5%AE%B9%E8%84%9A%E6%9C%AC%E5%A4%8D%E5%88%BB%E7%89%88"},
-            {Name = "叶脚本", Url = "https://raw.githubusercontent.com/roblox-ye/QQ515966991/refs/heads/main/ROBLOX-CNVIP-XIAOYE.lua"},
-            {Name = "xk脚本", Url = "https://github.com/devslopo/DVES/raw/main/XK%20Hub"},
-            {Name = "新版XA脚本", Url = "https://github.com/YunLua/Lua/raw/main/XA_Hub.lua"},
-            {Name = "皮脚本", Url = "https://raw.githubusercontent.com/xiaopi77/xiaopi77/main/QQ1002100032-Roblox-Pi-script.lua"},
-            {Name = "落叶脚本", Url = "https://raw.githubusercontent.com/krlpl/Deciduous-center-LS/main/%E8%90%BD%E5%8F%B6%E4%B8%AD%E5%BF%83%E6%B7%B7%E6%B7%86.txt"},
-            {Name = "Rb脚本中心＿汉化中心", Url = "https://api.luarmor.net/files/v3/loaders/4fe525637e43a1be8cb0cdf902d107c2.lua"},
-            {Name = "NOL免费版", Url = "https://raw.githubusercontent.com/Syndromehsh/BETA2/refs/heads/main/NOL"},
-            {Name = "BS中心", Url = "https://gitee.com/BS_script/script/raw/master/%E9%BB%91%E6%B4%9E%E4%B8%AD%E5%BF%83(BS).txt"},
-            {Name = "Rb脚本中心", Url = "https://raw.githubusercontent.com/Yungengxin/roblox/refs/heads/main/Rb-Hub"},
-            {Name = "sa脚本", Url = "https://raw.githubusercontent.com/Bebo-Mods/BeboScripts/main/StandAwekening.lua"},
-            {Name = "霖溺通用", Url = "https://raw.githubusercontent.com/ShenJiaoBen/Partial-Server-Ribbon/refs/heads/main/Linni_Universal.txt"},
-        }
-    },
-    {
-        GroupName = "99夜",
-        List = {
-            {Name = "99夜脚本可杀队友", Url = "https://raw.githubusercontent.com/358545698555/roblox-/refs/heads/main/%E5%8F%AF%E6%9D%80%E9%98%9F%E5%8F%8B99%E5%A4%9C"},
-        }
-    },
-    {
-        GroupName = "亡命速递",
-        List = {
-            {Name = "亡命速递英文脚本", Url = "https://raw.githubusercontent.com/xxdaysheus01/RuneX/refs/heads/main/DeadlyDeliveryScript.lua"},
-            {Name = "亡命速递", Url = "https://pandadevelopment.net/virtual/file/c96973c95ae3aaec"},
-            {Name = "亡命速递汉化脚本", Url = "https://raw.githubusercontent.com/JanseJYC/Script/refs/heads/main/Deadly-Deliver.lua"},
-        }
-    },
-    {
-        GroupName = "死铁轨",
-        List = {
-            {Name = "仿红叶脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E4%BB%BF%E7%BA%A2%E5%8F%B6%E8%84%9A%E6%9C%AC%E6%B1%89%E5%8C%96"},
-            {Name = "红叶脚本", Url = "https://getnative.cc/script/loader"},
-            {Name = "速通脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%AD%BB%E9%93%81%E8%BD%A8%E6%B1%89%E5%8C%96%E8%84%9A%E6%9C%AC"},
-            {Name = "死铁轨脚本", Url = "https://raw.githubusercontent.com/gumanba/Scripts/refs/heads/main/DeadRails"},
-            {Name = "死铁轨脚本(好用)", Url = "https://raw.githubusercontent.com/kiciahook/kiciahook/refs/heads/main/loader.lua"},
-        }
-    },
-    {
-        GroupName = "墨水游戏🤫",
-        List = {
-            {Name = "AX-inggame 有芙同享汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/ax%E8%84%9A%E6%9C%AC%E7%A7%8B%E8%BE%9E%E6%B1%89%E5%8C%96"},
-            {Name = "墨水游戏天使之翼汉化(卡密在通用功能复制)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E5%A2%A8%E6%B0%B4inkgame%E6%B1%89%E5%8C%96"},
-            {Name = "墨水Ringta汉化(无卡密)", Url = "https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/Ringta"},
-            {Name = "Unm汉化，卡密ink50", Url = "https://raw.githubusercontent.com/Youfutongxiang1/unm-CN/refs/heads/main/README.md"},
-        }
-    },
-    {
-        GroupName = "doors",
-        List = {
-            {Name = "doors最新脚本", Url = "https://raw.githubusercontent.com/TheHunterSolo1/Scripts/refs/heads/main/Protected_2809220311826785.lua.txt"},
-            {Name = "doorsDP汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/doors-DP-robot"},
-            {Name = "doors abysall汉化脚本", Url = "https://raw.githubusercontent.com/atnew2025/Chinese-scripts/refs/heads/main/Abysallcn-hub"},
-        }
-    },
-    {
-        GroupName = "监狱生活",
-        List = {
-            {Name = "监狱生活汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%9B%91%E7%8B%B1%E7%94%9F%E6%B4%BB%E8%84%9A%E6%9C%AC"},
-        }
-    },
-    {
-        GroupName = "战争大亨",
-        List = {
-            {Name = "战争大亨最强脚本", Url = "https://raw.githubusercontent.com/MaxPikaa/PureLove/refs/heads/main/520"},
-            {Name = "战争大亨无卡密高级脚本", Url = "https://raw.githubusercontent.com/Macintosh1983/ChillHubMain/main/ChillHubOilWarfareTycoon.lua"},
-        }
-    },
-    {
-        GroupName = "被遗弃🤫",
-        List = {
-            {Name = "被遗弃无卡密超好用", Url = "https://rawscripts.net/raw/G666-Forsaken-Keyless-auto-gen-reach-autoblock-+-more-63283"},
-            {Name = "被遗弃英文无卡密", Url = "https://github.com/shenxiuqi974/guesting-but-chinese/releases/download/hushwhw/default.txt"},
-            {Name = "被遗弃英文无卡密(好用)", Url = "https://pastebin.com/raw/zH9Extzk"},
-            {Name = "XA被遗弃脚本(无卡密中文)", Url = "https://raw.gitcode.com/XiaoYunUwU/XA/raw/main/Loader.lua"},
-        }
-    },
-    {
-        GroupName = "俄亥俄州😱",
-        List = {
-            {Name = "俄亥俄州自动捡彩蛋脚本", Url = "https://pastebin.com/raw/TrPbSbkm"},
-            {Name = "Rb脚本俄亥俄州", Url = "https://raw.githubusercontent.com/Yungengxin/roblox/refs/heads/main/RbHub-OHIO"},
-        }
-    },
-    {
-        GroupName = "画我🤔",
-        List = {
-            {Name = "无卡密画我脚本", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/KENNY%E7%94%BB%E6%88%91.lua"},
-        }
-    },
-    {
-        GroupName = "通缉脚本😋",
-        List = {
-            {Name = "SX HUB", Url = "https://api.luarmor.net/files/v3/loaders/87a8a4f4c2d2ef535ccd1bdb949218fe.lua"},
-            {Name = "KENNY", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/KENNY%E9%80%9A%E7%89%89%E6%8D%A2%E6%9C%8D.lua"},
-            {Name = "通缉", Url = "https://raw.githubusercontent.com/combatlegnd/combatlegnd/refs/heads/main/NH-Loader"},
-        }
-    },
-    {
-        GroupName = "闪光",
-        List = {
-            {Name = "闪光脚本", Url = "https://apigetunx.vercel.app/UNX.lua"},
-            {Name = "闪光脚本(英文)", Url = "https://raw.githubusercontent.com/Jager-Hub/Scripts/refs/heads/main/loader.lua"},
-        }
-    },
-    {
-        GroupName = "最坚强的战场",
-        List = {
-            {Name = "最强战场Phantasm汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/thestongestbattlegrounds-Phantasm-robot"},
-            {Name = "最坚强的战场脚本2", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/phantasm.lua"},
-            {Name = "最坚强的战场脚本(好用)", Url = "https://eltonshub-loader.netlify.app/UBG1.lua"},
-            {Name = "最坚强的战场open脚本", Url = "https://api.luarmor.net/files/v3/loaders/6f502e252308fb97855295005faa73a0.lua"},
-        }
-    },
-    {
-        GroupName = "偷走脑红😡",
-        List = {
-            {Name = "偷走脑红脚本", Url = "https://raw.githubusercontent.com/DynaFetchy/Scripts/refs/heads/main/Loader.lua"},
-            {Name = "偷走脑红脚本2", Url = "https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/%E5%81%B7%E8%B5%B0%E8%84%91%E7%BA%A2"},
-            {Name = "偷走脑红KURD汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/Brainrot-KURD-robot"},
-        }
-    },
-    {
-        GroupName = "竞争对手🤔",
-        List = {
-            {Name = "竞争对手脚本汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%AB%9E%E4%BA%89%E5%AF%B9%E6%89%8B%E6%B1%89%E5%8C%96%E8%84%9A%E6%9C%AC"},
-        }
-    },
-    {
-        GroupName = "chain脚本",
-        List = {
-            {Name = "chain英文脚本", Url = "https://api.getpolsec.com/scripts/hosted/79fcede2ce14619990c741986e6123ddbc41cd9e4a25c4dc4da13c5f63a25f2b.lua"},
-        }
-    },
-    {
-        GroupName = "跳跃对决🤓",
-        List = {
-            {Name = "跳跃对决脚本", Url = "https://raw.githubusercontent.com/solarastuff/sorryjimpee/refs/heads/main/Jumper.lua"},
-        }
-    },
-    {
-        GroupName = "死亡球😇",
-        List = {
-            {Name = "死亡球Fluxin汉化脚本(要卡密)", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/deathball-Fluxin-robot"},
-            {Name = "死亡球stark汉化脚本(要卡密)", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/Deathballs-stark-robot"},
-        }
-    },
-    {
-        GroupName = "监狱人生😂",
-        List = {
-            {Name = "监狱人生人机汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/PrisonLife-Serk4rx-robot"},
-        }
-    },
-    {
-        GroupName = "逃脱海啸🥵",
-        List = {
-            {Name = "逃脱海啸并带走红Merqur汉化脚本(要卡密)", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/EscapeTsunamiForBrinrots-Merqury-robot"},
-            {Name = "逃脱海啸并拿走脑红Solix汉化脚本(要卡密)", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/EscapeTsunamiForBrinrots-Solix-robot"},
-        }
-    },
-    {
-        GroupName = "盲射🥵",
-        List = {
-            {Name = "盲射ToraIsMe汉化脚本", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/blindshot-ToraIsMe-robot"},
-        }
-    },
-    {
-        GroupName = "彩虹朋友🥵😡",
-        List = {
-            {Name = "彩虹朋友二UB汉化脚本(要卡密)", Url = "https://raw.githubusercontent.com/Clover781/m/refs/heads/main/RainbowFriends-UB-robot"},
-        }
-    },
-    {
-        GroupName = "撕咬之夜😡",
-        List = {
-            {Name = "撕咬之夜", Url = "https://raw.githubusercontent.com/Youfutongxiang1/Msploit-v2-CN/refs/heads/main/Msploit-v2-CN"},
-            {Name = "殺脚本撕咬之夜", Url = "https://raw.githubusercontent.com/FengYu-X/Max/refs/X/BBN.lua"},
-            {Name = "Ringta撕咬之夜(汉化)", Url = "https://raw.githubusercontent.com/Youfutongxiang1/RINGTA-BitebyNight-CN/refs/heads/main/RINGTA/Bite%20by%20Night-CN"},
-            {Name = "撕咬之夜", Url = "https://raw.githubusercontent.com/YIRDEX/China/refs/heads/main/Cerberus"},
-        }
-    },
-    {
-        GroupName = "死刑🔓",
-        List = {
-            {Name = "死刑脚本(无卡密)", Url = "https://api.luarmor.net/files/v3/loaders/8c08b8f2252eec7dbb77d253d269bb65.lua"},
-        }
-    },
-    {
-        GroupName = "活了7天😱",
-        List = {
-            {Name = "活了7天刷废料", Url = "https://raw.githubusercontent.com/rndmq/Serverlist/refs/heads/main/Server87"},
-            {Name = "活了7天汉化", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/%E4%B8%83%E6%97%A5%E7%94%9F%E6%88%90kkk.txt"},
-        }
-    },
-    {
-        GroupName = "终极战场🔓",
-        List = {
-            {Name = "终极战场脚本", Url = "https://raw.githubusercontent.com/YQANTGV3/YQANTGV3/refs/heads/main/antitamper.txt"},
-        }
-    },
-    {
-        GroupName = "餐厅大亨",
-        List = {
-            {Name = "餐厅大亨脚本(自动解卡无卡密)", Url = "https://rawscripts.net/raw/Universal-Script-Samuraa1-Hub-Best-Keyless-Script-For-EA-ByB-RT3-etc-88197"},
-        }
-    },
-    {
-        GroupName = "恐鬼症🔓🔒",
-        List = {
-            {Name = "恐鬼症脚本", Url = "https://raw.githubusercontent.com/longchneg/GAl/refs/heads/Dragon/%E6%81%90%E9%AC%BC%E7%97%87%20%E5%85%8D%E8%B4%B9%E7%89%88"},
-            {Name = "恐鬼症付费脚本(免费用)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E6%81%90%E9%AC%BC%E7%97%87"},
-        }
-    },
-    {
-        GroupName = "力量传奇🔓",
-        List = {
-            {Name = "Yttrium力量传奇付费脚本(免费用)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E5%8A%9B%E9%87%8F%E4%BC%A0%E5%A5%87%E8%84%9A%E6%9C%AC"},
-        }
-    },
-    {
-        GroupName = "通缉🔓",
-        List = {
-            {Name = "Yttrium通缉付费脚本(免费用)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E9%80%9A%E7%89%89%E8%84%9A%E6%9C%AC%E5%85%8D%E8%B4%B9%E7%89%88"},
-        }
-    },
-    {
-        GroupName = "GB内脏与黑火药🔒",
-        List = {
-            {Name = "GB汉化脚本(需要解卡和AX一样)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/AF%20%E7%A7%8B%E5%AE%B9GB"},
-        }
-    },
-    {
-        GroupName = "攻击泰坦革命🔓",
-        List = {
-            {Name = "攻击泰坦革命脚本(英文版)", Url = "https://api.luarmor.net/files/v4/loaders/705e7fe7aa288f0fe86900cedb1119b1.lua"},
-        }
-    },
-    {
-        GroupName = "犯罪🔒",
-        List = {
-            {Name = "犯罪脚本付费版(免费用)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/%E7%8A%AF%E7%BD%AA"},
-        }
-    },
-    {
-        GroupName = "破坏者谜团🔓",
-        List = {
-            {Name = "破坏者谜团脚本", Url = "https://pastebin.com/raw/VRwdkSG3"},
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/WuMing-YYDS/Script-UI/refs/heads/main/Wind%20UI.LUA"))()
+
+WindUI:Popup({
+    Title = "提示",
+    Icon = "info",
+    Content = "是否加载最新版本 2.00《最新》",
+    Buttons = {
+        {
+            Title = "取消",
+            Callback = function() end,
+            Variant = "Tertiary",
+        },
+        {
+            Title = "确定",
+            Icon = "arrow-right",
+            Callback = function() end,
+            Variant = "Primary",
         }
     }
+})
+
+WindUI:Notify({
+    Title = "紧急通知：XY脚本可能会停更",
+    Content = "Notification Content example!",
+    Duration = 3, -- 3 seconds
+    Icon = "bird",
+})
+
+WindUI:Notify({
+    Title = "欢迎使用",
+    Content = "XY脚本",
+    Duration = 3,
+    Position = "Left"
+})
+
+WindUI:Notify({
+    Title = "XY脚本",
+    Content = "不跑路",
+    Duration = 11,
+})
+
+WindUI:Notify({
+    Title = "欢迎使用",
+    Content = "XY脚本",
+    Duration = 10,
+})
+
+WindUI:Notify({
+    Title = "Q 群",
+    Content = "1013013485",
+    Duration = 10,
+})
+
+WindUI:Popup({
+    Title = "欢迎用户进入 XY脚本",
+    Icon = "info",
+    Content = "欢迎你游玩我们的 XY脚本😋",
+    Buttons = {
+        {
+            Title = "我不知道",
+            Callback = function() end,
+            Variant = "Tertiary",
+        },
+        {
+            Title = "我知道的",
+            Icon = "arrow-right",
+            Callback = function() end,
+            Variant = "Primary",
+        }
+    }
+})
+
+WindUI:Popup({
+    Title = "公告",
+    Icon = "info",
+    Content = "今天即将添加功能",
+    Buttons = {
+        {
+            Title = "我不知道",
+            Callback = function() end,
+            Variant = "Tertiary",
+        },
+        {
+            Title = "我知道的",
+            Icon = "arrow-right",
+            Callback = function() end,
+            Variant = "Primary",
+        }
+    }
+})
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local mouse = player:GetMouse()
+
+local Main = WindUI:CreateWindow({
+    Title = "<font color='#ff007f'>XY脚本</font>-<font color='#00ffff'>通用</font>",
+    Author = "<font color='#00ffff'>by</font> <font color='#ff007f'>小夜</font>",
+    Folder = "CloudHub",
+    Size = UDim2.fromOffset(300, 400),
+    Transparent = true,
+    Theme = "Dark",
+    SideBarWidth = 200,
+    Icon = "rbxassetid://127418118514722",
+    IconThemed = true,
+    ScrollBarEnabled = true,
+    HideSearchBar = true,
+    User = {
+        Enabled = true,
+        Anonymous = false,
+        Callback = function() end
+    }
+})
+
+Main:EditOpenButton({
+    Title = "<font color='#ff007f'>XY</font><font color='#00ffff'>脚本 免费版</font>",
+    Icon = "rbxassetid://127418118514722",
+    CornerRadius = UDim.new(0, 8),
+    StrokeThickness = 2,
+    Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromHex("#ff007f")),
+        ColorSequenceKeypoint.new(0.5, Color3.fromHex("#00ffff")),
+        ColorSequenceKeypoint.new(1, Color3.fromHex("#ff007f"))
+    })
+})
+
+Main:Tag({
+    Title = "XY脚本",
+    Color = Color3.fromHex("#00ffff")
+})
+
+Main:Tag({
+    Title = "免费",
+    Color = Color3.fromHex("#ff007f")
+})
+
+local TimeTag = Main:Tag({
+    Title = "当前时间: 00:00:00",
+    Color = Color3.fromHex("#00ffff")
+})
+
+Main:Tag({
+    Title = "脚本创建的4天",
+    Color = Color3.fromHex("#ff007f")
+})
+
+local hue = 0
+local running = true
+
+task.spawn(function()
+    while running do
+        local now = os.date("*t")
+        local hours = string.format("%02d", now.hour)
+        local minutes = string.format("%02d", now.min)
+        local seconds = string.format("%02d", now.sec)
+        local timeString = string.format("当前时间: %s:%s:%s", hours, minutes, seconds)
+        hue = (hue + 0.01) % 1
+        local color = Color3.fromHSV(hue, 1, 1)
+        TimeTag:SetTitle(timeString)
+        TimeTag:SetColor(color)
+        task.wait(0.06)
+    end
+end)
+
+local TimeTag2 = Main:Tag({
+    Title = "新年倒计时: --",
+    Color = Color3.fromHex("#f57c00")
+})
+
+local function getNextNewYear()
+    local now = os.date("*t")
+    local newYear = {
+        year = now.year,
+        month = 1,
+        day = 1,
+        hour = 0,
+        min = 0,
+        sec = 0
+    }
+    if now.month > 1 or (now.month == 1 and now.day > 1) then
+        newYear.year = newYear.year + 1
+    end
+    return os.time(newYear)
+end
+
+task.spawn(function()
+    local nextNewYear = getNextNewYear()
+    while true do
+        local now = os.time()
+        local remaining = nextNewYear - now
+        if remaining <= 0 then
+            nextNewYear = getNextNewYear()
+            remaining = nextNewYear - now
+        end
+        local days = math.floor(remaining / 86400)
+        remaining = remaining % 86400
+        local hours = math.floor(remaining / 3600)
+        remaining = remaining % 3600
+        local minutes = math.floor(remaining / 60)
+        local seconds = remaining % 60
+        local displayText
+        if days > 0 then
+            displayText = string.format("新年倒计时: %d天%02d:%02d:%02d", days, hours, minutes, seconds)
+        else
+            displayText = string.format("新年倒计时: %02d:%02d:%02d", hours, minutes, seconds)
+        end
+        TimeTag2:SetTitle(displayText)
+        hue = (hue + 0.01) % 1
+        TimeTag2:SetColor(Color3.fromHSV(hue, 1, 1))
+        task.wait(1)
+    end
+end)
+
+local function ApplyNeonBorder(Window, Speed)
+    Speed = Speed or 60
+    local MainFrame = Window.UIElements and Window.UIElements.Main
+    if not MainFrame then
+        local Attempts = 0
+        while not MainFrame and Attempts < 50 do
+            task.wait(0.1)
+            MainFrame = Window.UIElements and Window.UIElements.Main
+            Attempts = Attempts + 1
+        end
+        if not MainFrame then return end
+    end
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, 12)
+    Corner.Parent = MainFrame
+    local Border = Instance.new("UIStroke")
+    Border.Name = "NeonBorder"
+    Border.Thickness = 2
+    Border.Color = Color3.new(1, 1, 1)
+    Border.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    Border.LineJoinMode = Enum.LineJoinMode.Round
+    Border.Parent = MainFrame
+    local Gradient = Instance.new("UIGradient")
+    Gradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromHex("#00FFFF")),
+        ColorSequenceKeypoint.new(0.5, Color3.fromHex("#FF00FF")),
+        ColorSequenceKeypoint.new(1, Color3.fromHex("#00FFFF"))
+    })
+    Gradient.Rotation = 0
+    Gradient.Parent = Border
+    local Connection
+    Connection = game:GetService("RunService").Heartbeat:Connect(function()
+        if not Border or Border.Parent == nil then
+            if Connection then Connection:Disconnect() end
+            return
+        end
+        local Time = tick()
+        Gradient.Rotation = (Time * Speed) % 360
+    end)
+    local OrigOnClose = Window.OnClose
+    Window.OnClose = function(...)
+        if Connection then Connection:Disconnect() end
+        if OrigOnClose then OrigOnClose(...) end
+    end
+end
+
+ApplyNeonBorder(Window, 60)
+
+local Tab = Window:Tab({
+    Title = "通用",
+    Icon = "bird", -- optional
+    Locked = false,
+})
+local Section = Tab:Section({
+    Title = "通用功能",
+    Opened = true
+})
+Section:Button({
+    Title = "飞踢",
+    Callback = function()
+    
+loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Fe-DropKick-Script-165813"))()    
+      end
+})
+Section:Button({
+    Title = "飞行",
+    Callback = function()
+    
+loadstring(game:HttpGet("https://raw.githubusercontent.com/rodan-demirali/RobloxUI/refs/heads/main/flyUIscript"))    
+      end
+})
+local Tab = Window:Tab({
+    Title = "用户信息",
+    Icon = "bird", -- optional
+    Locked = false,
+})
+local Tab = Window:Tab({
+    Title = "XY功能",
+    Icon = "bird", -- optional
+    Locked = false,
+})
+local Tab = Window:Tab({
+    Title = "自瞄",
+    Icon = "bird", -- optional
+    Locked = false,
+})
+local Tab = Window:Tab({
+    Title = "设置",
+    Icon = "bird", -- optional
+    Locked = false,
+})
+
+local Tab = Window:Tab({
+    Title = "脚本中心",
+    Icon = "bird", -- optional
+    Locked = false,
+})
+local Section = Tab:Section({
+    Title = "脚本",
+    Opened = true
+})
+Section:Button({
+    Title = "XK Hub",
+    Callback = function()
+    
+loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-XK-Hub-76803"))()
+      end
+})
+Section:Button({
+    Title = "河北唐县",
+    Callback = function()
+    
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Marco8642/science/ok/T%20ang%20County"))()
+      end
+})
+Section:Button({
+    Title = "皮脚本",
+    Callback = function()
+    
+loadstring(game:HttpGet("https://raw.githubusercontent.com/xiaopi77/xiaopi77/main/QQ1002100032-Roblox-Pi-script.lua"))()
+      end
+})
+Section:Button({
+    Title = "祖国人脚本",
+    Callback = function()
+    
+loadstring(game:HttpGet("https://raw.githubusercontent.com/giobolqvi1/homelander-by-GioBolqv1/refs/heads/main/homelander.lua"))()
+      end
+})
+Section:Button({
+    Title = "夜脚本",
+    Callback = function()
+    
+loadstring(game:HttpGet("https://raw.githubusercontent.com/giobolqvi1/homelander-by-GioBolqv1/refs/heads/main/homelander.lua"))()
+      end
+})
+Section:Button({
+    Title = "XY 脚本自然灾害",
+    Callback = function()
+    
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+local Window = WindUI:CreateWindow({
+        Title = "XY脚本-自然灾害<font color='#00FF00'>V2</font>",
+        Icon = "rbxassetid://4483362748",
+        IconTransparency = 0.5,
+        IconThemed = true,
+        Author = "作者:小夜",
+        Folder = "CloudHub",
+        Size = UDim2.fromOffset(400, 300),
+        Transparent = true,
+        Theme = "Light",
+        User = {
+            Enabled = true,
+            Callback = function() print("clicked") end,
+            Anonymous = false
+        },
+        SideBarWidth = 200,
+        ScrollBarEnabled = true,
+        Background = "rbxassetid://111122821357551"
+    })
+    
+
+WindUI:Popup({
+    Title = "欢迎使用",
+    Icon = "info",
+    Content = "欢迎用户使用XY脚本-自然灾害",
+    Buttons = {
+        {
+            Title = "取消",
+            Callback = function() end,
+            Variant = "Tertiary",
+        },
+        {
+            Title = "确定",
+            Icon = "arrow-right",
+            Callback = function() end,
+            Variant = "Primary",
+        }
+    }
+})
+
+Window:EditOpenButton({
+    Title = "XY脚本",
+    Icon = "monitor",
+    CornerRadius = UDim.new(0,16),
+    StrokeThickness = 4,
+    Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromHex("FF0000")),
+        ColorSequenceKeypoint.new(0.16, Color3.fromHex("FF7F00")),
+        ColorSequenceKeypoint.new(0.33, Color3.fromHex("FFFF00")),
+        ColorSequenceKeypoint.new(0.5, Color3.fromHex("00FF00")),
+        ColorSequenceKeypoint.new(0.66, Color3.fromHex("0000FF")),
+        ColorSequenceKeypoint.new(0.83, Color3.fromHex("4B0082")),
+        ColorSequenceKeypoint.new(1, Color3.fromHex("9400D3"))
+    }),
+    Draggable = true,
+})
+            
+Window:Tag({
+    Title = "XY脚本",
+    Color = Color3.fromHex("#30ff6a")
+})
+
+Window:Tag({
+        Title = "XY脚本", -- 标签汉化
+        Color = Color3.fromHex("#315dff")
+    })
+    local TimeTag = Window:Tag({
+        Title = "自然灾害",
+        Color = Color3.fromHex("#000000")
+    })
+
+local Tabs = {
+    Main = Window:Section({ Title = "XY脚本自然灾害", Opened = true }),
 }
 
-local scriptButtons = {}
+local TabHandles = {
+    Q = Tabs.Main:Tab({ Title = "功能", Icon = "layout-grid" }),
+}
 
-local function AddDivider(group)
-    group:AddLabel("────────────────────")
-end
-
-local function CreateScriptButton(group, scriptName, scriptUrl, isLeft)
-    local btn = group:AddButton({
-        Text = scriptName,
-        Func = function()
-            Library:Notify("正在加载: " .. scriptName, 3)
-            local success, result = pcall(function()
-                loadstring(game:HttpGet(scriptUrl))()
-            end)
-            if success then
-                Library:Notify("脚本加载成功: " .. scriptName, 3)
-            else
-                Library:Notify("加载失败: " .. tostring(result), 5)
-            end
-        end,
-        DoubleClick = false,
-    })
-    return btn
-end
-
-local function DistributeScripts()
-    local leftIndex = 1
-    local rightIndex = 1
-    local totalScripts = 0
+Button = TabHandles.Q:Button({
+    Title = "指南针（可以用下面的地方显示不了地图）",
+    Desc = "要使用的话就必须买指南针",
+    Locked = false,
+    Callback = function()
     
-    for _, category in ipairs(scriptCategories) do
-        totalScripts = totalScripts + #category.List
-    end
-    
-    local leftCount = math.ceil(totalScripts / 2)
-    local currentCount = 0
-    local isLeft = true
-    
-    for _, category in ipairs(scriptCategories) do
-        local title = "【" .. category.GroupName .. "】"
-        
-        if isLeft then
-            ScriptLeftGroup:AddLabel(title)
-            AddDivider(ScriptLeftGroup)
-        else
-            ScriptRightGroup:AddLabel(title)
-            AddDivider(ScriptRightGroup)
-        end
-        
-        for _, script in ipairs(category.List) do
-            if isLeft then
-                CreateScriptButton(ScriptLeftGroup, script.Name, script.Url, true)
-            else
-                CreateScriptButton(ScriptRightGroup, script.Name, script.Url, false)
-            end
+local p = game.Players.LocalPlayer
+local r, c, h = game.ReplicatedStorage.Remotes.Compass, p.Backpack:WaitForChild("Compass"), p.Character:WaitForChild("Humanoid")
+h:EquipTool(c)
+task.wait()
+r:FireServer("Vote Map", 3)
+r:FireServer("Vote Map", 4)
+task.wait()
+h:UnequipTools()
             
-            currentCount = currentCount + 1
-            if currentCount >= leftCount then
-                isLeft = false
+WindUI:Notify({
+    Title = "通知",
+    Content = "加载成功",
+    Duration = 1, -- 3 seconds
+    Icon = "layout-grid",
+})                        
+            
+ end
+})
+
+Button = TabHandles.Q:Button({
+    Title = "黑洞",
+    Desc = "点击加载",
+    Locked = false,
+    Callback = function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Super-ring-Parts-V6-28581"))()
+        
+WindUI:Notify({
+    Title = "通知",
+    Content = "加载成功",
+    Duration = 3, -- 3 seconds
+    Icon = "layout-grid",
+})        
+        
+    end
+})
+
+Button = TabHandles.Q:Button({
+    Title = "物理磁铁",
+    Desc = "可以把下面的东西吸上来可以踩",
+    Locked = false,
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/cytj777i/6669178/main/%E5%8D%95%E4%B8%80%E7%89%A9%E4%BD%93%E9%A3%9E%E8%A1%8C%E8%BD%BD%E8%87%AA%E5%B7%B1%E6%9C%80%E7%BB%88%E4%BC%98%E5%8C%96%E7%89%88"))()       
+        
+WindUI:Notify({
+    Title = "通知",
+    Content = "加载成功",
+    Duration = 1, -- 3 seconds
+    Icon = "layout-grid",
+})                                
+    end
+})
+
+Button = TabHandles.Q:Button({
+    Title = "无敌少侠",
+    Desc = "用了它，你就会变成城市超人",
+    Locked = false,
+    Callback = function()
+loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Invinicible-Flight-R15-45414"))()
+WindUI:Notify({
+    Title = "通知",
+    Content = "加载成功",
+    Duration = 1, -- 3 seconds
+    Icon = "layout-grid",
+})                        
+            
+ end
+})
+
+Button = TabHandles.Q:Button({
+    Title = "防止摔跤伤害",
+    Desc = "就算掉下去了，也毫发无伤，掉到水里面也会死的",
+    Locked = false,
+    Callback = function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/cytj777i/Fall-injury/main/防止摔落伤害"))()
+            
+WindUI:Notify({
+    Title = "通知",
+    Content = "加载成功",
+    Duration = 1, -- 3 seconds
+    Icon = "layout-grid",
+})                        
+            
+ end
+})
+
+      end
+})
+Section:Button({
+    Title = "XY脚本-请捐赠",
+    Callback = function()
+    
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()local Confirmed = false
+
+WindUI:Popup({
+    Title = "XY脚本-请捐赠",
+    IconThemed = true,
+    Content = "欢迎尊贵的用户" .. game.Players.LocalPlayer.Name .. "XY脚本 当前版本型号:V2",
+    Buttons = {
+        {
+            Title = "取消",
+            Callback = function() end,
+            Variant = "Secondary",
+        },
+        {
+            Title = "执行",
+            Icon = "arrow-right",
+            Callback = function() 
+                Confirmed = true
+                createUI()
+            end,
+            Variant = "Primary",
+        }
+    }
+})
+function createUI()
+    local Window = WindUI:CreateWindow({
+        Title = "XY脚本-请捐赠",
+        Icon = "palette",
+    Author = "尊贵的"..game.Players.localPlayer.Name.."欢迎使用 XY脚本", 
+        Folder = "Premium",
+        Size = UDim2.fromOffset(550, 320),
+        Theme = "Light",
+        User = {
+            Enabled = true,
+            Anonymous = true,
+            Callback = function()
+            end
+        },
+        SideBarWidth = 200,
+        HideSearchBar = false,  
+    })
+
+    Window:Tag({
+        Title = "请捐赠",
+        Color = Color3.fromHex("#00ffff") 
+    })
+
+    Window:EditOpenButton({
+        Title = "XY脚本V2",
+        Icon = "crown",
+        CornerRadius = UDim.new(0, 8),
+        StrokeThickness = 3,
+        Color = ColorSequence.new(
+            Color3.fromRGB(255, 255, 0),  
+            Color3.fromRGB(255, 165, 0),  
+            Color3.fromRGB(255, 0, 0),    
+            Color3.fromRGB(139, 0, 0)     
+        ),
+        Draggable = true,
+    })
+local MainTab = Window:Tab({Title = "摊位管理", Icon = "settings"})
+MainTab:Section({Title = "主要功能"})
+
+local autoThanks = false
+local thanksMessages = {
+    "谢谢爸爸捐赠!",
+    "感谢爸爸支持!",
+    "谢谢爸爸捐赠!"
+}
+MainTab:Toggle({
+    Title = "捐赠自动感谢",
+    Desc = "收到捐赠后自动发送感谢消息",
+    Default = false,
+    Callback = function(Value)
+        autoThanks = Value
+        if Value then
+            game.Players.LocalPlayer.leaderstats.Raised.Changed:Connect(function()
+                if autoThanks then
+                    local randomMsg = thanksMessages[math.random(1, #thanksMessages)]
+                    game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(randomMsg, "All")
+                end
+            end)
+        end
+    end
+})
+local antiAFK = false
+MainTab:Toggle({
+    Title = "防止AFK",
+    Default = false,
+    Callback = function(Value)
+        antiAFK = Value
+        if Value then
+            local VirtualInputManager = game:GetService("VirtualInputManager")
+            task.spawn(function()
+                while antiAFK do
+                    task.wait(30)
+                    VirtualInputManager:SendKeyEvent(true, "W", false, game)
+                    task.wait(0.1)
+                    VirtualInputManager:SendKeyEvent(false, "W", false, game)
+                end
+            end)
+        end
+    end
+})
+local autoTalk = false
+local talkInterval = 60 
+local talkMessages = {
+    "欢迎来到我的摊位!",
+    "请支持我",
+    "请多多捐赠支持!",
+    "我是最好的!",
+    "谢谢大家的支持!"
+}
+
+MainTab:Toggle({
+    Title = "自动说话",
+    Desc = "定期自动发送消息",
+    Default = false,
+    Callback = function(Value)
+        autoTalk = Value
+        if Value then
+            task.spawn(function()
+                while autoTalk do
+                    for i = 1, 5 do 
+                        if not autoTalk then break end
+                        local randomMsg = talkMessages[math.random(1, #talkMessages)]
+                        game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(randomMsg, "All")
+                        task.wait(1) 
+                    end
+                    task.wait(talkInterval - 5) 
+                end
+            end)
+        end
+    end
+})
+
+MainTab:Slider({
+    Title = "说话间隔(秒)",
+    Desc = "设置自动说话的间隔时间",
+    Value = {
+        Min = 10,
+        Max = 300,
+        Default = 60
+    },
+    Callback = function(Value)
+        talkInterval = Value
+    end
+})
+
+MainTab:Input({
+    Title = "自定义说话内容",
+    Desc = "输入自定义的说话内容(用逗号分隔)",
+    Placeholder = "消息1,消息2,消息3",
+    Callback = function(Value)
+        if Value and Value ~= "" then
+            local newMessages = {}
+            for msg in string.gmatch(Value, "([^,]+)") do
+                table.insert(newMessages, msg:gsub("^%s*(.-)%s*$", "%1"))
+            end
+            if #newMessages > 0 then
+                talkMessages = newMessages
+                WindUI:Notify({
+                    Title = "说话内容已更新",
+                    Content = "已设置 " .. #newMessages .. " 条自定义消息",
+                    Duration = 3
+                })
             end
         end
     end
+})
 end
-
-DistributeScripts()
-
-local MenuGroup = Tabs.Settings:AddLeftGroupbox('菜单')
-MenuGroup:AddButton('卸载脚本', function() Library:Unload() end)
-MenuGroup:AddLabel('菜单快捷键'):AddKeyPicker('MenuKeybind', { Default = 'RightShift', NoUI = true, Text = 'Menu keybind' })
-
-Library.ToggleKeybind = Options.MenuKeybind
-
-ThemeManager:SetLibrary(Library)
-SaveManager:SetLibrary(Library)
-SaveManager:IgnoreThemeSettings()
-ThemeManager:SetFolder("MyScriptTheme")
-SaveManager:SetFolder("MyScriptConfig")
-SaveManager:BuildConfigSection(Tabs.Settings)
-ThemeManager:ApplyToTab(Tabs.Settings)
+      end
+})
