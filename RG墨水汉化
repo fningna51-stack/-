@@ -1,0 +1,214 @@
+local RunScriptFirst = false
+
+local Translations = {
+["Home"]="主页",
+["Features"]="功能",
+["Red Light"]="红绿灯",
+["Members:105821"]="成员：105821",
+["Dalgona"]="扣糖饼",
+["Online:4237"]="在线：4237",
+["Tug Of War"]="拔河",
+["Discord"]="Discord",
+["Hide & Seek"]="捉迷藏",
+["Youtube"]="YouTube",
+["Jump/Glass"]="跳绳与玻璃桥",
+["Window"]="窗口",
+["Mingle"]="旋转木马",
+["Random"]="随机",
+["Theme"]="主题",
+["Valentine"]="情人节",
+["Rebel"]="反叛",
+["Transparency"]="透明度",
+["Final"]="决赛",
+["OPEN UI IN PC"]="在电脑上打开UI",
+["PRESS G on your keyboard to open the UI if it disappears when minimizing."]="如果UI在最小化时消失，请按键盘上的G键打开UI。",
+["CONTENT CREATOR"]="内容创作者",
+["If you upload a video on this script and DM Ringta in Discord you will get the content creator role and your video will be published in a showcase channel which can get you free views + you get access to 2 cool private channels. The video does NOT have to get a lot of views. Just make a good video and put some effort in 😊."]="如果您上传关于此脚本的视频并在Discord上私信Ringta，您将获得内容创作者角色，您的视频将发布在展示频道中，这可以为您带来免费观看次数，并且您还可以访问2个很棒的私人频道。视频不需要获得很多观看次数。只需制作一个好的视频并付出一些努力😊。",
+["IF YOU TURN THIS ON YOUR GAME MIGHT LAG MORE but it will help make the scripts better by sending random information to a text"]="如果您开启此功能，您的游戏可能会更卡顿，但它会通过向文本发送随机信息来帮助改进脚本",
+["ONLY TURN THIS ON IF YOU WANT TO HELP MAKE THE SCRIPT BETTER THIS WILL MOST LIKELY CAUSE LAG THOUGH SO MAYBE DON'T USE IT BUT MAYBE TURN IT ON IF YOU WANT TO TRY IT ON FOR A SECOND?"]="仅在您想帮助改进脚本时才开启此功能，但这很可能会导致卡顿，所以也许不要使用它，但如果您想尝试一下，也许可以开启一秒钟？",
+["Testing"]="测试",
+["If you play this game alot and like to test stuff and would like to test this script give suggestions and things like that dm ringta."]="如果您经常玩这个游戏并喜欢测试东西，并且想测试此脚本、提供建议等，请私信ringta。",
+["4 Main Features"]="4个主要功能",
+["Teleport to End"]="传送至终点",
+["Pentathlon"]="五人六足",
+["Remove Injury"]="移除伤害",
+["Auto Win"]="自动获胜",
+["How To Use"]="使用方法",
+["Watch the ringta long scripts video to know how to correctly use."]="观看ringta长脚本视频以了解如何正确使用。",
+["Win: Ddakji (CURRENTLY THIS IS BROKEN RIGHT NOW)"]="获胜：打画片（目前此功能已损坏）",
+["Win: FlyingStone"]="获胜：飞石头",
+["Win: Gonggi"]="获胜：抓石头",
+["Win: SpinningTop"]="获胜：陀螺",
+["Win: Jegi"]="获胜：踢毽子",
+["Player Utilities"]="玩家工具",
+["Auto Complete Dalgona"]="自动完成椪糖",
+["Auto Relaxing (Breathing)"]="自动放松（呼吸）",
+["Free Lighter"]="免费打火机",
+["Tug Of War Features"]="拔河功能",
+["How It Works"]="工作原理",
+["Watch the full video in RINGTA to learn how to use and ban safety strategies. Also recommend only doing standard mode."]="在RINGTA中观看完整视频，了解如何使用及封禁安全策略。也建议仅使用标准模式。",
+["Auto Pull (Smart Timing)"]="自动拉绳（智能计时）",
+["Delete the Spikes"]="删除尖刺",
+["Hide And Seek ESP"]="捉迷藏ESP",
+["ESP Hider & Seeker"]="ESP隐藏者与寻找者",
+["ESP Exit Doors"]="ESP出口门",
+["Key ESP & Utility"]="钥匙ESP与工具",
+["ESP Keys"]="ESP钥匙",
+["Teleport to Random Hider"]="传送至随机隐藏者",
+["Kill Aura"]="杀戮光环",
+["KILL AURA (EXTREMELY SAFE)"]="杀戮光环（极其安全）",
+["Jump Rope"]="跳绳",
+["TP to End (Jump Rope)"]="传送至终点（跳绳）",
+["Delete The Rope"]="删除绳子",
+["Glass Bridge Features"]="玻璃桥功能",
+["Enable Glass ESP"]="启用玻璃ESP",
+["Troll Players Glass Bridge"]="恶作剧玩家玻璃桥",
+["TP to End (Glass Bridge)"]="传送至终点（玻璃桥）",
+["Auto QTE"]="自动QTE",
+["QTE Info"]="QTE信息",
+["Hits each QTE button automatically. Works during Mingle, dalgona ladder climb minigame, sky squid"]="自动点击每个QTE按钮。在混战、椪糖爬梯子小游戏、天空鱿鱼中有效。",
+["Auto Win Mingle"]="自动赢得混战",
+["How Auto Win Works"]="自动获胜工作原理",
+["When the door is ever 1/1 it will automatically tp you to a room and lock the door. If it doesn't work you gotta manually close the door. If it's more than 1 player in a room it will automatically tp you to a group of players so you can get into a room together. Still kinda luck based."]="当门为1/1时，它会自动将您传送到一个房间并锁门。如果不起作用，您必须手动关门。如果房间内超过1名玩家，它会自动将您传送到一群玩家中，以便您们可以一起进入一个房间。仍然有点靠运气。",
+["Game Boosts"]="游戏增强",
+["Parkour Artist"]="跑酷大师",
+["Auto Skip Button"]="自动跳过按钮",
+["Movement&AntiFling"]="移动与防甩",
+["WalkSpeed Increase"]="增加行走速度",
+["WalkSpeed Amount"]="行走速度数值",
+["Reset WalkSpeed to Normal"]="将行走速度重置为正常",
+["Fly Premium Only"]="仅限高级会员飞行",
+["Fly is only for premium currently because there is a lot of ban risks for this so be carful using this"]="飞行目前仅限高级会员使用，因为此功能有很高的封禁风险，请谨慎使用",
+["and always use an alt account since there is a lot of mods."]="并且始终使用小号，因为有很多管理员。",
+["Fly (BETA)"]="飞行（测试版）",
+["Locked"]="已锁定",
+["Fly Speed"]="飞行速度",
+["Teleport&Emotes"]="传送与表情",
+["Select Player"]="选择玩家",
+["Teleport to Selected Player"]="传送至所选玩家",
+["Refresh Player List"]="刷新玩家列表",
+["Select Emotes"]="选择表情",
+["Play Selected Emotes"]="播放所选表情",
+["Stop Emoting"]="停止表情",
+["NPC Kill & Aimbot"]="NPC击杀与自瞄",
+["Auto Kill NPC Guards"]="自动击杀NPC守卫",
+["Rebel Aimbot"]="反叛自瞄",
+["Sky Squid Game & Poles"]="天空鱿鱼游戏与杆子",
+["SKY SQUID GAME GODMODE (BETA)"]="天空鱿鱼游戏无敌模式（测试版）",
+["INSTA GRAB Poles"]="立即抓取杆子",
+["SkySquid Game&Poles"]="天空鱿鱼游戏与杆子",
+["SKY"]="天空",
+["CloseWindow"]="关闭窗口",
+["Doyou want to close this window?You"]="您要关闭此窗口吗？您",
+["will not be able to open it again."]="将无法再次打开它。",
+["Cancel"]="取消",
+["CloseWindow"]="关闭窗口",
+["RINGTA SCRIPTS"]="RINGTA脚本",
+["Hide&Seek"]="捉迷藏",
+["Hide And Seek功能"]="捉迷藏功能",
+["KILL HIDERS (BETA)"]="击杀隐藏者（测试版）",
+["Hide And Seek Utilities"]="捉迷藏工具",
+["Teleport 100 Blocks Up"]="传送向上100格",
+["Teleport 40 Blocks Down"]="传送向下40格",
+["Win:Ddakji(CURRENTLYTHISISBROKENRIGHT NOW)"]="获胜：打画片（目前此功能已损坏）",
+["Games"]="游戏"
+}
+
+local function processTextComponent(gui, newText)
+    if gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox") then
+        pcall(function()
+            gui.RichText = true
+            if gui:FindFirstChildOfClass("UITextSizeConstraint") then
+                gui.UITextSizeConstraint.MaxTextSize = gui.TextSize
+            end
+        end)
+    end
+    return newText
+end
+
+local function translateText(text)
+    if not text or type(text) ~= "string" then return text end
+    if Translations[text] then return Translations[text] end
+    for en, cn in pairs(Translations) do
+        if text:find(en) then return text:gsub(en, cn) end
+    end
+    return text
+end
+
+local function translateAllElements()
+    local function translateGui(gui)
+        for _, element in ipairs(gui:GetDescendants()) do
+            if element:IsA("TextLabel") or element:IsA("TextButton") or element:IsA("TextBox") then
+                local currentText = element.Text
+                if currentText and currentText ~= "" then
+                    local translatedText = translateText(currentText)
+                    if translatedText ~= currentText then
+                        element.Text = processTextComponent(element, translatedText)
+                    end
+                end
+            end
+        end
+    end
+
+    pcall(translateGui, game:GetService("CoreGui"))
+
+    local player = game:GetService("Players").LocalPlayer
+    if player and player:FindFirstChild("PlayerGui") then
+        pcall(translateGui, player.PlayerGui)
+    end
+end
+
+local function setupListener()
+    local function connectToGui(gui)
+        gui.DescendantAdded:Connect(function(descendant)
+            if descendant:IsA("TextLabel") or descendant:IsA("TextButton") or descendant:IsA("TextBox") then
+                local currentText = descendant.Text
+                if currentText and currentText ~= "" then
+                    local translatedText = translateText(currentText)
+                    if translatedText ~= currentText then
+                        descendant.Text = processTextComponent(descendant, translatedText)
+                    end
+                end
+
+                descendant:GetPropertyChangedSignal("Text"):Connect(function()
+                    local newText = descendant.Text
+                    if newText and newText ~= "" then
+                        local translatedText = translateText(newText)
+                        if translatedText ~= newText then
+                            descendant.Text = processTextComponent(descendant, translatedText)
+                        end
+                    end
+                end)
+            end
+        end)
+    end
+
+    pcall(connectToGui, game:GetService("CoreGui"))
+
+    local player = game:GetService("Players").LocalPlayer
+    if player and player:FindFirstChild("PlayerGui") then
+        pcall(connectToGui, player.PlayerGui)
+    end
+end
+
+local function startTranslation()
+    translateAllElements()
+    setupListener()
+end
+
+local function loadScript()
+    local success, err = pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/wefwef34/inkgames.github.io/refs/heads/main/ringta.lua"))()
+    end)
+    if not success then
+        warn("加载失败:", err)
+    end
+end
+
+if RunScriptFirst then
+    loadScript()
+    startTranslation()
+else
+    startTranslation()
+    loadScript()
+end
