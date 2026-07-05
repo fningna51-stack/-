@@ -7475,6 +7475,18 @@ MenuGroup:AddButton("卸载脚本", function()
     Library:Unload()
 end)
 
+
+Library.ToggleKeybind = Options.MenuKeybind
+
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+ThemeManager:SetFolder("MyScriptTheme")
+SaveManager:SetFolder("MyScriptConfig")
+SaveManager:BuildConfigSection(Tabs.Settings)
+ThemeManager:ApplyToTab(Tabs.Settings)
+Library:Notify("AF Hub - AF Hub脚本中心 已加载", 3)
+Library:Notify("尊贵的 " .. game.Players.LocalPlayer.Name .. " 欢迎使用", 3)
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "AF Hub秋辞制作"
 screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
@@ -7514,15 +7526,3 @@ game:GetService("RunService").Heartbeat:Connect(function()
 end)
 print("秋辞丨AF Hub")
 local Humanoid = Character:WaitForChild("Humanoid")
-
-Library.ToggleKeybind = Options.MenuKeybind
-
-ThemeManager:SetLibrary(Library)
-SaveManager:SetLibrary(Library)
-SaveManager:IgnoreThemeSettings()
-ThemeManager:SetFolder("MyScriptTheme")
-SaveManager:SetFolder("MyScriptConfig")
-SaveManager:BuildConfigSection(Tabs.Settings)
-ThemeManager:ApplyToTab(Tabs.Settings)
-Library:Notify("AF Hub - AF Hub脚本中心 已加载", 3)
-Library:Notify("尊贵的 " .. game.Players.LocalPlayer.Name .. " 欢迎使用", 3)
