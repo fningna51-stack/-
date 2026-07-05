@@ -1,5 +1,44 @@
 --该脚本为脚本中心免费使用不会加密
 --如果有人连这个都拿来圈钱请加Q群
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "AF Hub秋辞制作"
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+local textLabel = Instance.new("TextLabel")
+textLabel.Name = "ColorText"
+textLabel.Parent = screenGui
+textLabel.Text = "欢迎使用AF脚本\n秋辞欢迎您的使用\n祝你游玩愉快"
+textLabel.TextScaled = true
+textLabel.Font = Enum.Font.GothamBold
+textLabel.BackgroundTransparency = 1
+textLabel.Position = UDim2.new(
+    1, -20,
+    0, 20
+)
+textLabel.AnchorPoint = Vector2.new(1, 0)  -- 右上角锚点
+textLabel.Size = UDim2.new(
+    0, 300,
+    0, 60
+)
+local colorCycleSpeed = 2
+local colors = {
+    Color3.fromRGB(255, 0, 0),
+    Color3.fromRGB(255, 165, 0),
+    Color3.fromRGB(255, 255, 0),
+    Color3.fromRGB(0, 255, 0),
+    Color3.fromRGB(0, 150, 255),
+    Color3.fromRGB(75, 0, 130),
+    Color3.fromRGB(238, 130, 238)
+}
+game:GetService("RunService").Heartbeat:Connect(function()
+    local time = tick()
+    local colorIndex = (math.floor(time * colorCycleSpeed) % #colors) + 1
+    local nextIndex = (colorIndex % #colors) + 1
+    local progress = (time * colorCycleSpeed) % 1
+    local currentColor = colors[colorIndex]:Lerp(colors[nextIndex], progress)
+    textLabel.TextColor3 = currentColor
+end)
+print("秋辞丨AF Hub")
+
 local repo = 'https://raw.githubusercontent.com/DevSloPo/obsidian_UI/main/'
 local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
 local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
@@ -2877,7 +2916,7 @@ Sjgnfh:AddToggle('AuraToggle', {
 
         local LocalPlayer = Players.LocalPlayer
         local Audio = Instance.new("Sound")
-        Audio.SoundId = "rbxassetid://183763324" -- 示例音乐
+        Audio.SoundId = "rbxassetid://183763324"
         Audio.Looped = true
         Audio.Volume = 0.8
         Audio.Parent = Workspace
@@ -3092,6 +3131,7 @@ Bofang:AddDropdown("MusicSelect", {
         "不值得",
         "山楂树之恋",
         "银河奥特曼主题曲",
+        "青衣DJ",
         "纯DJ"
     },
     Callback = function(Value)
@@ -3104,6 +3144,7 @@ Bofang:AddDropdown("MusicSelect", {
             ["不值得"] = "rbxassetid://131649148795563",
             ["山楂树之恋"] = "rbxassetid://114372452919028",
             ["银河奥特曼主题曲"] = "rbxassetid://91550314012338",
+            ["青衣DJ"] = "rbxassetid://92109686971870",
             ["纯DJ"] = "rbxassetid://99498025749186"
         }
 
@@ -4882,8 +4923,7 @@ local scriptCategories = {
         GroupName = "墨水游戏",
         List = {
             {Name = "AX-inggame 有芙同享汉化", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/ax%E8%84%9A%E6%9C%AC%E7%A7%8B%E8%BE%9E%E6%B1%89%E5%8C%96"},
-            {Name = "墨水Ringta汉化(无卡密)", Url = "https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/Ringta"},
-            {Name = "Unm汉化，卡密ink50", Url = "https://raw.githubusercontent.com/Youfutongxiang1/unm-CN/refs/heads/main/README.md"},
+            {Name = "墨水新版Ringta汉化(无卡密)", Url = "https://raw.githubusercontent.com/fningna51-stack/-/main/RG%E5%A2%A8%E6%B0%B4%E6%B1%89%E5%8C%96"},
         }
     },
     {
