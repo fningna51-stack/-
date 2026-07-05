@@ -12,45 +12,6 @@ local Workspace = game:GetService("Workspace")
 
 local LocalPlayer = Players.LocalPlayer
 local Character = LocalPlayer.Character
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "AF Hub秋辞制作"
-screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-local textLabel = Instance.new("TextLabel")
-textLabel.Name = "ColorText"
-textLabel.Parent = screenGui
-textLabel.Text = "欢迎使用AF脚本\n秋辞欢迎您的使用\n祝你游玩愉快"
-textLabel.TextScaled = true
-textLabel.Font = Enum.Font.GothamBold
-textLabel.BackgroundTransparency = 1
-textLabel.Position = UDim2.new(
-    1, -20,
-    0, 20
-)
-textLabel.AnchorPoint = Vector2.new(1, 0)  -- 右上角锚点
-textLabel.Size = UDim2.new(
-    0, 300,
-    0, 60
-)
-local colorCycleSpeed = 2
-local colors = {
-    Color3.fromRGB(255, 0, 0),
-    Color3.fromRGB(255, 165, 0),
-    Color3.fromRGB(255, 255, 0),
-    Color3.fromRGB(0, 255, 0),
-    Color3.fromRGB(0, 150, 255),
-    Color3.fromRGB(75, 0, 130),
-    Color3.fromRGB(238, 130, 238)
-}
-game:GetService("RunService").Heartbeat:Connect(function()
-    local time = tick()
-    local colorIndex = (math.floor(time * colorCycleSpeed) % #colors) + 1
-    local nextIndex = (colorIndex % #colors) + 1
-    local progress = (time * colorCycleSpeed) % 1
-    local currentColor = colors[colorIndex]:Lerp(colors[nextIndex], progress)
-    textLabel.TextColor3 = currentColor
-end)
-print("秋辞丨AF Hub")
-local Humanoid = Character:WaitForChild("Humanoid")
 
 local Options = Library.Options
 local Toggles = Library.Toggles
@@ -7514,6 +7475,45 @@ MenuGroup:AddButton("卸载脚本", function()
     Library:Unload()
 end)
 
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "AF Hub秋辞制作"
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+local textLabel = Instance.new("TextLabel")
+textLabel.Name = "ColorText"
+textLabel.Parent = screenGui
+textLabel.Text = "欢迎使用AF脚本\n秋辞欢迎您的使用\n祝你游玩愉快"
+textLabel.TextScaled = true
+textLabel.Font = Enum.Font.GothamBold
+textLabel.BackgroundTransparency = 1
+textLabel.Position = UDim2.new(
+    1, -20,
+    0, 20
+)
+textLabel.AnchorPoint = Vector2.new(1, 0)  -- 右上角锚点
+textLabel.Size = UDim2.new(
+    0, 300,
+    0, 60
+)
+local colorCycleSpeed = 2
+local colors = {
+    Color3.fromRGB(255, 0, 0),
+    Color3.fromRGB(255, 165, 0),
+    Color3.fromRGB(255, 255, 0),
+    Color3.fromRGB(0, 255, 0),
+    Color3.fromRGB(0, 150, 255),
+    Color3.fromRGB(75, 0, 130),
+    Color3.fromRGB(238, 130, 238)
+}
+game:GetService("RunService").Heartbeat:Connect(function()
+    local time = tick()
+    local colorIndex = (math.floor(time * colorCycleSpeed) % #colors) + 1
+    local nextIndex = (colorIndex % #colors) + 1
+    local progress = (time * colorCycleSpeed) % 1
+    local currentColor = colors[colorIndex]:Lerp(colors[nextIndex], progress)
+    textLabel.TextColor3 = currentColor
+end)
+print("秋辞丨AF Hub")
+local Humanoid = Character:WaitForChild("Humanoid")
 
 Library.ToggleKeybind = Options.MenuKeybind
 
