@@ -1,5 +1,17 @@
 --该脚本为脚本中心免费使用不会加密
 --如果有人连这个都拿来圈钱请加Q群
+local repo = 'https://raw.githubusercontent.com/DevSloPo/obsidian_UI/main/'
+local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
+local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
+local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "AF Hub秋辞制作"
 screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
@@ -38,19 +50,6 @@ game:GetService("RunService").Heartbeat:Connect(function()
     textLabel.TextColor3 = currentColor
 end)
 print("秋辞丨AF Hub")
-
-local repo = 'https://raw.githubusercontent.com/DevSloPo/obsidian_UI/main/'
-local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
-local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
-local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
-
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
-local Workspace = game:GetService("Workspace")
-
-local LocalPlayer = Players.LocalPlayer
-local Character = LocalPlayer.Character
 local Humanoid = Character:WaitForChild("Humanoid")
 
 local Options = Library.Options
