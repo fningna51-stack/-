@@ -1,0 +1,93 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+if LocalPlayer.Name == "91vip78tangxin" then
+    LocalPlayer:Kick("")
+else
+    local RevenantLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/Revenant", true))()
+    local RunService = game:GetService("RunService")
+    local t = 0
+    RunService.Heartbeat:Connect(function(dt)
+        t = t + 0.012
+        local r = math.sin(t * 1.1) * 0.45 + 0.55
+        local g = math.sin(t * 1.3) * 0.45 + 0.55
+        local b = math.sin(t * 1.6) * 0.45 + 0.55
+        RevenantLib.DefaultColor = Color3.new(r, g, b)
+    end)
+
+    local CurrentPlaceId = tostring(game.PlaceId)
+    local success, gameInfo = pcall(function()
+        return game:GetService("MarketplaceService"):GetProductInfo(tonumber(CurrentPlaceId))
+    end)
+    local GameName = success and gameInfo.Name or "未知游戏"
+
+    local Scripts = {
+        ["136801880565837"] = {
+            url = "https://raw.githubusercontent.com/fningna51-stack/-/refs/heads/main/AF%20%E9%97%AA%E5%85%89",
+            name = "闪光"
+        },
+        ["189707"] = {
+            url = "https://raw.githubusercontent.com/fningna51-stack/-/refs/heads/main/AF%20%E8%87%AA%E7%84%B6%E7%81%BE%E5%AE%B3",
+            name = "自然灾害"
+        }
+    }
+
+    RevenantLib:Notification({
+        Text = "✦ 正在检测游戏... ✦\n游戏: " .. GameName .. "\nID: " .. CurrentPlaceId,
+        Duration = 3,
+    })
+
+    wait(1.5)
+    
+    if Scripts[CurrentPlaceId] then
+        RevenantLib:Notification({
+            Text = "✓ 检测到支持的游戏: " .. Scripts[CurrentPlaceId].name,
+            Duration = 2,
+        })
+        wait(0.5)
+        
+        local loadTexts = {"█░░ 加载脚本中 33%", "██░ 加载脚本中 66%", "███ 加载脚本中 100%"}
+        for i = 1, 3 do
+            RevenantLib:Notification({
+                Text = loadTexts[i],
+                Duration = 0.8,
+            })
+            wait(0.8)
+        end
+        
+        local execSuccess, execErr = pcall(function()
+            loadstring(game:HttpGet(Scripts[CurrentPlaceId].url))()
+        end)
+        
+        if execSuccess then
+            RevenantLib:Notification({
+                Text = "✓ 脚本加载成功！\n当前游戏: " .. Scripts[CurrentPlaceId].name .. "\n✧ 欢迎使用 ✧",
+                Duration = 4,
+            })
+        else
+            RevenantLib:Notification({
+                Text = "✗ 脚本执行失败\n错误: " .. tostring(execErr),
+                Duration = 4,
+            })
+        end
+    else
+        RevenantLib:Notification({
+            Text = "⚠ 当前游戏不支持自动加载\n游戏: " .. GameName .. "\nID: " .. CurrentPlaceId .. "\n可提供ID我们考虑更新",
+            Duration = 5,
+        })
+        
+        local loadTexts = {"█░░ 检查完成 33%", "██░ 检查完成 66%", "███ 检查完成 100%"}
+        for i = 1, 3 do
+            RevenantLib:Notification({
+                Text = loadTexts[i],
+                Duration = 0.6,
+            })
+            wait(0.6)
+        end
+        
+        RevenantLib:Notification({
+            Text = "✧ 脚本未执行 ✧\n当前游戏不在支持列表中",
+            Duration = 3,
+        })
+    end
+end
