@@ -1,449 +1,97 @@
+local repo = 'https://raw.githubusercontent.com/KingScriptAE/No-sirve-nada./refs/heads/main/'
+local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
+local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
+local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
+local Options = Library.Options
+local Toggles = Library.Toggles
+local A1 = game:GetService("Players")
+local A2 = A1.LocalPlayer
+local A3 = game:GetService("RunService")
+local A4 = game:GetService("Lighting")
+local A5 = game:GetService("CoreGui")
+local A6 = game:GetService("UserInputService")
+local A7 = game:GetService("TeleportService")
+local A8 = workspace
+local A9 = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TextChatService = game:GetService("TextChatService")
-
-local LocalPlayer = Players.LocalPlayer
-
-local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/YIRDEX/Miscs/refs/heads/main/YXWindUI.lua"))()
-
-WindUI:AddTheme({
-    Name = "AF Hub", 
-    Accent = WindUI:Gradient({
-        ["0"] = {Color = Color3.fromHex("#FF4C4C"), Transparency = 0},
-        ["50"] = {Color = Color3.fromHex("#FF1A1A"), Transparency = 0},
-        ["100"] = {Color = Color3.fromHex("#CC0000"), Transparency = 0}
-    }, {Rotation = 90}),
-    Background = WindUI:Gradient({
-        ["0"] = {Color = Color3.fromHex("#FF4C4C"), Transparency = 0},
-        ["50"] = {Color = Color3.fromHex("#FF1A1A"), Transparency = 0},
-        ["100"] = {Color = Color3.fromHex("#CC0000"), Transparency = 0}
-    }, {Rotation = 90}),
-    Outline = Color3.fromHex("#FF6666"),
-    Text = Color3.fromHex("#FFFFFF"),
-    Placeholder = Color3.fromHex("#AAAAAA"),
-    Button = WindUI:Gradient({
-        ["0"] = {Color = Color3.fromHex("#FF4C4C"), Transparency = 0},
-        ["50"] = {Color = Color3.fromHex("#FF1A1A"), Transparency = 0},
-        ["100"] = {Color = Color3.fromHex("#CC0000"), Transparency = 0}
-    }, {Rotation = 90}),
-    Icon = Color3.fromHex("#FF6666")
-})
-
--- 月夜
-WindUI:AddTheme({
-    Name = "月夜",
-    Accent = WindUI:Gradient({
-        ["0"] = {Color = Color3.fromHex("#232526"), Transparency = 0},
-        ["50"] = {Color = Color3.fromHex("#636363"), Transparency = 0},
-        ["100"] = {Color = Color3.fromHex("#E0E0E0"), Transparency = 0}
-    }, {Rotation = 90}),
-    Dialog = WindUI:Gradient({
-        ["0"] = {Color = Color3.fromHex("#1C1C1C"), Transparency = 0},
-        ["50"] = {Color = Color3.fromHex("#3A3A3A"), Transparency = 0},
-        ["100"] = {Color = Color3.fromHex("#636363"), Transparency = 0}
-    }, {Rotation = 90}),
-    Outline = WindUI:Gradient({
-        ["0"] = {Color = Color3.fromHex("#B0B0B0"), Transparency = 0},
-        ["50"] = {Color = Color3.fromHex("#C0C0C0"), Transparency = 0},
-        ["100"] = {Color = Color3.fromHex("#E0E0E0"), Transparency = 0}
-    }, {Rotation = 90}),
-    Text = WindUI:Gradient({
-        ["0"] = {Color = Color3.fromHex("#FFFFFF"), Transparency = 0},
-        ["50"] = {Color = Color3.fromHex("#D9D9D9"), Transparency = 0},
-        ["100"] = {Color = Color3.fromHex("#BFBFBF"), Transparency = 0}
-    }, {Rotation = 90}),
-    Placeholder = WindUI:Gradient({
-        ["0"] = {Color = Color3.fromHex("#A0A0A0"), Transparency = 0},
-        ["50"] = {Color = Color3.fromHex("#B0B0B0"), Transparency = 0},
-        ["100"] = {Color = Color3.fromHex("#C0C0C0"), Transparency = 0}
-    }, {Rotation = 90}),
-    Background = WindUI:Gradient({
-        ["0"] = {Color = Color3.fromHex("#101010"), Transparency = 0},
-        ["50"] = {Color = Color3.fromHex("#3A3A3A"), Transparency = 0},
-        ["100"] = {Color = Color3.fromHex("#636363"), Transparency = 0}
-    }, {Rotation = 90}),
-    Button = WindUI:Gradient({
-        ["0"] = {Color = Color3.fromHex("#3A3A3A"), Transparency = 0},
-        ["50"] = {Color = Color3.fromHex("#636363"), Transparency = 0},
-        ["100"] = {Color = Color3.fromHex("#A2A2A2"), Transparency = 0}
-    }, {Rotation = 90}),
-    Icon = WindUI:Gradient({
-        ["0"] = {Color = Color3.fromHex("#C0C0C0"), Transparency = 0},
-        ["50"] = {Color = Color3.fromHex("#E0E0E0"), Transparency = 0},
-        ["100"] = {Color = Color3.fromHex("#FFFFFF"), Transparency = 0}
-    }, {Rotation = 90})
-})
-
--- 冬日霜雪
-WindUI:AddTheme({
-    Name = "冬日霜雪",
-    Accent = WindUI:Gradient({
-        ["0"] = {Color = Color3.fromHex("#D0E8F2"), Transparency = 0},
-        ["50"] = {Color = Color3.fromHex("#A0D4F2"), Transparency = 0},
-        ["100"] = {Color = Color3.fromHex("#70C0F2"), Transparency = 0}
-    }, {Rotation = 45}),
-    Dialog = WindUI:Gradient({
-        ["0"] = {Color = Color3.fromHex("#E0F7FF"), Transparency = 0},
-        ["50"] = {Color = Color3.fromHex("#B0EFFF"), Transparency = 0},
-        ["100"] = {Color = Color3.fromHex("#80E7FF"), Transparency = 0}
-    }, {Rotation = 45}),
-    Outline = WindUI:Gradient({
-        ["0"] = {Color = Color3.fromHex("#70C0F2"), Transparency = 0},
-        ["50"] = {Color = Color3.fromHex("#50B0E0"), Transparency = 0},
-        ["100"] = {Color = Color3.fromHex("#30A0D0"), Transparency = 0}
-    }, {Rotation = 45}),
-    Text = Color3.fromHex("#000000"),
-    Placeholder = WindUI:Gradient({
-        ["0"] = {Color = Color3.fromHex("#7FB3D5"), Transparency = 0},
-        ["50"] = {Color = Color3.fromHex("#5FA2C5"), Transparency = 0},
-        ["100"] = {Color = Color3.fromHex("#3F91B5"), Transparency = 0}
-    }, {Rotation = 45}),
-    Background = WindUI:Gradient({
-        ["0"] = {Color = Color3.fromHex("#E6F0FA"), Transparency = 0},
-        ["50"] = {Color = Color3.fromHex("#CDE0F5"), Transparency = 0},
-        ["100"] = {Color = Color3.fromHex("#B4D1F0"), Transparency = 0}
-    }, {Rotation = 45}),
-    Button = WindUI:Gradient({
-        ["0"] = {Color = Color3.fromHex("#50B0E0"), Transparency = 0},
-        ["50"] = {Color = Color3.fromHex("#30A0D0"), Transparency = 0},
-        ["100"] = {Color = Color3.fromHex("#108FC0"), Transparency = 0}
-    }, {Rotation = 45}),
-    Icon = Color3.fromHex("#00FFFF")
-})
-
--- 月渊
-WindUI:AddTheme({
-    Name = "月渊",
-    Accent = WindUI:Gradient({
-        ["0"] = {Color = Color3.fromHex("#0D0D1A"), Transparency = 0},
-        ["50"] = {Color = Color3.fromHex("#1A1A33"), Transparency = 0},
-        ["100"] = {Color = Color3.fromHex("#2E2E5C"), Transparency = 0}
-    }, {Rotation = 90}),
-    Dialog = WindUI:Gradient({
-        ["0"] = {Color = Color3.fromHex("#101026"), Transparency = 0},
-        ["50"] = {Color = Color3.fromHex("#1A1A3D"), Transparency = 0},
-        ["100"] = {Color = Color3.fromHex("#333366"), Transparency = 0}
-    }, {Rotation = 90}),
-    Outline = WindUI:Gradient({
-        ["0"] = {Color = Color3.fromHex("#2E2E5C"), Transparency = 0},
-        ["50"] = {Color = Color3.fromHex("#404080"), Transparency = 0},
-        ["100"] = {Color = Color3.fromHex("#5050A0"), Transparency = 0}
-    }, {Rotation = 90}),
-    Text = WindUI:Gradient({
-        ["0"] = {Color = Color3.fromHex("#A0A0FF"), Transparency = 0},
-        ["50"] = {Color = Color3.fromHex("#C0C0FF"), Transparency = 0},
-        ["100"] = {Color = Color3.fromHex("#E0E0FF"), Transparency = 0}
-    }, {Rotation = 90}),
-    Placeholder = WindUI:Gradient({
-        ["0"] = {Color = Color3.fromHex("#6060A0"), Transparency = 0},
-        ["50"] = {Color = Color3.fromHex("#8080C0"), Transparency = 0},
-        ["100"] = {Color = Color3.fromHex("#A0A0E0"), Transparency = 0}
-    }, {Rotation = 90}),
-    Background = WindUI:Gradient({
-        ["0"] = {Color = Color3.fromHex("#0A0A1A"), Transparency = 0},
-        ["50"] = {Color = Color3.fromHex("#1A1A33"), Transparency = 0},
-        ["100"] = {Color = Color3.fromHex("#2E2E5C"), Transparency = 0}
-    }, {Rotation = 90}),
-    Button = WindUI:Gradient({
-        ["0"] = {Color = Color3.fromHex("#404080"), Transparency = 0},
-        ["50"] = {Color = Color3.fromHex("#5050A0"), Transparency = 0},
-        ["100"] = {Color = Color3.fromHex("#6060C0"), Transparency = 0}
-    }, {Rotation = 90}),
-    Icon = Color3.fromHex("#00FFFF")
-})
-
-WindUI:SetFont("rbxassetid://12187369639")
-
-local Window = WindUI:CreateWindow({
-    Title = '<font color="#FF0000">A</font><font color="#00F0FF">F</font><font color="#00E5FF">-</font><font color="#00D5FF">H</font><font color="#00C8FF">U</font><font color="#00BBFF">B</font>', -- 窗口标题
-    Icon = "rbxassetid://82225829203828", 
-    Author = "@秋辞", -- 窗口副标题，可选
-    Folder = "YX-Hub文件夹", -- 保存密钥和图片的文件夹
-    Size = UDim2.fromOffset(520, 400), -- 窗口大小
-    MinSize = Vector2.new(560, 350), -- 窗口最小尺寸
-    MaxSize = Vector2.new(850, 560), -- 窗口最大尺寸
-    Transparent = true, -- 窗口透明度
-    Theme = "冬日霜雪", 
-    Resizable = true, -- 是否可调整窗口大小
-    SideBarWidth = 150, -- 侧边栏（标签页）宽度
-    HideSearchBar = false, -- 隐藏搜索栏
-    ScrollBarEnabled = true, -- 位于滚动框右侧的滚动条
-Background = "rbxassetid://136059273188532",
-    
-    User = { -- 位于左下角的用户信息
-        Enabled = false,
-        Anonymous = false,
-        Callback = function() -- 点击时的回调函数，可选，可移除
-            print("点击")
-        end,
-    },
-})
-
-
-
--- 编辑窗口展开按钮配置
-Window:EditOpenButton({
-    Title = '<font color="#FF0000">A</font><font color="#00F0FF">F</font><font color="#00E5FF">-</font><font color="#00D5FF">H</font><font color="#00C8FF">U</font><font color="#00BBFF">B</font>',
-    Icon = "snowflake",
-    CornerRadius = UDim.new(99,99),
-    StrokeThickness = 3,
-    IconSize = 30,
-    Color = ColorSequence.new(Color3.fromHex("00FFFF"), Color3.fromHex("00BBFF")),
-    OnlyMobile = false,
-    Enabled = true,
-    Draggable = true,
-})
-
-local COLOR_SCHEMES = {
-    ["彩虹颜色"] = {ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromHex("00FFFF")),
-        ColorSequenceKeypoint.new(1, Color3.fromHex("0000FF"))
-    }), "palette"},
-}
-
-local borderAnimation
-local animationSpeed = 5
-
-local function createRainbowBorder(window, colorScheme)
-    local mainFrame = window.UIElements.Main
-    if not mainFrame then return nil end
-
-    local existingStroke = mainFrame:FindFirstChild("RainbowStroke")
-    if existingStroke then existingStroke:Destroy() end
-
-    if not mainFrame:FindFirstChildOfClass("UICorner") then
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 16)
-        corner.Parent = mainFrame
-    end
-
-    local rainbowStroke = Instance.new("UIStroke")
-    rainbowStroke.Name = "RainbowStroke"
-    rainbowStroke.Thickness = 2
-    rainbowStroke.Color = Color3.new(1, 1, 1)
-    rainbowStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    rainbowStroke.LineJoinMode = Enum.LineJoinMode.Round
-    rainbowStroke.Parent = mainFrame
-
-    local glowEffect = Instance.new("UIGradient")
-    glowEffect.Name = "GlowEffect"
-    local schemeData = COLOR_SCHEMES[colorScheme or "彩虹颜色"]
-    glowEffect.Color = schemeData and schemeData[1] or COLOR_SCHEMES["彩虹颜色"][1]
-    glowEffect.Rotation = 0
-    glowEffect.Parent = rainbowStroke
-
-    return rainbowStroke
-end
-
-local function startBorderAnimation(window, speed)
-    local mainFrame = window.UIElements.Main
-    if not mainFrame then return nil end
-    local rainbowStroke = mainFrame:FindFirstChild("RainbowStroke")
-    if not rainbowStroke then return nil end
-    local glowEffect = rainbowStroke:FindFirstChild("GlowEffect")
-    if not glowEffect then return nil end
-
-    return game:GetService("RunService").Heartbeat:Connect(function()
-        if not rainbowStroke or rainbowStroke.Parent == nil then return end
-        glowEffect.Rotation = (tick() * speed * 10) % 360
-    end)
-end
-
-local rainbowStroke = createRainbowBorder(Window, "彩虹颜色")
-if rainbowStroke then
-    borderAnimation = startBorderAnimation(Window, animationSpeed)
-end
-
 local Lighting = game:GetService("Lighting")
 local TweenServiceBlur = game:GetService("TweenService")
-
-local blur = Lighting:FindFirstChildOfClass("BlurEffect")
-if not blur then
-    blur = Instance.new("BlurEffect")
-    blur.Size = 0
-    blur.Parent = Lighting
-end
-
-task.spawn(function()
-    local wasOpen = false
-    while true do
-        task.wait(0.1)
-        local mainFrame = Window.UIElements and Window.UIElements.Main
-        local isOpen = mainFrame and mainFrame.Visible or false
-        
-        if isOpen ~= wasOpen then
-            wasOpen = isOpen
-            TweenServiceBlur:Create(blur, TweenInfo.new(0.3), {
-                Size = isOpen and 20 or 0
-            }):Play()
-        end
-    end
-end)
-
-local info = Window:Section({
-    Title = "主页",
-    Icon = "star",
-    Opened = true
-})
-
-local Tab1 = info:Tab({
-    Title = "信息",
-    Icon = "info", -- optional
-    Locked = false,
-})
-
-
-
-local Paragraph = Tab1:Paragraph({
-    Title = 'AF Hub',
-    Desc = '欢迎使用YX-HUB脚本(＾ν＾)',
-    Thumbnail = "rbxassetid://100781334247855",
-    ThumbnailSize = 200,
-    Locked = false,
-})
-
-local Paragraph1 = Tab1:Paragraph({
-    Title = 'AF Hun',
-    Desc = '主打缝合 :D',
-    Thumbnail = "rbxassetid://72531855816776",
-    ThumbnailSize = 200,
-    Locked = false,
-})
-
-Tab1:Section({ 
-    Title = "开发者",
-    TextXAlignment = "Center",
-    TextSize = 20,
-})
-
-local Paragraph = Tab1:Paragraph({
-    Title = "秋词",
-    Desc = "AF Hub作者",
-    Image = "rbxassetid://138882879525986",
-    ImageSize = 60,
-    Locked = false,
-})
-
-local Paragraph = Tab1:Paragraph({
-    Title = "YirdeX",
-    Desc = "ui背景设计者",
-    Image = "rbxassetid://90051928527603",
-    ImageSize = 60,
-    Locked = false,
-})
-
-local Tab3 = info:Tab({
-    Title = "复制",
-    Icon = "file-code",
-    Locked = false,
-})
-
-local Button1 = Tab3:Button({
-    Title = "复制主群",
-    Desc = "复制作者QQ群", -- 可选参数
-    Icon = "file-code", -- 图标名称 或 资源ID链接，可选参数
-    IconAlign = "Left",
-    Locked = false, -- 是否禁用按钮，可选参数
-    LockedTitle = "已锁定", -- 按钮禁用时显示的文字，可选参数
-    Callback = function()
-setclipboard("938714427")
-    end
-})
-
-local Tab2 = info:Tab({
-    Title = "公告",
-    Icon = "menu",
-    Locked = false,
-})
-local Section1 = Tab2:Section({
-    Title = "AF Hub[公告]", -- 分区标题
-    Icon = "component", -- 图标，支持图标名称或资源ID（可选）
-    TextSize = 30, -- 标题文字大小（可选）
-    TextXAlignment = "Left", -- 文字水平对齐方式：左对齐/居中/右对齐（可选）
-    Box = true, -- 是否显示分区外框（可选）
-    BoxBorder = true, -- 是否显示外框边框（可选）
-    Opened = true, -- 分区默认是否展开（可选）
-    FontWeight = Enum.FontWeight.SemiBold, -- 标题字体粗细（可选）
-    DescFontWeight = Enum.FontWeight.Medium, -- 描述文字字体粗细（可选）
-    TextTransparency = 0, -- 标题文字透明度（可选）
-    DescTextTransparency = 0, -- 描述文字透明度（可选）
-})
-
-Section1:Paragraph({
-    Title = "这个是公告？",
-    TextSize = 30, 
-    Thumbnail = "rbxassetid://85076999766387",
-    ThumbnailSize = 100,
-})
-
-
-
-
-
-
-Window:Divider()
-
-local MainSection = Window:Section({
-    Title = "打开/关闭功能栏",
-    Icon = "folder-cog",
-    Opened = true,
-})
-local InfoTab = MainSection:Tab({
-    Title = "信息",
-    Icon = "info",
-})
-
+local LocalPlayer = Players.LocalPlayer
 local ServerPlayerCount = 0
-
+_G.autowinfarm = false
+_G.NoClip = nil
+_G.FallProtect = nil
+_G.BackgroundImage = "rbxassetid://136059273188532"
 local function UpdatePlayerCount()
     ServerPlayerCount = #Players:GetPlayers()
 end
-
 Players.PlayerAdded:Connect(UpdatePlayerCount)
 Players.PlayerRemoving:Connect(UpdatePlayerCount)
 UpdatePlayerCount()
 
-local TimeParagraph = InfoTab:Paragraph({
-    Title = "当前时间:",
-    Desc = "",
-    Icon = "clock",
+local Window = Library:CreateWindow({
+    Title = 'AF Hub丨自然灾害',
+    Footer = "@秋辞",
+    Icon = 82225829203828,
+    NotifySide = "Right",
+    ShowCustomCursor = true,
 })
 
+local Tabs = {
+    Main = Window:AddTab("主功能", "home"),
+    Settings = Window:AddTab("设置", "settings"),
+}
+
+local LeftGroup = Tabs.Main:AddLeftGroupbox("服务器信息 & 基础功能")
+local timeLabel = LeftGroup:AddLabel("当前时间: " .. os.date("%Y-%m-%d %H:%M:%S"))
 task.spawn(function()
     while true do
-        TimeParagraph:SetDesc(os.date("%Y-%m-%d %H:%M:%S"))
+        timeLabel:SetText("当前时间: " .. os.date("%Y-%m-%d %H:%M:%S"))
         task.wait(1)
     end
 end)
-
-local PlayerCountParagraph = InfoTab:Paragraph({
-    Title = "服务器人数:",
-    Desc = tostring(ServerPlayerCount),
-    Icon = "users",
-})
-
+local playerCountLabel = LeftGroup:AddLabel("服务器人数: " .. tostring(ServerPlayerCount))
 task.spawn(function()
     while true do
-        PlayerCountParagraph:SetDesc(tostring(ServerPlayerCount))
+        playerCountLabel:SetText("服务器人数: " .. tostring(ServerPlayerCount))
         task.wait(1)
     end
 end)
-
-local MainFunctionTab = MainSection:Tab({
-    Title = "主要功能",
-    Icon = "zap",
-})
-
-MainFunctionTab:Toggle({
-    Title = "自动存活",
+local disasterLabel = LeftGroup:AddLabel("当前灾难: 无")
+LeftGroup:AddToggle('DisasterDisplay', {
+    Text = '预测灾害显示',
     Default = false,
-    Callback = function(state)
-        _G.autowinfarm = state
+    Tooltip = '显示当前灾害名称',
+    Callback = function(Value)
+        task.spawn(function()
+            while Value do
+                local model = workspace:FindFirstChild(LocalPlayer.DisplayName)
+                local tag = model and model:FindFirstChild("SurvivalTag")
+                if tag then
+                    disasterLabel:SetText("当前灾难: " .. tag.Value)
+                else
+                    disasterLabel:SetText("当前灾难: 无")
+                end
+                task.wait(1)
+            end
+        end)
+    end
+})
+
+LeftGroup:AddDivider()
+
+LeftGroup:AddToggle('AutoWinFarm', {
+    Text = '自动存活',
+    Default = false,
+    Tooltip = '自动传送到安全位置',
+    Callback = function(Value)
+        _G.autowinfarm = Value
         task.spawn(function()
             while _G.autowinfarm do
-                local hrp = LocalPlayer.Character and
-                            LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
                 if hrp then
                     hrp.CFrame = CFrame.new(-236, 180, 360)
                 end
@@ -453,38 +101,19 @@ MainFunctionTab:Toggle({
     end
 })
 
-local DisasterParagraph = MainFunctionTab:Paragraph({
-    Title = "当前灾难",
-    Desc = "无",
-    Icon = "cloud",
-})
-
-MainFunctionTab:Toggle({
-    Title = "预测灾害显示",
+LeftGroup:AddToggle('NoClip', {
+    Text = '防穿飞',
     Default = false,
-    Callback = function(state)
-        task.spawn(function()
-            while state do
-                local model = workspace:FindFirstChild(LocalPlayer.DisplayName)
-                local tag = model and model:FindFirstChild("SurvivalTag")
-                if tag then
-                    DisasterParagraph:SetDesc(tag.Value)
-                end
-                task.wait(1)
-            end
-        end)
-    end
-})
-
-MainFunctionTab:Toggle({
-    Title = "防穿飞",
-    Default = false,
-    Callback = function(state)
-        if state then
+    Tooltip = '穿过所有物体',
+    Callback = function(Value)
+        if Value then
             _G.NoClip = RunService.Stepped:Connect(function()
-                for _, v in ipairs(LocalPlayer.Character:GetDescendants()) do
-                    if v:IsA("BasePart") then
-                        v.CanCollide = false
+                local char = LocalPlayer.Character
+                if char then
+                    for _, v in ipairs(char:GetDescendants()) do
+                        if v:IsA("BasePart") then
+                            v.CanCollide = false
+                        end
                     end
                 end
             end)
@@ -497,14 +126,14 @@ MainFunctionTab:Toggle({
     end
 })
 
-MainFunctionTab:Toggle({
-    Title = "刹除跌落伤害",
+LeftGroup:AddToggle('FallProtect', {
+    Text = '刹除跌落伤害',
     Default = false,
-    Callback = function(state)
-        if state then
+    Tooltip = '防止摔落伤害',
+    Callback = function(Value)
+        if Value then
             _G.FallProtect = RunService.Heartbeat:Connect(function()
-                local hrp = LocalPlayer.Character and
-                            LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
                 if hrp then
                     hrp.AssemblyLinearVelocity = Vector3.zero
                 end
@@ -518,288 +147,608 @@ MainFunctionTab:Toggle({
     end
 })
 
-local BlackHoleTab = MainSection:Tab({
-    Title = "黑洞脚本大全",
-    Icon = "circle",
-})
+LeftGroup:AddDivider()
+LeftGroup:AddSlider("WalkSpeedSlider", {Text="移动速度(可在墨水使用)",Default=16,Min=16,Max=200,Rounding=0,Compact=false,Callback=function(Value)
+        if (A2 and A2.Character) then
+                local Humanoid = A2.Character:FindFirstChild("Humanoid");
+                if Humanoid then
+                        Humanoid.WalkSpeed = Value;
+                end
+        end
+end});
+LeftGroup:AddInput("WalkSpeedInput", {Text="移动速度设置",Default="",Placeholder="输入移动速度值",Numeric=true,Finished=false,Callback=function(Value)
+        local numValue = tonumber(Value);
+        if (numValue and A2 and A2.Character) then
+                local Humanoid = A2.Character:FindFirstChild("Humanoid");
+                if Humanoid then
+                        Humanoid.WalkSpeed = numValue;
+                end
+        end
+end});
+LeftGroup:AddButton({Text="无限跳",Func=function()
+        A20 = not A20;
+        if A25 then
+                A25:Disconnect();
+                A25 = nil;
+        end
+        if A20 then
+                A25 = A6.JumpRequest:Connect(function()
+                        if A2.Character then
+                                local Humanoid = A2.Character:FindFirstChildOfClass("Humanoid");
+                                if Humanoid then
+                                        Humanoid:ChangeState("Jumping");
+                                end
+                        end
+                end);
+        end
+end});
+local FlyingEnabled = false
+local SpinningEnabled = false
+local FlightSpeed = 50
+local SpinSpeed = 5
 
-BlackHoleTab:Button({
-    Title = "皮-黑洞脚本",
-    Callback = function()
-        loadstring(game:HttpGet(
-            "https://raw.githubusercontent.com/xiaopi77/xiaopi77/refs/heads/main/%F0%9F%98%A1%F0%9F%98%A1%F0%9F%98%A1blackhole.lua"
-        ))()
+local CurrentAO, CurrentLV, CurrentMoverAttachment
+local FlightConnection
+local Control = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
+
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+local function getControlModule()
+    local PlayerModule = LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")
+    return require(PlayerModule:WaitForChild("ControlModule"))
+end
+
+local function setupBodyMovers(character)
+    local hrp = character:WaitForChild("HumanoidRootPart")
+    local humanoid = character:WaitForChild("Humanoid")
+    local moverParent = workspace:FindFirstChildOfClass("Terrain") or workspace
+
+    local moverAttachment = Instance.new("Attachment", hrp)
+    moverAttachment.Name = "FlightAttachment"
+
+    local alignOrientation = Instance.new("AlignOrientation")
+    alignOrientation.Mode = Enum.OrientationAlignmentMode.OneAttachment
+    alignOrientation.RigidityEnabled = true
+    alignOrientation.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+    alignOrientation.CFrame = hrp.CFrame
+    alignOrientation.Attachment0 = moverAttachment
+    alignOrientation.Parent = moverParent
+
+    local linearVelocity = Instance.new("LinearVelocity")
+    linearVelocity.VectorVelocity = Vector3.zero
+    linearVelocity.MaxForce = 9e9
+    linearVelocity.Attachment0 = moverAttachment
+    linearVelocity.Parent = moverParent
+
+    return alignOrientation, linearVelocity, humanoid, moverAttachment
+end
+
+local function getFlightVector(controlModule)
+    local moveVector = controlModule:GetMoveVector()
+
+    Control.F = -moveVector.Z
+    Control.B = moveVector.Z
+    Control.L = -moveVector.X
+    Control.R = moveVector.X
+    Control.Q = moveVector.Y
+    Control.E = -moveVector.Y
+
+    if UserInputService:IsKeyDown(Enum.KeyCode.W) then Control.F = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.S) then Control.B = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.A) then Control.L = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.D) then Control.R = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.Space) then Control.Q = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then Control.E = 1 end
+
+    local flightVector =
+        Camera.CFrame.LookVector * (Control.F - Control.B) +
+        Camera.CFrame.RightVector * (Control.R - Control.L) +
+        Vector3.new(0, 1, 0) * (Control.Q - Control.E)
+
+    return flightVector.Magnitude > 0 and flightVector.Unit or flightVector
+end
+
+local function startFlying()
+    if FlyingEnabled then return end
+
+    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    if not character then return end
+
+    FlyingEnabled = true
+    SpinningEnabled = false
+
+    if CurrentAO then CurrentAO:Destroy() end
+    if CurrentLV then CurrentLV:Destroy() end
+    if CurrentMoverAttachment then CurrentMoverAttachment:Destroy() end
+
+    CurrentAO, CurrentLV, humanoid, CurrentMoverAttachment = setupBodyMovers(character)
+
+    local controlModule = getControlModule()
+
+    FlightConnection = RunService.Heartbeat:Connect(function()
+        if not FlyingEnabled or not CurrentLV or not CurrentAO then return end
+
+        local flightVector = getFlightVector(controlModule)
+
+        if flightVector.Magnitude > 0 then
+            CurrentLV.VelocityConstraintMode = Enum.VelocityConstraintMode.Vector
+            CurrentLV.VectorVelocity = flightVector * FlightSpeed
+        else
+            CurrentLV.VectorVelocity = Vector3.zero
+        end
+
+        if SpinningEnabled then
+            local targetPart = humanoid.SeatPart or character.HumanoidRootPart
+            CurrentAO.CFrame = targetPart.CFrame * CFrame.Angles(0, math.rad(SpinSpeed), 0)
+        else
+            CurrentAO.CFrame = Camera.CFrame
+        end
+
+        humanoid.PlatformStand = true
+    end)
+
+    character.AncestryChanged:Connect(function(_, parent)
+        if not parent and FlyingEnabled then
+            stopFlying()
+        end
+    end)
+end
+
+local function stopFlying()
+    if not FlyingEnabled then return end
+
+    FlyingEnabled = false
+    SpinningEnabled = false
+
+    if FlightConnection then
+        FlightConnection:Disconnect()
+        FlightConnection = nil
+    end
+
+    if CurrentAO then CurrentAO:Destroy() end
+    if CurrentLV then CurrentLV:Destroy() end
+    if CurrentMoverAttachment then CurrentMoverAttachment:Destroy() end
+
+    local character = LocalPlayer.Character
+    if character and character:FindFirstChild("Humanoid") then
+        character.Humanoid.PlatformStand = false
+    end
+end
+
+LeftGroup:AddToggle('MyToggle', {
+    Text = '飞行模式(能在墨水使用可能会被反作弊击杀)',
+    Default = false,
+    Tooltip = '开启 / 关闭飞行功能',
+    Callback = function(Value)
+        if Value then
+            startFlying()
+        else
+            stopFlying()
+        end
     end
 })
-
-BlackHoleTab:Button({
-    Title = "点击即跟随型黑洞",
-    Callback = function()
-        loadstring(game:HttpGet("https://pastefy.app/BbXuvVkK/raw", true))()
+LeftGroup:AddSlider('MyIntSlider', {
+    Text = '飞行速度',
+    Default = 50,
+    Min = 1,
+    Max = 200,
+    Rounding = 0,
+    Suffix = '',
+    Compact = false,
+    Callback = function(Value)
+        FlightSpeed = Value
     end
 })
-BlackHoleTab:Button({
-    Title = "祖国人脚本",
-    Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/giobolqvi1/homelander-by-GioBolqv1/refs/heads/main/homelander.lua"))()
+LeftGroup:AddSlider('UltraWideSlider', {
+    Text = "超广角设置(可在墨水使用)",
+    Default = 70,
+    Min = 20,
+    Max = 120,
+    Rounding = 0,
+    Suffix = "°",
+    Compact = false,
+
+    Callback = function(Value)
+        local fov = tonumber(Value)
+        if fov then
+            CurrentCamera.FieldOfView = fov
+        end
     end
 })
-BlackHoleTab:Button({
-    Title = "无敌少侠脚本",
-    Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/giobolqvi1/Omni-man-fly-by-GioBolqv1/refs/heads/main/omniman.lua"))()
+LeftGroup:AddCheckbox("ESP", {
+    Text = "透视[墨水可用]",
+    Default = false,
+    Callback = function(enabled)
+        local Players = game:GetService("Players")
+        local RunService = game:GetService("RunService")
+
+        local highlights = {}
+        local connections = {}
+
+        local function clearHighlights()
+            for _, plr in pairs(Players:GetPlayers()) do
+                if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                    local hl = plr.Character.HumanoidRootPart:FindFirstChild("Highlight")
+                    if hl then
+                        hl:Destroy()
+                    end
+                end
+            end
+            for _, conn in pairs(connections) do
+                if typeof(conn) == "RBXScriptConnection" then
+                    conn:Disconnect()
+                end
+            end
+            table.clear(highlights)
+            table.clear(connections)
+        end
+
+        if enabled then
+            for _, plr in pairs(Players:GetPlayers()) do
+                task.spawn(function()
+                    repeat task.wait() until plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+                    if not plr.Character.HumanoidRootPart:FindFirstChild("Highlight") then
+                        local highlight = Instance.new("Highlight")
+                        highlight.Name = "Highlight"
+                        highlight.Adornee = plr.Character
+                        highlight.Parent = plr.Character.HumanoidRootPart
+                        highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                        highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+                        highlights[plr] = highlight
+                    end
+                end)
+            end
+
+            connections["PlayerAdded"] = Players.PlayerAdded:Connect(function(plr)
+                task.spawn(function()
+                    repeat task.wait() until plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+                    if not plr.Character.HumanoidRootPart:FindFirstChild("Highlight") then
+                        local highlight = Instance.new("Highlight")
+                        highlight.Name = "Highlight"
+                        highlight.Adornee = plr.Character
+                        highlight.Parent = plr.Character.HumanoidRootPart
+                        highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                        highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+                        highlights[plr] = highlight
+                    end
+                end)
+            end)
+
+            connections["PlayerRemoving"] = Players.PlayerRemoving:Connect(function(plr)
+                if highlights[plr] then
+                    highlights[plr]:Destroy()
+                    highlights[plr] = nil
+                end
+            end)
+
+        else
+            clearHighlights()
+        end
     end
 })
-local CommandTab = MainSection:Tab({
-    Title = "指令",
-    Icon = "terminal",
-})
+LeftGroup:AddToggle('AntiFlingToggle', {
+    Text = '防甩飞(可在墨水使用)',
+    Default = false,
+    Tooltip = '开启后防止玩家被甩飞',
 
-CommandTab:Button({
-    Title = "指令脚本",
-    Callback = function()
-        loadstring(game:HttpGet(
-            "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source",
-            true
-        ))()
-    end
-})
+    Callback = function(state)
+        if state then
+            local Players = game:GetService("Players")
+            local RunService = game:GetService("RunService")
+            local LocalPlayer = Players.LocalPlayer
 
-local TeleportTab = MainSection:Tab({
-    Title = "传送功能",
-    Icon = "map",
-})
+            local ANTI_FLING_FORCE = 1e6
+            local UPDATE_RATE = 0.01
 
-TeleportTab:Button({
-    Title = "传送到地图",
-    Callback = function()
-        LocalPlayer.Character:PivotTo(
-            CFrame.new(-115.828506, 65.4863434, 18.8461514)
-        )
-    end
-})
+            _G.ActiveHandles = {
+                Connections = {},
+                Constraints = {},
+                Alignments = {}
+            }
 
-TeleportTab:Button({
-    Title = "传送到游戏岛",
-    Callback = function()
-        LocalPlayer.Character:PivotTo(
-            CFrame.new(-83.5, 38.5, -27.5)
-        )
-    end
-})
+            local function CreateSuperConstraint(part)
+                local bodyPos = Instance.new("BodyPosition")
+                bodyPos.P = ANTI_FLING_FORCE
+                bodyPos.D = ANTI_FLING_FORCE / 10
+                bodyPos.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                bodyPos.Position = part.Position
+                bodyPos.Parent = part
 
+                local bodyGyro = Instance.new("BodyGyro")
+                bodyGyro.P = ANTI_FLING_FORCE
+                bodyGyro.D = ANTI_FLING_FORCE / 10
+                bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+                bodyGyro.CFrame = part.CFrame
+                bodyGyro.Parent = part
 
+                local alignPos = Instance.new("AlignPosition")
+                alignPos.RigidityEnabled = true
+                alignPos.MaxForce = ANTI_FLING_FORCE
+                alignPos.Responsiveness = ANTI_FLING_FORCE
+                alignPos.Parent = part
 
+                local alignOri = Instance.new("AlignOrientation")
+                alignOri.RigidityEnabled = true
+                alignOri.MaxTorque = ANTI_FLING_FORCE
+                alignOri.Responsiveness = ANTI_FLING_FORCE
+                alignOri.Parent = part
 
+                table.insert(_G.ActiveHandles.Constraints, bodyPos)
+                table.insert(_G.ActiveHandles.Constraints, bodyGyro)
+                table.insert(_G.ActiveHandles.Alignments, alignPos)
+                table.insert(_G.ActiveHandles.Alignments, alignOri)
 
-
-
-
-Window:Divider()
-local SettingsTab = Window:Tab({
-    Title = "Ui设置",
-    Desc = "Ui美术设置", -- 可选
-    Icon = "settings", -- lucide 图标 或 "rbxassetid://" 或 URL，可选
-    IconThemed = true, -- 使用主题颜色，可选
-    Locked = false, -- 禁用标签页交互，可选
-    ShowTabTitle = false, -- 在标签页内显示标题，可选
-    Border = true, -- 在标签页周围添加边框，可选
-})
-
-local ThemeSelectDropdown = SettingsTab:Dropdown({
-    Title = "选择主题",
-    Multi = false,
-    AllowNone = false,
-    Value = nil,
-    Values = {"AF Hub", "月夜", "冬日霜雪", "月渊"},
-    Callback = function(theme)
-        WindUI:SetTheme(theme)
-    end
-})
-
-
-SettingsTab:Divider()
-SettingsTab:Section({ 
-    Title = "背景选择",
-    TextXAlignment = "Center",
-    TextSize = 20,
-})
-
-local Dropdown = SettingsTab:Dropdown({
-    Title = "切换背景图",
-    Values = {
-        {
-            Title = "无背景",
-            Icon = "app-window",
-            Callback = function()
-                -- 清除背景图
-                Window:SetBackgroundImage("rbxassetid://0")
-                WindUI:Notify({
-                    Title = "AF Hub",
-                    Content = "已切换为无背景",
-                    Duration = 3
-                })
+                return bodyPos, bodyGyro, alignPos, alignOri
             end
-        },
-        {
-            Title = "背景图1(默认)",
-            Desc = "秋词提供",
-            Icon = "app-window",
-            Callback = function()
- Window:SetBackgroundImage("rbxassetid://136059273188532")
-                WindUI:Notify({
-                    Title = "AF Hub",
-                    Content = "已切换背景图1",
-                    Duration = 3
-                })
-            end
-        },
-        {
-            Title = "背景图2",
-            Icon = "app-window",
-            Callback = function()
-       Window:SetBackgroundImage("rbxassetid://101182501948173")
-                WindUI:Notify({
-                    Title = "AF Hub",
-                    Content = "已切换背景图2",
-                    Duration = 3
-                })
-            end
-        },
-        {
-            Title = "背景图3",
-            Icon = "app-window",
-            Callback = function()
- Window:SetBackgroundImage("rbxassetid://90514823373955")
-                WindUI:Notify({
-                    Title = "AF Hub",
-                    Content = "已切换背景图3",
-                    Duration = 3
-                })
-            end
-        },
-        {
-            Title = "背景图4",
-            Icon = "app-window",
-            Callback = function()
- Window:SetBackgroundImage("rbxassetid://103858984350097")
-                WindUI:Notify({
-                    Title = "AF Hub",
-                    Content = "已切换背景图4",
-                    Duration = 3
-                })
-            end
-        },
-        {
-            Title = "背景图5",
-            Icon = "app-window",
-            Callback = function()
- Window:SetBackgroundImage("rbxassetid://137662774446930")
-                WindUI:Notify({
-                    Title = "AF Hub",
-                    Content = "已切换背景图5",
-                    Duration = 3
-                })
-            end
-        },
-                {
-            Title = "背景图6",
-            Icon = "app-window",
-            Callback = function()
- Window:SetBackgroundImage("rbxassetid://73618579935939")
-                WindUI:Notify({
-                    Title = "AF Hub",
-                    Content = "已切换背景图6",
-                    Duration = 3
-                })
-            end
-        },
-                {
-            Title = "背景图7",
-            Icon = "app-window",
-            Callback = function()
- Window:SetBackgroundImage("rbxassetid://131845772886226")
-                WindUI:Notify({
-                    Title = "AF Hub",
-                    Content = "已切换背景图7",
-                    Duration = 3
-                })
-            end
-        },
-                {
-            Title = "背景图8",
-            Icon = "app-window",
-            Callback = function()
- Window:SetBackgroundImage("rbxassetid://92388982051300")
-                WindUI:Notify({
-                    Title = "AF Hub",
-                    Content = "已切换背景图8",
-                    Duration = 3
-                })
-            end
-        },
-                        {
-            Title = "背景图9",
-            Icon = "app-window",
-            Callback = function()
- Window:SetBackgroundImage("rbxassetid://103197377834563")
-                WindUI:Notify({
-                    Title = "AF Hub",
-                    Content = "已切换背景图9",
-                    Duration = 3
-                })
-            end
-        },
-                        {
-            Title = "背景图10",
-            Icon = "app-window",
-            Callback = function()
- Window:SetBackgroundImage("rbxassetid://123887383447725")
-                WindUI:Notify({
-                    Title = "AF Hub",
-                    Content = "已切换背景图10",
-                    Duration = 3
-                })
-            end
-        },
-                        {
-            Title = "背景图11",
-            Icon = "app-window",
-            Callback = function()
- Window:SetBackgroundImage("rbxassetid://84371548883810")
-                WindUI:Notify({
-                    Title = "AF Hub",
-                    Content = "已切换背景图11",
-                    Duration = 3
-                })
-            end
-        },
-    }
-})
 
-SettingsTab:Section({ 
-    Title = "自定义背景",
-    TextXAlignment = "Center",
-    TextSize = 20,
-})
-SettingsTab:Divider()
+            local function ApplyUltimateProtection(character)
+                if not character then return end
 
-local CustomBackground = SettingsTab:Input({
-    Title = "背景 ID",
-    Type = "Input",
-    Placeholder = "输入图片ID",
-    Callback = function(input)
-        if input ~= "" then
-            _G.BackgroundImage = "rbxassetid://" .. input
-            Window:SetBackgroundImage(_G.BackgroundImage)
+                local rootPart = character:FindFirstChild("HumanoidRootPart")
+                    or character:FindFirstChild("Torso")
+
+                if not rootPart then return end
+
+                local bodyPos, bodyGyro, alignPos, alignOri =
+                    CreateSuperConstraint(rootPart)
+
+                local updateConn = RunService.Heartbeat:Connect(function()
+                    if not character:IsDescendantOf(workspace) then return end
+
+                    bodyPos.Position = rootPart.Position
+                    bodyGyro.CFrame = rootPart.CFrame
+
+                    for _, part in ipairs(character:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = false
+                            part.CustomPhysicalProperties =
+                                PhysicalProperties.new(0, 0, 0)
+                            part.AssemblyAngularVelocity = Vector3.new()
+                            part.AssemblyLinearVelocity = Vector3.new()
+                            part.Velocity = Vector3.new()
+                            part.RotVelocity = Vector3.new()
+                            part:SetAttribute("LastPosition", part.Position)
+                        end
+                    end
+                end)
+
+                table.insert(_G.ActiveHandles.Connections, updateConn)
+
+                local velConn =
+                    rootPart:GetPropertyChangedSignal("AssemblyLinearVelocity")
+                        :Connect(function()
+                            rootPart.AssemblyLinearVelocity = Vector3.new()
+                            rootPart.Velocity = Vector3.new()
+                        end)
+
+                table.insert(_G.ActiveHandles.Connections, velConn)
+
+                local rotConn =
+                    rootPart:GetPropertyChangedSignal("AssemblyAngularVelocity")
+                        :Connect(function()
+                            rootPart.AssemblyAngularVelocity = Vector3.new()
+                            rootPart.RotVelocity = Vector3.new()
+                        end)
+
+                table.insert(_G.ActiveHandles.Connections, rotConn)
+
+                local posCheck = RunService.Heartbeat:Connect(function()
+                    if not character:IsDescendantOf(workspace) then return end
+
+                    local lastPos = rootPart:GetAttribute("LastPosition")
+                    if lastPos then
+                        local dist =
+                            (rootPart.Position - lastPos).Magnitude
+                        if dist > 5 then
+                            rootPart.CFrame = CFrame.new(lastPos)
+                        end
+                    end
+                    rootPart:SetAttribute("LastPosition", rootPart.Position)
+                end)
+
+                table.insert(_G.ActiveHandles.Connections, posCheck)
+            end
+
+            local function MonitorPlayer(player)
+                if player == LocalPlayer then return end
+
+                local function HandleCharacter(character)
+                    if not character then return end
+                    repeat task.wait() until
+                        character:FindFirstChild("HumanoidRootPart")
+                        or character:FindFirstChild("Torso")
+
+                    ApplyUltimateProtection(character)
+                end
+
+                if player.Character then
+                    HandleCharacter(player.Character)
+                end
+
+                local charConn =
+                    player.CharacterAdded:Connect(HandleCharacter)
+                table.insert(_G.ActiveHandles.Connections, charConn)
+            end
+
+            for _, player in ipairs(Players:GetPlayers()) do
+                MonitorPlayer(player)
+            end
+
+            local playerConn =
+                Players.PlayerAdded:Connect(MonitorPlayer)
+            table.insert(_G.ActiveHandles.Connections, playerConn)
+
+        else
+            for _, conn in ipairs(_G.ActiveHandles.Connections or {}) do
+                if conn.Connected then
+                    conn:Disconnect()
+                end
+            end
+
+            for _, constraint in ipairs(
+                _G.ActiveHandles.Constraints or {}
+            ) do
+                if constraint and constraint.Parent then
+                    constraint:Destroy()
+                end
+            end
+
+            for _, align in ipairs(
+                _G.ActiveHandles.Alignments or {}
+            ) do
+                if align and align.Parent then
+                    align:Destroy()
+                end
+            end
+
+            for _, player in ipairs(
+                game:GetService("Players"):GetPlayers()
+            ) do
+                if player ~= LocalPlayer and player.Character then
+                    for _, part in ipairs(
+                        player.Character:GetDescendants()
+                    ) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = true
+                            part.CustomPhysicalProperties = nil
+                            part.AssemblyAngularVelocity = Vector3.new()
+                            part.AssemblyLinearVelocity = Vector3.new()
+                            part:SetAttribute("LastPosition", nil)
+                        end
+                    end
+                end
+            end
+
+            _G.ActiveHandles = {
+                Connections = {},
+                Constraints = {},
+                Alignments = {}
+            }
         end
     end
 })
 
-local Keybind = SettingsTab:Keybind({
-    Title = "关闭界面的快捷键",
-    Value = "G",
-    Callback = function(v)
-        Window:SetToggleKey(Enum.KeyCode[v])
-    end
+local RightGroup = Tabs.Main:AddRightGroupbox("传送 & 脚本")
+
+RightGroup:AddButton({
+    Text = "传送到地图",
+    Func = function()
+        LocalPlayer.Character:PivotTo(CFrame.new(-115.828506, 65.4863434, 18.8461514))
+        Library:Notify("已传送到地图", 2)
+    end,
 })
+
+RightGroup:AddButton({
+    Text = "传送到游戏岛",
+    Func = function()
+        LocalPlayer.Character:PivotTo(CFrame.new(-83.5, 38.5, -27.5))
+        Library:Notify("已传送到游戏岛", 2)
+    end,
+})
+
+RightGroup:AddDivider()
+
+RightGroup:AddLabel("=== 黑洞脚本 ===")
+RightGroup:AddButton({
+    Text = "皮-黑洞脚本",
+    Func = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/xiaopi77/xiaopi77/refs/heads/main/%F0%9F%98%A1%F0%9F%98%A1%F0%9F%98%A1blackhole.lua"))()
+        Library:Notify("正在加载黑洞脚本...", 3)
+    end,
+})
+
+RightGroup:AddButton({
+    Text = "点击即跟随型黑洞",
+    Func = function()
+        loadstring(game:HttpGet("https://pastefy.app/BbXuvVkK/raw", true))()
+        Library:Notify("正在加载跟随黑洞...", 3)
+    end,
+})
+
+RightGroup:AddDivider()
+
+RightGroup:AddLabel("=== 角色脚本 ===")
+RightGroup:AddButton({
+    Text = "史蒂夫建造",
+    Func = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Steve"))()
+        Library:Notify("正在加载史蒂夫建造", 3)
+    end,
+})
+RightGroup:AddButton({
+    Text = "火车头脚本",
+    Func = function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/giobolqv1/A-Train-by-GioBolqv1-/refs/heads/main/train.lua"))()
+        Library:Notify("正在加载火车头...", 3)
+    end,
+})
+RightGroup:AddButton({
+    Text = "隐身脚本",
+    Func = function()
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Invisible-script-20557"))()
+        Library:Notify("正在加隐身...", 3)
+    end,
+})
+RightGroup:AddButton({
+    Text = "全能侠脚本",
+    Func = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/giobolqvi1/Omni-man-fly-by-GioBolqv1/refs/heads/main/omniman.lua"))()
+        Library:Notify("正在加载全能侠...", 3)
+    end,
+})
+RightGroup:AddDivider()
+
+RightGroup:AddLabel("=== 其他脚本 ===")
+RightGroup:AddButton({
+    Text = "加载指令脚本",
+    Func = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source", true))()
+        Library:Notify("正在加载指令脚本...", 3)
+    end,
+})
+
+RightGroup:AddDivider()
+
+RightGroup:AddButton({
+    Text = "复制主群 (938714427)",
+    Func = function()
+        setclipboard("938714427")
+        Library:Notify("已复制QQ群号！", 3)
+    end,
+})
+
+RightGroup:AddDivider()
+
+RightGroup:AddLabel("作者: 秋辞")
+
+local MenuGroup = Tabs.Settings:AddLeftGroupbox('菜单设置')
+local ThemeGroup = Tabs.Settings:AddRightGroupbox('主题设置')
+
+MenuGroup:AddButton('卸载脚本', function()
+    Library:Unload()
+end)
+
+-- 菜单快捷键
+MenuGroup:AddLabel('菜单快捷键'):AddKeyPicker('MenuKeybind', {
+    Default = 'RightShift',
+    NoUI = true,
+    Text = '菜单快捷键'
+})
+
+Library.ToggleKeybind = Options.MenuKeybind
+
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+ThemeManager:SetFolder("AFHubTheme")
+SaveManager:SetFolder("AFHubConfig")
+SaveManager:BuildConfigSection(Tabs.Settings)
+ThemeManager:ApplyToTab(Tabs.Settings)
+Library:Notify("AF Hub 已加载！", 3)
