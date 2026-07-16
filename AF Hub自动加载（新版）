@@ -26,6 +26,10 @@ else
             url = "https://raw.githubusercontent.com/fningna51-stack/-/refs/heads/main/AF%20%E9%97%AA%E5%85%89",
             name = "闪光"
         },
+        ["3956818381"] = {
+            url = "https://raw.githubusercontent.com/fningna51-stack/-/main/AF%20%E5%BF%8D%E8%80%85%E4%BC%A0%E5%A5%87",
+            name = "忍者传奇"
+        },
         ["189707"] = {
             url = "https://raw.githubusercontent.com/fningna51-stack/-/refs/heads/main/AF%20%E8%87%AA%E7%84%B6%E7%81%BE%E5%AE%B3",
             name = "自然灾害"
