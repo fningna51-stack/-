@@ -60,116 +60,166 @@ LeftGroup:AddToggle('AutoM1', {
         end
     end
 })
-LeftGroup:AddToggle('AutoSkill1_New', {
-    Text = '自动一技能 (Quick Slice)',
-    Default = false,
-    Tooltip = '自动释放一技能 - Quick Slice',
-    Callback = function(Value)
-        getgenv().AutoSkill1_New = Value
-        if Value then
-            Library:Notify("自动一技能已开启", 2)
-            spawn(function()
-                while getgenv().AutoSkill1_New do
+local useFirstSkill = false
+local useSecondSkill = false
+local useThirdSkill = false
+local useFourthSkill = false
+
+local skillUsage = {
+    firstskill = 0,
+    secondskill = 0,
+    thirdskill = 0,
+    fourthskill = 0
+}
+local skills = {
+    firstskill = {"Normal Punch", "Flowing Water", "Machine Gun Blows", "Flash Strike", "Homerun", "Quick Slice", "Bullet Barrage", "Crushing Pull"},
+    secondskill = {"Atmos Cleave", "Windstorm Fury", "Ignition Burst", "Whirlwind Kick", "Beatdown", "Consecutive Punches", "Lethal Whirlwind Stream", "Vanishing Kick"},
+    thirdskill = {"Shove", "Hunter's Grasp", "Blitz Shot", "Scatter", "Grand Slam", "Pinpoint Cut", "Stone Coffin", "Whirlwind Drop"},
+    fourthskill = {"Split Second Counter", "Expulsive Push", "Jet Dive", "Explosive Shuriken", "Foul Ball", "Uppercut", "Head First", "Prey's Peril"}
+}
+local skillCooldowns = {
+    ["Normal Punch"] = 0,
+    ["Flowing Water"] = 0,
+    ["Machine Gun Blows"] = 0,
+    ["Flash Strike"] = 0,
+    ["Homerun"] = 0,
+    ["Quick Slice"] = 0,
+    ["Bullet Barrage"] = 0,
+    ["Crushing Pull"] = 0,
+    ["Consecutive Punches"] = 0,
+    ["Lethal Whirlwind Stream"] = 0,
+    ["Ignition Burst"] = 0,
+    ["Whirlwind Kick"] = 0,
+    ["Beatdown"] = 0,
+    ["Atmos Cleave"] = 0,
+    ["Windstorm Fury"] = 0,
+    ["Vanishing Kick"] = 0,
+    ["Shove"] = 0,
+    ["Hunter's Grasp"] = 0,
+    ["Blitz Shot"] = 0,
+    ["Scatter"] = 0,
+    ["Grand Slam"] = 0,
+    ["Pinpoint Cut"] = 0,
+    ["Stone Coffin"] = 0,
+    ["Whirlwind Drop"] = 0,
+    ["Jet Dive"] = 0,
+    ["Explosive Shuriken"] = 0,
+    ["Foul Ball"] = 0,
+    ["Split Second Counter"] = 0,
+    ["Expulsive Push"] = 0,
+    ["Prey's Peril"] = 0,
+    ["Head First"] = 0,
+    ["Uppercut"] = 0
+}
+local function equipAndUseSkill(player, skillType)
+    local character = player.Character
+    if character then
+        local backpack = player.Backpack
+        local liveFolder = workspace:FindFirstChild("Live")
+        if backpack and liveFolder then
+            for _, skill in pairs(skills[skillType]) do
+                local tool = backpack:FindFirstChild(skill) or character:FindFirstChild(skill)
+                if tool then
+                    character.Humanoid:EquipTool(tool)
+                    
                     local args = {
-                        {
-                            Tool = game:GetService("Players").LocalPlayer:WaitForChild("Backpack"):WaitForChild("Quick Slice"),
-                            Goal = "Console Move",
-                            IsAutoActivate = true
+                        [1] = {
+                            ["Mobile"] = true,
+                            ["Goal"] = "LeftClick"
                         }
                     }
-                    pcall(function()
-                        game:GetService("Players").LocalPlayer.Character:WaitForChild("Communicate"):FireServer(unpack(args))
-                    end)
-                    task.wait(0.5)
+                    game:GetService("Players").LocalPlayer.Character.Communicate:FireServer(unpack(args))
+
+                    wait(0.02)
+
+                    local argsRelease = {
+                        [1] = {
+                            ["Goal"] = "LeftClickRelease",
+                            ["Mobile"] = true
+                        }
+                    }
+                    game:GetService("Players").LocalPlayer.Character.Communicate:FireServer(unpack(argsRelease))
+
+                    character.Humanoid:UnequipTools()
+
+                    if skillCooldowns[skill] then
+                        skillUsage[skillType] = tick()
+                        wait(skillCooldowns[skill])
+                    end
                 end
-            end)
-        else
-            Library:Notify("自动一技能已关闭", 2)
+            end
         end
     end
-})
-LeftGroup:AddToggle('AutoSkill2_New', {
-    Text = '自动二技能 (Atmos Cleave)',
-    Default = false,
-    Tooltip = '自动释放二技能 - Atmos Cleave',
-    Callback = function(Value)
-        getgenv().AutoSkill2_New = Value
-        if Value then
-            Library:Notify("自动二技能已开启", 2)
-            spawn(function()
-                while getgenv().AutoSkill2_New do
-                    local args = {
-                        {
-                            Tool = game:GetService("Players").LocalPlayer:WaitForChild("Backpack"):WaitForChild("Atmos Cleave"),
-                            Goal = "Console Move",
-                            IsAutoActivate = true
-                        }
-                    }
-                    pcall(function()
-                        game:GetService("Players").LocalPlayer.Character:WaitForChild("Communicate"):FireServer(unpack(args))
-                    end)
-                    task.wait(0.5)
-                end
-            end)
-        else
-            Library:Notify("自动二技能已关闭", 2)
+end
+
+local function skillLoop()
+    local player = game:GetService("Players").LocalPlayer
+    
+    while true do
+        wait(0.1)
+        
+        local currentTime = tick()
+        if useFirstSkill and (currentTime - skillUsage["firstskill"] >= skillCooldowns[skills.firstskill[1]]) then
+            coroutine.wrap(equipAndUseSkill)(player, "firstskill")
+            skillUsage["firstskill"] = currentTime
+        end
+        
+        if useSecondSkill and (currentTime - skillUsage["secondskill"] >= skillCooldowns[skills.secondskill[1]]) then
+            coroutine.wrap(equipAndUseSkill)(player, "secondskill")
+            skillUsage["secondskill"] = currentTime
+        end
+        
+        if useThirdSkill and (currentTime - skillUsage["thirdskill"] >= skillCooldowns[skills.thirdskill[1]]) then
+            coroutine.wrap(equipAndUseSkill)(player, "thirdskill")
+            skillUsage["thirdskill"] = currentTime
+        end
+        
+        if useFourthSkill and (currentTime - skillUsage["fourthskill"] >= skillCooldowns[skills.fourthskill[1]]) then
+            coroutine.wrap(equipAndUseSkill)(player, "fourthskill")
+            skillUsage["fourthskill"] = currentTime
         end
     end
-})
-LeftGroup:AddToggle('AutoSkill3_New', {
-    Text = '自动三技能 (Pinpoint Cut)',
+end
+
+coroutine.wrap(skillLoop)()
+
+LeftGroup:AddToggle('Skill1Toggle', {
+    Text = '自动放技能1',
     Default = false,
-    Tooltip = '自动释放三技能 - Pinpoint Cut',
+    Tooltip = '开启/关闭技能1自动释放',
     Callback = function(Value)
-        getgenv().AutoSkill3_New = Value
-        if Value then
-            Library:Notify("自动三技能已开启", 2)
-            spawn(function()
-                while getgenv().AutoSkill3_New do
-                    local args = {
-                        {
-                            Tool = game:GetService("Players").LocalPlayer:WaitForChild("Backpack"):WaitForChild("Pinpoint Cut"),
-                            Goal = "Console Move",
-                            IsAutoActivate = true
-                        }
-                    }
-                    pcall(function()
-                        game:GetService("Players").LocalPlayer.Character:WaitForChild("Communicate"):FireServer(unpack(args))
-                    end)
-                    task.wait(0.5)
-                end
-            end)
-        else
-            Library:Notify("自动三技能已关闭", 2)
-        end
+        useFirstSkill = Value
+        print('[技能1] 开关状态:', Value)
     end
 })
-LeftGroup:AddToggle('AutoSkill4_New', {
-    Text = '自动四技能 (Split Second Counter)',
+
+LeftGroup:AddToggle('Skill2Toggle', {
+    Text = '自动放技能2',
     Default = false,
-    Tooltip = '自动释放四技能 - Split Second Counter',
+    Tooltip = '开启/关闭技能2自动释放',
     Callback = function(Value)
-        getgenv().AutoSkill4_New = Value
-        if Value then
-            Library:Notify("自动四技能已开启", 2)
-            spawn(function()
-                while getgenv().AutoSkill4_New do
-                    local args = {
-                        {
-                            Tool = game:GetService("Players").LocalPlayer:WaitForChild("Backpack"):WaitForChild("Split Second Counter"),
-                            Goal = "Console Move",
-                            IsAutoActivate = true
-                        }
-                    }
-                    pcall(function()
-                        game:GetService("Players").LocalPlayer.Character:WaitForChild("Communicate"):FireServer(unpack(args))
-                    end)
-                    task.wait(0.5)
-                end
-            end)
-        else
-            Library:Notify("自动四技能已关闭", 2)
-        end
+        useSecondSkill = Value
+        print('[技能2] 开关状态:', Value)
+    end
+})
+
+LeftGroup:AddToggle('Skill3Toggle', {
+    Text = '自动放技能3',
+    Default = false,
+    Tooltip = '开启/关闭技能3自动释放',
+    Callback = function(Value)
+        useThirdSkill = Value
+        print('[技能3] 开关状态:', Value)
+    end
+})
+
+LeftGroup:AddToggle('Skill4Toggle', {
+    Text = '自动放技能4',
+    Default = false,
+    Tooltip = '开启/关闭技能4自动释放',
+    Callback = function(Value)
+        useFourthSkill = Value
+        print('[技能4] 开关状态:', Value)
     end
 })
 LeftGroup:AddToggle('AutoDodging', {
