@@ -35,7 +35,7 @@ UpdatePlayerCount()
 local Window = Library:CreateWindow({
     Title = 'AF Hub丨自然灾害',
     Footer = "@秋辞",
-    Icon = 82225829203828,
+    Icon = 122936242690381,
     NotifySide = "Right",
     ShowCustomCursor = true,
 })
