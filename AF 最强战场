@@ -18,7 +18,7 @@ local A9 = game:GetService("HttpService")
 local Window = Library:CreateWindow({
     Title = "AF Hub丨最强战场",
     Footer = "By 秋辞",
-    Icon = 82225829203828,
+    Icon = 122936242690381,
     NotifySide = "Right",
     ShowCustomCursor = true,
 })
