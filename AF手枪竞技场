@@ -1,0 +1,1863 @@
+local repo = 'https://raw.githubusercontent.com/KingScriptAE/No-sirve-nada./refs/heads/main/'
+local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
+local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
+local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
+
+local Options = Library.Options
+local Toggles = Library.Toggles
+--玩家功能变量
+local Toggles = Library.Toggles
+local A1 = game:GetService("Players")
+local A2 = A1.LocalPlayer
+local A3 = game:GetService("RunService")
+local A4 = game:GetService("Lighting")
+local A5 = game:GetService("CoreGui")
+local A6 = game:GetService("UserInputService")
+local A7 = game:GetService("TeleportService")
+local A8 = workspace
+local A9 = game:GetService("HttpService")
+--自瞄功能变量
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local workspace = game:GetService("Workspace")
+local TweenService = game:GetService("TweenService")
+local Red = Color3.fromRGB(255, 0, 0)
+local Green = Color3.fromRGB(0, 255, 0)
+local Grey = Color3.fromRGB(128, 128, 128)
+local InfiniteJumpEnabled = false
+local JumpConnection = nil
+local GravityLoop = nil
+local SpeedValue = 1
+local SpeedEnabled = false
+local SpeedConnection = nil
+local originalGravity = workspace.Gravity
+local AimSettings = {
+    Enabled = false,
+    FOVEnabled = false,
+    FOVRainbowEnabled = false,
+    FOVRainbowSpeed = 5,
+    FOV = 200,
+    FOVColor = Color3.fromRGB(255, 0, 0),
+    Smoothness = 10,
+    CrosshairDistance = 0,
+    FriendCheck = false,
+    WallCheck = false,
+    TargetAll = true,
+    TargetPlayer = nil,
+}
+local AimTeamCheck = false
+local AimTargetPart = "头"
+local AimBlacklist = {}
+local CurrentTarget = nil
+local CurrentFOVHue = 0
+local FOVCircle = nil
+local DrawingObjects = {}
+local AimConnection = nil
+local StatusIndicator = nil
+local RainbowUIEnabled = false
+local RainbowUIScreenGui = nil
+local animationConnection = nil
+local ESPEnabled = false
+local ESPRainbowEnabled = false
+local ESPNameColor = Color3.fromRGB(255, 255, 255)
+local ESPBodyColor = Color3.fromRGB(255, 0, 0)
+local ESPNameSize = 14
+local CurrentESPHue = 0
+local ESPRainbowSpeed = 5
+local ESPMaxDistance = 1000
+local ESPTeamCheck = false
+local ESP_ScreenGui = nil
+local ESPFolder = nil
+local BackstabCheckEnabled = false
+local BackstabCooldown = 0
+local BACKSTAB_COOLDOWN_TIME = 3
+local DeathCheckEnabled = false
+local NightVisionEnabled = false
+local originalBrightness = nil
+local originalAmbient = nil
+local autoLobbyEnabled = false
+local autoLobbyThread = nil
+local connection = nil
+local currentTarget = nil
+local lastShotTime = 0
+local shootInterval = 0.56
+local maxDistance = 100
+local originalFire = nil
+
+local function GetRainbowColor(hue)
+    hue = hue % 1
+    local r, g, b
+    local i = math.floor(hue * 6)
+    local f = hue * 6 - i
+    local p = 1
+    local q = 1 - f
+    local t = f
+    if i % 6 == 0 then r, g, b = 1, t, p
+    elseif i % 6 == 1 then r, g, b = q, 1, p
+    elseif i % 6 == 2 then r, g, b = p, 1, t
+    elseif i % 6 == 3 then r, g, b = p, q, 1
+    elseif i % 6 == 4 then r, g, b = t, p, 1
+    else r, g, b = 1, p, q end
+    return Color3.new(r, g, b)
+end
+
+local function InitializeAimDrawings()
+    pcall(function()
+        if not FOVCircle then
+            FOVCircle = Drawing.new("Circle")
+            FOVCircle.Visible = AimSettings.Enabled and AimSettings.FOVEnabled
+            FOVCircle.Thickness = 2
+            FOVCircle.Filled = false
+            FOVCircle.Radius = AimSettings.FOV
+            FOVCircle.Position = workspace.CurrentCamera.ViewportSize / 2
+            table.insert(DrawingObjects, FOVCircle)
+        end
+    end)
+end
+
+local function UpdateFOVCircle()
+    pcall(function()
+        if FOVCircle then
+            FOVCircle.Visible = AimSettings.Enabled and AimSettings.FOVEnabled
+            FOVCircle.Radius = AimSettings.FOV
+            if AimSettings.FOVRainbowEnabled then
+                FOVCircle.Color = GetRainbowColor(CurrentFOVHue)
+            else
+                FOVCircle.Color = AimSettings.FOVColor
+            end
+            FOVCircle.Position = workspace.CurrentCamera.ViewportSize / 2
+        end
+    end)
+end
+
+local function CleanupDrawings()
+    pcall(function()
+        for _, drawing in ipairs(DrawingObjects) do
+            if drawing and drawing.Remove then
+                drawing:Remove()
+            end
+        end
+        DrawingObjects = {}
+        FOVCircle = nil
+    end)
+end
+
+local function InitESP()
+    ESP_ScreenGui = Instance.new("ScreenGui")
+    ESP_ScreenGui.Name = "PlayerESP_System"
+    ESP_ScreenGui.ResetOnSpawn = false
+    ESP_ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    ESP_ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+    ESPFolder = Instance.new("Folder")
+    ESPFolder.Name = "PlayerESPFolder"
+    ESPFolder.Parent = ESP_ScreenGui
+end
+
+local function UpdateESPColors()
+    if not ESPEnabled or not ESPFolder then return end
+    pcall(function()
+        for _, child in ipairs(ESPFolder:GetChildren()) do
+            if child:IsA("BillboardGui") then
+                local nameLabel = child:FindFirstChild("NameLabel")
+                if nameLabel then
+                    nameLabel.TextColor3 = ESPRainbowEnabled and GetRainbowColor(CurrentESPHue) or ESPNameColor
+                    nameLabel.TextSize = ESPNameSize
+                end
+            elseif child:IsA("Highlight") then
+                child.FillColor = ESPRainbowEnabled and GetRainbowColor(CurrentESPHue) or ESPBodyColor
+                child.OutlineColor = ESPRainbowEnabled and GetRainbowColor(CurrentESPHue) or ESPBodyColor
+            end
+        end
+    end)
+end
+
+local function UpdateESPNameSize()
+    if not ESPEnabled or not ESPFolder then return end
+    pcall(function()
+        for _, child in ipairs(ESPFolder:GetChildren()) do
+            if child:IsA("BillboardGui") then
+                local nameLabel = child:FindFirstChild("NameLabel")
+                if nameLabel then
+                    nameLabel.TextSize = ESPNameSize
+                end
+            end
+        end
+    end)
+end
+
+local function CreatePlayerESP(player)
+    if player == LocalPlayer or not ESPEnabled then return end
+    pcall(function()
+        local character = player.Character
+        if not character then return end
+        local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+        if not humanoidRootPart then return end
+        local existingESP = ESPFolder:FindFirstChild(player.Name)
+        if existingESP then existingESP:Destroy() end
+        local ESPGui = Instance.new("BillboardGui")
+        ESPGui.Name = player.Name
+        ESPGui.Adornee = humanoidRootPart
+        ESPGui.Size = UDim2.new(0, 100, 0, 40)
+        ESPGui.StudsOffset = Vector3.new(0, 3, 0)
+        ESPGui.AlwaysOnTop = true
+        ESPGui.MaxDistance = 10000
+        ESPGui.Enabled = true
+        ESPGui.Parent = ESPFolder
+        local NameLabel = Instance.new("TextLabel")
+        NameLabel.Size = UDim2.new(1, 0, 0.5, 0)
+        NameLabel.BackgroundTransparency = 1
+        NameLabel.Font = Enum.Font.GothamBold
+        NameLabel.TextSize = ESPNameSize
+        NameLabel.TextColor3 = ESPRainbowEnabled and GetRainbowColor(CurrentESPHue) or ESPNameColor
+        NameLabel.TextStrokeTransparency = 0.5
+        NameLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
+        NameLabel.Text = player.Name
+        NameLabel.Name = "NameLabel"
+        NameLabel.Parent = ESPGui
+        local DistanceLabel = Instance.new("TextLabel")
+        DistanceLabel.Size = UDim2.new(1, 0, 0.5, 0)
+        DistanceLabel.Position = UDim2.new(0, 0, 0.5, 0)
+        DistanceLabel.BackgroundTransparency = 1
+        DistanceLabel.Font = Enum.Font.Gotham
+        DistanceLabel.TextSize = 12
+        DistanceLabel.TextColor3 = Color3.fromRGB(240, 255, 245)
+        DistanceLabel.TextStrokeTransparency = 0.5
+        DistanceLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
+        DistanceLabel.Name = "DistanceLabel"
+        DistanceLabel.Parent = ESPGui
+        local Highlight = Instance.new("Highlight")
+        Highlight.Name = player.Name .. "_Highlight"
+        Highlight.Adornee = character
+        Highlight.FillColor = ESPRainbowEnabled and GetRainbowColor(CurrentESPHue) or ESPBodyColor
+        Highlight.FillTransparency = 0.7
+        Highlight.OutlineColor = ESPRainbowEnabled and GetRainbowColor(CurrentESPHue) or ESPBodyColor
+        Highlight.OutlineTransparency = 0
+        Highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+        Highlight.Enabled = true
+        Highlight.Parent = ESPFolder
+    end)
+end
+
+local function UpdateESP()
+    if not ESPEnabled then return end
+    pcall(function()
+        local myCharacter = LocalPlayer.Character
+        local myHRP = myCharacter and myCharacter:FindFirstChild("HumanoidRootPart")
+        if not myHRP then return end
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer then
+                local character = player.Character
+                if character then
+                    local hrp = character:FindFirstChild("HumanoidRootPart")
+                    if hrp then
+                        local espGui = ESPFolder:FindFirstChild(player.Name)
+                        if not espGui then
+                            CreatePlayerESP(player)
+                            espGui = ESPFolder:FindFirstChild(player.Name)
+                        end
+                        if espGui then
+                            local distance = (myHRP.Position - hrp.Position).Magnitude
+                            local distanceLabel = espGui:FindFirstChild("DistanceLabel")
+                            if distanceLabel then
+                                distanceLabel.Text = string.format("%.0f studs", distance)
+                            end
+                            if distance > ESPMaxDistance then
+                                espGui.Enabled = false
+                                local highlight = ESPFolder:FindFirstChild(player.Name .. "_Highlight")
+                                if highlight then highlight.Enabled = false end
+                            else
+                                local teamHide = false
+                                if ESPTeamCheck and LocalPlayer.Team and player.Team and player.Team == LocalPlayer.Team then
+                                    teamHide = true
+                                end
+                                if teamHide then
+                                    espGui.Enabled = false
+                                    local highlight = ESPFolder:FindFirstChild(player.Name .. "_Highlight")
+                                    if highlight then highlight.Enabled = false end
+                                else
+                                    espGui.Enabled = true
+                                    local highlight = ESPFolder:FindFirstChild(player.Name .. "_Highlight")
+                                    if highlight then highlight.Enabled = true end
+                                end
+                            end
+                        end
+                    else
+                        local espGui = ESPFolder:FindFirstChild(player.Name)
+                        if espGui then espGui:Destroy() end
+                        local highlight = ESPFolder:FindFirstChild(player.Name .. "_Highlight")
+                        if highlight then highlight:Destroy() end
+                    end
+                else
+                    local esp = ESPFolder:FindFirstChild(player.Name)
+                    if esp then esp:Destroy() end
+                    local highlight = ESPFolder:FindFirstChild(player.Name .. "_Highlight")
+                    if highlight then highlight:Destroy() end
+                end
+            end
+        end
+    end)
+end
+
+local function ToggleESP(state)
+    ESPEnabled = state
+    if state then
+        pcall(function()
+            if not ESP_ScreenGui then InitESP() end
+            for _, player in ipairs(Players:GetPlayers()) do
+                if player ~= LocalPlayer and player.Character then
+                    CreatePlayerESP(player)
+                end
+            end
+            Library:Notification("透视", "玩家透视已开启", 3)
+        end)
+    else
+        pcall(function()
+            if ESPFolder then
+                for _, esp in ipairs(ESPFolder:GetChildren()) do
+                    esp:Destroy()
+                end
+            end
+            Library:Notification("透视", "玩家透视已关闭", 3)
+        end)
+    end
+end
+
+local function CheckBackstabThreat()
+    if not BackstabCheckEnabled then return end
+    if BackstabCooldown > 0 then return end
+    pcall(function()
+        local myCharacter = LocalPlayer.Character
+        local myHRP = myCharacter and myCharacter:FindFirstChild("HumanoidRootPart")
+        if not myHRP then return end
+        local myPosition = myHRP.Position
+        local myCFrame = myHRP.CFrame
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character then
+                local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+                local humanoid = player.Character:FindFirstChild("Humanoid")
+                if hrp and humanoid and humanoid.Health > 0 then
+                    local enemyPosition = hrp.Position
+                    local distance = (myPosition - enemyPosition).Magnitude
+                    if distance < 30 then
+                        local toEnemy = (enemyPosition - myPosition).Unit
+                        local myForward = myCFrame.LookVector
+                        local dotProduct = toEnemy:Dot(myForward)
+                        if dotProduct < 0.5 then
+                            Library:Notification("偷袭检测", "⚠️ 有人要偷袭你：" .. player.Name, 5)
+                            BackstabCooldown = BACKSTAB_COOLDOWN_TIME
+                            break
+                        end
+                    end
+                end
+            end
+        end
+    end)
+end
+
+local function SetupDeathDetection()
+    LocalPlayer.CharacterAdded:Connect(function(character)
+        task.wait(0.5)
+        pcall(function()
+            local humanoid = character:WaitForChild("Humanoid")
+            humanoid.Died:Connect(function()
+                if DeathCheckEnabled then
+                    Library:Notification("死亡提醒", "💀 你死了！", 5)
+                end
+            end)
+        end)
+    end)
+    if LocalPlayer.Character then
+        pcall(function()
+            local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+            if humanoid then
+                humanoid.Died:Connect(function()
+                    if DeathCheckEnabled then
+                        Library:Notification("死亡提醒", "💀 你死了！", 5)
+                    end
+                end)
+            end
+        end)
+    end
+end
+local function IsFriend(player)
+    if not AimSettings.FriendCheck then return false end
+    local success, result = pcall(function()
+        if LocalPlayer:IsFriendsWith(player.UserId) then return true end
+        return false
+    end)
+    return success and result
+end
+
+local function WallCheck(targetPosition, targetCharacter)
+    if not AimSettings.WallCheck then return true end
+    local success, result = pcall(function()
+        local camera = workspace.CurrentCamera
+        local origin = camera.CFrame.Position
+        local direction = (targetPosition - origin).Unit
+        local distance = (targetPosition - origin).Magnitude
+        local raycastParams = RaycastParams.new()
+        raycastParams.FilterDescendantsInstances = {LocalPlayer.Character, targetCharacter}
+        raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+        raycastParams.IgnoreWater = true
+        local raycastResult = workspace:Raycast(origin, direction * distance, raycastParams)
+        return raycastResult == nil
+    end)
+    return success and result
+end
+
+local function GetTargetPosition(character, partName)
+    if not character then return nil end
+    local part
+    if partName == "头" then
+        part = character:FindFirstChild("Head")
+    elseif partName == "上身" then
+        part = character:FindFirstChild("UpperTorso") or character:FindFirstChild("Torso") or character:FindFirstChild("HumanoidRootPart")
+    elseif partName == "左腿" then
+        part = character:FindFirstChild("Left Leg") or character:FindFirstChild("LeftLowerLeg") or character:FindFirstChild("LeftUpperLeg")
+    elseif partName == "右腿" then
+        part = character:FindFirstChild("Right Leg") or character:FindFirstChild("RightLowerLeg") or character:FindFirstChild("RightUpperLeg")
+    elseif partName == "裆部" then
+        part = character:FindFirstChild("HumanoidRootPart") or character:FindFirstChild("LowerTorso")
+    elseif partName == "胸部" then
+        part = character:FindFirstChild("UpperTorso") or character:FindFirstChild("Torso")
+    else
+        part = character:FindFirstChild("Head")
+    end
+    return part and part.Position
+end
+
+local function GetClosestPlayer()
+    local camera = workspace.CurrentCamera
+    local mousePos = camera.ViewportSize / 2
+    local nearestPlayer = nil
+    local shortestDistance = AimSettings.FOV
+
+    if AimSettings.TargetPlayer and not AimSettings.TargetAll then
+        local target = Players:FindFirstChild(AimSettings.TargetPlayer)
+        if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+            local inBlacklist = false
+            for _, blackName in ipairs(AimBlacklist) do
+                if target.Name == blackName then
+                    inBlacklist = true
+                    break
+                end
+            end
+            if not inBlacklist then
+                if AimTeamCheck then
+                    local myTeam = LocalPlayer.Team
+                    if myTeam and target.Team == myTeam then
+                        CurrentTarget = nil
+                        return nil
+                    end
+                end
+                local humanoid = target.Character:FindFirstChild("Humanoid")
+                if humanoid and humanoid.Health > 0 then
+                    local targetPos = target.Character.HumanoidRootPart.Position
+                    local screenPos, onScreen = camera:WorldToViewportPoint(targetPos)
+                    if onScreen then
+                        local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+                        if distance <= AimSettings.FOV and WallCheck(targetPos, target.Character) then
+                            if not AimSettings.FriendCheck or not IsFriend(target) then
+                                CurrentTarget = target
+                                return target
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        CurrentTarget = nil
+        return nil
+    end
+
+    if CurrentTarget and CurrentTarget ~= LocalPlayer and CurrentTarget.Character then
+        local hrp = CurrentTarget.Character:FindFirstChild("HumanoidRootPart")
+        local humanoid = CurrentTarget.Character:FindFirstChild("Humanoid")
+        if hrp and humanoid and humanoid.Health > 0 then
+            local inBlacklist = false
+            for _, blackName in ipairs(AimBlacklist) do
+                if CurrentTarget.Name == blackName then
+                    inBlacklist = true
+                    break
+                end
+            end
+            if not inBlacklist then
+                if AimTeamCheck then
+                    local myTeam = LocalPlayer.Team
+                    if myTeam and CurrentTarget.Team == myTeam then
+                        CurrentTarget = nil
+                        return nil
+                    end
+                end
+                local screenPos, onScreen = camera:WorldToViewportPoint(hrp.Position)
+                if onScreen then
+                    local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+                    if distance <= AimSettings.FOV and WallCheck(hrp.Position, CurrentTarget.Character) then
+                        if not AimSettings.FriendCheck or not IsFriend(CurrentTarget) then
+                            return CurrentTarget
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    CurrentTarget = nil
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character then
+            local skip = false
+            if AimSettings.FriendCheck and IsFriend(player) then skip = true end
+            if not skip then
+                for _, blackName in ipairs(AimBlacklist) do
+                    if player.Name == blackName then
+                        skip = true
+                        break
+                    end
+                end
+            end
+            if not skip then
+                if AimTeamCheck then
+                    local myTeam = LocalPlayer.Team
+                    if myTeam and player.Team == myTeam then skip = true end
+                end
+            end
+            if not skip then
+                local humanoidRootPart = player.Character:FindFirstChild("HumanoidRootPart")
+                local humanoid = player.Character:FindFirstChild("Humanoid")
+                if humanoidRootPart and humanoid and humanoid.Health > 0 then
+                    if WallCheck(humanoidRootPart.Position, player.Character) then
+                        local screenPos, onScreen = camera:WorldToViewportPoint(humanoidRootPart.Position)
+                        if onScreen then
+                            local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+                            if distance < shortestDistance then
+                                shortestDistance = distance
+                                nearestPlayer = player
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    if nearestPlayer then CurrentTarget = nearestPlayer end
+    return nearestPlayer
+end
+
+local function AimBot()
+    if not AimSettings.Enabled then return end
+    pcall(function()
+        local camera = workspace.CurrentCamera
+        local target = GetClosestPlayer()
+        if target and target.Character then
+            local humanoidRootPart = target.Character:FindFirstChild("HumanoidRootPart")
+            local head = target.Character:FindFirstChild("Head")
+            local targetPosition = GetTargetPosition(target.Character, AimTargetPart) or (head and head.Position) or (humanoidRootPart and humanoidRootPart.Position)
+            if not targetPosition then return end
+            if humanoidRootPart then
+                local targetVelocity = humanoidRootPart.Velocity
+                if AimSettings.CrosshairDistance > 0 then
+                    local distance = (targetPosition - camera.CFrame.Position).Magnitude
+                    local timeToTarget = distance / 1000
+                    targetPosition = targetPosition + (targetVelocity * timeToTarget * AimSettings.CrosshairDistance)
+                end
+            end
+            local currentCFrame = camera.CFrame
+            local targetCFrame = CFrame.new(currentCFrame.Position, targetPosition)
+            local smoothedCFrame = currentCFrame:Lerp(targetCFrame, 1 / AimSettings.Smoothness)
+            camera.CFrame = smoothedCFrame
+        end
+    end)
+end
+
+local function getVisiblePart(targetCharacter)
+    if not targetCharacter or not LocalPlayer.Character then return nil end
+    local localCharacter = LocalPlayer.Character
+    local humanoidRootPart = localCharacter:FindFirstChild("HumanoidRootPart")
+    if not humanoidRootPart then return nil end
+    local partNames = {"Head","UpperTorso","Torso","LowerTorso","HumanoidRootPart"}
+    local bestPart = nil
+    local bestPosition = nil
+    local bestOrigin = nil
+    local minDistance = math.huge
+    for _, partName in ipairs(partNames) do
+        local part = targetCharacter:FindFirstChild(partName)
+        if part and part:IsA("BasePart") then
+            local targetPosition = part.Position
+            for height = 0, 10.5, 2 do
+                local startPos = humanoidRootPart.Position + Vector3.new(0, height, 0)
+                local direction = (targetPosition - startPos).Unit
+                local forwardPos = startPos + direction * 2.5
+                local rayParams = RaycastParams.new()
+                rayParams.FilterType = Enum.RaycastFilterType.Exclude
+                rayParams.FilterDescendantsInstances = {localCharacter, workspace.CurrentCamera}
+                rayParams.IgnoreWater = true
+                local ray = workspace:Raycast(forwardPos, targetPosition - forwardPos, rayParams)
+                if not ray or ray.Instance:IsDescendantOf(targetCharacter) or ray.Instance.Transparency >= 0.9 then
+                    local distance = (targetPosition - forwardPos).Magnitude
+                    if distance < minDistance then
+                        minDistance = distance
+                        bestPart = part
+                        bestPosition = targetPosition
+                        bestOrigin = forwardPos
+                    end
+                end
+            end
+        end
+    end
+    return bestPart, bestPosition, bestOrigin
+end
+
+local function isDead(player)
+    if not player or not player.Character then return true end
+    local humanoid = player.Character:FindFirstChild("Humanoid")
+    return not humanoid or humanoid.Health <= 0
+end
+
+local function playShootSound()
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://6534948092"
+    sound.Volume = 1
+    sound.Parent = workspace.CurrentCamera
+    sound.PlayOnRemove = true
+    sound:Destroy()
+end
+
+local function createBeam(startPos, endPos)
+    local part1 = Instance.new("Part")
+    part1.Anchored = true
+    part1.CanCollide = false
+    part1.Transparency = 1
+    part1.Size = Vector3.new(0.1, 0.1, 0.1)
+    part1.Position = startPos
+    part1.Parent = workspace
+
+    local part2 = Instance.new("Part")
+    part2.Anchored = true
+    part2.CanCollide = false
+    part2.Transparency = 1
+    part2.Size = Vector3.new(0.1, 0.1, 0.1)
+    part2.Position = endPos
+    part2.Parent = workspace
+
+    local attachment1 = Instance.new("Attachment")
+    attachment1.Parent = part1
+    local attachment2 = Instance.new("Attachment")
+    attachment2.Parent = part2
+
+    local beam1 = Instance.new("Beam")
+    beam1.Color = ColorSequence.new(Color3.fromRGB(0, 0, 0))
+    beam1.Transparency = NumberSequence.new(0)
+    beam1.Width0 = 0.25
+    beam1.Width1 = 0.25
+    beam1.Texture = "rbxassetid://7136858729"
+    beam1.TextureSpeed = 0.8
+    beam1.TextureMode = Enum.TextureMode.Wrap
+    beam1.Brightness = 1
+    beam1.LightEmission = 0
+    beam1.FaceCamera = true
+    beam1.Attachment0 = attachment1
+    beam1.Attachment1 = attachment2
+    beam1.Parent = part1
+
+    local beam2 = Instance.new("Beam")
+    beam2.Color = ColorSequence.new(Color3.fromRGB(180, 200, 255))
+    beam2.Transparency = NumberSequence.new(0.4)
+    beam2.Width0 = 0.12
+    beam2.Width1 = 0.12
+    beam2.Texture = "rbxassetid://7136858729"
+    beam2.TextureSpeed = 1.2
+    beam2.TextureMode = Enum.TextureMode.Wrap
+    beam2.Brightness = 1.2
+    beam2.LightEmission = 0.6
+    beam2.FaceCamera = true
+    beam2.Attachment0 = attachment1
+    beam2.Attachment1 = attachment2
+    beam2.Parent = part1
+
+    local shaking = true
+    task.spawn(function()
+        while shaking and part1 and part1.Parent do
+            attachment1.Position = Vector3.new(math.random(-3, 3) / 100, math.random(-3, 3) / 100, math.random(-3, 3) / 100)
+            attachment2.Position = Vector3.new(math.random(-3, 3) / 100, math.random(-3, 3) / 100, math.random(-3, 3) / 100)
+            task.wait(0.02)
+        end
+    end)
+
+    task.delay(math.random(10, 40) / 10, function()
+        shaking = false
+        for i = 0, 1, 0.05 do
+            if not part1 or not part1.Parent then break end
+            beam1.Transparency = NumberSequence.new(i)
+            beam2.Transparency = NumberSequence.new(0.4 + i * 0.6)
+            task.wait(0.03)
+        end
+        pcall(function() part1:Destroy() end)
+        pcall(function() part2:Destroy() end)
+    end)
+end
+
+local function shoot(player, targetPart, targetPos, origin)
+    local currentTime = tick()
+    if currentTime - lastShotTime < shootInterval then return false end
+
+    local character = LocalPlayer.Character
+    if not character or not targetPart or not origin then return false end
+
+    local direction = (targetPos - origin).Unit
+    local time = tick()
+    local cframe = CFrame.lookAt(origin, targetPos)
+
+    local clientRemotes = LocalPlayer:FindFirstChild("ClientRemotes")
+    if clientRemotes then
+        pcall(function() clientRemotes.CheckFire:FireServer(time, origin) end)
+        pcall(function() clientRemotes.CheckShot:FireServer(0, 0, 1, 0.8, cframe, targetPos, targetPart, 11, time) end)
+        pcall(function() clientRemotes.Reload:FireServer() end)
+    end
+
+    local gun = game:GetService("ReplicatedStorage"):FindFirstChild("ModuleScripts")
+    if gun then
+        gun = gun:FindFirstChild("GunModules")
+        if gun then
+            gun = gun:FindFirstChild("Remote")
+            if gun then
+                pcall(function() gun.ProjectileRender:FireServer(time, character, origin, direction * 999999, 360, 0, Vector3.zero, 5, "Bullet") end)
+                pcall(function() gun.ProjectileFinished:FireServer(time, CFrame.new(targetPos), "Gib_T", false, 15, "rbxassetid://2814354338") end)
+            end
+        end
+    end
+
+    createBeam(origin, targetPos)
+    playShootSound()
+    lastShotTime = currentTime
+
+    return true
+end
+
+local function getVisibleTargets()
+    local targets = {}
+    local character = LocalPlayer.Character
+    if not character then return targets end
+
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    if not humanoidRootPart then return targets end
+
+    local origin = humanoidRootPart.Position
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and not isDead(player) and player.Character then
+            local visiblePart, visiblePos, originPos = getVisiblePart(player.Character)
+            if visiblePart and visiblePos and originPos then
+                local distance = (visiblePos - origin).Magnitude
+                if distance <= maxDistance then
+                    table.insert(targets, {
+                        player = player,
+                        distance = distance,
+                        part = visiblePart,
+                        position = visiblePos,
+                        origin = originPos
+                    })
+                end
+            end
+        end
+    end
+
+    table.sort(targets, function(a, b) return a.distance < b.distance end)
+    return targets
+end
+local Window = Library:CreateWindow({
+    Title = "AF Hub丨手枪竞技场",
+    Footer = "By Linni",
+    Icon = 122936242690381,
+    NotifySide = "Right",
+    ShowCustomCursor = true,
+})
+
+local Tabs = {
+    Main = Window:AddTab("主要控件", "info"),
+    Settings = Window:AddTab("设置", "settings"),
+}
+
+local LeftGroup = Tabs.Main:AddLeftGroupbox("攻击&杀戮")
+local Wjtjgn = Tabs.Main:AddLeftGroupbox("玩家调节")
+local RightGroup = Tabs.Main:AddRightGroupbox("透视")
+local Wjzmgn = Tabs.Main:AddRightGroupbox("自瞄")
+
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Debris = game:GetService("Debris")
+local LocalPlayer = Players.LocalPlayer
+local Camera = Workspace.CurrentCamera
+local SETTINGS = {
+	Enabled = false,
+	MaxRange = 120,
+	FovDeg = 45,
+	HeadshotChance = 0.15,
+	IgnoreTeammates = true,
+	FireRateClose = 0.55,
+	FireRateMid   = 0.85,
+	FireRateFar   = 1.30,
+	MinAttackDelay = 0.50,
+	BulletLifeTime = 0.35,
+	MissChance = 0.60,
+	IdleChance = 0.12,
+	MissOffsetMin = 0.6,
+	MissOffsetMax = 2.8,
+	HitParts = {
+		Head = 15,
+		UpperTorso = 45,
+		LowerTorso = 25,
+		HumanoidRootPart = 15,
+	}
+}
+local lastAttack = 0
+local function isTeammate(plr)
+	return SETTINGS.IgnoreTeammates
+		and plr.Team
+		and plr.Team == LocalPlayer.Team
+end
+local function angleBetween(v1, v2)
+	return math.acos(v1:Dot(v2))
+end
+local function canHit(origin, targetPos, ignore)
+	local ray = RaycastParams.new()
+	ray.FilterType = Enum.RaycastFilterType.Blacklist
+	ray.FilterDescendantsInstances = ignore or {}
+	local result = Workspace:Raycast(origin, targetPos - origin, ray)
+	return not result or result.Instance:IsDescendantOf(LocalPlayer.Character)
+end
+local function getFireRate(dist)
+	if dist < 15 then
+		return SETTINGS.FireRateClose
+	elseif dist < 40 then
+		return SETTINGS.FireRateMid
+	else
+		return SETTINGS.FireRateFar
+	end
+end
+local function getRandomHitPart(character)
+	local total = 0
+	for _, w in pairs(SETTINGS.HitParts) do
+		total += w
+	end
+	local r = math.random() * total
+	local cumulative = 0
+	for partName, weight in pairs(SETTINGS.HitParts) do
+		cumulative += weight
+		if r <= cumulative then
+			return character:FindFirstChild(partName)
+		end
+	end
+	return character:FindFirstChild("HumanoidRootPart")
+end
+local function shouldMiss()
+	return math.random() < SETTINGS.MissChance
+end
+local function shouldIdle()
+	return math.random() < SETTINGS.IdleChance
+end
+local function getMissedPosition(realPos, dist)
+	local offset = SETTINGS.MissOffsetMin
+		+ math.random() * (SETTINGS.MissOffsetMax - SETTINGS.MissOffsetMin)
+	offset *= math.clamp(dist / 35, 0.7, 2.2)
+	local angle = math.random() * math.pi * 2
+	local ox = math.cos(angle) * offset
+	local oy = math.sin(angle) * offset
+
+	return realPos + Vector3.new(ox, oy, 0)
+end
+local function showBullet(origin, hitPos)
+	local part = Instance.new("Part")
+	part.Anchored = true
+	part.CanCollide = false
+	part.Size = Vector3.new(0.06, 0.06, (hitPos - origin).Magnitude)
+	part.CFrame = CFrame.new(origin, hitPos) * CFrame.new(0, 0, -part.Size.Z / 2)
+	part.Color = Color3.fromRGB(255, 210, 50)
+	part.Transparency = 0.3
+	part.Material = Enum.Material.Neon
+	part.Parent = Workspace
+
+	Debris:AddItem(part, SETTINGS.BulletLifeTime)
+end
+local function fireAttack(targetPart)
+	local origin = Camera.CFrame.Position
+	local realHitPos = targetPart.Position
+	local dist = (realHitPos - origin).Magnitude
+	local hitPos
+	if shouldMiss() then
+		hitPos = getMissedPosition(realHitPos, dist)
+	else
+		hitPos = realHitPos
+	end
+	local direction = (hitPos - origin).Unit
+	showBullet(origin, hitPos)
+	local args = {
+		{
+			direction = direction,
+			hitPosition = hitPos,
+			origin = origin,
+			hitInstance = targetPart,
+			hitHumanoid = targetPart.Parent:FindFirstChild("Humanoid"),
+			IsHeadshot = false
+		}
+	}
+	ReplicatedStorage
+		:WaitForChild("SystemResources")
+		:WaitForChild("BufferCache")
+		:WaitForChild("RequestActionSync")
+		:FireServer(unpack(args))
+end
+local function getBestTarget()
+	local char = LocalPlayer.Character
+	if not char or not char:FindFirstChild("HumanoidRootPart") then
+		return nil, nil, math.huge
+	end
+	local origin = Camera.CFrame.Position
+	local lookVec = Camera.CFrame.LookVector
+	local bestPlr, bestPart, bestDist = nil, nil, SETTINGS.MaxRange
+	for _, plr in ipairs(Players:GetPlayers()) do
+		if plr ~= LocalPlayer and not isTeammate(plr) and plr.Character then
+			local hrp = plr.Character:FindFirstChild("HumanoidRootPart")
+			if hrp then
+				local dir = (hrp.Position - origin).Unit
+				local angle = math.deg(angleBetween(lookVec, dir))
+				if angle < SETTINGS.FovDeg then
+					local dist = (hrp.Position - origin).Magnitude
+					if dist < bestDist then
+						local part = getRandomHitPart(plr.Character)
+						if part and canHit(origin, part.Position, {char, plr.Character}) then
+							bestDist = dist
+							bestPlr = plr
+							bestPart = part
+						end
+					end
+				end
+			end
+		end
+	end
+	return bestPlr, bestPart, bestDist
+end
+RunService.RenderStepped:Connect(function()
+	if not SETTINGS.Enabled then return end
+	if shouldIdle() then return end
+	local _, targetPart, dist = getBestTarget()
+	if not targetPart then return end
+	local rate = getFireRate(dist)
+	rate = math.max(rate, SETTINGS.MinAttackDelay)
+	rate += math.random(-10, 10) / 100
+	if tick() - lastAttack < rate then return end
+	fireAttack(targetPart)
+	lastAttack = tick()
+end)
+LeftGroup:AddToggle('AutoAttackToggle', {
+    Text = '自动攻击',
+    Default = false,
+    Tooltip = '开启后会自动瞄准并攻击敌人',
+    Callback = function(Value)
+        SETTINGS.Enabled = Value
+    end
+})
+local respawnRunning = false
+local respawnConnection = nil
+local function startRespawn()
+    if respawnConnection then return end  
+    respawnRunning = true
+    respawnConnection = game:GetService("RunService").Heartbeat:Connect(function()
+        local args = {"Respawn"}        game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("RemoteEvents"):WaitForChild("DeathScreenButtonPressed"):FireServer(unpack(args))
+    end)
+end
+local function stopRespawn()
+    if respawnConnection then
+        respawnConnection:Disconnect()
+        respawnConnection = nil
+    end
+    respawnRunning = false
+end
+LeftGroup:AddToggle('AutoRespawn', {
+    Text = '自动重生',
+    Default = false,
+    Tooltip = '开启后死亡会自动重生',
+    Callback = function(Value)
+        if Value then
+            startRespawn()
+        else
+            stopRespawn()
+        end
+    end
+})
+LeftGroup:AddSlider('MaxRangeSlider', {
+    Text = '最大射程',
+    Default = 120,
+    Min = 30,
+    Max = 250,
+    Rounding = 0,
+    Suffix = " 米",
+    Callback = function(Value)
+        SETTINGS.MaxRange = Value
+    end
+})
+LeftGroup:AddSlider('FovSlider', {
+    Text = '视野角度',
+    Default = 45,
+    Min = 10,
+    Max = 120,
+    Rounding = 0,
+    Suffix = "°",
+    Callback = function(Value)
+        SETTINGS.FovDeg = Value
+    end
+})
+LeftGroup:AddSlider('FireRateCloseSlider', {
+    Text = '近距射速(<15m)',
+    Default = 0.55,
+    Min = 0.2,
+    Max = 1.0,
+    Rounding = 2,
+    Suffix = "s",
+    Callback = function(Value)
+        SETTINGS.FireRateClose = Value
+    end
+})
+LeftGroup:AddSlider('FireRateMidSlider', {
+    Text = '中距射速(15-40m)',
+    Default = 0.85,
+    Min = 0.3,
+    Max = 1.5,
+    Rounding = 2,
+    Suffix = "s",
+    Callback = function(Value)
+        SETTINGS.FireRateMid = Value
+    end
+})
+LeftGroup:AddSlider('FireRateFarSlider', {
+    Text = '远距射速(>40m)',
+    Default = 1.30,
+    Min = 0.5,
+    Max = 2.5,
+    Rounding = 2,
+    Suffix = "s",
+    Callback = function(Value)
+        SETTINGS.FireRateFar = Value
+    end
+})
+LeftGroup:AddSlider('HeadshotSlider', {
+    Text = '爆头概率',
+    Default = 0.15,
+    Min = 0,
+    Max = 0.5,
+    Rounding = 2,
+    Suffix = " %",
+    Callback = function(Value)
+        SETTINGS.HeadshotChance = Value
+    end
+})
+LeftGroup:AddSlider('MissChanceSlider', {
+    Text = '打空概率',
+    Default = 0.60,
+    Min = 0,
+    Max = 0.9,
+    Rounding = 2,
+    Suffix = " %",
+    Callback = function(Value)
+        SETTINGS.MissChance = Value
+    end
+})
+LeftGroup:AddSlider('IdleChanceSlider', {
+    Text = '停火概率',
+    Default = 0.12,
+    Min = 0,
+    Max = 0.5,
+    Rounding = 2,
+    Suffix = " %",
+    Callback = function(Value)
+        SETTINGS.IdleChance = Value
+    end
+})
+LeftGroup:AddSlider('MissOffsetSlider', {
+    Text = '打空偏移量',
+    Default = 0.6,
+    Min = 0.1,
+    Max = 5.0,
+    Rounding = 1,
+    Suffix = " 米",
+    Callback = function(Value)
+        SETTINGS.MissOffsetMin = Value
+    end
+})
+LeftGroup:AddToggle('TeamProtectToggle', {
+    Text = '保护队友',
+    Default = true,
+    Tooltip = '开启后不会攻击队友',
+    Callback = function(Value)
+        SETTINGS.IgnoreTeammates = Value
+    end
+})
+LeftGroup:AddSlider('MinDelaySlider', {
+    Text = '最小攻击间隔',
+    Default = 0.50,
+    Min = 0.1,
+    Max = 1.5,
+    Rounding = 2,
+    Suffix = "s",
+    Callback = function(Value)
+        SETTINGS.MinAttackDelay = Value
+    end
+})
+--透视
+RightGroup:AddCheckbox("ESP", {
+    Text = "透视",
+    Default = false,
+    Callback = function(enabled)
+        local Players = game:GetService("Players")
+        local RunService = game:GetService("RunService")
+        local highlights = {}
+        local connections = {}
+        local function createHighlight(plr)
+            if not plr or not plr.Character then return end            
+            local hrp = plr.Character:FindFirstChild("HumanoidRootPart")
+            if not hrp then return end            
+            if hrp:FindFirstChild("Highlight") then
+                return
+            end            
+            local highlight = Instance.new("Highlight")
+            highlight.Name = "Highlight"
+            highlight.Adornee = plr.Character
+            highlight.Parent = hrp
+            highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+            highlight.FillColor = Color3.fromRGB(255, 0, 0)
+            highlight.OutlineColor = Color3.fromRGB(255, 255, 255)           
+            highlight.FillTransparency = 0.5
+            highlight.OutlineTransparency = 0            
+            highlights[plr] = highlight
+        end
+        local function clearHighlights()
+            for plr, highlight in pairs(highlights) do
+                if highlight and highlight.Parent then
+                    highlight:Destroy()
+                end
+            end
+            table.clear(highlights)
+        end
+        local function clearConnections()
+            for _, conn in pairs(connections) do
+                if typeof(conn) == "RBXScriptConnection" then
+                    conn:Disconnect()
+                end
+            end
+            table.clear(connections)
+        end
+        local function setupCharacterTracking(plr)
+            if connections["Char_" .. plr.UserId] then
+                return
+            end           
+            local charConn = plr.CharacterAdded:Connect(function(character)
+                task.wait(0.1)                
+                if enabled then
+                    createHighlight(plr)
+                end
+            end)           
+            connections["Char_" .. plr.UserId] = charConn
+        end
+        if enabled then
+            for _, plr in pairs(Players:GetPlayers()) do
+                task.spawn(function()
+                    if plr.Character then
+                        repeat task.wait() until plr.Character:FindFirstChild("HumanoidRootPart")
+                        createHighlight(plr)
+                    end
+                    setupCharacterTracking(plr)
+                end)
+            end
+            connections["PlayerAdded"] = Players.PlayerAdded:Connect(function(plr)
+                task.spawn(function()
+                    if plr.Character then
+                        repeat task.wait() until plr.Character:FindFirstChild("HumanoidRootPart")
+                        createHighlight(plr)
+                    end
+                    setupCharacterTracking(plr)
+                end)
+            end)
+            connections["PlayerRemoving"] = Players.PlayerRemoving:Connect(function(plr)
+                if highlights[plr] then
+                    highlights[plr]:Destroy()
+                    highlights[plr] = nil
+                end
+                if connections["Char_" .. plr.UserId] then
+                    connections["Char_" .. plr.UserId]:Disconnect()
+                    connections["Char_" .. plr.UserId] = nil
+                end
+            end)
+
+        else
+            clearHighlights()
+            clearConnections()
+        end
+    end
+})
+--自瞄
+Wjzmgn:AddToggle('AimEnabled', {
+    Text = '启用自瞄',
+    Default = AimSettings.Enabled,
+    Tooltip = '开启/关闭自瞄功能',
+    Callback = function(Value)
+        AimSettings.Enabled = Value
+        if Value then
+            InitializeAimDrawings()
+            UpdateFOVCircle()
+            if AimConnection then
+                AimConnection:Disconnect()
+            end
+            AimConnection = RunService.RenderStepped:Connect(function(deltaTime)
+                pcall(function()
+                    if AimSettings.FOVRainbowEnabled then
+                        CurrentFOVHue = CurrentFOVHue + deltaTime * AimSettings.FOVRainbowSpeed / 10
+                    end
+                    UpdateFOVCircle()
+                    AimBot()
+                end)
+            end)
+            Library:Notification("自瞄", "自瞄功能已开启", 3)
+        else
+            if AimConnection then
+                AimConnection:Disconnect()
+                AimConnection = nil
+            end
+            CleanupDrawings()
+            CurrentTarget = nil
+            Library:Notification("自瞄", "自瞄功能已关闭", 3)
+        end
+        if StatusIndicator then
+            StatusIndicator.BackgroundColor3 = AimSettings.Enabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+        end
+    end
+})
+
+Wjzmgn:AddToggle('FOVEnabled', {
+    Text = 'FOV开关',
+    Default = AimSettings.FOVEnabled,
+    Tooltip = '显示自瞄范围圆圈',
+    Callback = function(Value)
+        AimSettings.FOVEnabled = Value
+        UpdateFOVCircle()
+    end
+})
+
+Wjzmgn:AddToggle('FOVRainbow', {
+    Text = 'FOV彩虹效果',
+    Default = AimSettings.FOVRainbowEnabled,
+    Tooltip = '开启FOV圆圈彩虹效果',
+    Callback = function(Value)
+        AimSettings.FOVRainbowEnabled = Value
+        UpdateFOVCircle()
+    end
+})
+
+Wjzmgn:AddToggle('FriendCheck', {
+    Text = '好友检测',
+    Default = AimSettings.FriendCheck,
+    Tooltip = '不秒好友',
+    Callback = function(Value)
+        AimSettings.FriendCheck = Value
+    end
+})
+
+Wjzmgn:AddToggle('WallCheck', {
+    Text = '墙壁检测',
+    Default = AimSettings.WallCheck,
+    Tooltip = '开启墙壁检测 避免自瞄乱飞',
+    Callback = function(Value)
+        AimSettings.WallCheck = Value
+    end
+})
+
+Wjzmgn:AddToggle('TeamCheck', {
+    Text = '队伍检测',
+    Default = AimTeamCheck,
+    Tooltip = '不攻击同队队友',
+    Callback = function(Value)
+        AimTeamCheck = Value
+    end
+})
+
+Wjzmgn:AddToggle('TargetAllMode', {
+    Text = '目标自瞄模式',
+    Default = not AimSettings.TargetAll,
+    Tooltip = '开启后可以选择目标进行制裁',
+    Callback = function(Value)
+        AimSettings.TargetAll = not Value
+        CurrentTarget = nil
+    end
+})
+
+Wjzmgn:AddSlider('FOVRainbowSpeed', {
+    Text = 'FOV彩虹速度',
+    Default = AimSettings.FOVRainbowSpeed,
+    Min = 1,
+    Max = 20,
+    Rounding = 0,
+    Callback = function(Value)
+        AimSettings.FOVRainbowSpeed = Value
+    end
+})
+
+Wjzmgn:AddSlider('AimFOV', {
+    Text = '自瞄范围 (FOV)',
+    Default = AimSettings.FOV,
+    Min = 50,
+    Max = 500,
+    Rounding = 0,
+    Suffix = ' px',
+    Callback = function(Value)
+        AimSettings.FOV = Value
+        UpdateFOVCircle()
+    end
+})
+
+Wjzmgn:AddSlider('AimSmoothness', {
+    Text = '自瞄平滑度',
+    Default = AimSettings.Smoothness,
+    Min = 1,
+    Max = 50,
+    Rounding = 0,
+    Tooltip = '数值越小越强锁',
+    Callback = function(Value)
+        AimSettings.Smoothness = Value
+    end
+})
+
+Wjzmgn:AddSlider('CrosshairDistance', {
+    Text = '预判距离',
+    Default = AimSettings.CrosshairDistance,
+    Min = 0,
+    Max = 20,
+    Rounding = 0,
+    Tooltip = '设置预判距离(需要强锁直接调到0-3)',
+    Callback = function(Value)
+        AimSettings.CrosshairDistance = Value
+    end
+})
+
+Wjzmgn:AddToggle('FOVColorPicker', {
+    Text = 'FOV圆圈颜色',
+    Default = false,
+    Tooltip = '彩虹模式关闭时生效',
+}):AddColorPicker('FOVColor', {
+    Default = AimSettings.FOVColor,
+    Title = 'FOV圆圈颜色',
+    Transparency = 0,
+    Callback = function(Value)
+        AimSettings.FOVColor = Value
+        UpdateFOVCircle()
+    end
+})
+
+Wjzmgn:AddDropdown('AimTargetPart', {
+    Values = {'头', '上身', '左腿', '右腿', '裆部', '胸部'},
+    Default = 1,
+    Multi = false,
+    Text = '自瞄部位',
+    Tooltip = '选择要瞄准的身体部位',
+    Callback = function(Value)
+        AimTargetPart = Value
+    end
+})
+
+Wjzmgn:AddDropdown('TargetPlayer', {
+    SpecialType = 'Player',
+    Text = '选择目标玩家',
+    Tooltip = '选择要自瞄的玩家 (目标自瞄模式下生效)',
+    Callback = function(Value)
+        AimSettings.TargetPlayer = Value
+        CurrentTarget = nil
+    end
+})
+
+Wjzmgn:AddInput('BlacklistInput', {
+    Default = '',
+    Numeric = false,
+    Finished = true,
+    Text = '自瞄黑名单',
+    Placeholder = '例如: Player1,Player2,Player3',
+    Tooltip = '输入不攻击的玩家名字，多个用逗号分隔',
+    Callback = function(Value)
+        local names = {}
+        for name in string.gmatch(Value, "[^,]+") do
+            name = name:match("^%s*(.-)%s*$")
+            if name ~= "" then
+                table.insert(names, name)
+            end
+        end
+        AimBlacklist = names
+        blacklistInputRef = Value
+    end
+})
+
+Wjzmgn:AddButton({
+    Text = '添加当前目标到黑名单',
+    Func = function()
+        if CurrentTarget and CurrentTarget.Name then
+            local targetName = CurrentTarget.Name
+            for _, name in ipairs(AimBlacklist) do
+                if name == targetName then
+                    Library:Notification("黑名单", targetName .. " 已在黑名单中", 3)
+                    return
+                end
+            end
+            table.insert(AimBlacklist, targetName)
+            local newValue = table.concat(AimBlacklist, ", ")
+            blacklistInputRef = newValue
+            local inputField = Wjzmgn:FindFirstChild('BlacklistInput')
+            if inputField and inputField.SetValue then
+                inputField:SetValue(newValue)
+            end
+            Library:Notification("黑名单", "已添加 " .. targetName .. " 到黑名单", 3)
+        else
+            Library:Notification("黑名单", "没有当前目标", 3)
+        end
+    end,
+    DoubleClick = false,
+})
+
+Wjzmgn:AddButton({
+    Text = '清空黑名单',
+    Func = function()
+        AimBlacklist = {}
+        blacklistInputRef = ""
+        local inputField = Wjzmgn:FindFirstChild('BlacklistInput')
+        if inputField and inputField.SetValue then
+            inputField:SetValue("")
+        end
+        Library:Notification("黑名单", "黑名单已清空", 3)
+    end,
+    DoubleClick = false,
+})
+--玩家功能
+Wjtjgn:AddSlider("WalkSpeedSlider", {Text="移动速度(可在墨水使用)",Default=16,Min=16,Max=200,Rounding=0,Compact=false,Callback=function(Value)
+        if (A2 and A2.Character) then
+                local Humanoid = A2.Character:FindFirstChild("Humanoid");
+                if Humanoid then
+                        Humanoid.WalkSpeed = Value;
+                end
+        end
+end});
+Wjtjgn:AddInput("WalkSpeedInput", {Text="移动速度设置",Default="",Placeholder="输入移动速度值",Numeric=true,Finished=false,Callback=function(Value)
+        local numValue = tonumber(Value);
+        if (numValue and A2 and A2.Character) then
+                local Humanoid = A2.Character:FindFirstChild("Humanoid");
+                if Humanoid then
+                        Humanoid.WalkSpeed = numValue;
+                end
+        end
+end});
+Wjtjgn:AddButton({Text="无限跳",Func=function()
+        A20 = not A20;
+        if A25 then
+                A25:Disconnect();
+                A25 = nil;
+        end
+        if A20 then
+                A25 = A6.JumpRequest:Connect(function()
+                        if A2.Character then
+                                local Humanoid = A2.Character:FindFirstChildOfClass("Humanoid");
+                                if Humanoid then
+                                        Humanoid:ChangeState("Jumping");
+                                end
+                        end
+                end);
+        end
+end});
+local FlyingEnabled = false
+local SpinningEnabled = false
+local FlightSpeed = 50
+local SpinSpeed = 5
+
+local CurrentAO, CurrentLV, CurrentMoverAttachment
+local FlightConnection
+local Control = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
+
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+local function getControlModule()
+    local PlayerModule = LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")
+    return require(PlayerModule:WaitForChild("ControlModule"))
+end
+
+local function setupBodyMovers(character)
+    local hrp = character:WaitForChild("HumanoidRootPart")
+    local humanoid = character:WaitForChild("Humanoid")
+    local moverParent = workspace:FindFirstChildOfClass("Terrain") or workspace
+
+    local moverAttachment = Instance.new("Attachment", hrp)
+    moverAttachment.Name = "FlightAttachment"
+
+    local alignOrientation = Instance.new("AlignOrientation")
+    alignOrientation.Mode = Enum.OrientationAlignmentMode.OneAttachment
+    alignOrientation.RigidityEnabled = true
+    alignOrientation.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+    alignOrientation.CFrame = hrp.CFrame
+    alignOrientation.Attachment0 = moverAttachment
+    alignOrientation.Parent = moverParent
+
+    local linearVelocity = Instance.new("LinearVelocity")
+    linearVelocity.VectorVelocity = Vector3.zero
+    linearVelocity.MaxForce = 9e9
+    linearVelocity.Attachment0 = moverAttachment
+    linearVelocity.Parent = moverParent
+
+    return alignOrientation, linearVelocity, humanoid, moverAttachment
+end
+
+local function getFlightVector(controlModule)
+    local moveVector = controlModule:GetMoveVector()
+
+    Control.F = -moveVector.Z
+    Control.B = moveVector.Z
+    Control.L = -moveVector.X
+    Control.R = moveVector.X
+    Control.Q = moveVector.Y
+    Control.E = -moveVector.Y
+
+    if UserInputService:IsKeyDown(Enum.KeyCode.W) then Control.F = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.S) then Control.B = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.A) then Control.L = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.D) then Control.R = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.Space) then Control.Q = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then Control.E = 1 end
+
+    local flightVector =
+        Camera.CFrame.LookVector * (Control.F - Control.B) +
+        Camera.CFrame.RightVector * (Control.R - Control.L) +
+        Vector3.new(0, 1, 0) * (Control.Q - Control.E)
+
+    return flightVector.Magnitude > 0 and flightVector.Unit or flightVector
+end
+
+local function startFlying()
+    if FlyingEnabled then return end
+
+    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    if not character then return end
+
+    FlyingEnabled = true
+    SpinningEnabled = false
+
+    if CurrentAO then CurrentAO:Destroy() end
+    if CurrentLV then CurrentLV:Destroy() end
+    if CurrentMoverAttachment then CurrentMoverAttachment:Destroy() end
+
+    CurrentAO, CurrentLV, humanoid, CurrentMoverAttachment = setupBodyMovers(character)
+
+    local controlModule = getControlModule()
+
+    FlightConnection = RunService.Heartbeat:Connect(function()
+        if not FlyingEnabled or not CurrentLV or not CurrentAO then return end
+
+        local flightVector = getFlightVector(controlModule)
+
+        if flightVector.Magnitude > 0 then
+            CurrentLV.VelocityConstraintMode = Enum.VelocityConstraintMode.Vector
+            CurrentLV.VectorVelocity = flightVector * FlightSpeed
+        else
+            CurrentLV.VectorVelocity = Vector3.zero
+        end
+
+        if SpinningEnabled then
+            local targetPart = humanoid.SeatPart or character.HumanoidRootPart
+            CurrentAO.CFrame = targetPart.CFrame * CFrame.Angles(0, math.rad(SpinSpeed), 0)
+        else
+            CurrentAO.CFrame = Camera.CFrame
+        end
+
+        humanoid.PlatformStand = true
+    end)
+
+    character.AncestryChanged:Connect(function(_, parent)
+        if not parent and FlyingEnabled then
+            stopFlying()
+        end
+    end)
+end
+
+local function stopFlying()
+    if not FlyingEnabled then return end
+
+    FlyingEnabled = false
+    SpinningEnabled = false
+
+    if FlightConnection then
+        FlightConnection:Disconnect()
+        FlightConnection = nil
+    end
+
+    if CurrentAO then CurrentAO:Destroy() end
+    if CurrentLV then CurrentLV:Destroy() end
+    if CurrentMoverAttachment then CurrentMoverAttachment:Destroy() end
+
+    local character = LocalPlayer.Character
+    if character and character:FindFirstChild("Humanoid") then
+        character.Humanoid.PlatformStand = false
+    end
+end
+
+Wjtjgn:AddToggle('MyToggle', {
+    Text = '飞行模式(能在墨水使用可能会被反作弊击杀)',
+    Default = false,
+    Tooltip = '开启 / 关闭飞行功能',
+    Callback = function(Value)
+        if Value then
+            startFlying()
+        else
+            stopFlying()
+        end
+    end
+})
+Wjtjgn:AddSlider('MyIntSlider', {
+    Text = '飞行速度',
+    Default = 50,
+    Min = 1,
+    Max = 200,
+    Rounding = 0,
+    Suffix = '',
+    Compact = false,
+    Callback = function(Value)
+        FlightSpeed = Value
+    end
+})
+Wjtjgn:AddSlider('UltraWideSlider', {
+    Text = "超广角设置(可在墨水使用)",
+    Default = 70,
+    Min = 20,
+    Max = 120,
+    Rounding = 0,
+    Suffix = "°",
+    Compact = false,
+
+    Callback = function(Value)
+        local fov = tonumber(Value)
+        if fov then
+            CurrentCamera.FieldOfView = fov
+        end
+    end
+})
+Wjtjgn:AddToggle('AntiFlingToggle', {
+    Text = '防甩飞(可在墨水使用)',
+    Default = false,
+    Tooltip = '开启后防止玩家被甩飞',
+
+    Callback = function(state)
+        if state then
+            local Players = game:GetService("Players")
+            local RunService = game:GetService("RunService")
+            local LocalPlayer = Players.LocalPlayer
+
+            local ANTI_FLING_FORCE = 1e6
+            local UPDATE_RATE = 0.01
+
+            _G.ActiveHandles = {
+                Connections = {},
+                Constraints = {},
+                Alignments = {}
+            }
+
+            local function CreateSuperConstraint(part)
+                local bodyPos = Instance.new("BodyPosition")
+                bodyPos.P = ANTI_FLING_FORCE
+                bodyPos.D = ANTI_FLING_FORCE / 10
+                bodyPos.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                bodyPos.Position = part.Position
+                bodyPos.Parent = part
+
+                local bodyGyro = Instance.new("BodyGyro")
+                bodyGyro.P = ANTI_FLING_FORCE
+                bodyGyro.D = ANTI_FLING_FORCE / 10
+                bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+                bodyGyro.CFrame = part.CFrame
+                bodyGyro.Parent = part
+
+                local alignPos = Instance.new("AlignPosition")
+                alignPos.RigidityEnabled = true
+                alignPos.MaxForce = ANTI_FLING_FORCE
+                alignPos.Responsiveness = ANTI_FLING_FORCE
+                alignPos.Parent = part
+
+                local alignOri = Instance.new("AlignOrientation")
+                alignOri.RigidityEnabled = true
+                alignOri.MaxTorque = ANTI_FLING_FORCE
+                alignOri.Responsiveness = ANTI_FLING_FORCE
+                alignOri.Parent = part
+
+                table.insert(_G.ActiveHandles.Constraints, bodyPos)
+                table.insert(_G.ActiveHandles.Constraints, bodyGyro)
+                table.insert(_G.ActiveHandles.Alignments, alignPos)
+                table.insert(_G.ActiveHandles.Alignments, alignOri)
+
+                return bodyPos, bodyGyro, alignPos, alignOri
+            end
+
+            local function ApplyUltimateProtection(character)
+                if not character then return end
+
+                local rootPart = character:FindFirstChild("HumanoidRootPart")
+                    or character:FindFirstChild("Torso")
+
+                if not rootPart then return end
+
+                local bodyPos, bodyGyro, alignPos, alignOri =
+                    CreateSuperConstraint(rootPart)
+
+                local updateConn = RunService.Heartbeat:Connect(function()
+                    if not character:IsDescendantOf(workspace) then return end
+
+                    bodyPos.Position = rootPart.Position
+                    bodyGyro.CFrame = rootPart.CFrame
+
+                    for _, part in ipairs(character:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = false
+                            part.CustomPhysicalProperties =
+                                PhysicalProperties.new(0, 0, 0)
+                            part.AssemblyAngularVelocity = Vector3.new()
+                            part.AssemblyLinearVelocity = Vector3.new()
+                            part.Velocity = Vector3.new()
+                            part.RotVelocity = Vector3.new()
+                            part:SetAttribute("LastPosition", part.Position)
+                        end
+                    end
+                end)
+
+                table.insert(_G.ActiveHandles.Connections, updateConn)
+
+                local velConn =
+                    rootPart:GetPropertyChangedSignal("AssemblyLinearVelocity")
+                        :Connect(function()
+                            rootPart.AssemblyLinearVelocity = Vector3.new()
+                            rootPart.Velocity = Vector3.new()
+                        end)
+
+                table.insert(_G.ActiveHandles.Connections, velConn)
+
+                local rotConn =
+                    rootPart:GetPropertyChangedSignal("AssemblyAngularVelocity")
+                        :Connect(function()
+                            rootPart.AssemblyAngularVelocity = Vector3.new()
+                            rootPart.RotVelocity = Vector3.new()
+                        end)
+
+                table.insert(_G.ActiveHandles.Connections, rotConn)
+
+                local posCheck = RunService.Heartbeat:Connect(function()
+                    if not character:IsDescendantOf(workspace) then return end
+
+                    local lastPos = rootPart:GetAttribute("LastPosition")
+                    if lastPos then
+                        local dist =
+                            (rootPart.Position - lastPos).Magnitude
+                        if dist > 5 then
+                            rootPart.CFrame = CFrame.new(lastPos)
+                        end
+                    end
+                    rootPart:SetAttribute("LastPosition", rootPart.Position)
+                end)
+
+                table.insert(_G.ActiveHandles.Connections, posCheck)
+            end
+
+            local function MonitorPlayer(player)
+                if player == LocalPlayer then return end
+
+                local function HandleCharacter(character)
+                    if not character then return end
+                    repeat task.wait() until
+                        character:FindFirstChild("HumanoidRootPart")
+                        or character:FindFirstChild("Torso")
+
+                    ApplyUltimateProtection(character)
+                end
+
+                if player.Character then
+                    HandleCharacter(player.Character)
+                end
+
+                local charConn =
+                    player.CharacterAdded:Connect(HandleCharacter)
+                table.insert(_G.ActiveHandles.Connections, charConn)
+            end
+
+            for _, player in ipairs(Players:GetPlayers()) do
+                MonitorPlayer(player)
+            end
+
+            local playerConn =
+                Players.PlayerAdded:Connect(MonitorPlayer)
+            table.insert(_G.ActiveHandles.Connections, playerConn)
+
+        else
+            for _, conn in ipairs(_G.ActiveHandles.Connections or {}) do
+                if conn.Connected then
+                    conn:Disconnect()
+                end
+            end
+
+            for _, constraint in ipairs(
+                _G.ActiveHandles.Constraints or {}
+            ) do
+                if constraint and constraint.Parent then
+                    constraint:Destroy()
+                end
+            end
+
+            for _, align in ipairs(
+                _G.ActiveHandles.Alignments or {}
+            ) do
+                if align and align.Parent then
+                    align:Destroy()
+                end
+            end
+
+            for _, player in ipairs(
+                game:GetService("Players"):GetPlayers()
+            ) do
+                if player ~= LocalPlayer and player.Character then
+                    for _, part in ipairs(
+                        player.Character:GetDescendants()
+                    ) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = true
+                            part.CustomPhysicalProperties = nil
+                            part.AssemblyAngularVelocity = Vector3.new()
+                            part.AssemblyLinearVelocity = Vector3.new()
+                            part:SetAttribute("LastPosition", nil)
+                        end
+                    end
+                end
+            end
+
+            _G.ActiveHandles = {
+                Connections = {},
+                Constraints = {},
+                Alignments = {}
+            }
+        end
+    end
+})
+local MenuGroup = Tabs.Settings:AddLeftGroupbox('菜单')
+MenuGroup:AddButton('卸载脚本', function() Library:Unload() end)
+MenuGroup:AddLabel('菜单快捷键'):AddKeyPicker('MenuKeybind', { Default = 'RightShift', NoUI = true, Text = 'Menu keybind' })
+
+Library.ToggleKeybind = Options.MenuKeybind
+
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+ThemeManager:SetFolder("MyScriptTheme")
+SaveManager:SetFolder("MyScriptConfig")
+SaveManager:BuildConfigSection(Tabs.Settings)
+ThemeManager:ApplyToTab(Tabs.Settings)
