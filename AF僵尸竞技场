@@ -5,7 +5,15 @@ local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
 
 local Options = Library.Options
 local Toggles = Library.Toggles
-
+local A1 = game:GetService("Players")
+local A2 = A1.LocalPlayer
+local A3 = game:GetService("RunService")
+local A4 = game:GetService("Lighting")
+local A5 = game:GetService("CoreGui")
+local A6 = game:GetService("UserInputService")
+local A7 = game:GetService("TeleportService")
+local A8 = workspace
+local A9 = game:GetService("HttpService")
 local Window = Library:CreateWindow({
     Title = "AF Hub丨僵尸竞技场",
     Footer = "By 秋辞丨九万字",
@@ -15,7 +23,7 @@ local Window = Library:CreateWindow({
 })
 
 local Tabs = {
-    Main = Window:AddTab("主要功能", "info"),
+    Main = Window:AddTab("主要控件", "info"),
     Settings = Window:AddTab("设置", "settings"),
 }
 
