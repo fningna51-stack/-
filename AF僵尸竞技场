@@ -1,0 +1,539 @@
+local repo = 'https://raw.githubusercontent.com/KingScriptAE/No-sirve-nada./refs/heads/main/'
+local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
+local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
+local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
+
+local Options = Library.Options
+local Toggles = Library.Toggles
+
+local Window = Library:CreateWindow({
+    Title = "AF Hub丨僵尸竞技场",
+    Footer = "By 秋辞丨九万字",
+    Icon = 122936242690381,
+    NotifySide = "Right",
+    ShowCustomCursor = true,
+})
+
+local Tabs = {
+    Main = Window:AddTab("主要控件", "info"),
+    Settings = Window:AddTab("设置", "settings"),
+}
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Workspace = workspace
+
+local lp = Players.LocalPlayer
+
+local WEAPON_NAME = "Pistol"
+local MAX_DAMAGE = 9999999999999
+local PROCESS_RATE = 15
+local HIT_COOLDOWN = 0.05
+
+local ZombieRemotes = ReplicatedStorage:WaitForChild("ZombieRemotes")
+local GunRemotes = ReplicatedStorage:WaitForChild("GunRemotes")
+local NetRemotes = ReplicatedStorage:WaitForChild("NetRemotes")
+
+local damageRemote = ZombieRemotes:WaitForChild("ZombieDamage")
+local GunHit = GunRemotes:WaitForChild("GunHit")
+local GunFire = NetRemotes:WaitForChild("GunFire")
+
+local zombieContainer = Workspace:WaitForChild("Zombies_Local")
+
+local activeZombies = {}
+local lastHit = {}
+
+local function tryTrack(obj)
+    if not obj:IsA("Model") then return end
+    if not obj.Name:find("Zombie") then return end
+    if activeZombies[obj] then return end
+    local id = tonumber(obj.Name:match("Zombie_(%d+)"))
+    if id then
+        activeZombies[obj] = id
+    end
+end
+
+local function tryUntrack(obj)
+    if obj:IsA("Model") then
+        local id = activeZombies[obj]
+        if id then
+            lastHit[id] = nil
+        end
+        activeZombies[obj] = nil
+    end
+end
+
+for _, obj in ipairs(zombieContainer:GetChildren()) do
+    tryTrack(obj)
+end
+
+zombieContainer.ChildAdded:Connect(tryTrack)
+zombieContainer.ChildRemoved:Connect(tryUntrack)
+
+task.spawn(function()
+    while true do
+        task.wait(0.5)
+        for _, obj in ipairs(zombieContainer:GetChildren()) do
+            tryTrack(obj)
+        end
+        for model in pairs(activeZombies) do
+            if not model or not model.Parent then
+                tryUntrack(model)
+            end
+        end
+    end
+end)
+
+local function isHoldingGun()
+    local char = lp.Character
+    if not char then return false end
+    local tool = char:FindFirstChildOfClass("Tool")
+    return tool and tool.Name:find(WEAPON_NAME) ~= nil
+end
+
+local function getMuzzlePosition()
+    local char = lp.Character
+    if not char then return nil end
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return nil end
+    return root.Position + root.CFrame.LookVector * 2
+end
+
+local autoKillEnabled = false
+local autoKillConn = nil
+
+local function startAutoKill()
+    if autoKillConn then return end
+    autoKillConn = RunService.Heartbeat:Connect(function()
+        if not autoKillEnabled then return end
+
+        local now = tick()
+        local char = lp.Character
+        if not char then return end
+        local root = char:FindFirstChild("HumanoidRootPart")
+        if not root then return end
+
+        local targets = {}
+        for model, id in pairs(activeZombies) do
+            if not model or not model.Parent then
+                tryUntrack(model)
+                continue
+            end
+
+            local hum = model:FindFirstChildOfClass("Humanoid")
+            if hum and hum.Health <= 0 then
+                tryUntrack(model)
+                continue
+            end
+
+            if lastHit[id] and (now - lastHit[id]) < HIT_COOLDOWN then
+                continue
+            end
+
+            table.insert(targets, { id = id })
+        end
+
+        table.sort(targets, function(a, b)
+            return a.id < b.id
+        end)
+
+        local limit = math.min(#targets, PROCESS_RATE)
+        for i = 1, limit do
+            local id = targets[i].id
+            lastHit[id] = now
+            damageRemote:FireServer(id, MAX_DAMAGE)
+        end
+    end)
+end
+
+local function stopAutoKill()
+    if autoKillConn then
+        autoKillConn:Disconnect()
+        autoKillConn = nil
+    end
+end
+
+local gunKillEnabled = false
+local gunKillConn = nil
+
+local function startGunKill()
+    if gunKillConn then return end
+    gunKillConn = RunService.RenderStepped:Connect(function()
+        if not gunKillEnabled then return end
+        if not isHoldingGun() then return end
+
+        local char = lp.Character
+        if not char then return end
+        local root = char:FindFirstChild("HumanoidRootPart")
+        local muzzle = getMuzzlePosition()
+        if not root or not muzzle then return end
+
+        local now = tick()
+        local targets = {}
+
+        for model, id in pairs(activeZombies) do
+            if not model or not model.Parent then
+                tryUntrack(model)
+                continue
+            end
+
+            local hum = model:FindFirstChildOfClass("Humanoid")
+            if hum and hum.Health <= 0 then
+                tryUntrack(model)
+                continue
+            end
+
+            local part =
+                model.PrimaryPart
+                or model:FindFirstChild("HumanoidRootPart")
+                or model:FindFirstChildWhichIsA("BasePart")
+
+            if not part then continue end
+
+            if lastHit[id] and (now - lastHit[id]) < HIT_COOLDOWN then
+                continue
+            end
+
+            table.insert(targets, {
+                id = id,
+                pos = part.Position
+            })
+        end
+
+        table.sort(targets, function(a, b)
+            return (a.pos - root.Position).Magnitude < (b.pos - root.Position).Magnitude
+        end)
+
+        local limit = math.min(#targets, PROCESS_RATE)
+        for i = 1, limit do
+            local t = targets[i]
+            lastHit[t.id] = now
+            local dir = (t.pos - muzzle).Unit
+            GunFire:FireServer(WEAPON_NAME, muzzle, dir)
+            GunHit:FireServer(WEAPON_NAME, t.id, t.pos, MAX_DAMAGE)
+        end
+    end)
+end
+
+local function stopGunKill()
+    if gunKillConn then
+        gunKillConn:Disconnect()
+        gunKillConn = nil
+    end
+end
+
+local LeftGroup = Tabs.Main:AddLeftGroupbox("战斗控制")
+local RightGroup = Tabs.Main:AddRightGroupbox("玩家调节")
+local Mhgn = Tabs.Main:AddRightGroupbox("美化功能")
+
+LeftGroup:AddLabel('僵尸战斗控制系统')
+LeftGroup:AddToggle('AutoKillToggle', {
+    Text = '自动秒杀',
+    Default = false,
+    Tooltip = '自动对僵尸造成巨额伤害，快速击杀',
+    Callback = function(Value)
+        autoKillEnabled = Value
+        if autoKillEnabled then
+            startAutoKill()
+            Library:Notify("自动秒杀已开启", 2)
+        else
+            stopAutoKill()
+            Library:Notify("自动秒杀已关闭", 2)
+        end
+    end
+})
+LeftGroup:AddToggle('GunKillToggle', {
+    Text = '枪械攻击',
+    Default = false,
+    Tooltip = '仅当手持枪支时自动攻击最近的僵尸',
+    Callback = function(Value)
+        gunKillEnabled = Value
+        if gunKillEnabled then
+            startGunKill()
+            Library:Notify("枪械攻击已开启（需持枪）", 2)
+        else
+            stopGunKill()
+            Library:Notify("枪械攻击已关闭", 2)
+        end
+    end
+})
+LeftGroup:AddLabel('— — 配置选项 — —')
+LeftGroup:AddInput('WeaponNameInput', {
+    Default = 'Pistol',
+    Numeric = false,
+    Finished = true,
+    Text = '武器名称',
+    Placeholder = '输入武器名称...',
+    Tooltip = '修改为当前使用的武器名称',
+    Callback = function(Value)
+        if Value and Value ~= "" then
+            WEAPON_NAME = Value
+            Library:Notify("武器已切换为: " .. WEAPON_NAME, 2)
+        end
+    end
+})
+LeftGroup:AddSlider('ProcessRateSlider', {
+    Text = '攻击速率',
+    Default = 15,
+    Min = 1,
+    Max = 50,
+    Rounding = 0,
+    Suffix = " 次/帧",
+    Tooltip = '每帧攻击的僵尸数量，越高越快',
+    Callback = function(Value)
+        PROCESS_RATE = Value
+    end
+})
+LeftGroup:AddLabel('当前伤害: ' .. tostring(MAX_DAMAGE))
+LeftGroup:AddButton({
+    Text = '刷新状态信息',
+    Func = function()
+        local count = 0
+        for _ in pairs(activeZombies) do count = count + 1 end
+        Library:Notify("当前僵尸数量: " .. count .. " | 武器: " .. WEAPON_NAME, 3)
+    end,
+})
+
+RightGroup:AddSlider("WalkSpeedSlider", {Text="移动速度(可在墨水使用)",Default=16,Min=16,Max=200,Rounding=0,Compact=false,Callback=function(Value)
+        if (A2 and A2.Character) then
+                local Humanoid = A2.Character:FindFirstChild("Humanoid");
+                if Humanoid then
+                        Humanoid.WalkSpeed = Value;
+                end
+        end
+end});
+RightGroup:AddInput("WalkSpeedInput", {Text="移动速度设置",Default="",Placeholder="输入移动速度值",Numeric=true,Finished=false,Callback=function(Value)
+        local numValue = tonumber(Value);
+        if (numValue and A2 and A2.Character) then
+                local Humanoid = A2.Character:FindFirstChild("Humanoid");
+                if Humanoid then
+                        Humanoid.WalkSpeed = numValue;
+                end
+        end
+end});
+RightGroup:AddButton({Text="无限跳",Func=function()
+        A20 = not A20;
+        if A25 then
+                A25:Disconnect();
+                A25 = nil;
+        end
+        if A20 then
+                A25 = A6.JumpRequest:Connect(function()
+                        if A2.Character then
+                                local Humanoid = A2.Character:FindFirstChildOfClass("Humanoid");
+                                if Humanoid then
+                                        Humanoid:ChangeState("Jumping");
+                                end
+                        end
+                end);
+        end
+end});
+local FlyingEnabled = false
+local SpinningEnabled = false
+local FlightSpeed = 50
+local SpinSpeed = 5
+
+local CurrentAO, CurrentLV, CurrentMoverAttachment
+local FlightConnection
+local Control = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
+
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+local function getControlModule()
+    local PlayerModule = LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")
+    return require(PlayerModule:WaitForChild("ControlModule"))
+end
+
+local function setupBodyMovers(character)
+    local hrp = character:WaitForChild("HumanoidRootPart")
+    local humanoid = character:WaitForChild("Humanoid")
+    local moverParent = workspace:FindFirstChildOfClass("Terrain") or workspace
+
+    local moverAttachment = Instance.new("Attachment", hrp)
+    moverAttachment.Name = "FlightAttachment"
+
+    local alignOrientation = Instance.new("AlignOrientation")
+    alignOrientation.Mode = Enum.OrientationAlignmentMode.OneAttachment
+    alignOrientation.RigidityEnabled = true
+    alignOrientation.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+    alignOrientation.CFrame = hrp.CFrame
+    alignOrientation.Attachment0 = moverAttachment
+    alignOrientation.Parent = moverParent
+
+    local linearVelocity = Instance.new("LinearVelocity")
+    linearVelocity.VectorVelocity = Vector3.zero
+    linearVelocity.MaxForce = 9e9
+    linearVelocity.Attachment0 = moverAttachment
+    linearVelocity.Parent = moverParent
+
+    return alignOrientation, linearVelocity, humanoid, moverAttachment
+end
+
+local function getFlightVector(controlModule)
+    local moveVector = controlModule:GetMoveVector()
+
+    Control.F = -moveVector.Z
+    Control.B = moveVector.Z
+    Control.L = -moveVector.X
+    Control.R = moveVector.X
+    Control.Q = moveVector.Y
+    Control.E = -moveVector.Y
+
+    if UserInputService:IsKeyDown(Enum.KeyCode.W) then Control.F = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.S) then Control.B = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.A) then Control.L = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.D) then Control.R = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.Space) then Control.Q = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then Control.E = 1 end
+
+    local flightVector =
+        Camera.CFrame.LookVector * (Control.F - Control.B) +
+        Camera.CFrame.RightVector * (Control.R - Control.L) +
+        Vector3.new(0, 1, 0) * (Control.Q - Control.E)
+
+    return flightVector.Magnitude > 0 and flightVector.Unit or flightVector
+end
+
+local function startFlying()
+    if FlyingEnabled then return end
+
+    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    if not character then return end
+
+    FlyingEnabled = true
+    SpinningEnabled = false
+
+    if CurrentAO then CurrentAO:Destroy() end
+    if CurrentLV then CurrentLV:Destroy() end
+    if CurrentMoverAttachment then CurrentMoverAttachment:Destroy() end
+
+    CurrentAO, CurrentLV, humanoid, CurrentMoverAttachment = setupBodyMovers(character)
+
+    local controlModule = getControlModule()
+
+    FlightConnection = RunService.Heartbeat:Connect(function()
+        if not FlyingEnabled or not CurrentLV or not CurrentAO then return end
+
+        local flightVector = getFlightVector(controlModule)
+
+        if flightVector.Magnitude > 0 then
+            CurrentLV.VelocityConstraintMode = Enum.VelocityConstraintMode.Vector
+            CurrentLV.VectorVelocity = flightVector * FlightSpeed
+        else
+            CurrentLV.VectorVelocity = Vector3.zero
+        end
+
+        if SpinningEnabled then
+            local targetPart = humanoid.SeatPart or character.HumanoidRootPart
+            CurrentAO.CFrame = targetPart.CFrame * CFrame.Angles(0, math.rad(SpinSpeed), 0)
+        else
+            CurrentAO.CFrame = Camera.CFrame
+        end
+
+        humanoid.PlatformStand = true
+    end)
+
+    character.AncestryChanged:Connect(function(_, parent)
+        if not parent and FlyingEnabled then
+            stopFlying()
+        end
+    end)
+end
+
+local function stopFlying()
+    if not FlyingEnabled then return end
+
+    FlyingEnabled = false
+    SpinningEnabled = false
+
+    if FlightConnection then
+        FlightConnection:Disconnect()
+        FlightConnection = nil
+    end
+
+    if CurrentAO then CurrentAO:Destroy() end
+    if CurrentLV then CurrentLV:Destroy() end
+    if CurrentMoverAttachment then CurrentMoverAttachment:Destroy() end
+
+    local character = LocalPlayer.Character
+    if character and character:FindFirstChild("Humanoid") then
+        character.Humanoid.PlatformStand = false
+    end
+end
+
+RightGroup:AddToggle('MyToggle', {
+    Text = '飞行模式(能在墨水使用可能会被反作弊击杀)',
+    Default = false,
+    Tooltip = '开启 / 关闭飞行功能',
+    Callback = function(Value)
+        if Value then
+            startFlying()
+        else
+            stopFlying()
+        end
+    end
+})
+RightGroup:AddSlider('MyIntSlider', {
+    Text = '飞行速度',
+    Default = 50,
+    Min = 1,
+    Max = 200,
+    Rounding = 0,
+    Suffix = '',
+    Compact = false,
+    Callback = function(Value)
+        FlightSpeed = Value
+    end
+})
+
+Mhgn:AddInput('CrystalsInput', {
+    Default = '999',
+    Numeric = true,
+    Finished = true,
+    Text = '晶体数量 (Crystals)',
+    Placeholder = '请输入晶体数量...', 
+    Callback = function(Value)
+        local numValue = tonumber(Value)
+        if numValue then
+            game:GetService("Players").LocalPlayer.leaderstats.Crystals.Value = numValue
+            print('[晶体] 已设置为:', numValue)
+        else
+            print('[晶体] 输入无效，请输入数字')
+        end
+    end
+})
+Mhgn:AddInput('VoidShardsInput', {
+    Default = '999',
+    Numeric = true,
+    Finished = true,
+    Text = '事件碎片 (VoidShards)',
+    Placeholder = '请输入事件碎片数量...', 
+    Callback = function(Value)
+        local numValue = tonumber(Value)
+        if numValue then
+            game:GetService("Players").LocalPlayer.VoidShards.Value = numValue
+            print('[事件碎片] 已设置为:', numValue)
+        else
+            print('[事件碎片] 输入无效，请输入数字')
+        end
+    end
+})
+local MenuGroup = Tabs.Settings:AddLeftGroupbox('菜单')
+MenuGroup:AddButton('卸载脚本', function() Library:Unload() end)
+MenuGroup:AddLabel('菜单快捷键'):AddKeyPicker('MenuKeybind', { Default = 'RightShift', NoUI = true, Text = 'Menu keybind' })
+
+Library.ToggleKeybind = Options.MenuKeybind
+
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+ThemeManager:SetFolder("MyScriptTheme")
+SaveManager:SetFolder("MyScriptConfig")
+SaveManager:BuildConfigSection(Tabs.Settings)
+ThemeManager:ApplyToTab(Tabs.Settings)
