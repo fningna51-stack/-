@@ -15,7 +15,7 @@ local Window = Library:CreateWindow({
 })
 
 local Tabs = {
-    Main = Window:AddTab("主要控件", "info"),
+    Main = Window:AddTab("主要功能", "info"),
     Settings = Window:AddTab("设置", "settings"),
 }
 
