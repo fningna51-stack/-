@@ -1,0 +1,924 @@
+local repo = 'https://raw.githubusercontent.com/KingScriptAE/No-sirve-nada./refs/heads/main/'
+local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
+local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
+local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
+
+local Options = Library.Options
+local Toggles = Library.Toggles
+local A1 = game:GetService("Players")
+local A2 = A1.LocalPlayer
+local A3 = game:GetService("RunService")
+local A4 = game:GetService("Lighting")
+local A5 = game:GetService("CoreGui")
+local A6 = game:GetService("UserInputService")
+local A7 = game:GetService("TeleportService")
+local A8 = workspace
+local A9 = game:GetService("HttpService")
+
+local Window = Library:CreateWindow({
+    Title = "AF Hub丨每点击+一次黑客攻击",
+    Footer = "By 秋辞丨九万字",
+    Icon = 122936242690381,
+    NotifySide = "Right",
+    ShowCustomCursor = true,
+})
+
+local Tabs = {
+    Main = Window:AddTab("主要", "info"),
+    Settings = Window:AddTab("设置", "settings"),
+}
+
+local LeftGroup = Tabs.Main:AddLeftGroupbox("主要功能")
+local Yxszgn = Tabs.Main:AddLeftGroupbox("游戏设置")
+local RightGroup = Tabs.Main:AddRightGroupbox("每日领取")
+local Wjgn = Tabs.Main:AddRightGroupbox("玩家功能")
+local function AutoAddKick()
+    local replicatedStorage = game:GetService("ReplicatedStorage")
+    local success, result = pcall(function()
+        return replicatedStorage:WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("sleitnick_knit@1.7.0"):WaitForChild("knit"):WaitForChild("Services"):WaitForChild("KickService"):WaitForChild("RF"):WaitForChild("AddKick"):InvokeServer()
+    end)
+    if not success then
+        warn("AutoAddKick 执行失败:", result)
+    end
+    return result
+end
+local autoAddKickEnabled = false
+local connection = nil
+LeftGroup:AddToggle('MyToggle', {
+    Text = '自动点击增加',
+    Default = false,
+    Tooltip = '开启后每帧自动调用 AddKick（速度0延迟）',
+    Callback = function(Value)
+        autoAddKickEnabled = Value
+        print('[回调] 自动点击增加状态改变:', Value)
+        
+        if Value then
+            if not connection then
+                connection = game:GetService("RunService").RenderStepped:Connect(function()
+                    if autoAddKickEnabled then
+                        AutoAddKick()
+                    end
+                end)
+                print("[自动点击] 已启动（每帧执行）")
+            end
+        else
+            if connection then
+                connection:Disconnect()
+                connection = nil
+                print("[自动点击] 已停止")
+            end
+        end
+    end
+})
+local function FireLevelUpVFX()
+    local success, result = pcall(function()
+        return game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("sleitnick_knit@1.7.0"):WaitForChild("knit"):WaitForChild("Services"):WaitForChild("LevelUpService"):WaitForChild("RF"):WaitForChild("FireLevelUpVFX"):InvokeServer()
+    end)
+    if not success then
+        warn("升级特效执行失败:", result)
+    end
+    return result
+end
+local levelUpVFXEnabled = false
+local levelUpConnection = nil
+local levelUpTimer = nil
+LeftGroup:AddToggle('MyToggle', {
+    Text = '升级特效循环',
+    Default = false,
+    Tooltip = '开启后循环执行升级特效（每0.5秒一次）',
+    Callback = function(Value)
+        levelUpVFXEnabled = Value
+        print('[回调] 升级特效循环状态改变:', Value)
+        
+        if Value then
+            if not levelUpConnection then
+                FireLevelUpVFX()
+                levelUpTimer = 0
+                levelUpConnection = game:GetService("RunService").Heartbeat:Connect(function(deltaTime)
+                    if not levelUpVFXEnabled then return end
+                    levelUpTimer = levelUpTimer + deltaTime
+                    if levelUpTimer >= 0.5 then
+                        levelUpTimer = 0
+                        FireLevelUpVFX()
+                    end
+                end)
+                print("[升级特效] 已启动循环（间隔0.5秒）")
+            end
+        else
+            if levelUpConnection then
+                levelUpConnection:Disconnect()
+                levelUpConnection = nil
+                levelUpTimer = nil
+                print("[升级特效] 已停止循环")
+            end
+        end
+    end
+})
+local function HitWall()
+    local success, result = pcall(function()
+        return game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("sleitnick_knit@1.7.0"):WaitForChild("knit"):WaitForChild("Services"):WaitForChild("BreakWallService"):WaitForChild("RF"):WaitForChild("HitWall"):InvokeServer()
+    end)
+    if not success then
+        warn("攻击执行失败:", result)
+    end
+    return result
+end
+local autoAttackEnabled = false
+local autoAttackConnection = nil
+LeftGroup:AddToggle('MyToggle', {
+    Text = '自动攻击',
+    Default = false,
+    Tooltip = '开启后每帧自动攻击（速度0）',
+    Callback = function(Value)
+        autoAttackEnabled = Value
+        print('[回调] 自动攻击状态改变:', Value)
+        
+        if Value then
+            if not autoAttackConnection then
+                autoAttackConnection = game:GetService("RunService").RenderStepped:Connect(function()
+                    if autoAttackEnabled then
+                        HitWall()
+                    end
+                end)
+                print("[自动攻击] 已启动（每帧执行，速度0）")
+            end
+        else
+            if autoAttackConnection then
+                autoAttackConnection:Disconnect()
+                autoAttackConnection = nil
+                print("[自动攻击] 已停止")
+            end
+        end
+    end
+})
+LeftGroup:AddButton({
+    Text = '恢复初始墙壁',
+    Func = function()
+        local success, result = pcall(function()
+            return game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("sleitnick_knit@1.7.0"):WaitForChild("knit"):WaitForChild("Services"):WaitForChild("BreakWallService"):WaitForChild("RF"):WaitForChild("ResetWalls"):InvokeServer()
+        end)
+        if success then
+            Library:Notify("墙壁已恢复！", 2)
+            print("墙壁恢复成功")
+        else
+            warn("墙壁恢复失败:", result)
+            Library:Notify("墙壁恢复失败！", 2)
+        end
+    end,
+    DoubleClick = false,
+})
+local function Rebirth()
+    local success, result = pcall(function()
+        return game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("sleitnick_knit@1.7.0"):WaitForChild("knit"):WaitForChild("Services"):WaitForChild("RebirthService"):WaitForChild("RF"):WaitForChild("Rebirth"):InvokeServer()
+    end)
+    if not success then
+        warn("重生执行失败:", result)
+    end
+    return result
+end
+
+local autoRebirthEnabled = false
+local autoRebirthConnection = nil
+
+LeftGroup:AddToggle('AutoRebirth', {
+    Text = '自动重生',
+    Default = false,
+    Tooltip = '开启后每帧自动重生（速度0）',
+    Callback = function(Value)
+        autoRebirthEnabled = Value
+        print('[回调] 自动重生状态改变:', Value)
+        
+        if Value then
+            if not autoRebirthConnection then
+                autoRebirthConnection = game:GetService("RunService").RenderStepped:Connect(function()
+                    if autoRebirthEnabled then
+                        Rebirth()
+                    end
+                end)
+                print("[自动重生] 已启动（每帧执行，速度0）")
+            end
+        else
+            if autoRebirthConnection then
+                autoRebirthConnection:Disconnect()
+                autoRebirthConnection = nil
+                print("[自动重生] 已停止")
+            end
+        end
+    end
+})
+local function Spin()
+    local success, result = pcall(function()
+        return game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("sleitnick_knit@1.7.0"):WaitForChild("knit"):WaitForChild("Services"):WaitForChild("SpinWheelService"):WaitForChild("RF"):WaitForChild("Spin"):InvokeServer()
+    end)
+    if not success then
+        warn("旋转执行失败:", result)
+    end
+    return result
+end
+
+local autoSpinEnabled = false
+local autoSpinConnection = nil
+
+LeftGroup:AddToggle('AutoSpin', {
+    Text = '自动旋转',
+    Default = false,
+    Tooltip = '开启后每帧自动旋转（速度0）',
+    Callback = function(Value)
+        autoSpinEnabled = Value
+        print('[回调] 自动旋转状态改变:', Value)
+        
+        if Value then
+            if not autoSpinConnection then
+                autoSpinConnection = game:GetService("RunService").RenderStepped:Connect(function()
+                    if autoSpinEnabled then
+                        Spin()
+                    end
+                end)
+                print("[自动旋转] 已启动（每帧执行，速度0）")
+            end
+        else
+            if autoSpinConnection then
+                autoSpinConnection:Disconnect()
+                autoSpinConnection = nil
+                print("[自动旋转] 已停止")
+            end
+        end
+    end
+})
+--游戏设置
+local function SaveSettings(settings)
+    local success, result = pcall(function()
+        return game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("sleitnick_knit@1.7.0"):WaitForChild("knit"):WaitForChild("Services"):WaitForChild("SettingsService"):WaitForChild("RF"):WaitForChild("SaveSettings"):InvokeServer(settings)
+    end)
+    if not success then
+        warn("设置保存失败:", result)
+    end
+    return success
+end
+local settingsState = {
+    OtherPets = true,
+    SFX = true,
+    Music = true,
+    VFX = true,
+    Speed = true
+}
+Yxszgn:AddButton({
+    Text = '隐藏其他宠物',
+    Func = function()
+        settingsState.OtherPets = not settingsState.OtherPets
+        if SaveSettings(settingsState) then
+            local status = settingsState.OtherPets and "显示" or "隐藏"
+            Library:Notify("其他宠物已" .. status, 2)
+            print("其他宠物状态:", status)
+        end
+    end,
+    DoubleClick = false,
+})
+Yxszgn:AddButton({
+    Text = '音效开关',
+    Func = function()
+        settingsState.SFX = not settingsState.SFX
+        if SaveSettings(settingsState) then
+            local status = settingsState.SFX and "开启" or "关闭"
+            Library:Notify("音效已" .. status, 2)
+            print("音效状态:", status)
+        end
+    end,
+    DoubleClick = false,
+})
+Yxszgn:AddButton({
+    Text = '音乐开关',
+    Func = function()
+        settingsState.Music = not settingsState.Music
+        if SaveSettings(settingsState) then
+            local status = settingsState.Music and "开启" or "关闭"
+            Library:Notify("音乐已" .. status, 2)
+            print("音乐状态:", status)
+        end
+    end,
+    DoubleClick = false,
+})
+Yxszgn:AddButton({
+    Text = '视觉特效开关',
+    Func = function()
+        settingsState.VFX = not settingsState.VFX
+        if SaveSettings(settingsState) then
+            local status = settingsState.VFX and "开启" or "关闭"
+            Library:Notify("视觉特效已" .. status, 2)
+            print("视觉特效状态:", status)
+        end
+    end,
+    DoubleClick = false,
+})
+Yxszgn:AddButton({
+    Text = '速度开关',
+    Func = function()
+        settingsState.Speed = not settingsState.Speed
+        if SaveSettings(settingsState) then
+            local status = settingsState.Speed and "开启" or "关闭"
+            Library:Notify("速度已" .. status, 2)
+            print("速度状态:", status)
+        end
+    end,
+    DoubleClick = false,
+})
+--每日领取
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local KnitPath = ReplicatedStorage:WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("sleitnick_knit@1.7.0"):WaitForChild("knit")
+local DailyRewardsService = KnitPath:WaitForChild("Services"):WaitForChild("DailyRewardsService"):WaitForChild("RF")
+local BackpackService = KnitPath:WaitForChild("Services"):WaitForChild("BackpackService"):WaitForChild("RF")
+local EquipRewardWeapon = DailyRewardsService:WaitForChild("EquipRewardWeapon")
+local EquipBackpack = BackpackService:WaitForChild("EquipBackpack")
+local WeaponIDs = {1, 3, 4, 5, 6, 7}
+local WeaponNames = {
+    [1] = "天数 1",
+    [3] = "天数 3", 
+    [4] = "天数 4",
+    [5] = "天数 5",
+    [6] = "天数 6",
+    [7] = "天数 7"
+}
+local DropdownValues = {}
+for _, id in ipairs(WeaponIDs) do
+    table.insert(DropdownValues, WeaponNames[id] or "武器 " .. id)
+end
+RightGroup:AddDropdown('WeaponDropdown', {
+    Values = DropdownValues,
+    Default = 1,
+    Multi = false,
+    Text = '选择要领取的每日奖励',
+    Callback = function(Value)
+        print('[回调] 选中:', Value)
+    end
+})
+RightGroup:AddButton({
+    Text = '领取选中的每日奖励',
+    Func = function()
+        local selected = LeftGroup:Get('WeaponDropdown')
+        local weaponIndex = nil        
+        for id, name in pairs(WeaponNames) do
+            if name == selected then
+                weaponIndex = id
+                break
+            end
+        end        
+        if weaponIndex then
+            local args = {weaponIndex}
+            local success, result = pcall(function()
+                EquipRewardWeapon:InvokeServer(unpack(args))
+            end)           
+            if success then
+                Library:Notify("成功领取: " .. selected, 3)
+                print("领取武器:", selected, "ID:", weaponIndex)
+            else
+                Library:Notify("领取失败: " .. tostring(result), 3)
+                warn("领取失败:", result)
+            end
+        else
+            Library:Notify("请选择一个武器", 3)
+        end
+    end,
+    DoubleClick = false,
+})
+RightGroup:AddButton({
+    Text = '一键领取全部',
+    Func = function()
+        local successCount = 0
+        local failCount = 0        
+        local backpackArgs = {"Hologram"}
+        local backpackSuccess, backpackResult = pcall(function()
+            EquipBackpack:InvokeServer(unpack(backpackArgs))
+        end)        
+        if not backpackSuccess then
+            Library:Notify("装备背包失败: " .. tostring(backpackResult), 3)
+            warn("装备背包失败:", backpackResult)
+            return
+        end        
+        for _, id in ipairs(WeaponIDs) do
+            local args = {id}
+            local success, result = pcall(function()
+                EquipRewardWeapon:InvokeServer(unpack(args))
+            end)            
+            if success then
+                successCount = successCount + 1
+                print("成功领取武器 ID:", id)
+            else
+                failCount = failCount + 1
+                warn("领取武器 ID:", id, "失败:", result)
+            end            
+            task.wait(0.1)
+        end       
+        Library:Notify(string.format("一键领取完成！成功: %d, 失败: %d", successCount, failCount), 4)
+        print(string.format("一键领取完成 - 成功: %d, 失败: %d", successCount, failCount))
+    end,
+    DoubleClick = false,
+})
+--玩家功能
+Wjgn:AddSlider("WalkSpeedSlider", {Text="移动速度(可在墨水使用)",Default=16,Min=16,Max=200,Rounding=0,Compact=false,Callback=function(Value)
+        if (A2 and A2.Character) then
+                local Humanoid = A2.Character:FindFirstChild("Humanoid");
+                if Humanoid then
+                        Humanoid.WalkSpeed = Value;
+                end
+        end
+end});
+Wjgn:AddInput("WalkSpeedInput", {Text="移动速度设置",Default="",Placeholder="输入移动速度值",Numeric=true,Finished=false,Callback=function(Value)
+        local numValue = tonumber(Value);
+        if (numValue and A2 and A2.Character) then
+                local Humanoid = A2.Character:FindFirstChild("Humanoid");
+                if Humanoid then
+                        Humanoid.WalkSpeed = numValue;
+                end
+        end
+end});
+Wjgn:AddButton({Text="无限跳",Func=function()
+        A20 = not A20;
+        if A25 then
+                A25:Disconnect();
+                A25 = nil;
+        end
+        if A20 then
+                A25 = A6.JumpRequest:Connect(function()
+                        if A2.Character then
+                                local Humanoid = A2.Character:FindFirstChildOfClass("Humanoid");
+                                if Humanoid then
+                                        Humanoid:ChangeState("Jumping");
+                                end
+                        end
+                end);
+        end
+end});
+local FlyingEnabled = false
+local SpinningEnabled = false
+local FlightSpeed = 50
+local SpinSpeed = 5
+
+local CurrentAO, CurrentLV, CurrentMoverAttachment
+local FlightConnection
+local Control = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
+
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+local function getControlModule()
+    local PlayerModule = LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")
+    return require(PlayerModule:WaitForChild("ControlModule"))
+end
+
+local function setupBodyMovers(character)
+    local hrp = character:WaitForChild("HumanoidRootPart")
+    local humanoid = character:WaitForChild("Humanoid")
+    local moverParent = workspace:FindFirstChildOfClass("Terrain") or workspace
+
+    local moverAttachment = Instance.new("Attachment", hrp)
+    moverAttachment.Name = "FlightAttachment"
+
+    local alignOrientation = Instance.new("AlignOrientation")
+    alignOrientation.Mode = Enum.OrientationAlignmentMode.OneAttachment
+    alignOrientation.RigidityEnabled = true
+    alignOrientation.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+    alignOrientation.CFrame = hrp.CFrame
+    alignOrientation.Attachment0 = moverAttachment
+    alignOrientation.Parent = moverParent
+
+    local linearVelocity = Instance.new("LinearVelocity")
+    linearVelocity.VectorVelocity = Vector3.zero
+    linearVelocity.MaxForce = 9e9
+    linearVelocity.Attachment0 = moverAttachment
+    linearVelocity.Parent = moverParent
+
+    return alignOrientation, linearVelocity, humanoid, moverAttachment
+end
+
+local function getFlightVector(controlModule)
+    local moveVector = controlModule:GetMoveVector()
+
+    Control.F = -moveVector.Z
+    Control.B = moveVector.Z
+    Control.L = -moveVector.X
+    Control.R = moveVector.X
+    Control.Q = moveVector.Y
+    Control.E = -moveVector.Y
+
+    if UserInputService:IsKeyDown(Enum.KeyCode.W) then Control.F = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.S) then Control.B = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.A) then Control.L = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.D) then Control.R = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.Space) then Control.Q = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then Control.E = 1 end
+
+    local flightVector =
+        Camera.CFrame.LookVector * (Control.F - Control.B) +
+        Camera.CFrame.RightVector * (Control.R - Control.L) +
+        Vector3.new(0, 1, 0) * (Control.Q - Control.E)
+
+    return flightVector.Magnitude > 0 and flightVector.Unit or flightVector
+end
+
+local function startFlying()
+    if FlyingEnabled then return end
+
+    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    if not character then return end
+
+    FlyingEnabled = true
+    SpinningEnabled = false
+
+    if CurrentAO then CurrentAO:Destroy() end
+    if CurrentLV then CurrentLV:Destroy() end
+    if CurrentMoverAttachment then CurrentMoverAttachment:Destroy() end
+
+    CurrentAO, CurrentLV, humanoid, CurrentMoverAttachment = setupBodyMovers(character)
+
+    local controlModule = getControlModule()
+
+    FlightConnection = RunService.Heartbeat:Connect(function()
+        if not FlyingEnabled or not CurrentLV or not CurrentAO then return end
+
+        local flightVector = getFlightVector(controlModule)
+
+        if flightVector.Magnitude > 0 then
+            CurrentLV.VelocityConstraintMode = Enum.VelocityConstraintMode.Vector
+            CurrentLV.VectorVelocity = flightVector * FlightSpeed
+        else
+            CurrentLV.VectorVelocity = Vector3.zero
+        end
+
+        if SpinningEnabled then
+            local targetPart = humanoid.SeatPart or character.HumanoidRootPart
+            CurrentAO.CFrame = targetPart.CFrame * CFrame.Angles(0, math.rad(SpinSpeed), 0)
+        else
+            CurrentAO.CFrame = Camera.CFrame
+        end
+
+        humanoid.PlatformStand = true
+    end)
+
+    character.AncestryChanged:Connect(function(_, parent)
+        if not parent and FlyingEnabled then
+            stopFlying()
+        end
+    end)
+end
+
+local function stopFlying()
+    if not FlyingEnabled then return end
+
+    FlyingEnabled = false
+    SpinningEnabled = false
+
+    if FlightConnection then
+        FlightConnection:Disconnect()
+        FlightConnection = nil
+    end
+
+    if CurrentAO then CurrentAO:Destroy() end
+    if CurrentLV then CurrentLV:Destroy() end
+    if CurrentMoverAttachment then CurrentMoverAttachment:Destroy() end
+
+    local character = LocalPlayer.Character
+    if character and character:FindFirstChild("Humanoid") then
+        character.Humanoid.PlatformStand = false
+    end
+end
+
+Wjgn:AddToggle('MyToggle', {
+    Text = '飞行模式(能在墨水使用可能会被反作弊击杀)',
+    Default = false,
+    Tooltip = '开启 / 关闭飞行功能',
+    Callback = function(Value)
+        if Value then
+            startFlying()
+        else
+            stopFlying()
+        end
+    end
+})
+Wjgn:AddSlider('MyIntSlider', {
+    Text = '飞行速度',
+    Default = 50,
+    Min = 1,
+    Max = 200,
+    Rounding = 0,
+    Suffix = '',
+    Compact = false,
+    Callback = function(Value)
+        FlightSpeed = Value
+    end
+})
+Wjgn:AddCheckbox("ESP", {
+    Text = "透视[墨水可用]",
+    Default = false,
+    Callback = function(enabled)
+        local Players = game:GetService("Players")
+        local RunService = game:GetService("RunService")
+
+        local highlights = {}
+        local connections = {}
+
+        local function clearHighlights()
+            for _, plr in pairs(Players:GetPlayers()) do
+                if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                    local hl = plr.Character.HumanoidRootPart:FindFirstChild("Highlight")
+                    if hl then
+                        hl:Destroy()
+                    end
+                end
+            end
+            for _, conn in pairs(connections) do
+                if typeof(conn) == "RBXScriptConnection" then
+                    conn:Disconnect()
+                end
+            end
+            table.clear(highlights)
+            table.clear(connections)
+        end
+
+        if enabled then
+            for _, plr in pairs(Players:GetPlayers()) do
+                task.spawn(function()
+                    repeat task.wait() until plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+                    if not plr.Character.HumanoidRootPart:FindFirstChild("Highlight") then
+                        local highlight = Instance.new("Highlight")
+                        highlight.Name = "Highlight"
+                        highlight.Adornee = plr.Character
+                        highlight.Parent = plr.Character.HumanoidRootPart
+                        highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                        highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+                        highlights[plr] = highlight
+                    end
+                end)
+            end
+
+            connections["PlayerAdded"] = Players.PlayerAdded:Connect(function(plr)
+                task.spawn(function()
+                    repeat task.wait() until plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+                    if not plr.Character.HumanoidRootPart:FindFirstChild("Highlight") then
+                        local highlight = Instance.new("Highlight")
+                        highlight.Name = "Highlight"
+                        highlight.Adornee = plr.Character
+                        highlight.Parent = plr.Character.HumanoidRootPart
+                        highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                        highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+                        highlights[plr] = highlight
+                    end
+                end)
+            end)
+
+            connections["PlayerRemoving"] = Players.PlayerRemoving:Connect(function(plr)
+                if highlights[plr] then
+                    highlights[plr]:Destroy()
+                    highlights[plr] = nil
+                end
+            end)
+
+        else
+            clearHighlights()
+        end
+    end
+})
+Wjgn:AddToggle('AntiFlingToggle', {
+    Text = '防甩飞(可在墨水使用)',
+    Default = false,
+    Tooltip = '开启后防止玩家被甩飞',
+
+    Callback = function(state)
+        if state then
+            local Players = game:GetService("Players")
+            local RunService = game:GetService("RunService")
+            local LocalPlayer = Players.LocalPlayer
+
+            local ANTI_FLING_FORCE = 1e6
+            local UPDATE_RATE = 0.01
+
+            _G.ActiveHandles = {
+                Connections = {},
+                Constraints = {},
+                Alignments = {}
+            }
+
+            local function CreateSuperConstraint(part)
+                local bodyPos = Instance.new("BodyPosition")
+                bodyPos.P = ANTI_FLING_FORCE
+                bodyPos.D = ANTI_FLING_FORCE / 10
+                bodyPos.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                bodyPos.Position = part.Position
+                bodyPos.Parent = part
+
+                local bodyGyro = Instance.new("BodyGyro")
+                bodyGyro.P = ANTI_FLING_FORCE
+                bodyGyro.D = ANTI_FLING_FORCE / 10
+                bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+                bodyGyro.CFrame = part.CFrame
+                bodyGyro.Parent = part
+
+                local alignPos = Instance.new("AlignPosition")
+                alignPos.RigidityEnabled = true
+                alignPos.MaxForce = ANTI_FLING_FORCE
+                alignPos.Responsiveness = ANTI_FLING_FORCE
+                alignPos.Parent = part
+
+                local alignOri = Instance.new("AlignOrientation")
+                alignOri.RigidityEnabled = true
+                alignOri.MaxTorque = ANTI_FLING_FORCE
+                alignOri.Responsiveness = ANTI_FLING_FORCE
+                alignOri.Parent = part
+
+                table.insert(_G.ActiveHandles.Constraints, bodyPos)
+                table.insert(_G.ActiveHandles.Constraints, bodyGyro)
+                table.insert(_G.ActiveHandles.Alignments, alignPos)
+                table.insert(_G.ActiveHandles.Alignments, alignOri)
+
+                return bodyPos, bodyGyro, alignPos, alignOri
+            end
+
+            local function ApplyUltimateProtection(character)
+                if not character then return end
+
+                local rootPart = character:FindFirstChild("HumanoidRootPart")
+                    or character:FindFirstChild("Torso")
+
+                if not rootPart then return end
+
+                local bodyPos, bodyGyro, alignPos, alignOri =
+                    CreateSuperConstraint(rootPart)
+
+                local updateConn = RunService.Heartbeat:Connect(function()
+                    if not character:IsDescendantOf(workspace) then return end
+
+                    bodyPos.Position = rootPart.Position
+                    bodyGyro.CFrame = rootPart.CFrame
+
+                    for _, part in ipairs(character:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = false
+                            part.CustomPhysicalProperties =
+                                PhysicalProperties.new(0, 0, 0)
+                            part.AssemblyAngularVelocity = Vector3.new()
+                            part.AssemblyLinearVelocity = Vector3.new()
+                            part.Velocity = Vector3.new()
+                            part.RotVelocity = Vector3.new()
+                            part:SetAttribute("LastPosition", part.Position)
+                        end
+                    end
+                end)
+
+                table.insert(_G.ActiveHandles.Connections, updateConn)
+
+                local velConn =
+                    rootPart:GetPropertyChangedSignal("AssemblyLinearVelocity")
+                        :Connect(function()
+                            rootPart.AssemblyLinearVelocity = Vector3.new()
+                            rootPart.Velocity = Vector3.new()
+                        end)
+
+                table.insert(_G.ActiveHandles.Connections, velConn)
+
+                local rotConn =
+                    rootPart:GetPropertyChangedSignal("AssemblyAngularVelocity")
+                        :Connect(function()
+                            rootPart.AssemblyAngularVelocity = Vector3.new()
+                            rootPart.RotVelocity = Vector3.new()
+                        end)
+
+                table.insert(_G.ActiveHandles.Connections, rotConn)
+
+                local posCheck = RunService.Heartbeat:Connect(function()
+                    if not character:IsDescendantOf(workspace) then return end
+
+                    local lastPos = rootPart:GetAttribute("LastPosition")
+                    if lastPos then
+                        local dist =
+                            (rootPart.Position - lastPos).Magnitude
+                        if dist > 5 then
+                            rootPart.CFrame = CFrame.new(lastPos)
+                        end
+                    end
+                    rootPart:SetAttribute("LastPosition", rootPart.Position)
+                end)
+
+                table.insert(_G.ActiveHandles.Connections, posCheck)
+            end
+
+            local function MonitorPlayer(player)
+                if player == LocalPlayer then return end
+
+                local function HandleCharacter(character)
+                    if not character then return end
+                    repeat task.wait() until
+                        character:FindFirstChild("HumanoidRootPart")
+                        or character:FindFirstChild("Torso")
+
+                    ApplyUltimateProtection(character)
+                end
+
+                if player.Character then
+                    HandleCharacter(player.Character)
+                end
+
+                local charConn =
+                    player.CharacterAdded:Connect(HandleCharacter)
+                table.insert(_G.ActiveHandles.Connections, charConn)
+            end
+
+            for _, player in ipairs(Players:GetPlayers()) do
+                MonitorPlayer(player)
+            end
+
+            local playerConn =
+                Players.PlayerAdded:Connect(MonitorPlayer)
+            table.insert(_G.ActiveHandles.Connections, playerConn)
+
+        else
+            for _, conn in ipairs(_G.ActiveHandles.Connections or {}) do
+                if conn.Connected then
+                    conn:Disconnect()
+                end
+            end
+
+            for _, constraint in ipairs(
+                _G.ActiveHandles.Constraints or {}
+            ) do
+                if constraint and constraint.Parent then
+                    constraint:Destroy()
+                end
+            end
+
+            for _, align in ipairs(
+                _G.ActiveHandles.Alignments or {}
+            ) do
+                if align and align.Parent then
+                    align:Destroy()
+                end
+            end
+
+            for _, player in ipairs(
+                game:GetService("Players"):GetPlayers()
+            ) do
+                if player ~= LocalPlayer and player.Character then
+                    for _, part in ipairs(
+                        player.Character:GetDescendants()
+                    ) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = true
+                            part.CustomPhysicalProperties = nil
+                            part.AssemblyAngularVelocity = Vector3.new()
+                            part.AssemblyLinearVelocity = Vector3.new()
+                            part:SetAttribute("LastPosition", nil)
+                        end
+                    end
+                end
+            end
+
+            _G.ActiveHandles = {
+                Connections = {},
+                Constraints = {},
+                Alignments = {}
+            }
+        end
+    end
+})
+Wjgn:AddButton({Text="穿墙模式",Func=function()
+        A19 = not A19;
+        if A22 then
+                A22:Disconnect();
+                A22 = nil;
+        end
+        if A19 then
+                A22 = A3.Stepped:Connect(function()
+                        if A2.Character then
+                                for _, Part in pairs(A2.Character:GetDescendants()) do
+                                        if Part:IsA("BasePart") then
+                                                Part.CanCollide = false;
+                                        end
+                                end
+                        end
+                end);
+        end
+end});
+Wjgn:AddButton({Text="祖国人脚本",Func=function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/giobolqv1/homelander-by-GioBolqv1-/main/homelander.lua"))()
+        local Func = loadstring(ScriptContent);
+        if Func then
+                Func();
+        end
+end});
+local MenuGroup = Tabs.Settings:AddLeftGroupbox('菜单')
+MenuGroup:AddButton('卸载脚本', function() Library:Unload() end)
+MenuGroup:AddLabel('菜单快捷键'):AddKeyPicker('MenuKeybind', { Default = 'RightShift', NoUI = true, Text = 'Menu keybind' })
+
+Library.ToggleKeybind = Options.MenuKeybind
+
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+ThemeManager:SetFolder("MyScriptTheme")
+SaveManager:SetFolder("MyScriptConfig")
+SaveManager:BuildConfigSection(Tabs.Settings)
+ThemeManager:ApplyToTab(Tabs.Settings)
