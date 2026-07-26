@@ -118,7 +118,7 @@ local Translations = {
 ["Auto Balance"]="自动平衡",
 ["Auto Jump (BETA)"]="自动跳跃 (测试版)",
 ["Jumps over the rope automatically"]="自动跳过绳子",
-["Rope Godmode (BETA)"]="绳子无敌模式 (测试版)",
+["Rope Godmode (BETA)"]="无视绳子 (测试版)",
 ["the rope will not do anything and you can walk through it."]="绳子将不会产生任何效果，你可以直接穿过它。",
 ["Glass Bridge Features"]="玻璃桥功能",
 ["Five People, Six Feet"]="五人六足",
@@ -154,7 +154,7 @@ local Translations = {
 ["this feature will auto shoot guards in rebel it will kill the playable guards as well as the npc guards aswell so it may be obvious your cheating so be carefull using this YOUR AMMO WILL NOT GO DOWN THAT IS NORMAL, watch the full video in ringta to learn how to use this feature correctly and a guide. If you are positive this is not working try turning it off and on again and see if it fixes it and if it doesnt then report the issue. Always use an alt account so incase you get banned you dont lose everything."]="此功能将在反叛模式中自动射击守卫，会同时击杀可玩守卫和NPC守卫，因此可能会明显暴露你在作弊，请谨慎使用。你的弹药不会减少，这是正常现象。请观看 ringta 中的完整视频以学习如何正确使用此功能及指南。如果你确信此功能无效，请尝试关闭再打开，看是否能修复。如果仍无效，请报告问题。始终使用小号，以防被封禁时丢失所有东西。",
 ["Playable Guards"]="可玩守卫",
 ["Guard Auto-Shoot"]="守卫自动射击",
-["Auto-Shoot (Guard)"]="自动射击（守卫）",
+["Auto-Shoot (Guard)"]="自动射击玩家",
 ["Games"]="游戏"
 }
 
