@@ -1500,174 +1500,338 @@ autoCompleteStatus:SetDesc("状态: 未启动")
 
 -- ========== 战斗标签页 ==========
 Tabs.CombatTab:Section({ Title = "自动杀戮" })
-local autoKillToggle = Tabs.CombatTab:Toggle({
-    Title = "自动杀戮 (50米内)",
-    Value = false,
-    Callback = function(state)
-        if state then StartAutoKill() else StopAutoKill() end
-    end
-})
-Tabs.CombatTab:Slider({
-    Title = "杀戮范围",
-    Value = { Min = 10, Max = 100, Default = 50 },
-    Callback = function(v) KillFeature.KillRadius = v end
-})
-Tabs.CombatTab:Button({
-    Title = "手动击杀一次",
-    Callback = function() ManualKill() end
-})
--- 在 KillFeature 表中添加变量
-local KillFeature = {
-    Enabled = false,
-    KillRadius = 50,
-    KillCount = 0,
-    LoopConnection = nil,
-    RepeatKillConnection = nil,
-    KillPerExecution = 1,  -- 新增：每次执行击杀数量
-    Targets = {
-        Police = true,
-        NPCs = true,
-        Enemies = true,
-        Civilians = false,
-        Players = false
-    }
+
+local Settings = {
+    KillAuraEnabled = false,
+    KillDelay = 0.1,
+    KillRange = 50,
+    KillDamage = 13,
 }
 
--- 修改 ManualKill 函数，支持每次击杀多个目标
-local function ManualKill()
-    local entities = GetKillableEntities()
-    local count = 0
-    local maxKills = KillFeature.KillPerExecution  -- 获取每次击杀数量
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+local LocalPlayer = Players.LocalPlayer
+
+local lastKillTime = 0
+local killAuraConnection = nil
+
+local function getAllNPCs()
+    local npcs = {}
+    local playerChars = {}
     
-    if #entities == 0 then
-        -- 不弹出通知，避免刷屏
-        return 0
-    end
-    
-    -- 只击杀指定数量的目标
-    local killCount = 0
-    for i = 1, #entities do
-        if killCount >= maxKills then break end  -- 达到上限则停止
-        
-        local entity = entities[i]
-        if entity.humanoid and entity.humanoid.Health > 0 then
-            local killed = KillEntity(entity)
-            if killed then
-                count = count + 1
-                killCount = killCount + 1
-                KillFeature.KillCount = KillFeature.KillCount + 1
-            end
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr.Character then
+            playerChars[plr.Character] = true
         end
     end
     
-    return count
+    for _, obj in pairs(Workspace:GetDescendants()) do
+        if obj:IsA("Model") and obj:FindFirstChild("Humanoid") and obj:FindFirstChild("Head") then
+            if not playerChars[obj] then
+                table.insert(npcs, obj)
+            end
+        end
+    end
+    return npcs
 end
 
--- UI部分：添加击杀数量滑块
-Tabs.CombatTab:Slider({
-    Title = "一次击杀数量",
-    Desc = "每次执行击杀的目标数量",
-    Value = {
-        Min = 1,
-        Max = 99999999,
-        Default = 1
-    },
-    Callback = function(value)
-        KillFeature.KillPerExecution = value
-        WindUI:Notify({ Title = string.format("一次击杀数量设置为: %d", value), Duration = 2 })
+local function getNearestNPC()
+    local nearestNPC = nil
+    local nearestDistance = Settings.KillRange
+    local myPosition = nil
+    
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        myPosition = LocalPlayer.Character.HumanoidRootPart.Position
+    else
+        return nil
     end
+    
+    for _, npc in pairs(getAllNPCs()) do
+        local humanoid = npc:FindFirstChild("Humanoid")
+        local rootPart = npc:FindFirstChild("HumanoidRootPart") or npc.PrimaryPart
+        if humanoid and humanoid.Health > 0 and rootPart then
+            local distance = (myPosition - rootPart.Position).Magnitude
+            if distance < nearestDistance then
+                nearestDistance = distance
+                nearestNPC = npc
+            end
+        end
+    end
+    return nearestNPC
+end
+
+local function killAura()
+    local nearestNPC = getNearestNPC()
+    if nearestNPC then
+        local humanoid = nearestNPC:FindFirstChild("Humanoid")
+        if humanoid and humanoid.Health > 0 then
+            local Event = ReplicatedStorage:FindFirstChild("FlowClient") 
+                and ReplicatedStorage.FlowClient:FindFirstChild("ClientRunner") 
+                and ReplicatedStorage.FlowClient.ClientRunner:FindFirstChild("Event")
+            if Event then
+                Event:FireServer("NPCs", "Damage", humanoid, Settings.KillDamage)
+                return true
+            end
+        end
+    end
+    return false
+end
+
+local function StartKillAura()
+    if killAuraConnection then 
+        return false, "杀戮光环已在运行"
+    end
+    
+    if not Settings.KillAuraEnabled then
+        return false, "杀戮光环未启用"
+    end
+    
+    killAuraConnection = RunService.Heartbeat:Connect(function()
+        if Settings.KillAuraEnabled then
+            local currentTime = tick()
+            if currentTime - lastKillTime >= Settings.KillDelay then
+                killAura()
+                lastKillTime = currentTime
+            end
+        end
+    end)
+    
+    return true, "杀戮光环已启动"
+end
+
+local function StopKillAura()
+    if killAuraConnection then
+        killAuraConnection:Disconnect()
+        killAuraConnection = nil
+        return true, "杀戮光环已停止"
+    end
+    return false, "杀戮光环未在运行"
+end
+
+local function SetKillAuraEnabled(enabled)
+    Settings.KillAuraEnabled = enabled
+    if enabled then
+        return StartKillAura()
+    else
+        return StopKillAura()
+    end
+end
+
+local function GetStatus()
+    return {
+        Enabled = Settings.KillAuraEnabled,
+        Running = killAuraConnection ~= nil,
+        Delay = Settings.KillDelay,
+        Range = Settings.KillRange,
+        Damage = Settings.KillDamage,
+    }
+end
+
+local function SetDelay(delay)
+    Settings.KillDelay = math.max(0.01, math.min(1, delay))
+end
+
+local function SetRange(range)
+    Settings.KillRange = math.max(10, math.min(10000, range))
+end
+
+local function SetDamage(damage)
+    Settings.KillDamage = math.max(13, math.min(10000, damage))
+end
+
+local function AttackOnce()
+    return killAura()
+end
+
+Tabs.CombatTab:Paragraph({
+    Title = "杀戮光环",
+    Desc = "你看你妈呢？"
 })
 
--- 反复击杀开关（使用上面定义的 KillPerExecution）
+local statusPara = Tabs.CombatTab:Paragraph({
+    Title = "状态监控",
+    Desc = "状态: 未启用\n伤害: 13\n范围: 50\n延迟: 0.1秒"
+})
+
+local function updateStatus()
+    local status = GetStatus()
+    local desc = ""
+    if status.Enabled and status.Running then
+        desc = "运行中\n"
+    elseif status.Enabled and not status.Running then
+        desc = "已启用但未运行\n"
+    else
+        desc = "已禁用\n"
+    end
+    desc = desc .. "伤害: " .. status.Damage .. "\n范围: " .. status.Range .. "\n延迟: " .. status.Delay .. "秒"
+    if status.Running then
+        desc = desc .. "\n攻击中..."
+    end
+    statusPara:SetDesc(desc)
+end
+
+Tabs.CombatTab:Divider()
+
 Tabs.CombatTab:Toggle({
-    Title = "反复击杀",
-    Desc = "持续自动击杀范围内的目标",
+    Title = "启用杀戮光环",
+    Desc = "开启后自动攻击范围内的NPC",
     Value = false,
-    Callback = function(state)
-        if state then
-            if KillFeature.RepeatKillConnection then 
-                KillFeature.RepeatKillConnection:Disconnect()
-                KillFeature.RepeatKillConnection = nil
-            end
-            WindUI:Notify({ Title = string.format("反复击杀已开启（每次击杀%d个）！", KillFeature.KillPerExecution), Duration = 2 })
-            
-            KillFeature.RepeatKillConnection = game:GetService("RunService").Stepped:Connect(function()
-                local count = ManualKill()
-                if count > 0 and killStatsLabel then
-                    killStatsLabel:SetDesc(string.format("已击杀: %d 个生物", KillFeature.KillCount))
-                end
-            end)
-        else
-            if KillFeature.RepeatKillConnection then
-                KillFeature.RepeatKillConnection:Disconnect()
-                KillFeature.RepeatKillConnection = nil
-            end
-            WindUI:Notify({ Title = "反复击杀已关闭！", Duration = 2 })
-        end
-    end
-})
-
--- 保留手动击杀按钮（可选）
-Tabs.CombatTab:Button({
-    Title = "手动击杀一次",
-    Desc = string.format("立即击杀 %d 个目标", KillFeature.KillPerExecution),
-    Callback = function()
-        local count = ManualKill()
-        if count > 0 then
-            if killStatsLabel then
-                killStatsLabel:SetDesc(string.format("已击杀: %d 个生物", KillFeature.KillCount))
-            end
-            WindUI:Notify({ Title = string.format("已击杀 %d 个目标！", count), Duration = 2 })
-        else
-            WindUI:Notify({ Title = "没有找到可击杀的目标！", Duration = 2 })
-        end
-    end
-})
-local killStatsLabel = Tabs.CombatTab:Paragraph({
-    Title = "击杀统计",
-    Desc = "已击杀: 0 个生物"
-})
-Tabs.CombatTab:Button({
-    Title = "重置击杀统计",
-    Callback = function()
-        ResetKillCount()
-        killStatsLabel:SetDesc("已击杀: 0 个生物")
+    Callback = function(enabled)
+        local success, msg = SetKillAuraEnabled(enabled)
+        updateStatus()
+        WindUI:Notify({
+            Title = "杀戮光环",
+            Content = success and (enabled and "已开启" or "已关闭") or msg,
+            Duration = 2
+        })
     end
 })
 
 Tabs.CombatTab:Divider()
-Tabs.CombatTab:Section({ Title = "击杀目标过滤" })
-Tabs.CombatTab:Toggle({
-    Title = "击杀警察",
-    Value = true,
-    Callback = function(state) KillFeature.Targets.Police = state end
-})
-Tabs.CombatTab:Toggle({
-    Title = "击杀敌人",
-    Value = true,
-    Callback = function(state) KillFeature.Targets.Enemies = state end
-})
-Tabs.CombatTab:Toggle({
-    Title = "击杀普通NPC",
-    Value = true,
-    Callback = function(state) KillFeature.Targets.NPCs = state end
-})
-Tabs.CombatTab:Toggle({
-    Title = "击杀平民（慎用）",
-    Value = false,
-    Callback = function(state)
-        KillFeature.Targets.Civilians = state
-        if state then WindUI:Notify({ Title = "警告：已启用击杀平民功能！", Duration = 5 }) end
+
+Tabs.CombatTab:Slider({
+    Title = "伤害",
+    Desc = "每次攻击造成的伤害值",
+    Value = {Min = 13, Max = 10000, Default = Settings.KillDamage},
+    Step = 1,
+    Callback = function(damage)
+        SetDamage(damage)
+        updateStatus()
     end
 })
-Tabs.CombatTab:Toggle({
-    Title = "击杀玩家（危险）",
-    Value = false,
-    Callback = function(state)
-        KillFeature.Targets.Players = state
-        if state then WindUI:Notify({ Title = "警告：已启用击杀玩家功能！", Duration = 5 }) end
+
+Tabs.CombatTab:Slider({
+    Title = "攻击范围",
+    Desc = "检测NPC的范围（单位）",
+    Value = {Min = 10, Max = 10000, Default = Settings.KillRange},
+    Step = 10,
+    Callback = function(range)
+        SetRange(range)
+        updateStatus()
     end
 })
+
+Tabs.CombatTab:Slider({
+    Title = "攻击延迟",
+    Desc = "每次攻击的间隔时间（秒）",
+    Value = {Min = 0.01, Max = 1, Default = Settings.KillDelay},
+    Step = 0.01,
+    Callback = function(delay)
+        SetDelay(delay)
+        updateStatus()
+    end
+})
+
+Tabs.CombatTab:Divider()
+
+Tabs.CombatTab:Button({
+    Title = "手动攻击一次",
+    Desc = "立即攻击最近的NPC",
+    Callback = function()
+        local success = AttackOnce()
+        WindUI:Notify({
+            Title = "杀戮光环",
+            Content = success and "攻击成功!" or "未找到目标或目标无效",
+            Duration = 2
+        })
+        updateStatus()
+    end
+})
+
+Tabs.CombatTab:Divider()
+
+Tabs.CombatTab:Paragraph({
+    Title = "快速预设",
+    Desc = "一键切换不同模式"
+})
+
+Tabs.CombatTab:Button({
+    Title = "秒杀模式",
+    Desc = "伤害1000 | 范围200 | 延迟0.01秒",
+    Callback = function()
+        SetDamage(1000)
+        SetDelay(0.01)
+        SetRange(200)
+        if not Settings.KillAuraEnabled then
+            SetKillAuraEnabled(true)
+        end
+        updateStatus()
+        WindUI:Notify({Title = "杀戮光环", Content = "秒杀模式已激活!", Duration = 2})
+    end
+})
+
+Tabs.CombatTab:Button({
+    Title = "精确模式",
+    Desc = "伤害50 | 范围30 | 延迟0.1秒",
+    Callback = function()
+        SetDamage(50)
+        SetDelay(0.1)
+        SetRange(30)
+        if not Settings.KillAuraEnabled then
+            SetKillAuraEnabled(true)
+        end
+        updateStatus()
+        WindUI:Notify({Title = "杀戮光环", Content = "精确模式已激活!", Duration = 2})
+    end
+})
+
+Tabs.CombatTab:Button({
+    Title = "保守模式",
+    Desc = "伤害20 | 范围20 | 延迟0.5秒",
+    Callback = function()
+        SetDamage(20)
+        SetDelay(0.5)
+        SetRange(20)
+        if not Settings.KillAuraEnabled then
+            SetKillAuraEnabled(true)
+        end
+        updateStatus()
+        WindUI:Notify({Title = "杀戮光环", Content = "保守模式已激活!", Duration = 2})
+    end
+})
+
+Tabs.CombatTab:Divider()
+
+Tabs.CombatTab:Button({
+    Title = "停止杀戮光环",
+    Desc = "立即停止所有攻击",
+    Callback = function()
+        StopKillAura()
+        Settings.KillAuraEnabled = false
+        updateStatus()
+        WindUI:Notify({Title = "杀戮光环", Content = "已停止", Duration = 2})
+    end
+})
+
+Tabs.CombatTab:Divider()
+
+Tabs.CombatTab:Keybind({
+    Title = "切换杀戮光环",
+    Desc = "快捷键开关",
+    Value = "None",
+    Callback = function(key)
+        local currentState = Settings.KillAuraEnabled
+        SetKillAuraEnabled(not currentState)
+        updateStatus()
+        WindUI:Notify({
+            Title = "杀戮光环",
+            Content = not currentState and "已开启" or "已关闭",
+            Duration = 2
+        })
+    end
+})
+
+task.spawn(function()
+    while true do
+        task.wait(1)
+        updateStatus()
+    end
+end)
+
+updateStatus()
+WindUI:Notify({Title = "杀戮光环", Content = "已加载", Duration = 2})
 
 Tabs.CombatTab:Divider()
 Tabs.CombatTab:Section({ Title = "透视物品设置" })
