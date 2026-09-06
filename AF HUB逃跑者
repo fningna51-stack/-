@@ -1,0 +1,2722 @@
+local MusicId = "rbxassetid://89711807693889"
+for _, sound in ipairs(workspace:GetDescendants()) do
+    if sound:IsA("Sound") and sound.SoundId == MusicId then
+        sound:Stop()
+        sound:Destroy()
+    end
+end
+local sound = Instance.new("Sound")
+sound.SoundId = MusicId
+sound.Volume = 0.5
+sound.Looped = false
+sound.Parent = workspace
+sound:Play()
+print('[音乐] 正在播放：雨爱')
+print('[音乐] ID：' .. MusicId)
+sound.Ended:Connect(function()
+    sound:Destroy()
+    print('[音乐] 播放结束')
+end)
+task.delay(10, function()
+    if sound and sound.Parent and not sound.IsPlaying then
+        sound:Destroy()
+    end
+end)
+
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/WasKKal/-/refs/heads/main/WindQW.lua"))()
+local Window = WindUI:CreateWindow({
+    Title = "<font color='#FFB6C1'>AF</font><font color='#FFA0B5'> Hub 丨逃跑者</font>",
+    Author = "AF",
+    Folder = "AFHub_Escape",
+    Size = UDim2.fromOffset(520, 550),
+    Transparent = true,
+    Theme = "Dark",
+    User = { Enabled = false },
+    SideBarWidth = 135,
+    ScrollBarEnabled = true,
+    Background = "rbxassetid://72246404201633",
+    BackgroundImageTransparency = 0.5,
+})
+
+Window:EditOpenButton({
+    Title = "AF Hub",
+    Icon = "rbxassetid://4483362748",
+    CornerRadius = UDim.new(16,16),
+    StrokeThickness = 2.5,
+    Color = ColorSequence.new(
+        Color3.fromHex("#6a11cb"),
+        Color3.fromHex("#2575fc")
+    ),
+    Draggable = true,
+})
+
+local Workspace = game:GetService("Workspace")
+local LootFolder = Workspace:FindFirstChild("Loot")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Camera = workspace.CurrentCamera
+local TweenService = game:GetService("TweenService")
+local HttpService = game:GetService("HttpService")
+
+local LootConfig = {
+    { Name = "白银王冠", Path = {"SilverTiara", "Handle"} },
+    { Name = "奖杯", Path = {"Trophy", "Trophy"} },
+    { Name = "黄金手表", Path = {"GoldWatch", "Handle"} },
+    { Name = "银戒指", Path = {"SilverRing", "Handle"} },
+    { Name = "混凝土块", Path = {"ConcreteBlock", "Handle"} },
+    { Name = "铁通", Path = {"Bucket", "Handle"} },
+    { Name = "活塞", Path = {"Plunger", "Plunger"} },
+    { Name = "建筑灯", Path = {"ConstructionLight", "Handle"} },
+    { Name = "蓝色牛", Path = {"BlueCow", "CaneEnergyDrink"} },
+    { Name = "洒水壶", Index = 19, Child = "Handle" },
+    { Name = "绷带", Path = {"Bandage", "Handle"} },
+    { Name = "医疗包", Path = {"MedicPack", "Handle"} },
+    { Name = "Chonks", Path = {"Chonks", "Handle"} },
+    { Name = "三明治", Path = {"Sandwich", "Handle"} },
+    { Name = "热狗", Path = {"Hotdog", "Handle"} },
+    { Name = "油漆罐", Path = {"PaintCan", "Handle"} },
+    { Name = "烤面包机", Path = {"Toaster", "ToasterBorder"} },
+    { Name = "银色手镯", Path = {"SilverBracelet", "Handle"} },
+    { Name = "玉米味的", Path = {"Corny", "CaneSoda"} },
+    { Name = "钱包", Index = 94, Child = "Handle" },
+    { Name = "矿泉水", Index = 51, Child = "Handle" },
+}
+
+local LootESPEnabled = true
+local LootESPColor = Color3.fromRGB(255, 0, 0)
+local CreatedHighlights = {}
+local CreatedNames = {}
+
+local FlyingEnabled = false
+local SpinningEnabled = false
+local FlightSpeed = 50
+local SpinSpeed = 5
+local CurrentAO, CurrentLV, CurrentMoverAttachment
+local FlightConnection
+local Control = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
+
+local NightVision = {
+    Enabled = false,
+    Connection = nil,
+    OriginalBrightness = nil,
+    OriginalAmbient = nil,
+    OriginalOutdoor = nil,
+    OriginalColorCorrection = nil
+}
+
+-- 穿墙
+local Noclip = { Enabled = false, Connection = nil }
+
+-- 自动拾取
+local AutoLoot = {
+    Enabled = false,
+    LootRadius = 50,
+    LootInterval = 0.5,
+    LootCount = 0,
+    LoopConnection = nil
+}
+
+-- 自动杀戮
+local KillFeature = {
+    Enabled = false,
+    KillRadius = 50,
+    KillCount = 0,
+    LoopConnection = nil,
+    Targets = {
+        Police = true,
+        NPCs = true,
+        Enemies = true,
+        Civilians = false,
+        Players = false
+    }
+}
+
+-- 玩家修改
+local PlayerMod = {
+    Enabled = false,
+    Locked = false,
+    LockConnection = nil,
+    LoopConnection = nil,
+    Values = {
+        WalkSpeed = 16,
+        JumpPower = 50,
+        Health = 100,
+        MaxHealth = 100,
+        HipHeight = 0,
+        JumpHeight = 7.2,
+    },
+    Defaults = {
+        WalkSpeed = 16,
+        JumpPower = 50,
+        Health = 100,
+        MaxHealth = 100,
+        HipHeight = 0,
+        JumpHeight = 7.2,
+    }
+}
+
+-- 自动通关
+local AutoComplete = {
+    Enabled = false,
+    StartPosition = Vector3.new(496.9, 2005.4, -15749.4),
+    EndPosition = Vector3.new(1650.0, 1507.2, 83873.2),
+    LoopConnection = nil,
+    Speed = 1000,
+    Tolerance = 10,
+    Status = "未启动",
+    StatusLabel = nil  -- 这行没问题，但使用时需要检查是否为 nil
+}
+
+-- 使用时安全调用
+if AutoComplete.StatusLabel then
+    AutoComplete.StatusLabel:SetText("状态: " .. AutoComplete.Status)
+end
+
+-- 门删除配置
+local CustomDoorPaths = {
+    "workspace.Map.StartArea.Decorations.House.House1.House1.Door",
+    "workspace.Map.Buildings.PawnShop.PawnShop.Door.DoubleDoor",
+}
+local DoorConfig = {
+    RemoveAllDoors = false,
+    RemoveHouseDoors = false,
+    RemovePawnShopDoors = false,
+    RemoveCustomDoors = false,
+    CustomDoorPaths = CustomDoorPaths,
+}
+
+-- ===================== 辅助函数 =====================
+
+local function GetLootPart(Config)
+    if not LootFolder then return nil end
+    if Config.Path then
+        local Object = LootFolder
+        for _, Name in ipairs(Config.Path) do
+            Object = Object:FindFirstChild(Name)
+            if not Object then return nil end
+        end
+        if Object:IsA("BasePart") then
+            return Object
+        end
+        if Object:IsA("Model") then
+            if Object.PrimaryPart then
+                return Object.PrimaryPart
+            end
+            return Object:FindFirstChildWhichIsA("BasePart", true)
+        end
+        return nil
+    end
+    if Config.Index then
+        local Children = LootFolder:GetChildren()
+        local Object = Children[Config.Index]
+        if not Object then return nil end
+        if Config.Child then
+            Object = Object:FindFirstChild(Config.Child)
+        end
+        if Object and Object:IsA("BasePart") then
+            return Object
+        end
+        if Object and Object:IsA("Model") then
+            if Object.PrimaryPart then
+                return Object.PrimaryPart
+            end
+            return Object:FindFirstChildWhichIsA("BasePart", true)
+        end
+    end
+    return nil
+end
+
+local function CreateNameESP(Part, DisplayName)
+    if not Part or not Part:IsA("BasePart") then return end
+    local Existing = Part:FindFirstChild("AF_LootName")
+    if Existing then Existing:Destroy() end
+    local Billboard = Instance.new("BillboardGui")
+    Billboard.Name = "AF_LootName"
+    Billboard.Adornee = Part
+    Billboard.Size = UDim2.new(0, 180, 0, 35)
+    Billboard.StudsOffset = Vector3.new(0, 2.5, 0)
+    Billboard.AlwaysOnTop = true
+    Billboard.MaxDistance = 1000
+    Billboard.Enabled = LootESPEnabled
+    Billboard.Parent = Part
+    local Text = Instance.new("TextLabel")
+    Text.Name = "Name"
+    Text.Size = UDim2.fromScale(1, 1)
+    Text.BackgroundTransparency = 1
+    Text.Text = DisplayName
+    Text.TextColor3 = LootESPColor
+    Text.TextSize = 14
+    Text.Font = Enum.Font.GothamBold
+    Text.TextStrokeTransparency = 0
+    Text.TextStrokeColor3 = Color3.new(0, 0, 0)
+    Text.Parent = Billboard
+    CreatedNames[Part] = {
+        Billboard = Billboard,
+        Text = Text,
+    }
+end
+
+local function CreateHighlight(Part)
+    if not Part then return end
+    local Existing = Part:FindFirstChild("AF_LootHighlight")
+    if Existing then Existing:Destroy() end
+    local Highlight = Instance.new("Highlight")
+    Highlight.Name = "AF_LootHighlight"
+    Highlight.Adornee = Part
+    Highlight.FillColor = LootESPColor
+    Highlight.OutlineColor = LootESPColor
+    Highlight.FillTransparency = 0.45
+    Highlight.OutlineTransparency = 0
+    Highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    Highlight.Enabled = LootESPEnabled
+    Highlight.Parent = Part
+    CreatedHighlights[Part] = Highlight
+end
+
+local function RefreshLootESP()
+    for Part, _ in pairs(CreatedHighlights) do
+        if not Part or not Part.Parent then
+            CreatedHighlights[Part] = nil
+        end
+    end
+    for Part, _ in pairs(CreatedNames) do
+        if not Part or not Part.Parent then
+            CreatedNames[Part] = nil
+        end
+    end
+    for _, Config in ipairs(LootConfig) do
+        local Part = GetLootPart(Config)
+        if Part then
+            CreateHighlight(Part)
+            CreateNameESP(Part, Config.Name)
+        end
+    end
+end
+
+local function UpdateLootESPEnabled(Value)
+    LootESPEnabled = Value
+    for Part, Highlight in pairs(CreatedHighlights) do
+        if Highlight and Highlight.Parent then
+            Highlight.Enabled = Value
+        end
+    end
+    for Part, Data in pairs(CreatedNames) do
+        if Data and Data.Billboard and Data.Billboard.Parent then
+            Data.Billboard.Enabled = Value
+        end
+    end
+end
+
+local function UpdateLootESPColor(Value)
+    LootESPColor = Value
+    for Part, Highlight in pairs(CreatedHighlights) do
+        if Highlight and Highlight.Parent then
+            Highlight.FillColor = Value
+            Highlight.OutlineColor = Value
+        end
+    end
+    for Part, Data in pairs(CreatedNames) do
+        if Data and Data.Text and Data.Text.Parent then
+            Data.Text.TextColor3 = Value
+        end
+    end
+end
+
+-- ===================== 飞行功能 =====================
+local function getControlModule()
+    local PlayerModule = LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")
+    return require(PlayerModule:WaitForChild("ControlModule"))
+end
+
+local function setupBodyMovers(character)
+    local hrp = character:WaitForChild("HumanoidRootPart")
+    local humanoid = character:WaitForChild("Humanoid")
+    local moverParent = workspace:FindFirstChildOfClass("Terrain") or workspace
+    local moverAttachment = Instance.new("Attachment", hrp)
+    moverAttachment.Name = "FlightAttachment"
+    local alignOrientation = Instance.new("AlignOrientation")
+    alignOrientation.Mode = Enum.OrientationAlignmentMode.OneAttachment
+    alignOrientation.RigidityEnabled = true
+    alignOrientation.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+    alignOrientation.CFrame = hrp.CFrame
+    alignOrientation.Attachment0 = moverAttachment
+    alignOrientation.Parent = moverParent
+    local linearVelocity = Instance.new("LinearVelocity")
+    linearVelocity.VectorVelocity = Vector3.zero
+    linearVelocity.MaxForce = 9e9
+    linearVelocity.Attachment0 = moverAttachment
+    linearVelocity.Parent = moverParent
+    return alignOrientation, linearVelocity, humanoid, moverAttachment
+end
+
+local function getFlightVector(controlModule)
+    local moveVector = controlModule:GetMoveVector()
+    Control.F = -moveVector.Z
+    Control.B = moveVector.Z
+    Control.L = -moveVector.X
+    Control.R = moveVector.X
+    Control.Q = moveVector.Y
+    Control.E = -moveVector.Y
+    if UserInputService:IsKeyDown(Enum.KeyCode.W) then Control.F = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.S) then Control.B = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.A) then Control.L = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.D) then Control.R = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.Space) then Control.Q = 1 end
+    if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then Control.E = 1 end
+    local flightVector =
+        Camera.CFrame.LookVector * (Control.F - Control.B) +
+        Camera.CFrame.RightVector * (Control.R - Control.L) +
+        Vector3.new(0, 1, 0) * (Control.Q - Control.E)
+    return flightVector.Magnitude > 0 and flightVector.Unit or flightVector
+end
+
+local function startFlying()
+    if FlyingEnabled then return end
+    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    if not character then return end
+    FlyingEnabled = true
+    SpinningEnabled = false
+    if CurrentAO then CurrentAO:Destroy() end
+    if CurrentLV then CurrentLV:Destroy() end
+    if CurrentMoverAttachment then CurrentMoverAttachment:Destroy() end
+    CurrentAO, CurrentLV, humanoid, CurrentMoverAttachment = setupBodyMovers(character)
+    local controlModule = getControlModule()
+    FlightConnection = RunService.Heartbeat:Connect(function()
+        if not FlyingEnabled or not CurrentLV or not CurrentAO then return end
+        local flightVector = getFlightVector(controlModule)
+        if flightVector.Magnitude > 0 then
+            CurrentLV.VelocityConstraintMode = Enum.VelocityConstraintMode.Vector
+            CurrentLV.VectorVelocity = flightVector * FlightSpeed
+        else
+            CurrentLV.VectorVelocity = Vector3.zero
+        end
+        if SpinningEnabled then
+            local targetPart = humanoid.SeatPart or character.HumanoidRootPart
+            CurrentAO.CFrame = targetPart.CFrame * CFrame.Angles(0, math.rad(SpinSpeed), 0)
+        else
+            CurrentAO.CFrame = Camera.CFrame
+        end
+        humanoid.PlatformStand = true
+    end)
+    character.AncestryChanged:Connect(function(_, parent)
+        if not parent and FlyingEnabled then
+            stopFlying()
+        end
+    end)
+end
+
+local function stopFlying()
+    if not FlyingEnabled then return end
+    FlyingEnabled = false
+    SpinningEnabled = false
+    if FlightConnection then
+        FlightConnection:Disconnect()
+        FlightConnection = nil
+    end
+    if CurrentAO then CurrentAO:Destroy() end
+    if CurrentLV then CurrentLV:Destroy() end
+    if CurrentMoverAttachment then CurrentMoverAttachment:Destroy() end
+    local character = LocalPlayer.Character
+    if character and character:FindFirstChild("Humanoid") then
+        character.Humanoid.PlatformStand = false
+    end
+end
+
+-- 快速通关工具（原FlyModule）
+local FlyModule = {}
+FlyModule.Config = {MoveSpeed=10,FreezeEnabled=false,FreezeY=nil}
+FlyModule.State = {UI=nil,Connections={},Initialized=false}
+FlyModule.Init = function()
+    if FlyModule.State.Initialized then return end
+    FlyModule.Services = {Players=game:GetService("Players"),UserInputService=game:GetService("UserInputService"),RunService=game:GetService("RunService"),CoreGui=game:GetService("CoreGui")}
+    FlyModule.Player = FlyModule.Services.Players.LocalPlayer
+    FlyModule.State.Initialized = true
+end
+FlyModule.CreateUI = function()
+    if FlyModule.State.UI then
+        FlyModule.State.UI:Destroy()
+        FlyModule.State.UI = nil
+    end
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "QC_FlyUI"
+    ScreenGui.Parent = FlyModule.Services.CoreGui
+    ScreenGui.DisplayOrder = 2000
+    ScreenGui.ResetOnSpawn = false
+    local SpeedInput = Instance.new("TextBox")
+    SpeedInput.Name = "SpeedInput"
+    SpeedInput.Parent = ScreenGui
+    SpeedInput.Size = UDim2.new(0, 120, 0, 30)
+    SpeedInput.Position = UDim2.new(0.95, -120, 0.05, 38)
+    SpeedInput.Text = tostring(FlyModule.Config.MoveSpeed)
+    SpeedInput.TextSize = 18
+    SpeedInput.PlaceholderText = "移动速度"
+    SpeedInput.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    SpeedInput.BackgroundTransparency = 0.2
+    SpeedInput.TextColor3 = Color3.fromRGB(0, 0, 0)
+    Instance.new("UICorner").Parent = SpeedInput
+    SpeedInput.FocusLost:Connect(function()
+        local num = tonumber(SpeedInput.Text)
+        if (num and (num > 0)) then
+            FlyModule.Config.MoveSpeed = num
+        else
+            SpeedInput.Text = tostring(FlyModule.Config.MoveSpeed)
+        end
+    end)
+    local FreezeBtn = Instance.new("TextButton")
+    FreezeBtn.Name = "FreezeBtn"
+    FreezeBtn.Parent = ScreenGui
+    FreezeBtn.Size = UDim2.new(0, 120, 0, 38)
+    FreezeBtn.Position = UDim2.new(0.95, -120, 0.05, 0)
+    FreezeBtn.Text = "开启空中悬挂"
+    FreezeBtn.TextSize = 20
+    FreezeBtn.BackgroundColor3 = Color3.fromRGB(210, 240, 255)
+    FreezeBtn.BackgroundTransparency = 0.2
+    FreezeBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+    Instance.new("UICorner").Parent = FreezeBtn
+    FreezeBtn.MouseButton1Click:Connect(function()
+        FlyModule.Config.FreezeEnabled = not FlyModule.Config.FreezeEnabled
+        FreezeBtn.Text = (FlyModule.Config.FreezeEnabled and "悬挂√") or "开启空中悬挂"
+        FreezeBtn.BackgroundColor3 = (FlyModule.Config.FreezeEnabled and Color3.fromRGB(255, 200, 200)) or Color3.fromRGB(210, 240, 255)
+        if not FlyModule.Config.FreezeEnabled then
+            FlyModule.Config.FreezeY = nil
+        end
+    end)
+    FlyModule.State.UI = ScreenGui
+    return ScreenGui
+end
+FlyModule.SetupCharacter = function(Character)
+    FlyModule.Character = Character
+    FlyModule.Humanoid = Character:WaitForChild("Humanoid", 10)
+    FlyModule.HRP = Character:WaitForChild("HumanoidRootPart", 10)
+    FlyModule.Humanoid.Died:Connect(function()
+        FlyModule.Config.FreezeEnabled = false
+        FlyModule.Config.FreezeY = nil
+        if FlyModule.State.UI then
+            local FreezeBtn = FlyModule.State.UI:FindFirstChild("FreezeBtn")
+            if FreezeBtn then
+                FreezeBtn.Text = "开启空中悬挂"
+                FreezeBtn.BackgroundColor3 = Color3.fromRGB(210, 240, 255)
+            end
+        end
+    end)
+end
+FlyModule.SetupInfiniteJump = function()
+    table.insert(FlyModule.State.Connections, FlyModule.Services.UserInputService.JumpRequest:Connect(function()
+        if (FlyModule.Humanoid and (FlyModule.Humanoid:GetState() ~= Enum.HumanoidStateType.Dead)) then
+            FlyModule.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end))
+end
+FlyModule.SetupMainLoop = function()
+    table.insert(FlyModule.State.Connections, FlyModule.Services.RunService.Heartbeat:Connect(function(dt)
+        if (FlyModule.Humanoid and FlyModule.HRP and (FlyModule.Humanoid:GetState() ~= Enum.HumanoidStateType.Dead)) then
+            local MoveDirection = FlyModule.Humanoid.MoveDirection
+            if FlyModule.Config.FreezeEnabled then
+                local State = FlyModule.Humanoid:GetState()
+                if ((State == Enum.HumanoidStateType.Freefall) and (FlyModule.Humanoid:GetState() ~= Enum.HumanoidStateType.Jumping)) then
+                    if (MoveDirection.Magnitude > 0) then
+                        if not FlyModule.Config.FreezeY then
+                            FlyModule.Config.FreezeY = FlyModule.HRP.Position.Y
+                        end
+                        local Move = Vector3.new(MoveDirection.X, 0, MoveDirection.Z) * FlyModule.Config.MoveSpeed * dt
+                        local CurrentPos = FlyModule.HRP.Position
+                        local NewPos = Vector3.new(CurrentPos.X, FlyModule.Config.FreezeY, CurrentPos.Z) + Move
+                        FlyModule.HRP.CFrame = CFrame.new(NewPos, NewPos + FlyModule.HRP.CFrame.LookVector)
+                        FlyModule.HRP.Velocity = Vector3.new(0, 0, 0)
+                    else
+                        FlyModule.Config.FreezeY = nil
+                    end
+                    return
+                else
+                    FlyModule.Config.FreezeY = nil
+                end
+            end
+            if (MoveDirection.Magnitude > 0) then
+                FlyModule.HRP.CFrame = FlyModule.HRP.CFrame + (MoveDirection.Unit * FlyModule.Config.MoveSpeed * dt)
+            end
+        end
+    end))
+end
+FlyModule.SetupCharacterListeners = function()
+    if FlyModule.Player.Character then
+        FlyModule.SetupCharacter(FlyModule.Player.Character)
+    end
+    table.insert(FlyModule.State.Connections, FlyModule.Player.CharacterAdded:Connect(function(Character)
+        FlyModule.SetupCharacter(Character)
+    end))
+    table.insert(FlyModule.State.Connections, FlyModule.Player.CharacterRemoving:Connect(function()
+        FlyModule.Character = nil
+        FlyModule.Humanoid = nil
+        FlyModule.HRP = nil
+        FlyModule.Config.FreezeEnabled = false
+        FlyModule.Config.FreezeY = nil
+    end))
+end
+FlyModule.Start = function()
+    FlyModule.Init()
+    FlyModule.CreateUI()
+    FlyModule.SetupInfiniteJump()
+    FlyModule.SetupMainLoop()
+    FlyModule.SetupCharacterListeners()
+end
+
+-- ===================== 夜视 =====================
+local function ToggleNightVision(enable)
+    local lighting = game:GetService("Lighting")
+    if enable then
+        NightVision.OriginalBrightness = lighting.Brightness
+        NightVision.OriginalAmbient = lighting.Ambient
+        NightVision.OriginalOutdoor = lighting.OutdoorAmbient
+        lighting.Brightness = 2
+        lighting.Ambient = Color3.new(1, 1, 1)
+        lighting.OutdoorAmbient = Color3.new(1, 1, 1)
+        lighting.FogEnd = 1000
+        lighting.GlobalShadows = false
+        local colorCorrection = Instance.new("ColorCorrectionEffect")
+        colorCorrection.Name = "NightVisionEffect"
+        colorCorrection.Brightness = 0.1
+        colorCorrection.Contrast = 0.3
+        colorCorrection.Saturation = -0.5
+        colorCorrection.TintColor = Color3.new(0, 1, 0)
+        colorCorrection.Parent = lighting
+        NightVision.Enabled = true
+        WindUI:Notify({ Title = "夜视已开启", Duration = 2 })
+    else
+        if NightVision.OriginalBrightness then
+            lighting.Brightness = NightVision.OriginalBrightness
+        end
+        if NightVision.OriginalAmbient then
+            lighting.Ambient = NightVision.OriginalAmbient
+        end
+        if NightVision.OriginalOutdoor then
+            lighting.OutdoorAmbient = NightVision.OriginalOutdoor
+        end
+        lighting.FogEnd = 100000
+        lighting.GlobalShadows = true
+        local effect = lighting:FindFirstChild("NightVisionEffect")
+        if effect then effect:Destroy() end
+        NightVision.Enabled = false
+        WindUI:Notify({ Title = "夜视已关闭", Duration = 2 })
+    end
+end
+
+-- ===================== 穿墙 =====================
+local function ToggleNoclip(enable)
+    local player = game:GetService("Players").LocalPlayer
+    if enable then
+        Noclip.Enabled = true
+        Noclip.Connection = game:GetService("RunService").Stepped:Connect(function()
+            local character = player.Character
+            if character then
+                for _, part in ipairs(character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+            end
+        end)
+        WindUI:Notify({ Title = "穿墙已开启", Duration = 2 })
+    else
+        Noclip.Enabled = false
+        if Noclip.Connection then
+            Noclip.Connection:Disconnect()
+            Noclip.Connection = nil
+        end
+        local character = player.Character
+        if character then
+            for _, part in ipairs(character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = true
+                end
+            end
+        end
+        WindUI:Notify({ Title = "穿墙已关闭", Duration = 2 })
+    end
+end
+
+-- ===================== 传送功能 =====================
+local function TeleportToMexico()
+    local player = game:GetService("Players").LocalPlayer
+    local character = player.Character
+    if not character then
+        WindUI:Notify({ Title = "找不到角色！", Duration = 3 })
+        return false
+    end
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    if not humanoidRootPart then
+        WindUI:Notify({ Title = "找不到HumanoidRootPart！", Duration = 3 })
+        return false
+    end
+    local targetPosition = Vector3.new(359.0, 1038.8, 83526.1)
+    pcall(function()
+        humanoidRootPart.CFrame = CFrame.new(targetPosition)
+        if (humanoidRootPart.Position - targetPosition).Magnitude > 10 then
+            local tweenService = game:GetService("TweenService")
+            local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
+            local tween = tweenService:Create(humanoidRootPart, tweenInfo, {CFrame = CFrame.new(targetPosition)})
+            tween:Play()
+            tween.Completed:Wait()
+        end
+    end)
+    wait(0.5)
+    if (humanoidRootPart.Position - targetPosition).Magnitude < 50 then
+        WindUI:Notify({ Title = string.format("已传送到墨西哥！(%.1f, %.1f, %.1f)", targetPosition.X, targetPosition.Y, targetPosition.Z), Duration = 3 })
+        return true
+    else
+        WindUI:Notify({ Title = "传送失败，请重试！", Duration = 3 })
+        return false
+    end
+end
+
+-- ===================== 自动拾取 =====================
+local function GetLootableItems()
+    local player = game:GetService("Players").LocalPlayer
+    local character = player.Character
+    if not character then return {} end
+    local rootPart = character:FindFirstChild("PrimaryPart") or character:FindFirstChild("HumanoidRootPart")
+    if not rootPart then return {} end
+    local items = {}
+    local lootFolder = workspace:FindFirstChild("Loot") or workspace
+    local descendants = lootFolder:GetDescendants()
+    for i = 1, #descendants do
+        local item = descendants[i]
+        if item:IsA("BasePart") and item.Parent and item.Parent:FindFirstChild("Handle") then
+            local distance = (item.Position - rootPart.Position).Magnitude
+            if distance <= AutoLoot.LootRadius then
+                table.insert(items, item.Parent)
+            end
+        end
+    end
+    return items
+end
+
+local function LootItem(item)
+    local args = { "Loot", "LootEquip", item:WaitForChild("Handle") }
+    local replicatedStorage = game:GetService("ReplicatedStorage")
+    if replicatedStorage then
+        local flowClient = replicatedStorage:FindFirstChild("FlowClient")
+        if flowClient then
+            local clientRunner = flowClient:FindFirstChild("ClientRunner")
+            if clientRunner then
+                local func = clientRunner:FindFirstChild("Function")
+                if func then
+                    func:InvokeServer(unpack(args))
+                end
+            end
+        end
+    end
+end
+
+local function AutoLootLoop()
+    if not AutoLoot.Enabled then return end
+    local items = GetLootableItems()
+    local count = 0
+    for i = 1, #items do
+        local item = items[i]
+        local success = pcall(function()
+            LootItem(item)
+            count = count + 1
+        end)
+        if success then
+            AutoLoot.LootCount = AutoLoot.LootCount + 1
+        end
+    end
+    if count > 0 then
+        -- 更新统计标签（在UI中）
+    end
+end
+
+local function StartAutoLoot()
+    if AutoLoot.LoopConnection then return end
+    AutoLoot.Enabled = true
+    AutoLoot.LoopConnection = game:GetService("RunService").Stepped:Connect(function()
+        AutoLootLoop()
+    end)
+end
+
+local function StopAutoLoot()
+    AutoLoot.Enabled = false
+    if AutoLoot.LoopConnection then
+        AutoLoot.LoopConnection:Disconnect()
+        AutoLoot.LoopConnection = nil
+    end
+end
+
+local function ResetLootCount()
+    AutoLoot.LootCount = 0
+    -- 更新标签
+end
+
+-- ===================== 自动杀戮 =====================
+local function GetKillableEntities()
+    local player = game:GetService("Players").LocalPlayer
+    local character = player.Character
+    if not character then return {} end
+    local rootPart = character:FindFirstChild("PrimaryPart") or character:FindFirstChild("HumanoidRootPart")
+    if not rootPart then return {} end
+    local entities = {}
+    local killRadius = KillFeature.KillRadius
+    local descendants = workspace:GetDescendants()
+    for i = 1, #descendants do
+        local model = descendants[i]
+        if model:IsA("Model") then
+            local humanoid = model:FindFirstChildOfClass("Humanoid")
+            if humanoid and humanoid.Health > 0 then
+                local isPlayer = game:GetService("Players"):GetPlayerFromCharacter(model)
+                if isPlayer and not KillFeature.Targets.Players then
+                else
+                    local primaryPart = model:FindFirstChild("PrimaryPart") or model:FindFirstChild("HumanoidRootPart") or model:FindFirstChild("Head") or model:FindFirstChild("Torso")
+                    if primaryPart then
+                        local distance = (primaryPart.Position - rootPart.Position).Magnitude
+                        if distance <= killRadius then
+                            local entityType = "Unknown"
+                            local modelName = model.Name:lower()
+                            local modelFullName = model.Name
+                            if string.find(modelName, "police") or string.find(modelName, "cop") or string.find(modelName, "sheriff") or string.find(modelName, "officer") or string.find(modelFullName, "警察") or string.find(modelFullName, "警员") or string.find(modelFullName, "警") then
+                                entityType = "Police"
+                            elseif string.find(modelName, "enemy") or string.find(modelName, "bandit") or string.find(modelName, "thief") or string.find(modelName, "criminal") or string.find(modelName, "robber") or string.find(modelName, "gang") or string.find(modelFullName, "敌人") or string.find(modelFullName, "强盗") or string.find(modelFullName, "罪犯") then
+                                entityType = "Enemy"
+                            elseif string.find(modelName, "npc") or string.find(modelName, "character") or string.find(modelName, "civilian") or string.find(modelName, "pedestrian") or string.find(modelName, "person") or string.find(modelFullName, "NPC") or string.find(modelFullName, "角色") or string.find(modelFullName, "人物") then
+                                entityType = "NPC"
+                            elseif string.find(modelName, "civilian") or string.find(modelName, "ped") or string.find(modelName, "citizen") or string.find(modelFullName, "平民") or string.find(modelFullName, "市民") then
+                                entityType = "Civilian"
+                            end
+                            local shouldAdd = false
+                            if entityType == "Police" and KillFeature.Targets.Police then
+                                shouldAdd = true
+                            elseif entityType == "NPC" and KillFeature.Targets.NPCs then
+                                shouldAdd = true
+                            elseif entityType == "Enemy" and KillFeature.Targets.Enemies then
+                                shouldAdd = true
+                            elseif entityType == "Civilian" and KillFeature.Targets.Civilians then
+                                shouldAdd = true
+                            elseif entityType == "Unknown" and not isPlayer then
+                                shouldAdd = true
+                            end
+                            if shouldAdd then
+                                table.insert(entities, {
+                                    model = model,
+                                    humanoid = humanoid,
+                                    part = primaryPart,
+                                    type = entityType,
+                                    isPlayer = (isPlayer ~= nil),
+                                    displayName = model.Name,
+                                    health = humanoid.Health
+                                })
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return entities
+end
+
+local function KillEntity(entity)
+    if not entity or not entity.humanoid then return false end
+    local success = false
+    pcall(function()
+        if entity.humanoid.Health > 0 then
+            entity.humanoid.Health = 0
+            success = true
+        end
+        if entity.humanoid.Health > 0 then
+            entity.humanoid:TakeDamage(entity.humanoid.Health)
+            success = true
+        end
+        if entity.humanoid.Health > 0 and entity.model then
+            entity.model:BreakJoints()
+            success = true
+        end
+    end)
+    return success
+end
+
+local function AutoKillLoop()
+    if not KillFeature.Enabled then return end
+    local entities = GetKillableEntities()
+    local count = 0
+    for i = 1, #entities do
+        local entity = entities[i]
+        if entity.humanoid and entity.humanoid.Health > 0 then
+            local killed = KillEntity(entity)
+            if killed then
+                count = count + 1
+                KillFeature.KillCount = KillFeature.KillCount + 1
+            end
+        end
+    end
+    if count > 0 then
+        WindUI:Notify({ Title = string.format("已击杀 %d 个生物！", count), Duration = 1 })
+    end
+end
+
+local function StartAutoKill()
+    if KillFeature.LoopConnection then return end
+    KillFeature.Enabled = true
+    KillFeature.LoopConnection = game:GetService("RunService").Stepped:Connect(function()
+        AutoKillLoop()
+    end)
+    WindUI:Notify({ Title = "自动杀戮已开启！", Duration = 2 })
+end
+
+local function StopAutoKill()
+    KillFeature.Enabled = false
+    if KillFeature.LoopConnection then
+        KillFeature.LoopConnection:Disconnect()
+        KillFeature.LoopConnection = nil
+    end
+    WindUI:Notify({ Title = "自动杀戮已关闭！", Duration = 2 })
+end
+
+local function ManualKill()
+    local entities = GetKillableEntities()
+    local count = 0
+    if #entities == 0 then
+        WindUI:Notify({ Title = "没有找到可击杀的生物！", Duration = 2 })
+        return 0
+    end
+    for i = 1, #entities do
+        local entity = entities[i]
+        if entity.humanoid and entity.humanoid.Health > 0 then
+            local killed = KillEntity(entity)
+            if killed then
+                count = count + 1
+                KillFeature.KillCount = KillFeature.KillCount + 1
+            end
+        end
+    end
+    WindUI:Notify({ Title = string.format("已手动击杀 %d 个生物！", count), Duration = 2 })
+    return count
+end
+
+local function ResetKillCount()
+    KillFeature.KillCount = 0
+end
+
+-- ===================== 玩家修改 =====================
+local function GetPlayerHumanoid()
+    local player = game:GetService("Players").LocalPlayer
+    if not player then return nil end
+    local character = player.Character
+    if not character then return nil end
+    return character:FindFirstChildOfClass("Humanoid")
+end
+
+local function ApplyPlayerMods()
+    local humanoid = GetPlayerHumanoid()
+    if not humanoid then return end
+    pcall(function()
+        if PlayerMod.Values.WalkSpeed then humanoid.WalkSpeed = PlayerMod.Values.WalkSpeed end
+        if PlayerMod.Values.JumpPower then humanoid.JumpPower = PlayerMod.Values.JumpPower end
+        if PlayerMod.Values.Health then humanoid.Health = PlayerMod.Values.Health end
+        if PlayerMod.Values.MaxHealth then humanoid.MaxHealth = PlayerMod.Values.MaxHealth end
+        if PlayerMod.Values.HipHeight ~= nil then humanoid.HipHeight = PlayerMod.Values.HipHeight end
+        if humanoid:FindFirstChild("JumpHeight") then
+            humanoid.JumpHeight = PlayerMod.Values.JumpHeight
+        end
+        if humanoid:FindFirstChild("UseJumpPower") then
+            humanoid.UseJumpPower = true
+        end
+        if humanoid:FindFirstChild("AutomaticScalingEnabled") then
+            humanoid.AutomaticScalingEnabled = false
+        end
+    end)
+end
+
+local function LockPlayerAttributes()
+    local humanoid = GetPlayerHumanoid()
+    if not humanoid then return end
+    pcall(function()
+        local function CreateLock(property, targetValue)
+            local connection
+            connection = humanoid:GetPropertyChangedSignal(property):Connect(function()
+                if PlayerMod.Locked and humanoid and humanoid[property] ~= targetValue then
+                    pcall(function()
+                        humanoid[property] = targetValue
+                    end)
+                end
+            end)
+            return connection
+        end
+        if PlayerMod.LockConnection then
+            PlayerMod.LockConnection:Disconnect()
+            PlayerMod.LockConnection = nil
+        end
+        local connections = {}
+        table.insert(connections, CreateLock("WalkSpeed", PlayerMod.Values.WalkSpeed))
+        table.insert(connections, CreateLock("JumpPower", PlayerMod.Values.JumpPower))
+        table.insert(connections, CreateLock("Health", PlayerMod.Values.Health))
+        table.insert(connections, CreateLock("MaxHealth", PlayerMod.Values.MaxHealth))
+        table.insert(connections, CreateLock("HipHeight", PlayerMod.Values.HipHeight))
+        if humanoid:FindFirstChild("JumpHeight") then
+            table.insert(connections, CreateLock("JumpHeight", PlayerMod.Values.JumpHeight))
+        end
+        PlayerMod.LockConnection = {
+            Disconnect = function()
+                for i = 1, #connections do
+                    pcall(function()
+                        connections[i]:Disconnect()
+                    end)
+                end
+            end
+        }
+    end)
+end
+
+local function AutoModLoop()
+    if not PlayerMod.Enabled then return end
+    local humanoid = GetPlayerHumanoid()
+    if not humanoid then return end
+    local needsUpdate = false
+    if humanoid.WalkSpeed ~= PlayerMod.Values.WalkSpeed then needsUpdate = true end
+    if humanoid.JumpPower ~= PlayerMod.Values.JumpPower then needsUpdate = true end
+    if humanoid.Health ~= PlayerMod.Values.Health then needsUpdate = true end
+    if humanoid.MaxHealth ~= PlayerMod.Values.MaxHealth then needsUpdate = true end
+    if needsUpdate then
+        ApplyPlayerMods()
+    end
+end
+
+local function StartPlayerMod()
+    if PlayerMod.LoopConnection then return end
+    PlayerMod.Enabled = true
+    ApplyPlayerMods()
+    if PlayerMod.Locked then
+        LockPlayerAttributes()
+    end
+    PlayerMod.LoopConnection = game:GetService("RunService").Stepped:Connect(function()
+        AutoModLoop()
+    end)
+    WindUI:Notify({ Title = "玩家属性修改已开启！", Duration = 2 })
+end
+
+local function StopPlayerMod()
+    PlayerMod.Enabled = false
+    if PlayerMod.LoopConnection then
+        PlayerMod.LoopConnection:Disconnect()
+        PlayerMod.LoopConnection = nil
+    end
+    if PlayerMod.LockConnection then
+        PlayerMod.LockConnection:Disconnect()
+        PlayerMod.LockConnection = nil
+    end
+    WindUI:Notify({ Title = "玩家属性修改已关闭！", Duration = 2 })
+end
+
+local function ResetPlayerMods()
+    local humanoid = GetPlayerHumanoid()
+    if not humanoid then return end
+    pcall(function()
+        humanoid.WalkSpeed = PlayerMod.Defaults.WalkSpeed
+        humanoid.JumpPower = PlayerMod.Defaults.JumpPower
+        humanoid.Health = PlayerMod.Defaults.Health
+        humanoid.MaxHealth = PlayerMod.Defaults.MaxHealth
+        humanoid.HipHeight = PlayerMod.Defaults.HipHeight
+        if humanoid:FindFirstChild("JumpHeight") then
+            humanoid.JumpHeight = PlayerMod.Defaults.JumpHeight
+        end
+        if humanoid:FindFirstChild("UseJumpPower") then
+            humanoid.UseJumpPower = true
+        end
+        if humanoid:FindFirstChild("AutomaticScalingEnabled") then
+            humanoid.AutomaticScalingEnabled = true
+        end
+    end)
+    WindUI:Notify({ Title = "已重置所有属性！", Duration = 2 })
+end
+
+-- ===================== 自动通关 =====================
+local function EnableNoclipFly()
+    local player = game:GetService("Players").LocalPlayer
+    local character = player.Character
+    if not character then return end
+    for _, part in ipairs(character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = false
+        end
+    end
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        humanoid.PlatformStand = true
+        humanoid.WalkSpeed = AutoComplete.Speed
+    end
+end
+
+local function DisableNoclipFly()
+    local player = game:GetService("Players").LocalPlayer
+    local character = player.Character
+    if not character then return end
+    for _, part in ipairs(character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = true
+        end
+    end
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        humanoid.PlatformStand = false
+    end
+end
+
+local function MoveToPositionSmooth(targetPos, speed)
+    local player = game:GetService("Players").LocalPlayer
+    local character = player.Character
+    if not character then
+        WindUI:Notify({ Title = "找不到角色！", Duration = 3 })
+        return false
+    end
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    if not humanoidRootPart then
+        WindUI:Notify({ Title = "找不到HumanoidRootPart！", Duration = 3 })
+        return false
+    end
+    EnableNoclipFly()
+    local startPos = humanoidRootPart.Position
+    local distance = (targetPos - startPos).Magnitude
+    if distance < AutoComplete.Tolerance then
+        WindUI:Notify({ Title = "已经在目标位置附近！", Duration = 2 })
+        return true
+    end
+    local moveTime = distance / speed
+    moveTime = math.max(moveTime, 0.5)
+    WindUI:Notify({ Title = string.format("开始高速平移 (速度: %.0f, 距离: %.0f)", speed, distance), Duration = 2 })
+    local tweenService = game:GetService("TweenService")
+    local tweenInfo = TweenInfo.new(moveTime, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
+    local tween = tweenService:Create(humanoidRootPart, tweenInfo, { CFrame = CFrame.new(targetPos) })
+    tween:Play()
+    tween.Completed:Wait()
+    wait(0.3)
+    local finalPos = humanoidRootPart.Position
+    local finalDistance = (finalPos - targetPos).Magnitude
+    if finalDistance < AutoComplete.Tolerance then
+        WindUI:Notify({ Title = string.format("已到达目标点！(%.1f, %.1f, %.1f)", targetPos.X, targetPos.Y, targetPos.Z), Duration = 3 })
+        return true
+    else
+        WindUI:Notify({ Title = string.format("移动完成，剩余距离: %.1f", finalDistance), Duration = 2 })
+        return true
+    end
+end
+
+local function AutoCompleteLoop()
+    if not AutoComplete.Enabled then return end
+    local player = game:GetService("Players").LocalPlayer
+    local character = player.Character
+    if not character then
+        AutoComplete.Status = "等待角色加载..."
+        if AutoComplete.StatusLabel then AutoComplete.StatusLabel:SetText("状态: " .. AutoComplete.Status) end
+        return
+    end
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    if not humanoidRootPart then
+        AutoComplete.Status = "等待RootPart加载..."
+        if AutoComplete.StatusLabel then AutoComplete.StatusLabel:SetText("状态: " .. AutoComplete.Status) end
+        return
+    end
+    local currentPos = humanoidRootPart.Position
+    local targetPos = AutoComplete.EndPosition
+    local distance = (currentPos - targetPos).Magnitude
+    if distance > AutoComplete.Tolerance then
+        AutoComplete.Status = string.format("移动中... 距离: %.1f", distance)
+        if AutoComplete.StatusLabel then AutoComplete.StatusLabel:SetText("状态: " .. AutoComplete.Status) end
+        EnableNoclipFly()
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.WalkSpeed = AutoComplete.Speed
+            local direction = (targetPos - currentPos).Unit
+            local step = math.min(AutoComplete.Speed * 0.05, distance)
+            local newPos = currentPos + direction * step
+            humanoidRootPart.CFrame = CFrame.new(newPos)
+        end
+    else
+        if AutoComplete.Status ~= "已到达通关点！" then
+            AutoComplete.Status = "已到达通关点！"
+            if AutoComplete.StatusLabel then AutoComplete.StatusLabel:SetText("状态: " .. AutoComplete.Status) end
+            WindUI:Notify({ Title = "自动通关完成！", Duration = 3 })
+            DisableNoclipFly()
+            WindUI:Notify({ Title = "已关闭穿墙和飞天模式", Duration = 2 })
+        end
+    end
+end
+
+local function StartAutoComplete()
+    if AutoComplete.LoopConnection then return end
+    AutoComplete.Enabled = true
+    AutoComplete.Status = "启动中..."
+    if AutoComplete.StatusLabel then AutoComplete.StatusLabel:SetText("状态: " .. AutoComplete.Status) end
+    WindUI:Notify({ Title = "传送到起点...", Duration = 2 })
+    local success = MoveToPositionSmooth(AutoComplete.StartPosition, AutoComplete.Speed)
+    if success then
+        WindUI:Notify({ Title = "开始自动通关路径...", Duration = 2 })
+        wait(0.5)
+        success = MoveToPositionSmooth(AutoComplete.EndPosition, AutoComplete.Speed)
+    end
+    if success then
+        AutoComplete.Status = "已到达通关点！"
+        if AutoComplete.StatusLabel then AutoComplete.StatusLabel:SetText("状态: " .. AutoComplete.Status) end
+        WindUI:Notify({ Title = "自动通关完成！", Duration = 3 })
+        DisableNoclipFly()
+        WindUI:Notify({ Title = "已关闭穿墙和飞天模式", Duration = 2 })
+    else
+        AutoComplete.Status = "移动失败"
+        if AutoComplete.StatusLabel then AutoComplete.StatusLabel:SetText("状态: " .. AutoComplete.Status) end
+        WindUI:Notify({ Title = "自动通关失败，请重试！", Duration = 3 })
+    end
+end
+
+local function StopAutoComplete()
+    AutoComplete.Enabled = false
+    if AutoComplete.LoopConnection then
+        AutoComplete.LoopConnection:Disconnect()
+        AutoComplete.LoopConnection = nil
+    end
+    AutoComplete.Status = "已停止"
+    if AutoComplete.StatusLabel then AutoComplete.StatusLabel:SetText("状态: " .. AutoComplete.Status) end
+    WindUI:Notify({ Title = "自动通关已停止", Duration = 2 })
+    DisableNoclipFly()
+    WindUI:Notify({ Title = "已关闭穿墙和飞天模式", Duration = 2 })
+end
+
+-- ===================== 门删除功能 =====================
+local function GetObjectByPath(pathString)
+    local success, obj = pcall(function()
+        return loadstring("return " .. pathString)()
+    end)
+    if success and obj then
+        return obj
+    end
+    return nil
+end
+
+local function SafeDestroy(obj)
+    if obj and obj:IsA("BasePart") then
+        pcall(function()
+            obj:Destroy()
+            return true
+        end)
+        return true
+    end
+    return false
+end
+
+local function FindAndDeleteByName(parent, name)
+    local count = 0
+    if not parent then return count end
+    for _, child in ipairs(parent:GetChildren()) do
+        if child:IsA("BasePart") and child.Name:lower():find(name:lower()) then
+            if SafeDestroy(child) then
+                count = count + 1
+            end
+        end
+        count = count + FindAndDeleteByName(child, name)
+    end
+    return count
+end
+
+local function RemoveAllWoodenDoors()
+    local count = 0
+    local specificDoors = {
+        "workspace.Map.StartArea.Decorations.House.House1.House1.Door",
+        "workspace.Map.StartArea.Decorations.House.House2.House2.Door",
+        "workspace.Map.StartArea.Decorations.House.House3.House3.Door",
+    }
+    for _, path in ipairs(specificDoors) do
+        local obj = GetObjectByPath(path)
+        if obj then
+            for _, child in ipairs(obj:GetChildren()) do
+                if child:IsA("BasePart") and (child.Name:lower():find("door") or child.Name:lower():find("wood")) then
+                    if SafeDestroy(child) then
+                        count = count + 1
+                    end
+                end
+            end
+        end
+    end
+    local map = Workspace:FindFirstChild("Map")
+    if map then
+        count = count + FindAndDeleteByName(map, "door")
+        count = count + FindAndDeleteByName(map, "wood")
+    end
+    return count
+end
+
+local function RemoveAllDoubleDoors()
+    local count = 0
+    local doubleDoorPaths = {
+        "workspace.Map.Buildings.PawnShop.PawnShop.Door.DoubleDoor.DoorA",
+        "workspace.Map.Buildings.PawnShop.PawnShop.Door.DoubleDoor.DoorB",
+        "workspace.Map.Buildings.Store.Store.Door.DoubleDoor.DoorA",
+        "workspace.Map.Buildings.Store.Store.Door.DoubleDoor.DoorB",
+        "workspace.Map.Buildings.Bank.Bank.Door.DoubleDoor.DoorA",
+        "workspace.Map.Buildings.Bank.Bank.Door.DoubleDoor.DoorB",
+    }
+    for _, path in ipairs(doubleDoorPaths) do
+        local obj = GetObjectByPath(path)
+        if obj and obj:IsA("BasePart") then
+            if SafeDestroy(obj) then
+                count = count + 1
+            end
+        end
+    end
+    return count
+end
+
+local function RemoveCustomDoors(customPaths)
+    local count = 0
+    for _, path in ipairs(customPaths) do
+        local obj = GetObjectByPath(path)
+        if obj then
+            for _, child in ipairs(obj:GetChildren()) do
+                if child:IsA("BasePart") then
+                    if SafeDestroy(child) then
+                        count = count + 1
+                    end
+                end
+            end
+        end
+    end
+    return count
+end
+
+local function ExecuteDoorRemoval(config)
+    local count = 0
+    if config.RemoveAllDoors then
+        count = RemoveAllWoodenDoors()
+        count = count + RemoveAllDoubleDoors()
+        count = count + RemoveCustomDoors(config.CustomDoorPaths or {})
+    else
+        if config.RemoveHouseDoors then
+            count = count + RemoveAllWoodenDoors()
+        end
+        if config.RemovePawnShopDoors then
+            count = count + RemoveAllDoubleDoors()
+        end
+        if config.RemoveCustomDoors then
+            count = count + RemoveCustomDoors(config.CustomDoorPaths or {})
+        end
+    end
+    return count
+end
+
+-- ========================================================================
+-- 创建UI（使用WindUI组件）
+-- ========================================================================
+
+local Tabs = {}
+
+-- 主要功能 Section
+local MainSection = Window:Section({ Title = "主要功能", Opened = true })
+Tabs.MainTab = MainSection:Tab({ Title = "通用", Icon = "home" })
+Tabs.CombatTab = MainSection:Tab({ Title = "战斗", Icon = "sword" })
+Tabs.PlayerTab = MainSection:Tab({ Title = "玩家", Icon = "user" })
+Tabs.DoorTab = MainSection:Tab({ Title = "门删除", Icon = "door-closed" })
+
+-- 设置 Section
+local SettingsSection = Window:Section({ Title = "设置", Opened = true })
+Tabs.SettingsTab = SettingsSection:Tab({ Title = "配置", Icon = "settings" })
+
+-- ========== 主要标签页 ==========
+Tabs.MainTab:Section({ Title = "飞行模式" })
+Tabs.MainTab:Toggle({
+    Title = "飞行模式",
+    Value = false,
+    Callback = function(state)
+        if state then startFlying() else stopFlying() end
+    end
+})
+Tabs.MainTab:Slider({
+    Title = "飞行速度",
+    Value = { Min = 1, Max = 200, Default = 50 },
+    Callback = function(v) FlightSpeed = v end
+})
+Tabs.MainTab:Button({
+    Title = "快速通关工具",
+    Callback = function() FlyModule.Start() end
+})
+
+Tabs.MainTab:Divider()
+Tabs.MainTab:Section({ Title = "视觉功能" })
+Tabs.MainTab:Toggle({
+    Title = "夜视模式",
+    Value = false,
+    Callback = function(state) ToggleNightVision(state) end
+})
+Tabs.MainTab:Toggle({
+    Title = "穿墙模式",
+    Value = false,
+    Callback = function(state) ToggleNoclip(state) end
+})
+
+Tabs.MainTab:Divider()
+Tabs.MainTab:Section({ Title = "传送功能" })
+Tabs.MainTab:Button({
+    Title = "向上传送100格",
+    Callback = function()
+        local player = game:GetService("Players").LocalPlayer
+        local character = player.Character
+        if not character then WindUI:Notify({ Title = "找不到角色！", Duration = 3 }) return end
+        local hrp = character:FindFirstChild("HumanoidRootPart")
+        if not hrp then WindUI:Notify({ Title = "找不到HumanoidRootPart！", Duration = 3 }) return end
+        local newPos = Vector3.new(hrp.Position.X, hrp.Position.Y + 100, hrp.Position.Z)
+        pcall(function()
+            hrp.CFrame = CFrame.new(newPos)
+            WindUI:Notify({ Title = string.format("向上传送100格！新高度: %.1f", newPos.Y), Duration = 2 })
+        end)
+    end
+})
+Tabs.MainTab:Button({
+    Title = "向下传送100格",
+    Callback = function()
+        local player = game:GetService("Players").LocalPlayer
+        local character = player.Character
+        if not character then WindUI:Notify({ Title = "找不到角色！", Duration = 3 }) return end
+        local hrp = character:FindFirstChild("HumanoidRootPart")
+        if not hrp then WindUI:Notify({ Title = "找不到HumanoidRootPart！", Duration = 3 }) return end
+        local newPos = Vector3.new(hrp.Position.X, hrp.Position.Y - 100, hrp.Position.Z)
+        pcall(function()
+            hrp.CFrame = CFrame.new(newPos)
+            WindUI:Notify({ Title = string.format("向下传送100格！新高度: %.1f", newPos.Y), Duration = 2 })
+        end)
+    end
+})
+local customHeightSlider = Tabs.MainTab:Slider({
+    Title = "自定义传送高度",
+    Value = { Min = -1000, Max = 1000, Default = 100 },
+    Callback = function(v) end
+})
+Tabs.MainTab:Button({
+    Title = "传送到自定义高度",
+    Callback = function()
+        local player = game:GetService("Players").LocalPlayer
+        local character = player.Character
+        if not character then WindUI:Notify({ Title = "找不到角色！", Duration = 3 }) return end
+        local hrp = character:FindFirstChild("HumanoidRootPart")
+        if not hrp then WindUI:Notify({ Title = "找不到HumanoidRootPart！", Duration = 3 }) return end
+        local height = customHeightSlider:GetValue()
+        local newPos = Vector3.new(hrp.Position.X, hrp.Position.Y + height, hrp.Position.Z)
+        pcall(function()
+            hrp.CFrame = CFrame.new(newPos)
+            WindUI:Notify({ Title = string.format("传送到自定义高度！新高度: %.1f", newPos.Y), Duration = 2 })
+        end)
+    end
+})
+Tabs.MainTab:Button({
+    Title = "传送到墨西哥",
+    Callback = function() TeleportToMexico() end
+})
+
+Tabs.MainTab:Divider()
+Tabs.MainTab:Section({ Title = "自动拾取" })
+local autoLootToggle = Tabs.MainTab:Toggle({
+    Title = "自动拾取",
+    Value = false,
+    Callback = function(state)
+        if state then StartAutoLoot() else StopAutoLoot() end
+    end
+})
+Tabs.MainTab:Slider({
+    Title = "拾取范围",
+    Value = { Min = 10, Max = 100, Default = 50 },
+    Callback = function(v) AutoLoot.LootRadius = v end
+})
+Tabs.MainTab:Slider({
+    Title = "拾取速度 (秒)",
+    Value = { Min = 0.1, Max = 1, Default = 0.5, Step = 0.1 },
+    Callback = function(v)
+        AutoLoot.LootInterval = v
+        if AutoLoot.Enabled then
+            StopAutoLoot()
+            StartAutoLoot()
+        end
+    end
+})
+Tabs.MainTab:Button({
+    Title = "手动拾取一次",
+    Callback = function()
+        local count = 0
+        local items = GetLootableItems()
+        for i = 1, #items do
+            local item = items[i]
+            local success = pcall(function()
+                LootItem(item)
+                count = count + 1
+            end)
+            if success then AutoLoot.LootCount = AutoLoot.LootCount + 1 end
+        end
+        WindUI:Notify({ Title = string.format("已拾取 %d 个物品！", count), Duration = 2 })
+    end
+})
+local lootStatsLabel = Tabs.MainTab:Paragraph({
+    Title = "拾取统计",
+    Desc = "当前拾取: 0 个物品"
+})
+Tabs.MainTab:Button({
+    Title = "重置统计",
+    Callback = function()
+        AutoLoot.LootCount = 0
+        lootStatsLabel:SetDesc("当前拾取: 0 个物品")
+    end
+})
+
+Tabs.MainTab:Divider()
+Tabs.MainTab:Section({ Title = "自动通关" })
+local autoCompleteToggle = Tabs.MainTab:Toggle({
+    Title = "自动通关模式 (穿墙+飞天)",
+    Value = false,
+    Callback = function(state)
+        if state then StartAutoComplete() else StopAutoComplete() end
+    end
+})
+Tabs.MainTab:Button({
+    Title = "立即移动到终点",
+    Callback = function()
+        MoveToPositionSmooth(AutoComplete.EndPosition, AutoComplete.Speed)
+    end
+})
+Tabs.MainTab:Button({
+    Title = "立即移动到起点",
+    Callback = function()
+        MoveToPositionSmooth(AutoComplete.StartPosition, AutoComplete.Speed)
+    end
+})
+Tabs.MainTab:Slider({
+    Title = "移动速度",
+    Value = { Min = 100, Max = 5000, Default = 1000 },
+    Callback = function(v) AutoComplete.Speed = v end
+})
+Tabs.MainTab:Slider({
+    Title = "到达判定距离",
+    Value = { Min = 1, Max = 50, Default = 10 },
+    Callback = function(v) AutoComplete.Tolerance = v end
+})
+local autoCompleteStatus = Tabs.MainTab:Paragraph({
+    Title = "状态",
+    Desc = "状态: 未启动"
+})
+AutoComplete.StatusLabel = autoCompleteStatus
+autoCompleteStatus:SetDesc("状态: 未启动")
+
+-- ========== 战斗标签页 ==========
+Tabs.CombatTab:Section({ Title = "自动杀戮" })
+local autoKillToggle = Tabs.CombatTab:Toggle({
+    Title = "自动杀戮 (50米内)",
+    Value = false,
+    Callback = function(state)
+        if state then StartAutoKill() else StopAutoKill() end
+    end
+})
+Tabs.CombatTab:Slider({
+    Title = "杀戮范围",
+    Value = { Min = 10, Max = 100, Default = 50 },
+    Callback = function(v) KillFeature.KillRadius = v end
+})
+Tabs.CombatTab:Button({
+    Title = "手动击杀一次",
+    Callback = function() ManualKill() end
+})
+-- 在 KillFeature 表中添加变量
+local KillFeature = {
+    Enabled = false,
+    KillRadius = 50,
+    KillCount = 0,
+    LoopConnection = nil,
+    RepeatKillConnection = nil,
+    KillPerExecution = 1,  -- 新增：每次执行击杀数量
+    Targets = {
+        Police = true,
+        NPCs = true,
+        Enemies = true,
+        Civilians = false,
+        Players = false
+    }
+}
+
+-- 修改 ManualKill 函数，支持每次击杀多个目标
+local function ManualKill()
+    local entities = GetKillableEntities()
+    local count = 0
+    local maxKills = KillFeature.KillPerExecution  -- 获取每次击杀数量
+    
+    if #entities == 0 then
+        -- 不弹出通知，避免刷屏
+        return 0
+    end
+    
+    -- 只击杀指定数量的目标
+    local killCount = 0
+    for i = 1, #entities do
+        if killCount >= maxKills then break end  -- 达到上限则停止
+        
+        local entity = entities[i]
+        if entity.humanoid and entity.humanoid.Health > 0 then
+            local killed = KillEntity(entity)
+            if killed then
+                count = count + 1
+                killCount = killCount + 1
+                KillFeature.KillCount = KillFeature.KillCount + 1
+            end
+        end
+    end
+    
+    return count
+end
+
+-- UI部分：添加击杀数量滑块
+Tabs.CombatTab:Slider({
+    Title = "一次击杀数量",
+    Desc = "每次执行击杀的目标数量",
+    Value = {
+        Min = 1,
+        Max = 99999999,
+        Default = 1
+    },
+    Callback = function(value)
+        KillFeature.KillPerExecution = value
+        WindUI:Notify({ Title = string.format("一次击杀数量设置为: %d", value), Duration = 2 })
+    end
+})
+
+-- 反复击杀开关（使用上面定义的 KillPerExecution）
+Tabs.CombatTab:Toggle({
+    Title = "反复击杀",
+    Desc = "持续自动击杀范围内的目标",
+    Value = false,
+    Callback = function(state)
+        if state then
+            if KillFeature.RepeatKillConnection then 
+                KillFeature.RepeatKillConnection:Disconnect()
+                KillFeature.RepeatKillConnection = nil
+            end
+            WindUI:Notify({ Title = string.format("反复击杀已开启（每次击杀%d个）！", KillFeature.KillPerExecution), Duration = 2 })
+            
+            KillFeature.RepeatKillConnection = game:GetService("RunService").Stepped:Connect(function()
+                local count = ManualKill()
+                if count > 0 and killStatsLabel then
+                    killStatsLabel:SetDesc(string.format("已击杀: %d 个生物", KillFeature.KillCount))
+                end
+            end)
+        else
+            if KillFeature.RepeatKillConnection then
+                KillFeature.RepeatKillConnection:Disconnect()
+                KillFeature.RepeatKillConnection = nil
+            end
+            WindUI:Notify({ Title = "反复击杀已关闭！", Duration = 2 })
+        end
+    end
+})
+
+-- 保留手动击杀按钮（可选）
+Tabs.CombatTab:Button({
+    Title = "手动击杀一次",
+    Desc = string.format("立即击杀 %d 个目标", KillFeature.KillPerExecution),
+    Callback = function()
+        local count = ManualKill()
+        if count > 0 then
+            if killStatsLabel then
+                killStatsLabel:SetDesc(string.format("已击杀: %d 个生物", KillFeature.KillCount))
+            end
+            WindUI:Notify({ Title = string.format("已击杀 %d 个目标！", count), Duration = 2 })
+        else
+            WindUI:Notify({ Title = "没有找到可击杀的目标！", Duration = 2 })
+        end
+    end
+})
+local killStatsLabel = Tabs.CombatTab:Paragraph({
+    Title = "击杀统计",
+    Desc = "已击杀: 0 个生物"
+})
+Tabs.CombatTab:Button({
+    Title = "重置击杀统计",
+    Callback = function()
+        ResetKillCount()
+        killStatsLabel:SetDesc("已击杀: 0 个生物")
+    end
+})
+
+Tabs.CombatTab:Divider()
+Tabs.CombatTab:Section({ Title = "击杀目标过滤" })
+Tabs.CombatTab:Toggle({
+    Title = "击杀警察",
+    Value = true,
+    Callback = function(state) KillFeature.Targets.Police = state end
+})
+Tabs.CombatTab:Toggle({
+    Title = "击杀敌人",
+    Value = true,
+    Callback = function(state) KillFeature.Targets.Enemies = state end
+})
+Tabs.CombatTab:Toggle({
+    Title = "击杀普通NPC",
+    Value = true,
+    Callback = function(state) KillFeature.Targets.NPCs = state end
+})
+Tabs.CombatTab:Toggle({
+    Title = "击杀平民（慎用）",
+    Value = false,
+    Callback = function(state)
+        KillFeature.Targets.Civilians = state
+        if state then WindUI:Notify({ Title = "警告：已启用击杀平民功能！", Duration = 5 }) end
+    end
+})
+Tabs.CombatTab:Toggle({
+    Title = "击杀玩家（危险）",
+    Value = false,
+    Callback = function(state)
+        KillFeature.Targets.Players = state
+        if state then WindUI:Notify({ Title = "警告：已启用击杀玩家功能！", Duration = 5 }) end
+    end
+})
+
+Tabs.CombatTab:Divider()
+Tabs.CombatTab:Section({ Title = "透视物品设置" })
+local lootESPToggle = Tabs.CombatTab:Toggle({
+    Title = "物品高亮 + 名字",
+    Value = true,
+    Callback = function(state) UpdateLootESPEnabled(state) end
+})
+Tabs.CombatTab:Colorpicker({
+    Title = "Loot 高亮颜色",
+    Default = Color3.fromRGB(255, 0, 0),
+    Callback = function(color) UpdateLootESPColor(color) end
+})
+Tabs.CombatTab:Button({
+    Title = "手动刷新 Loot",
+    Callback = function()
+        if LootFolder and LootFolder.Parent then
+            RefreshLootESP()
+            WindUI:Notify({ Title = "Loot ESP 已刷新！", Duration = 2 })
+        else
+            WindUI:Notify({ Title = "未找到 Loot 文件夹！", Duration = 3 })
+        end
+    end
+})
+local lootStatusLabel = Tabs.CombatTab:Paragraph({
+    Title = "Loot 状态检测",
+    Desc = "正在检测..."
+})
+local function UpdateStatus()
+    if not LootFolder then
+        lootStatusLabel:SetDesc("未找到 Loot 文件夹")
+        return
+    end
+    local count = #LootFolder:GetChildren()
+    local active = 0
+    for _, Config in ipairs(LootConfig) do
+        if GetLootPart(Config) then active = active + 1 end
+    end
+    lootStatusLabel:SetDesc(string.format("Loot总数: %d | 已高亮: %d/%d", count, active, #LootConfig))
+end
+task.spawn(function()
+    task.wait(1)
+    if LootFolder and LootFolder.Parent then
+        RefreshLootESP()
+        UpdateStatus()
+    end
+end)
+if LootFolder then
+    LootFolder.ChildAdded:Connect(function()
+        task.wait(0.2)
+        RefreshLootESP()
+        UpdateStatus()
+    end)
+    LootFolder.ChildRemoved:Connect(function()
+        task.wait(0.2)
+        RefreshLootESP()
+        UpdateStatus()
+    end)
+end
+task.spawn(function()
+    while task.wait(2) do
+        if LootFolder and LootFolder.Parent then
+            RefreshLootESP()
+            UpdateStatus()
+        else
+            LootFolder = Workspace:FindFirstChild("Loot")
+            if LootFolder then
+                RefreshLootESP()
+                UpdateStatus()
+            end
+        end
+    end
+end)
+
+-- ========== 玩家标签页 ==========
+Tabs.PlayerTab:Section({ Title = "Humanoid属性修改" })
+local playerModToggle = Tabs.PlayerTab:Toggle({
+    Title = "启用属性修改",
+    Value = false,
+    Callback = function(state)
+        if state then StartPlayerMod() else StopPlayerMod() end
+    end
+})
+Tabs.PlayerTab:Toggle({
+    Title = "锁定属性（防止系统修改）",
+    Value = false,
+    Callback = function(state)
+        PlayerMod.Locked = state
+        if state and PlayerMod.Enabled then
+            LockPlayerAttributes()
+            WindUI:Notify({ Title = "属性已锁定！", Duration = 2 })
+        elseif not state then
+            if PlayerMod.LockConnection then
+                PlayerMod.LockConnection:Disconnect()
+                PlayerMod.LockConnection = nil
+            end
+            WindUI:Notify({ Title = "属性已解锁！", Duration = 2 })
+        end
+    end
+})
+Tabs.PlayerTab:Slider({
+    Title = "行走速度",
+    Value = { Min = 0, Max = 100, Default = 16, Rounding = 1 },
+    Callback = function(v)
+        PlayerMod.Values.WalkSpeed = v
+        if PlayerMod.Enabled then
+            ApplyPlayerMods()
+            if PlayerMod.Locked then LockPlayerAttributes() end
+        end
+    end
+})
+Tabs.PlayerTab:Slider({
+    Title = "跳跃高度",
+    Value = { Min = 0, Max = 200, Default = 50, Rounding = 1 },
+    Callback = function(v)
+        PlayerMod.Values.JumpPower = v
+        if PlayerMod.Enabled then
+            ApplyPlayerMods()
+            if PlayerMod.Locked then LockPlayerAttributes() end
+        end
+    end
+})
+Tabs.PlayerTab:Slider({
+    Title = "当前血量",
+    Value = { Min = 0, Max = 1000, Default = 100 },
+    Callback = function(v)
+        PlayerMod.Values.Health = v
+        if PlayerMod.Enabled then
+            ApplyPlayerMods()
+            if PlayerMod.Locked then LockPlayerAttributes() end
+        end
+    end
+})
+Tabs.PlayerTab:Slider({
+    Title = "最大血量",
+    Value = { Min = 1, Max = 1000, Default = 100 },
+    Callback = function(v)
+        PlayerMod.Values.MaxHealth = v
+        if PlayerMod.Enabled then
+            ApplyPlayerMods()
+            if PlayerMod.Locked then LockPlayerAttributes() end
+        end
+    end
+})
+Tabs.PlayerTab:Slider({
+    Title = "HipHeight",
+    Value = { Min = -2, Max = 5, Default = 0, Step = 0.01 },
+    Callback = function(v)
+        PlayerMod.Values.HipHeight = v
+        if PlayerMod.Enabled then
+            ApplyPlayerMods()
+            if PlayerMod.Locked then LockPlayerAttributes() end
+        end
+    end
+})
+Tabs.PlayerTab:Slider({
+    Title = "JumpHeight (额外)",
+    Value = { Min = 0, Max = 20, Default = 7.2, Step = 0.1 },
+    Callback = function(v)
+        PlayerMod.Values.JumpHeight = v
+        if PlayerMod.Enabled then
+            ApplyPlayerMods()
+            if PlayerMod.Locked then LockPlayerAttributes() end
+        end
+    end
+})
+Tabs.PlayerTab:Button({
+    Title = "应用所有修改",
+    Callback = function()
+        if PlayerMod.Enabled then
+            ApplyPlayerMods()
+            if PlayerMod.Locked then LockPlayerAttributes() end
+            WindUI:Notify({ Title = "已应用所有修改！", Duration = 2 })
+        else
+            WindUI:Notify({ Title = "请先启用属性修改！", Duration = 2 })
+        end
+    end
+})
+Tabs.PlayerTab:Button({
+    Title = "重置所有属性",
+    Callback = function()
+        ResetPlayerMods()
+        if PlayerMod.Enabled then StopPlayerMod() end
+        PlayerMod.Values.WalkSpeed = PlayerMod.Defaults.WalkSpeed
+        PlayerMod.Values.JumpPower = PlayerMod.Defaults.JumpPower
+        PlayerMod.Values.Health = PlayerMod.Defaults.Health
+        PlayerMod.Values.MaxHealth = PlayerMod.Defaults.MaxHealth
+        PlayerMod.Values.HipHeight = PlayerMod.Defaults.HipHeight
+        PlayerMod.Values.JumpHeight = PlayerMod.Defaults.JumpHeight
+        PlayerMod.Locked = false
+        if PlayerMod.LockConnection then
+            PlayerMod.LockConnection:Disconnect()
+            PlayerMod.LockConnection = nil
+        end
+    end
+})
+
+Tabs.PlayerTab:Divider()
+Tabs.PlayerTab:Section({ Title = "快捷操作" })
+Tabs.PlayerTab:Button({
+    Title = "瞬间满血",
+    Callback = function()
+        local humanoid = GetPlayerHumanoid()
+        if humanoid then
+            humanoid.Health = humanoid.MaxHealth
+            WindUI:Notify({ Title = "已恢复满血！", Duration = 2 })
+        end
+    end
+})
+Tabs.PlayerTab:Button({
+    Title = "超级速度 (x2)",
+    Callback = function()
+        local humanoid = GetPlayerHumanoid()
+        if humanoid then
+            humanoid.WalkSpeed = humanoid.WalkSpeed * 2
+            WindUI:Notify({ Title = string.format("速度提升至 %.1f", humanoid.WalkSpeed), Duration = 2 })
+        end
+    end
+})
+Tabs.PlayerTab:Button({
+    Title = "超级跳跃 (x2)",
+    Callback = function()
+        local humanoid = GetPlayerHumanoid()
+        if humanoid then
+            humanoid.JumpPower = humanoid.JumpPower * 2
+            WindUI:Notify({ Title = string.format("跳跃提升至 %.1f", humanoid.JumpPower), Duration = 2 })
+        end
+    end
+})
+
+local playerStatsLabel = Tabs.PlayerTab:Paragraph({
+    Title = "当前属性状态",
+    Desc = "速度: 16 | 跳跃: 50 | 血量: 100/100"
+})
+local function UpdatePlayerStats()
+    local humanoid = GetPlayerHumanoid()
+    if not humanoid then return end
+    local speed = math.floor(humanoid.WalkSpeed * 10) / 10
+    local jump = math.floor(humanoid.JumpPower * 10) / 10
+    local health = math.floor(humanoid.Health)
+    local maxHealth = math.floor(humanoid.MaxHealth)
+    playerStatsLabel:SetDesc(string.format('速度: %.1f | 跳跃: %.1f | 血量: %d/%d', speed, jump, health, maxHealth))
+end
+game:GetService("RunService").Stepped:Connect(function() UpdatePlayerStats() end)
+Tabs.DoorTab:Section({ Title = "门删除控制" })
+Tabs.DoorTab:Button({
+    Title = "删除所有门",
+    Callback = function()
+        DoorConfig.RemoveAllDoors = true
+        local count = ExecuteDoorRemoval(DoorConfig)
+        WindUI:Notify({ Title = string.format("已删除 %d 个门", count), Duration = 3 })
+    end
+})
+Tabs.DoorTab:Toggle({
+    Title = "删除房屋木门",
+    Value = false,
+    Callback = function(state)
+        DoorConfig.RemoveHouseDoors = state
+        if state then
+            local count = RemoveAllWoodenDoors()
+            WindUI:Notify({ Title = string.format("已删除 %d 个木门", count), Duration = 3 })
+        end
+    end
+})
+Tabs.DoorTab:Toggle({
+    Title = "删除商店双开门",
+    Value = false,
+    Callback = function(state)
+        DoorConfig.RemovePawnShopDoors = state
+        if state then
+            local count = RemoveAllDoubleDoors()
+            WindUI:Notify({ Title = string.format("已删除 %d 个双开门", count), Duration = 3 })
+        end
+    end
+})
+Tabs.DoorTab:Toggle({
+    Title = "删除自定义门",
+    Value = false,
+    Callback = function(state)
+        DoorConfig.RemoveCustomDoors = state
+        if state then
+            local count = RemoveCustomDoors(CustomDoorPaths)
+            WindUI:Notify({ Title = string.format("已删除 %d 个自定义门", count), Duration = 3 })
+        end
+    end
+})
+Tabs.DoorTab:Button({
+    Title = "删除木门",
+    Callback = function()
+        local count = RemoveAllWoodenDoors()
+        WindUI:Notify({ Title = string.format("已删除 %d 个木门", count), Duration = 3 })
+    end
+})
+Tabs.DoorTab:Button({
+    Title = "删除双开门",
+    Callback = function()
+        local count = RemoveAllDoubleDoors()
+        WindUI:Notify({ Title = string.format("已删除 %d 个双开门", count), Duration = 3 })
+    end
+})
+
+Tabs.DoorTab:Divider()
+Tabs.DoorTab:Section({ Title = "自定义门路径" })
+local pathLabel = Tabs.DoorTab:Paragraph({ Title = "当前路径", Desc = "0 个" })
+local addPathInput = Tabs.DoorTab:Input({
+    Title = "输入门路径",
+    Value = "",
+    Placeholder = "例如: workspace.Map...",
+    Callback = function(v) end
+})
+Tabs.DoorTab:Button({
+    Title = "添加路径",
+    Callback = function()
+        local input = addPathInput:GetValue()
+        if input and input ~= "" then
+            table.insert(CustomDoorPaths, input)
+            pathLabel:SetDesc(string.format("%d 个", #CustomDoorPaths))
+            WindUI:Notify({ Title = string.format("已添加路径: %s", input), Duration = 3 })
+        else
+            WindUI:Notify({ Title = "请输入有效的路径", Duration = 3 })
+        end
+    end
+})
+local removePathInput = Tabs.DoorTab:Input({
+    Title = "输入要删除的路径",
+    Value = "",
+    Placeholder = "输入完整路径...",
+    Callback = function(v) end
+})
+Tabs.DoorTab:Button({
+    Title = "删除路径",
+    Callback = function()
+        local input = removePathInput:GetValue()
+        if input and input ~= "" then
+            for i, path in ipairs(CustomDoorPaths) do
+                if path == input then
+                    table.remove(CustomDoorPaths, i)
+                    pathLabel:SetDesc(string.format("%d 个", #CustomDoorPaths))
+                    WindUI:Notify({ Title = string.format("已移除路径: %s", input), Duration = 3 })
+                    return
+                end
+            end
+            WindUI:Notify({ Title = "未找到该路径", Duration = 3 })
+        else
+            WindUI:Notify({ Title = "请输入有效的路径", Duration = 3 })
+        end
+    end
+})
+Tabs.DoorTab:Button({
+    Title = "清空所有自定义路径",
+    Callback = function()
+        table.clear(CustomDoorPaths)
+        pathLabel:SetDesc(string.format("%d 个", #CustomDoorPaths))
+        WindUI:Notify({ Title = "已清空所有自定义路径", Duration = 3 })
+    end
+})
+Tabs.DoorTab:Button({
+    Title = "显示所有路径",
+    Callback = function()
+        if #CustomDoorPaths == 0 then
+            WindUI:Notify({ Title = "当前没有自定义路径", Duration = 3 })
+            return
+        end
+        local paths = table.concat(CustomDoorPaths, "\n")
+        WindUI:Notify({ Title = string.format("自定义路径 (%d 个):\n%s", #CustomDoorPaths, paths), Duration = 5 })
+    end
+})
+-- ========================================================================
+-- 飞车功能（纯坐标飞行 + 速度清零 + 手机移动摇杆）
+-- ========================================================================
+
+-- 创建飞车标签页
+local CarSection = Window:Section({ Title = "飞车功能", Opened = true })
+Tabs.CarTab = CarSection:Tab({ Title = "飞车", Icon = "car" })
+
+-- 飞车功能变量
+local CarFly = {
+    IsFlying = false,
+    Speed = 35,
+    JoyMode = false,
+    JoystickActive = false,
+    JoystickVector = Vector3.new(),
+    FlightConnection = nil,
+    AnimCache = nil,
+    LastUpdateTime = tick(),
+    ControlModule = nil,
+    ScreenGui = nil,
+    MainFrame = nil,
+    SpeedInput = nil,
+    ToggleBtn = nil,
+    JoyButton = nil,
+    JoyBase = nil,
+    JoyKnob = nil,
+    JoyDragInput = nil,
+    JoyBasePos = Vector2.new(),
+    IsDragging = false,
+    DragInput = nil,
+    DragStart = nil,
+    StartPos = nil,
+    MAX_RADIUS = 50,
+}
+
+-- 获取控制模块
+local function GetControlModule()
+    if CarFly.ControlModule then return CarFly.ControlModule end
+    local success, result = pcall(function()
+        return require(LocalPlayer.PlayerScripts:WaitForChild("PlayerModule")):GetControls()
+    end)
+    if success then
+        CarFly.ControlModule = result
+        return result
+    end
+    return nil
+end
+
+-- 检查是否在摇杆区域
+local function IsInJoyZone(pos)
+    if not CarFly.JoyMode then return false end
+    local vp = Camera.ViewportSize
+    return pos.X <= vp.X * 0.5 and pos.Y >= vp.Y * 0.55
+end
+
+-- 更新摇杆
+local function UpdateJoystickFromTouch(touchPos)
+    local delta = touchPos - CarFly.JoyBasePos
+    local mag = delta.Magnitude
+    if mag > CarFly.MAX_RADIUS then
+        delta = delta.Unit * CarFly.MAX_RADIUS
+        mag = CarFly.MAX_RADIUS
+    end
+    if CarFly.JoyKnob then
+        CarFly.JoyKnob.Position = UDim2.new(0.5, delta.X - 30, 0.5, delta.Y - 30)
+    end
+    local norm = (mag > 1 and delta / CarFly.MAX_RADIUS or delta / CarFly.MAX_RADIUS)
+    CarFly.JoystickVector = Vector3.new(norm.X, 0, norm.Y)
+end
+
+-- 设置摇杆模式
+local function SetJoyMode(mode)
+    CarFly.JoyMode = mode
+    if CarFly.JoyBase then CarFly.JoyBase.Visible = false end
+    if CarFly.JoyButton then
+        CarFly.JoyButton.Text = mode and "ON" or "摇"
+        CarFly.JoyButton.BackgroundColor3 = mode and Color3.fromRGB(0, 150, 255) or Color3.fromRGB(70, 70, 70)
+    end
+    if not mode then
+        CarFly.JoystickActive = false
+        CarFly.JoystickVector = Vector3.new()
+    end
+end
+
+-- 创建飞车UI
+local function CreateCarUI()
+    if CarFly.ScreenGui then
+        CarFly.ScreenGui:Destroy()
+        CarFly.ScreenGui = nil
+    end
+
+    -- 主Gui
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "CarFlyUI"
+    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+    ScreenGui.ResetOnSpawn = false
+    CarFly.ScreenGui = ScreenGui
+
+    -- 主框架
+    local MainFrame = Instance.new("Frame", ScreenGui)
+    MainFrame.Size = UDim2.new(0, 200, 0, 150)
+    MainFrame.Position = UDim2.new(0.5, -100, 0.4, 0)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    MainFrame.BorderSizePixel = 0
+    MainFrame.ClipsDescendants = true
+    local UICorner = Instance.new("UICorner", MainFrame)
+    UICorner.CornerRadius = UDim.new(0, 15)
+    CarFly.MainFrame = MainFrame
+
+    -- 标题
+    local Title = Instance.new("TextLabel", MainFrame)
+    Title.Size = UDim2.new(1, 0, 0, 30)
+    Title.BackgroundTransparency = 1
+    Title.Text = "飞车控制"
+    Title.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+    Title.TextSize = 14
+    Title.Font = Enum.Font.GothamBold
+
+    -- 速度输入
+    local SpeedInput = Instance.new("TextBox", MainFrame)
+    SpeedInput.Size = UDim2.new(0, 150, 0, 30)
+    SpeedInput.Position = UDim2.new(0.5, -75, 0, 40)
+    SpeedInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    SpeedInput.Text = "35"
+    SpeedInput.TextColor3 = Color3.new(1, 1, 1)
+    SpeedInput.TextSize = 14
+    SpeedInput.Font = Enum.Font.Gotham
+    Instance.new("UICorner", SpeedInput).CornerRadius = UDim.new(0, 8)
+    CarFly.SpeedInput = SpeedInput
+
+    -- 飞行开关
+    local ToggleBtn = Instance.new("TextButton", MainFrame)
+    ToggleBtn.Size = UDim2.new(0, 150, 0, 40)
+    ToggleBtn.Position = UDim2.new(0.5, -75, 0, 85)
+    ToggleBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    ToggleBtn.Text = "飞行: OFF"
+    ToggleBtn.TextColor3 = Color3.new(1, 1, 1)
+    ToggleBtn.TextSize = 14
+    ToggleBtn.Font = Enum.Font.GothamBold
+    Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(0, 10)
+    CarFly.ToggleBtn = ToggleBtn
+
+    -- 摇杆按钮
+    local JoyButton = Instance.new("TextButton", MainFrame)
+    JoyButton.Size = UDim2.new(0, 30, 0, 30)
+    JoyButton.Position = UDim2.new(0, 6, 0, 2)
+    JoyButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    JoyButton.BorderSizePixel = 0
+    JoyButton.Text = "摇"
+    JoyButton.TextColor3 = Color3.new(1, 1, 1)
+    JoyButton.TextSize = 14
+    JoyButton.Font = Enum.Font.GothamBold
+    Instance.new("UICorner", JoyButton).CornerRadius = UDim.new(0, 6)
+    JoyButton.ZIndex = 50
+    CarFly.JoyButton = JoyButton
+
+    -- 摇杆底座
+    local JoyBase = Instance.new("Frame", ScreenGui)
+    JoyBase.Size = UDim2.new(0, 130, 0, 130)
+    JoyBase.Position = UDim2.new(0, 40, 1, -160)
+    JoyBase.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    JoyBase.BackgroundTransparency = 0.6
+    JoyBase.Active = false
+    JoyBase.ZIndex = 100
+    JoyBase.Visible = false
+    Instance.new("UICorner", JoyBase).CornerRadius = UDim.new(1, 0)
+    CarFly.JoyBase = JoyBase
+
+    -- 摇杆头
+    local JoyKnob = Instance.new("Frame", JoyBase)
+    JoyKnob.Size = UDim2.new(0, 60, 0, 60)
+    JoyKnob.Position = UDim2.new(0.5, -30, 0.5, -30)
+    JoyKnob.BackgroundColor3 = Color3.fromRGB(80, 150, 255)
+    JoyKnob.BackgroundTransparency = 0.2
+    JoyKnob.ZIndex = 101
+    Instance.new("UICorner", JoyKnob).CornerRadius = UDim.new(1, 0)
+    CarFly.JoyKnob = JoyKnob
+
+    -- 拖动逻辑
+    local function update(input)
+        local delta = input.Position - CarFly.DragStart
+        MainFrame.Position = UDim2.new(
+            CarFly.StartPos.X.Scale,
+            CarFly.StartPos.X.Offset + delta.X,
+            CarFly.StartPos.Y.Scale,
+            CarFly.StartPos.Y.Offset + delta.Y
+        )
+    end
+
+    MainFrame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            CarFly.IsDragging = true
+            CarFly.DragStart = input.Position
+            CarFly.StartPos = MainFrame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    CarFly.IsDragging = false
+                end
+            end)
+        end
+    end)
+
+    MainFrame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            CarFly.DragInput = input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if input == CarFly.DragInput and CarFly.IsDragging then
+            update(input)
+        end
+    end)
+
+    -- 触摸事件（摇杆）
+    UserInputService.InputBegan:Connect(function(input, processed)
+        if not CarFly.JoyMode then return end
+        if input.UserInputType == Enum.UserInputType.Touch then
+            if IsInJoyZone(input.Position) and not CarFly.JoyDragInput then
+                CarFly.JoystickActive = true
+                CarFly.JoyDragInput = input
+                CarFly.JoyBasePos = input.Position
+                JoyBase.Position = UDim2.fromOffset(input.Position.X - 65, input.Position.Y - 65)
+                JoyBase.Visible = true
+                JoyKnob.Position = UDim2.new(0.5, -30, 0.5, -30)
+            end
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input, processed)
+        if not CarFly.JoyMode then return end
+        if CarFly.JoystickActive and CarFly.JoyDragInput and input == CarFly.JoyDragInput then
+            if input.UserInputType == Enum.UserInputType.Touch then
+                UpdateJoystickFromTouch(input.Position)
+            end
+        end
+    end)
+
+    UserInputService.InputEnded:Connect(function(input, processed)
+        if CarFly.JoyDragInput and input == CarFly.JoyDragInput then
+            CarFly.JoystickActive = false
+            CarFly.JoystickVector = Vector3.new()
+            CarFly.JoyDragInput = nil
+            if CarFly.JoyMode then JoyBase.Visible = false end
+        end
+    end)
+
+    -- 摇杆按钮点击
+    JoyButton.MouseButton1Click:Connect(function()
+        SetJoyMode(not CarFly.JoyMode)
+    end)
+
+    -- 飞行切换
+    ToggleBtn.MouseButton1Click:Connect(function()
+        CarFly.IsFlying = not CarFly.IsFlying
+        CarFly.Speed = tonumber(SpeedInput.Text) or 35
+        ToggleBtn.Text = CarFly.IsFlying and "飞行: ON" or "飞行: OFF"
+        TweenService:Create(ToggleBtn, TweenInfo.new(0.3), {
+            BackgroundColor3 = CarFly.IsFlying and Color3.fromRGB(0, 150, 255) or Color3.fromRGB(60, 60, 60)
+        }):Play()
+        
+        if CarFly.IsFlying then
+            StartCarFly()
+        else
+            StopCarFly()
+        end
+    end)
+
+    -- 关闭按钮
+    local CloseBtn = Instance.new("TextButton", MainFrame)
+    CloseBtn.Size = UDim2.new(0, 25, 0, 25)
+    CloseBtn.Position = UDim2.new(1, -30, 0, 5)
+    CloseBtn.Text = "×"
+    CloseBtn.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
+    CloseBtn.TextColor3 = Color3.new(1, 1, 1)
+    CloseBtn.TextSize = 16
+    CloseBtn.Font = Enum.Font.GothamBold
+    Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 6)
+    CloseBtn.MouseButton1Click:Connect(function()
+        CarFly.IsFlying = false
+        StopCarFly()
+        if CarFly.ScreenGui then
+            CarFly.ScreenGui:Destroy()
+            CarFly.ScreenGui = nil
+        end
+    end)
+
+    -- 最小化按钮
+    local MinBtn = Instance.new("TextButton", MainFrame)
+    MinBtn.Size = UDim2.new(0, 25, 0, 25)
+    MinBtn.Position = UDim2.new(1, -60, 0, 5)
+    MinBtn.Text = "-"
+    MinBtn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    MinBtn.TextColor3 = Color3.new(1, 1, 1)
+    MinBtn.TextSize = 16
+    MinBtn.Font = Enum.Font.GothamBold
+    Instance.new("UICorner", MinBtn).CornerRadius = UDim.new(0, 6)
+    MinBtn.MouseButton1Click:Connect(function()
+        local isCollapsed = MainFrame.Size.Y.Offset < 150
+        local targetH = isCollapsed and 150 or 35
+        TweenService:Create(MainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quart), {
+            Size = UDim2.new(0, 200, 0, targetH)
+        }):Play()
+        ToggleBtn.Visible = isCollapsed
+        SpeedInput.Visible = isCollapsed
+    end)
+
+    -- 进场动画
+    MainFrame.Size = UDim2.new(0, 0, 0, 0)
+    MainFrame:TweenSize(UDim2.new(0, 200, 0, 150), "Out", "Back", 0.5)
+end
+
+-- 开始飞行
+local function StartCarFly()
+    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local hrp = char:WaitForChild("HumanoidRootPart")
+    local hum = char:WaitForChild("Humanoid")
+    local animate = char:FindFirstChild("Animate")
+
+    if animate then
+        CarFly.AnimCache = animate
+        animate.Parent = nil
+    end
+    hum.AutoRotate = false
+
+    if CarFly.FlightConnection then
+        CarFly.FlightConnection:Disconnect()
+        CarFly.FlightConnection = nil
+    end
+
+    CarFly.LastUpdateTime = tick()
+    CarFly.FlightConnection = RunService.Heartbeat:Connect(function()
+        if not CarFly.IsFlying or not char.Parent then
+            if CarFly.FlightConnection then
+                CarFly.FlightConnection:Disconnect()
+                CarFly.FlightConnection = nil
+            end
+            return
+        end
+
+        local now = tick()
+        local dt = now - CarFly.LastUpdateTime
+        CarFly.LastUpdateTime = now
+
+        local moveVec
+        if CarFly.JoystickActive and CarFly.JoyMode then
+            moveVec = CarFly.JoystickVector
+        else
+            local control = GetControlModule()
+            if control then
+                moveVec = control:GetMoveVector()
+            else
+                moveVec = Vector3.new()
+            end
+        end
+
+        local camCF = Camera.CFrame
+        local moveDir = (camCF.LookVector * -moveVec.Z) + (camCF.RightVector * moveVec.X) + (Vector3.new(0, moveVec.Y, 0))
+
+        if moveVec.Magnitude > 0 then
+            local newPos = hrp.Position + moveDir.Unit * (CarFly.Speed * dt)
+            hrp.CFrame = CFrame.new(newPos, newPos + camCF.LookVector)
+        else
+            hrp.CFrame = CFrame.lookAlong(hrp.Position, Vector3.new(camCF.LookVector.X, 0, camCF.LookVector.Z))
+        end
+
+        hrp.AssemblyLinearVelocity = Vector3.new()
+    end)
+end
+
+-- 停止飞行
+local function StopCarFly()
+    if CarFly.FlightConnection then
+        CarFly.FlightConnection:Disconnect()
+        CarFly.FlightConnection = nil
+    end
+    local char = LocalPlayer.Character
+    if char then
+        local hum = char:FindFirstChild("Humanoid")
+        if hum then hum.AutoRotate = true end
+        local animate = char:FindFirstChild("Animate")
+        if CarFly.AnimCache and not animate then
+            CarFly.AnimCache.Parent = char
+            CarFly.AnimCache = nil
+        end
+    end
+end
+
+-- ========================================================================
+-- 飞车UI（使用WindUI组件）
+-- ========================================================================
+
+-- 创建飞车控制UI（WindUI版本）
+Tabs.CarTab:Paragraph({
+    Title = "飞车控制",
+    Desc = "纯坐标飞行 + 速度清零 + 手机移动摇杆"
+})
+
+-- 速度滑块
+Tabs.CarTab:Slider({
+    Title = "飞行速度",
+    Value = { Min = 1, Max = 200, Default = 35 },
+    Callback = function(v)
+        CarFly.Speed = v
+        if CarFly.SpeedInput then
+            CarFly.SpeedInput.Text = tostring(v)
+        end
+    end
+})
+
+-- 飞行开关
+Tabs.CarTab:Toggle({
+    Title = "飞行模式",
+    Value = false,
+    Callback = function(state)
+        CarFly.IsFlying = state
+        if state then
+            StartCarFly()
+            WindUI:Notify({ Title = "飞行已开启！", Duration = 2 })
+        else
+            StopCarFly()
+            WindUI:Notify({ Title = "飞行已关闭！", Duration = 2 })
+        end
+    end
+})
+
+-- 摇杆开关
+Tabs.CarTab:Toggle({
+    Title = "手机摇杆模式",
+    Value = false,
+    Callback = function(state)
+        SetJoyMode(state)
+        WindUI:Notify({ Title = state and "摇杆模式已开启！" or "摇杆模式已关闭！", Duration = 2 })
+    end
+})
+
+-- 打开/关闭UI按钮
+Tabs.CarTab:Button({
+    Title = "打开飞车UI面板",
+    Callback = function()
+        if CarFly.ScreenGui then
+            CarFly.ScreenGui:Destroy()
+            CarFly.ScreenGui = nil
+        else
+            CreateCarUI()
+            WindUI:Notify({ Title = "飞车UI已打开！", Duration = 2 })
+        end
+    end
+})
+
+Tabs.CarTab:Button({
+    Title = "关闭飞车UI面板",
+    Callback = function()
+        if CarFly.ScreenGui then
+            CarFly.ScreenGui:Destroy()
+            CarFly.ScreenGui = nil
+            WindUI:Notify({ Title = "飞车UI已关闭！", Duration = 2 })
+        end
+    end
+})
+
+Tabs.CarTab:Divider()
+Tabs.CarTab:Paragraph({
+    Title = "使用说明",
+    Desc = "1. 开启飞行模式后自动飞行\n" ..
+          "2. 手机摇杆模式：触摸屏幕左下半区控制方向\n" ..
+          "3. 飞行速度可实时调整\n" ..
+          "4. 飞车UI面板可拖动、最小化"
+})
+
+-- 自动重玩功能
+
+local AutoReplay = {
+    Enabled = false,
+    LoopConnection = nil,
+    Interval = 3,
+    Count = 0,
+}
+
+local function ExecuteReplay()
+    local args = {
+        "GameManager",
+        "Replay"
+    }
+    local success = pcall(function()
+        game:GetService("ReplicatedStorage"):WaitForChild("FlowClient"):WaitForChild("ClientRunner"):WaitForChild("Event"):FireServer(unpack(args))
+        return true
+    end)
+    return success
+end
+
+local function AutoReplayLoop()
+    if not AutoReplay.Enabled then return end
+    
+    AutoReplay.Count = AutoReplay.Count + 1
+    local success = ExecuteReplay()
+    
+    if success then
+        print(string.format("自动重玩第 %d 次执行成功", AutoReplay.Count))
+    else
+        print(string.format("自动重玩第 %d 次执行失败", AutoReplay.Count))
+    end
+end
+
+local function StartAutoReplay()
+    if AutoReplay.LoopConnection then return end
+    
+    AutoReplay.Enabled = true
+    local lastTime = tick()
+    
+    AutoReplay.LoopConnection = game:GetService("RunService").Heartbeat:Connect(function()
+        if not AutoReplay.Enabled then return end
+        
+        local currentTime = tick()
+        if currentTime - lastTime >= AutoReplay.Interval then
+            lastTime = currentTime
+            AutoReplayLoop()
+        end
+    end)
+    
+    print("自动重玩已开启")
+end
+
+local function StopAutoReplay()
+    AutoReplay.Enabled = false
+    
+    if AutoReplay.LoopConnection then
+        AutoReplay.LoopConnection:Disconnect()
+        AutoReplay.LoopConnection = nil
+    end
+    
+    print("自动重玩已关闭")
+end
+
+local AutoReplaySection = Window:Section({ Title = "自动功能", Opened = true })
+local AutoReplayTab = AutoReplaySection:Tab({ Title = "自动重玩", Icon = "rotate-ccw" })
+
+AutoReplayTab:Toggle({
+    Title = "自动重玩",
+    Desc = "开启后自动执行重玩（间隔3秒）",
+    Value = false,
+    Callback = function(state)
+        if state then
+            StartAutoReplay()
+        else
+            StopAutoReplay()
+        end
+    end
+})
+
+AutoReplayTab:Divider()
+AutoReplayTab:Paragraph({
+    Title = "使用说明",
+    Desc = "1. 开启后自动执行重玩\n" ..
+          "2. 每3秒执行一次\n" ..
+          "3. 控制台显示执行状态"
+})
+
+task.wait(1)
+StartAutoReplay()
+
+local isEnabled = false
+local connection = nil
+local targetPosition = Vector3.new(382.9, 1880.9, 83617.0)
+local function TeleportToPosition(position)
+    local player = game:GetService("Players").LocalPlayer
+    local character = player.Character
+    if not character then return false end    
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return false end   
+    for _, part in ipairs(character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = false
+        end
+    end     
+    pcall(function()
+        hrp.CFrame = CFrame.new(position)
+        hrp.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+        hrp.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+    end)    
+    task.wait(0.1)
+    for _, part in ipairs(character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = true
+        end
+    end
+    
+    return true
+end
+local function DoVictory()
+    local player = game:GetService("Players").LocalPlayer
+    local character = player.Character
+    if not character then
+        print("等待角色加载...")
+        return
+    end    
+    local success = TeleportToPosition(targetPosition)
+    if success then
+        print("已传送到胜利位置: 382.9, 1880.9, 83617.0")
+    else
+        print("传送失败")
+    end
+end
+local function StartAutoWin()
+    if connection then return end    
+    isEnabled = true
+    local lastTime = tick()    
+    connection = game:GetService("RunService").Heartbeat:Connect(function()
+        if not isEnabled then return end        
+        local currentTime = tick()
+        if currentTime - lastTime >= 1 then
+            lastTime = currentTime
+            DoVictory()
+        end
+    end)    
+    print("自动胜利已开启")
+end
+local function StopAutoWin()
+    isEnabled = false
+    if connection then
+        connection:Disconnect()
+        connection = nil
+    end
+    print("自动胜利已关闭")
+end
+AutoReplayTab:Toggle({
+    Title = "自动胜利",
+    Desc = "开启后每秒自动传送到胜利位置",
+    Value = false,
+    Callback = function(state)
+        if state then
+            StartAutoWin()
+        else
+            StopAutoWin()
+        end
+    end
+})
+AutoReplayTab:Divider()
+AutoReplayTab:Button({
+    Title = "手动传送",
+    Desc = "立即传送到胜利位置",
+    Callback = function()
+        DoVictory()
+    end
+})
+
+Tabs.SettingsTab:Section({ Title = "菜单设置" })
+Tabs.SettingsTab:Button({
+    Title = "卸载脚本",
+    Callback = function()
+        StopAutoLoot()
+        StopAutoKill()
+        StopPlayerMod()
+        if NightVision.Enabled then ToggleNightVision(false) end
+        if Noclip.Enabled then ToggleNoclip(false) end
+        StopAutoComplete()
+        Window:Destroy()
+    end
+})
+Tabs.SettingsTab:Keybind({
+    Title = "菜单快捷键",
+    Value = "RightShift",
+    Callback = function(key)
+        Window:SetToggleKey(Enum.KeyCode[key])
+    end
+})
+
+local ConfigManager = Window.ConfigManager
+local myConfig = ConfigManager:CreateConfig("AFHub_Escape")
+task.defer(function()
+    pcall(function()
+        if Window.Gui and Window.Gui.BackgroundImage ~= nil then
+            Window.Gui.BackgroundImage = "rbxassetid://123887383447725"
+        end
+    end)
+end)
+
+WindUI:Notify({ Title = "AF Hub 已加载", Duration = 3 })
+
+-- 确保Loot ESP初始刷新
+task.wait(1)
+if LootFolder and LootFolder.Parent then
+    RefreshLootESP()
+    UpdateStatus()
+end
