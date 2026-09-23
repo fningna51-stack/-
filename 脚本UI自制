@@ -2,7 +2,7 @@
     WindUI - 原创风格界面库
     作者: 自定义
     特点: 无AI味,简洁现代,功能完整
-    更新: 正方形最小化可拖动 + 点击恢复 + 居中加载 + 最小化到屏幕上方
+    更新: 关闭确认弹窗 + 边缘光晕 + 最小化图标可换图片
 --]]
 
 local WindUI = {}
@@ -23,6 +23,7 @@ local Config = {
         Tertiary = Color3.fromRGB(45, 45, 55),
         Accent = Color3.fromRGB(90, 130, 255),
         AccentHover = Color3.fromRGB(110, 150, 255),
+        Glow = Color3.fromRGB(100, 160, 255), -- 淡蓝色光晕
         Text = Color3.fromRGB(240, 240, 245),
         TextDim = Color3.fromRGB(150, 150, 160),
         Border = Color3.fromRGB(55, 55, 65),
@@ -35,7 +36,10 @@ local Config = {
     -- 背景图配置
     BackgroundImage = "",
     BackgroundImageTransparency = 0.3,
-    BackgroundImageColor = Color3.fromRGB(255, 255, 255)
+    BackgroundImageColor = Color3.fromRGB(255, 255, 255),
+    -- 最小化图标配置
+    MinIconImage = "", -- 图片ID, 留空则显示 "W"
+    MinIconColor = Color3.fromRGB(255, 255, 255)
 }
 
 -- 工具函数
@@ -115,7 +119,50 @@ function WindUI:CreateWindow(title, subtitle)
         Parent = ScreenGui
     })
     Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = Main})
-    Create("UIStroke", {Color = Config.Theme.Border, Thickness = 1, Parent = Main})
+    
+    -- ============================================
+    -- 边缘淡蓝色光晕 (多层描边渐变)
+    -- ============================================
+    local GlowLayer1 = Create("Frame", {
+        Name = "GlowLayer1",
+        Size = UDim2.new(1, 6, 1, 6),
+        Position = UDim2.new(0, -3, 0, -3),
+        BackgroundColor3 = Config.Theme.Glow,
+        BackgroundTransparency = 0.85,
+        BorderSizePixel = 0,
+        ZIndex = -3,
+        Parent = Main
+    })
+    Create("UICorner", {CornerRadius = UDim.new(0, 14), Parent = GlowLayer1})
+    
+    local GlowLayer2 = Create("Frame", {
+        Name = "GlowLayer2",
+        Size = UDim2.new(1, 3, 1, 3),
+        Position = UDim2.new(0, -1.5, 0, -1.5),
+        BackgroundColor3 = Config.Theme.Glow,
+        BackgroundTransparency = 0.7,
+        BorderSizePixel = 0,
+        ZIndex = -2,
+        Parent = Main
+    })
+    Create("UICorner", {CornerRadius = UDim.new(0, 13), Parent = GlowLayer2})
+    
+    local GlowStroke = Create("UIStroke", {
+        Name = "GlowStroke",
+        Color = Config.Theme.Glow,
+        Thickness = 1.5,
+        Transparency = 0.3,
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+        Parent = Main
+    })
+    
+    -- 呼吸光晕动画
+    local glowTween1 = TweenService:Create(GlowLayer1, TweenInfo.new(1.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {BackgroundTransparency = 0.95})
+    glowTween1:Play()
+    local glowTween2 = TweenService:Create(GlowLayer2, TweenInfo.new(1.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {BackgroundTransparency = 0.85})
+    glowTween2:Play()
+    local glowTween3 = TweenService:Create(GlowStroke, TweenInfo.new(1.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {Transparency = 0.55})
+    glowTween3:Play()
     
     -- 背景图片层
     local BgImage = Create("ImageLabel", {
@@ -302,13 +349,152 @@ function WindUI:CreateWindow(title, subtitle)
     Tween(Main, 0.3, {BackgroundTransparency = 0})
     
     -- ============================================
-    -- 关闭
+    -- 关闭 (带确认弹窗)
     -- ============================================
-    CloseBtn.MouseButton1Click:Connect(function()
-        Tween(Main, 0.2, {Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0)})
-        task.wait(0.2)
-        ScreenGui:Destroy()
-    end)
+    local closeConfirmOpen = false
+    
+    local function CreateCloseConfirm()
+        if closeConfirmOpen then return end
+        closeConfirmOpen = true
+        
+        -- 遮罩层
+        local Overlay = Create("Frame", {
+            Name = "CloseConfirmOverlay",
+            Size = UDim2.new(1, 0, 1, 0),
+            BackgroundColor3 = Color3.new(0, 0, 0),
+            BackgroundTransparency = 1,
+            ZIndex = 200,
+            Parent = ScreenGui
+        })
+        
+        -- 弹窗
+        local Modal = Create("Frame", {
+            Name = "CloseConfirmModal",
+            Size = UDim2.new(0, 320, 0, 0),
+            Position = UDim2.new(0.5, -160, 0.5, 0),
+            BackgroundColor3 = Config.Theme.Background,
+            BorderSizePixel = 0,
+            ZIndex = 201,
+            Parent = Overlay
+        })
+        Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = Modal})
+        Create("UIStroke", {Color = Config.Theme.Border, Thickness = 1, Parent = Modal})
+        
+        -- 顶部警示条
+        local WarnBar = Create("Frame", {
+            Size = UDim2.new(1, 0, 0, 4),
+            BackgroundColor3 = Config.Theme.Warning,
+            BorderSizePixel = 0,
+            ZIndex = 202,
+            Parent = Modal
+        })
+        Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = WarnBar})
+        Create("Frame", {
+            Size = UDim2.new(1, 0, 0, 8),
+            Position = UDim2.new(0, 0, 1, -8),
+            BackgroundColor3 = Config.Theme.Warning,
+            BorderSizePixel = 0,
+            ZIndex = 202,
+            Parent = WarnBar
+        })
+        
+        -- 图标 + 标题
+        Create("TextLabel", {
+            Size = UDim2.new(1, -24, 0, 24),
+            Position = UDim2.new(0, 16, 0, 16),
+            BackgroundTransparency = 1,
+            Text = "⚠  确认关闭脚本",
+            TextColor3 = Config.Theme.Warning,
+            Font = Config.FontBold,
+            TextSize = 15,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            ZIndex = 202,
+            Parent = Modal
+        })
+        
+        -- 正文
+        Create("TextLabel", {
+            Size = UDim2.new(1, -32, 0, 60),
+            Position = UDim2.new(0, 16, 0, 48),
+            BackgroundTransparency = 1,
+            Text = "关闭后将无法恢复, 需要重新执行脚本才能再次打开界面。\n确定要彻底关闭吗?",
+            TextColor3 = Config.Theme.TextDim,
+            Font = Config.Font,
+            TextSize = 13,
+            TextWrapped = true,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            TextYAlignment = Enum.TextYAlignment.Top,
+            ZIndex = 202,
+            Parent = Modal
+        })
+        
+        -- 取消按钮
+        local CancelBtn = Create("TextButton", {
+            Size = UDim2.new(0, 120, 0, 34),
+            Position = UDim2.new(0, 16, 1, -50),
+            BackgroundColor3 = Config.Theme.Tertiary,
+            Text = "取消",
+            TextColor3 = Config.Theme.Text,
+            Font = Config.Font,
+            TextSize = 13,
+            AutoButtonColor = false,
+            ZIndex = 202,
+            Parent = Modal
+        })
+        Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = CancelBtn})
+        
+        -- 确认关闭按钮
+        local ConfirmBtn = Create("TextButton", {
+            Size = UDim2.new(0, 120, 0, 34),
+            Position = UDim2.new(1, -136, 1, -50),
+            BackgroundColor3 = Config.Theme.Danger,
+            Text = "确认关闭",
+            TextColor3 = Config.Theme.Text,
+            Font = Config.FontBold,
+            TextSize = 13,
+            AutoButtonColor = false,
+            ZIndex = 202,
+            Parent = Modal
+        })
+        Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = ConfirmBtn})
+        
+        CancelBtn.MouseEnter:Connect(function()
+            Tween(CancelBtn, 0.15, {BackgroundColor3 = Config.Theme.Border})
+        end)
+        CancelBtn.MouseLeave:Connect(function()
+            Tween(CancelBtn, 0.15, {BackgroundColor3 = Config.Theme.Tertiary})
+        end)
+        ConfirmBtn.MouseEnter:Connect(function()
+            Tween(ConfirmBtn, 0.15, {BackgroundColor3 = Color3.fromRGB(255, 100, 110)})
+        end)
+        ConfirmBtn.MouseLeave:Connect(function()
+            Tween(ConfirmBtn, 0.15, {BackgroundColor3 = Config.Theme.Danger})
+        end)
+        
+        -- 入场动画
+        Tween(Overlay, 0.2, {BackgroundTransparency = 0.5})
+        Tween(Modal, 0.3, {Size = UDim2.new(0, 320, 0, 180), Position = UDim2.new(0.5, -160, 0.5, -90)}, Enum.EasingStyle.Back)
+        
+        local function CloseConfirm()
+            Tween(Overlay, 0.2, {BackgroundTransparency = 1})
+            Tween(Modal, 0.2, {Size = UDim2.new(0, 320, 0, 0), Position = UDim2.new(0.5, -160, 0.5, 0)})
+            task.wait(0.2)
+            Overlay:Destroy()
+            closeConfirmOpen = false
+        end
+        
+        CancelBtn.MouseButton1Click:Connect(CloseConfirm)
+        
+        ConfirmBtn.MouseButton1Click:Connect(function()
+            CloseConfirm()
+            task.wait(0.2)
+            Tween(Main, 0.2, {Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0)})
+            task.wait(0.2)
+            ScreenGui:Destroy()
+        end)
+    end
+    
+    CloseBtn.MouseButton1Click:Connect(CreateCloseConfirm)
     
     -- ============================================
     -- 最小化: 收缩成正方形图标, 出现在屏幕上方
@@ -321,8 +507,8 @@ function WindUI:CreateWindow(title, subtitle)
         Name = "MinIcon",
         Size = UDim2.new(1, 0, 1, 0),
         BackgroundTransparency = 1,
-        Text = "W",
-        TextColor3 = Config.Theme.Text,
+        Text = Config.MinIconImage == "" and "W" or "",
+        TextColor3 = Config.MinIconColor,
         Font = Config.FontBold,
         TextSize = 22,
         ZIndex = 10,
@@ -330,6 +516,21 @@ function WindUI:CreateWindow(title, subtitle)
         Parent = Main
     })
     Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = MinIcon})
+    
+    -- 图片模式 (如果设置了图片ID)
+    local MinIconImage = Create("ImageLabel", {
+        Name = "MinIconImage",
+        Size = UDim2.new(1, -12, 1, -12),
+        Position = UDim2.new(0, 6, 0, 6),
+        BackgroundTransparency = 1,
+        Image = Config.MinIconImage,
+        ImageColor3 = Config.MinIconColor,
+        ScaleType = Enum.ScaleType.Fit,
+        ZIndex = 11,
+        Visible = false,
+        Parent = Main
+    })
+    Create("UICorner", {CornerRadius = UDim.new(0, 8), Parent = MinIconImage})
     
     -- 正方形点击恢复 (只响应短按, 不是拖动)
     local squarePressTime = 0
@@ -346,6 +547,20 @@ function WindUI:CreateWindow(title, subtitle)
             TopBar.Visible = false
             BgImage.Visible = false
             MinIcon.Visible = true
+            
+            -- 根据配置显示文字或图片
+            if Config.MinIconImage ~= "" then
+                MinIcon.Text = ""
+                MinIconImage.Visible = true
+            else
+                MinIcon.Text = "W"
+                MinIconImage.Visible = false
+            end
+            
+            -- 光晕在最小化时隐藏
+            GlowLayer1.Visible = false
+            GlowLayer2.Visible = false
+            GlowStroke.Transparency = 1
             
             -- 收缩到屏幕上方居中, 并变成正方形
             Tween(Main, 0.35, {
@@ -379,6 +594,7 @@ function WindUI:CreateWindow(title, subtitle)
                 minimized = false
                 
                 MinIcon.Visible = false
+                MinIconImage.Visible = false
                 
                 Tween(Main, 0.35, {
                     Size = UDim2.new(0, WINDOW_W, 0, WINDOW_H),
@@ -391,6 +607,13 @@ function WindUI:CreateWindow(title, subtitle)
                 Sidebar.Visible = true
                 TopBar.Visible = true
                 BgImage.Visible = Config.BackgroundImage ~= ""
+                
+                -- 恢复光晕
+                GlowLayer1.Visible = true
+                GlowLayer2.Visible = true
+                glowTween3:Cancel()
+                glowTween3 = TweenService:Create(GlowStroke, TweenInfo.new(1.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {Transparency = 0.55})
+                glowTween3:Play()
             end
             squarePressTime = 0
             squareMoved = false
@@ -1333,6 +1556,28 @@ function WindUI:CreateWindow(title, subtitle)
             BgImage.Visible = false
             TopBar.BackgroundTransparency = 0
             Sidebar.BackgroundTransparency = 0
+        end
+    end
+    
+    -- ============================================
+    -- 设置最小化图标 (图片ID)
+    -- ============================================
+    function Window:SetMinimizeIcon(assetId, color)
+        Config.MinIconImage = assetId or ""
+        Config.MinIconColor = color or Color3.fromRGB(255, 255, 255)
+        
+        MinIconImage.Image = Config.MinIconImage
+        MinIconImage.ImageColor3 = Config.MinIconColor
+        
+        -- 如果当前是最小化状态, 立即更新显示
+        if minimized then
+            if Config.MinIconImage ~= "" then
+                MinIcon.Text = ""
+                MinIconImage.Visible = true
+            else
+                MinIcon.Text = "W"
+                MinIconImage.Visible = false
+            end
         end
     end
     
