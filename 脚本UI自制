@@ -2,7 +2,7 @@
     WindUI - 原创风格界面库
     作者: 自定义
     特点: 无AI味,简洁现代,功能完整
-    更新: 功能页可滑动 + 大圆角 + 按键阴影 + 关闭确认 + 光晕
+    更新: 阴影效果 + 内置卡密 + 下拉层级修复 + 通知动画
 --]]
 
 local WindUI = {}
@@ -11,46 +11,47 @@ local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local TextService = game:GetService("TextService")
+local HttpService = game:GetService("HttpService")
 
 local LocalPlayer = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
 
+-- ============================================
+-- 卡密配置
+-- ============================================
+local KeyConfig = {
+    -- 内置有效卡密（可自行增删）
+    ValidKeys = {
+        ["WIND-2024-PRO"] = true,
+        ["WIND-2024-VIP"] = true,
+        ["TEST-KEY-1234"] = true,
+        ["FREE-FOREVER"] = true,
+    },
+    -- 本地存储文件名（PlayerGui 下）
+    SaveFileName = "WindUI_KeyCache",
+}
+
 -- 配置
 local Config = {
     Theme = {
-        Background = Color3.fromRGB(22, 22, 27),
-        Secondary = Color3.fromRGB(30, 30, 36),
-        Tertiary = Color3.fromRGB(40, 40, 48),
-        Elevated = Color3.fromRGB(48, 48, 58),
-        Accent = Color3.fromRGB(88, 128, 255),
-        AccentHover = Color3.fromRGB(108, 148, 255),
-        AccentPressed = Color3.fromRGB(78, 118, 245),
-        Glow = Color3.fromRGB(100, 160, 255),
-        Text = Color3.fromRGB(238, 238, 242),
-        TextDim = Color3.fromRGB(140, 140, 150),
-        Border = Color3.fromRGB(48, 48, 56),
-        BorderLight = Color3.fromRGB(60, 60, 70),
-        Danger = Color3.fromRGB(235, 75, 85),
-        DangerHover = Color3.fromRGB(255, 95, 105),
-        Success = Color3.fromRGB(75, 195, 115),
-        Warning = Color3.fromRGB(250, 175, 65),
-        Shadow = Color3.fromRGB(0, 0, 0)
+        Background = Color3.fromRGB(25, 25, 30),
+        Secondary = Color3.fromRGB(35, 35, 42),
+        Tertiary = Color3.fromRGB(45, 45, 55),
+        Accent = Color3.fromRGB(90, 130, 255),
+        AccentHover = Color3.fromRGB(110, 150, 255),
+        Text = Color3.fromRGB(240, 240, 245),
+        TextDim = Color3.fromRGB(150, 150, 160),
+        Border = Color3.fromRGB(55, 55, 65),
+        Danger = Color3.fromRGB(240, 80, 90),
+        Success = Color3.fromRGB(80, 200, 120),
+        Warning = Color3.fromRGB(255, 180, 70),
+        Shadow = Color3.fromRGB(0, 0, 0),
     },
     Font = Enum.Font.GothamMedium,
     FontBold = Enum.Font.GothamBold,
     BackgroundImage = "",
     BackgroundImageTransparency = 0.3,
-    BackgroundImageColor = Color3.fromRGB(255, 255, 255),
-    MinIconImage = "",
-    MinIconColor = Color3.fromRGB(255, 255, 255),
-    CornerRadius = 18,
-    ElementRadius = 10,
-    ButtonRadius = 10,
-    ShadowEnabled = true,
-    -- 滑动配置
-    ScrollSpeed = 60,         -- 滚轮速度 (像素)
-    SmoothScroll = true,      -- 平滑滚动
-    SmoothTime = 0.25         -- 平滑时间
+    BackgroundImageColor = Color3.fromRGB(255, 255, 255)
 }
 
 -- 工具函数
@@ -71,6 +72,51 @@ local function Tween(obj, time, props, style)
     local tween = TweenService:Create(obj, TweenInfo.new(time, style or Enum.EasingStyle.Quart, Enum.EasingDirection.Out), props)
     tween:Play()
     return tween
+end
+
+-- ============================================
+-- 卡密工具
+-- ============================================
+local KeyManager = {}
+
+function KeyManager.GetCachePath()
+    return LocalPlayer:FindFirstChild("PlayerGui")
+end
+
+function KeyManager.LoadKey()
+    local gui = KeyManager.GetCachePath()
+    if not gui then return nil end
+    local cache = gui:FindFirstChild(KeyConfig.SaveFileName)
+    if cache and cache:IsA("StringValue") then
+        return cache.Value
+    end
+    return nil
+end
+
+function KeyManager.SaveKey(key)
+    local gui = KeyManager.GetCachePath()
+    if not gui then return end
+    local cache = gui:FindFirstChild(KeyConfig.SaveFileName)
+    if not cache then
+        cache = Create("StringValue", {
+            Name = KeyConfig.SaveFileName,
+            Parent = gui
+        })
+    end
+    cache.Value = key
+end
+
+function KeyManager.Validate(key)
+    if not key or key == "" then return false end
+    return KeyConfig.ValidKeys[key] == true
+end
+
+function KeyManager.HasValidKey()
+    local saved = KeyManager.LoadKey()
+    if saved and KeyManager.Validate(saved) then
+        return true
+    end
+    return false
 end
 
 -- 拖动功能
@@ -107,182 +153,196 @@ local function MakeDraggable(frame, handle, getLocked)
 end
 
 -- ============================================
--- 平滑滑动控制器 (核心)
+-- 阴影工具
 -- ============================================
-local function SetupSmoothScroll(scrollFrame)
-    local targetY = 0
-    local currentY = 0
-    local isDragging = false
-    local dragStartY = 0
-    local dragStartCanvas = 0
-    local lastInputTime = 0
-    local velocity = 0
-    local momentumConn = nil
-    
-    local function GetMaxScroll()
-        return math.max(0, scrollFrame.AbsoluteCanvasSize.Y - scrollFrame.AbsoluteWindowSize.Y)
-    end
-    
-    local function SetCanvasY(y)
-        y = math.clamp(y, 0, GetMaxScroll())
-        scrollFrame.CanvasPosition = Vector2.new(0, y)
-        currentY = y
-        targetY = y
-    end
-    
-    -- 滚轮滚动 (平滑)
-    scrollFrame.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseWheel then
-            if GetMaxScroll() <= 0 then return end
-            
-            local delta = -input.Position.Z * Config.ScrollSpeed
-            targetY = math.clamp(targetY + delta, 0, GetMaxScroll())
-            
-            if not Config.SmoothScroll then
-                SetCanvasY(targetY)
-            end
-        end
-    end)
-    
-    -- 平滑滚动更新
-    RunService.RenderStepped:Connect(function(dt)
-        if isDragging then return end
-        if not Config.SmoothScroll then return end
-        
-        -- 阻尼平滑
-        local diff = targetY - currentY
-        if math.abs(diff) > 0.5 then
-            currentY = currentY + diff * math.min(1, dt * (1 / Config.SmoothTime) * 4)
-            scrollFrame.CanvasPosition = Vector2.new(0, currentY)
-        elseif math.abs(diff) > 0.01 then
-            currentY = targetY
-            scrollFrame.CanvasPosition = Vector2.new(0, currentY)
-        end
-    end)
-    
-    -- 触摸 / 鼠标拖动滑动
-    local dragInput
-    scrollFrame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-            -- 检查是否点在交互组件上, 是则不触发拖动滚动
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                -- 鼠标: 允许拖动空白区域
-                isDragging = true
-                dragStartY = input.Position.Y
-                dragStartCanvas = scrollFrame.CanvasPosition.Y
-                targetY = dragStartCanvas
-                currentY = dragStartCanvas
-                velocity = 0
-                lastInputTime = tick()
-            else
-                -- 触摸: 直接拖动
-                isDragging = true
-                dragStartY = input.Position.Y
-                dragStartCanvas = scrollFrame.CanvasPosition.Y
-                targetY = dragStartCanvas
-                currentY = dragStartCanvas
-                velocity = 0
-                lastInputTime = tick()
-            end
-        end
-    end)
-    
-    UserInputService.InputChanged:Connect(function(input)
-        if not isDragging then return end
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-            local deltaY = input.Position.Y - dragStartY
-            local newY = math.clamp(dragStartCanvas - deltaY, 0, GetMaxScroll())
-            
-            -- 计算速度
-            local now = tick()
-            local dt = now - lastInputTime
-            if dt > 0 then
-                velocity = (newY - currentY) / dt
-            end
-            lastInputTime = now
-            
-            currentY = newY
-            targetY = newY
-            scrollFrame.CanvasPosition = Vector2.new(0, currentY)
-        end
-    end)
-    
-    UserInputService.InputEnded:Connect(function(input)
-        if not isDragging then return end
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            isDragging = false
-            
-            -- 惯性滚动
-            if math.abs(velocity) > 30 then
-                local momentum = velocity * 0.15
-                targetY = math.clamp(currentY + momentum, 0, GetMaxScroll())
-            end
-        end
-    end)
-    
-    -- 阻止子组件上的滚轮冒泡
-    scrollFrame.MouseEnter:Connect(function()
-        -- 确保鼠标进入时, 滚轮响应正常
-    end)
-    
-    return {
-        SetY = function(y) SetCanvasY(y) end,
-        GetY = function() return currentY end,
-        ScrollTo = function(y) 
-            targetY = math.clamp(y, 0, GetMaxScroll())
-        end
+local function ApplyShadow(parentFrame)
+    -- 使用多层 Frame 模拟柔和阴影
+    local shadowLayers = {
+        {expand = 10, transparency = 0.92},
+        {expand = 7,  transparency = 0.88},
+        {expand = 4,  transparency = 0.82},
+        {expand = 2,  transparency = 0.75},
     }
+    
+    for _, layer in ipairs(shadowLayers) do
+        local shadow = Create("Frame", {
+            Name = "Shadow",
+            Size = UDim2.new(1, layer.expand * 2, 1, layer.expand * 2),
+            Position = UDim2.new(0, -layer.expand, 0, -layer.expand),
+            BackgroundColor3 = Config.Theme.Shadow,
+            BackgroundTransparency = layer.transparency,
+            BorderSizePixel = 0,
+            ZIndex = -1,
+            Parent = parentFrame
+        })
+        Create("UICorner", {
+            CornerRadius = UDim.new(0, 16),
+            Parent = shadow
+        })
+        -- 用内圈裁剪掉中心，只留边缘
+        local inner = Create("Frame", {
+            Name = "Inner",
+            Size = UDim2.new(1, -layer.expand * 2 + 4, 1, -layer.expand * 2 + 4),
+            Position = UDim2.new(0, layer.expand - 2, 0, layer.expand - 2),
+            BackgroundColor3 = Config.Theme.Shadow,
+            BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+            ZIndex = -1,
+            Parent = shadow
+        })
+        Create("UICorner", {
+            CornerRadius = UDim.new(0, 14),
+            Parent = inner
+        })
+    end
 end
 
--- 阴影生成器
-local function AddShadow(parent, radius, spread, transparency)
-    if not Config.ShadowEnabled then return end
-    
-    local shadowContainer = Create("Frame", {
-        Name = "Shadow",
-        Size = UDim2.new(1, spread or 12, 1, spread or 12),
-        Position = UDim2.new(0, -(spread or 12)/2, 0, -(spread or 12)/2),
-        BackgroundTransparency = 1,
-        ZIndex = -10,
-        Parent = parent
-    })
-    
-    local outer = Create("Frame", {
+-- ============================================
+-- 卡密输入界面
+-- ============================================
+local function ShowKeyPrompt(ScreenGui, onSuccess)
+    local Overlay = Create("Frame", {
+        Name = "KeyOverlay",
         Size = UDim2.new(1, 0, 1, 0),
-        BackgroundColor3 = Config.Theme.Shadow,
-        BackgroundTransparency = transparency or 0.75,
-        BorderSizePixel = 0,
-        ZIndex = -10,
-        Parent = shadowContainer
+        BackgroundColor3 = Color3.new(0, 0, 0),
+        BackgroundTransparency = 1,
+        ZIndex = 500,
+        Parent = ScreenGui
     })
-    Create("UICorner", {CornerRadius = UDim.new(0, radius or 20), Parent = outer})
     
-    local mid = Create("Frame", {
-        Size = UDim2.new(1, -4, 1, -4),
-        Position = UDim2.new(0, 2, 0, 2),
-        BackgroundColor3 = Config.Theme.Shadow,
-        BackgroundTransparency = (transparency or 0.75) + 0.1,
+    local Panel = Create("Frame", {
+        Name = "KeyPanel",
+        Size = UDim2.new(0, 360, 0, 0),
+        Position = UDim2.new(0.5, -180, 0.5, 0),
+        BackgroundColor3 = Config.Theme.Background,
         BorderSizePixel = 0,
-        ZIndex = -9,
-        Parent = shadowContainer
+        ZIndex = 501,
+        Parent = Overlay
     })
-    Create("UICorner", {CornerRadius = UDim.new(0, radius or 20), Parent = mid})
+    Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = Panel})
+    Create("UIStroke", {Color = Config.Theme.Border, Thickness = 1, Parent = Panel})
+    ApplyShadow(Panel)
     
-    local inner = Create("Frame", {
-        Size = UDim2.new(1, -8, 1, -8),
-        Position = UDim2.new(0, 4, 0, 4),
-        BackgroundColor3 = Config.Theme.Shadow,
-        BackgroundTransparency = (transparency or 0.75) + 0.2,
-        BorderSizePixel = 0,
-        ZIndex = -8,
-        Parent = shadowContainer
+    Create("TextLabel", {
+        Size = UDim2.new(1, -24, 0, 28),
+        Position = UDim2.new(0, 16, 0, 14),
+        BackgroundTransparency = 1,
+        Text = "🔐 请输入卡密",
+        TextColor3 = Config.Theme.Text,
+        Font = Config.FontBold,
+        TextSize = 16,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        ZIndex = 502,
+        Parent = Panel
     })
-    Create("UICorner", {CornerRadius = UDim.new(0, radius or 20), Parent = inner})
     
-    return shadowContainer
+    Create("TextLabel", {
+        Size = UDim2.new(1, -24, 0, 18),
+        Position = UDim2.new(0, 16, 0, 42),
+        BackgroundTransparency = 1,
+        Text = "首次使用需要验证卡密，验证成功后将自动保存",
+        TextColor3 = Config.Theme.TextDim,
+        Font = Config.Font,
+        TextSize = 11,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        ZIndex = 502,
+        Parent = Panel
+    })
+    
+    local InputBox = Create("TextBox", {
+        Size = UDim2.new(1, -32, 0, 38),
+        Position = UDim2.new(0, 16, 0, 70),
+        BackgroundColor3 = Config.Theme.Tertiary,
+        Text = "",
+        PlaceholderText = "输入卡密...",
+        PlaceholderColor3 = Config.Theme.TextDim,
+        TextColor3 = Config.Theme.Text,
+        Font = Config.Font,
+        TextSize = 14,
+        ClearTextOnFocus = false,
+        ZIndex = 502,
+        Parent = Panel
+    })
+    Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = InputBox})
+    Create("UIPadding", {PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 10), Parent = InputBox})
+    
+    local StatusLabel = Create("TextLabel", {
+        Size = UDim2.new(1, -32, 0, 18),
+        Position = UDim2.new(0, 16, 0, 112),
+        BackgroundTransparency = 1,
+        Text = "",
+        TextColor3 = Config.Theme.Danger,
+        Font = Config.Font,
+        TextSize = 11,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        ZIndex = 502,
+        Parent = Panel
+    })
+    
+    local ConfirmBtn = Create("TextButton", {
+        Size = UDim2.new(1, -32, 0, 38),
+        Position = UDim2.new(0, 16, 0, 136),
+        BackgroundColor3 = Config.Theme.Accent,
+        Text = "验证卡密",
+        TextColor3 = Config.Theme.Text,
+        Font = Config.FontBold,
+        TextSize = 14,
+        AutoButtonColor = false,
+        ZIndex = 502,
+        Parent = Panel
+    })
+    Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = ConfirmBtn})
+    
+    ConfirmBtn.MouseEnter:Connect(function()
+        Tween(ConfirmBtn, 0.15, {BackgroundColor3 = Config.Theme.AccentHover})
+    end)
+    ConfirmBtn.MouseLeave:Connect(function()
+        Tween(ConfirmBtn, 0.15, {BackgroundColor3 = Config.Theme.Accent})
+    end)
+    
+    local function TryValidate()
+        local key = InputBox.Text
+        if KeyManager.Validate(key) then
+            StatusLabel.TextColor3 = Config.Theme.Success
+            StatusLabel.Text = "✓ 卡密验证成功，正在进入..."
+            KeyManager.SaveKey(key)
+            Tween(Overlay, 0.3, {BackgroundTransparency = 1})
+            Tween(Panel, 0.3, {Size = UDim2.new(0, 360, 0, 0), Position = UDim2.new(0.5, -180, 0.5, 0)})
+            task.wait(0.3)
+            Overlay:Destroy()
+            if onSuccess then onSuccess() end
+        else
+            StatusLabel.TextColor3 = Config.Theme.Danger
+            StatusLabel.Text = "✗ 卡密无效，请重新输入"
+            -- 抖动动画
+            local origPos = Panel.Position
+            for i = 1, 3 do
+                Tween(Panel, 0.05, {Position = origPos + UDim2.new(0, 8, 0, 0)})
+                task.wait(0.05)
+                Tween(Panel, 0.05, {Position = origPos + UDim2.new(0, -8, 0, 0)})
+                task.wait(0.05)
+            end
+            Tween(Panel, 0.08, {Position = origPos})
+        end
+    end
+    
+    ConfirmBtn.MouseButton1Click:Connect(TryValidate)
+    InputBox.FocusLost:Connect(function(enterPressed)
+        if enterPressed then TryValidate() end
+    end)
+    
+    Tween(Overlay, 0.25, {BackgroundTransparency = 0.5})
+    Tween(Panel, 0.35, {
+        Size = UDim2.new(0, 360, 0, 190),
+        Position = UDim2.new(0.5, -180, 0.5, -95)
+    }, Enum.EasingStyle.Back)
+    
+    InputBox:CaptureFocus()
 end
 
+-- ============================================
 -- 创建主窗口
+-- ============================================
 function WindUI:CreateWindow(title, subtitle)
     local Window = {}
     
@@ -294,7 +354,7 @@ function WindUI:CreateWindow(title, subtitle)
         Parent = LocalPlayer:WaitForChild("PlayerGui")
     })
     
-    -- 主框架
+    -- 主框架（先隐藏，等卡密验证后再显示）
     local Main = Create("Frame", {
         Name = "Main",
         Size = UDim2.new(0, 580, 0, 400),
@@ -302,90 +362,27 @@ function WindUI:CreateWindow(title, subtitle)
         BackgroundColor3 = Config.Theme.Background,
         BorderSizePixel = 0,
         ClipsDescendants = false,
-        ZIndex = 10,
+        Visible = false,
         Parent = ScreenGui
     })
-    Create("UICorner", {CornerRadius = UDim.new(0, Config.CornerRadius), Parent = Main})
+    Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = Main})
+    Create("UIStroke", {Color = Config.Theme.Border, Thickness = 1, Parent = Main})
     
-    -- 内容裁剪层
-    local ContentClip = Create("Frame", {
-        Name = "ContentClip",
+    -- 应用阴影
+    ApplyShadow(Main)
+    
+    -- 内容裁剪层（避免背景图溢出圆角）
+    local ClipFrame = Create("Frame", {
+        Name = "ClipFrame",
         Size = UDim2.new(1, 0, 1, 0),
         BackgroundTransparency = 1,
         ClipsDescendants = true,
-        ZIndex = 10,
+        ZIndex = 1,
         Parent = Main
     })
-    Create("UICorner", {CornerRadius = UDim.new(0, Config.CornerRadius), Parent = ContentClip})
+    Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = ClipFrame})
     
-    -- 外部阴影
-    local ShadowLayer1 = Create("Frame", {
-        Name = "ShadowLayer1",
-        Size = UDim2.new(1, 20, 1, 20),
-        Position = UDim2.new(0, -10, 0, -10),
-        BackgroundColor3 = Color3.new(0, 0, 0),
-        BackgroundTransparency = 0.85,
-        BorderSizePixel = 0,
-        ZIndex = 8,
-        Parent = ScreenGui
-    })
-    Create("UICorner", {CornerRadius = UDim.new(0, Config.CornerRadius + 10), Parent = ShadowLayer1})
-    
-    local ShadowLayer2 = Create("Frame", {
-        Name = "ShadowLayer2",
-        Size = UDim2.new(1, 12, 1, 12),
-        Position = UDim2.new(0, -6, 0, -6),
-        BackgroundColor3 = Color3.new(0, 0, 0),
-        BackgroundTransparency = 0.75,
-        BorderSizePixel = 0,
-        ZIndex = 9,
-        Parent = ScreenGui
-    })
-    Create("UICorner", {CornerRadius = UDim.new(0, Config.CornerRadius + 6), Parent = ShadowLayer2})
-    
-    local function SyncShadows()
-        ShadowLayer1.Position = UDim2.new(Main.Position.X.Scale, Main.Position.X.Offset - 10, Main.Position.Y.Scale, Main.Position.Y.Offset - 10)
-        ShadowLayer2.Position = UDim2.new(Main.Position.X.Scale, Main.Position.X.Offset - 6, Main.Position.Y.Scale, Main.Position.Y.Offset - 6)
-        ShadowLayer1.Size = UDim2.new(Main.Size.X.Scale, Main.Size.X.Offset + 20, Main.Size.Y.Scale, Main.Size.Y.Offset + 20)
-        ShadowLayer2.Size = UDim2.new(Main.Size.X.Scale, Main.Size.X.Offset + 12, Main.Size.Y.Scale, Main.Size.Y.Offset + 12)
-    end
-    
-    Main:GetPropertyChangedSignal("Position"):Connect(SyncShadows)
-    Main:GetPropertyChangedSignal("Size"):Connect(SyncShadows)
-    
-    -- 光晕
-    local GlowLayer1 = Create("Frame", {
-        Name = "GlowLayer1",
-        Size = UDim2.new(1, 6, 1, 6),
-        Position = UDim2.new(0, -3, 0, -3),
-        BackgroundColor3 = Config.Theme.Glow,
-        BackgroundTransparency = 0.88,
-        BorderSizePixel = 0,
-        ZIndex = 9,
-        Parent = ScreenGui
-    })
-    Create("UICorner", {CornerRadius = UDim.new(0, Config.CornerRadius + 3), Parent = GlowLayer1})
-    
-    local GlowStroke = Create("UIStroke", {
-        Name = "GlowStroke",
-        Color = Config.Theme.Glow,
-        Thickness = 1.5,
-        Transparency = 0.4,
-        ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-        Parent = Main
-    })
-    
-    local function SyncGlow()
-        GlowLayer1.Position = UDim2.new(Main.Position.X.Scale, Main.Position.X.Offset - 3, Main.Position.Y.Scale, Main.Position.Y.Offset - 3)
-        GlowLayer1.Size = UDim2.new(Main.Size.X.Scale, Main.Size.X.Offset + 6, Main.Size.Y.Scale, Main.Size.Y.Offset + 6)
-    end
-    Main:GetPropertyChangedSignal("Position"):Connect(SyncGlow)
-    Main:GetPropertyChangedSignal("Size"):Connect(SyncGlow)
-    
-    TweenService:Create(GlowLayer1, TweenInfo.new(2.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {BackgroundTransparency = 0.95}):Play()
-    TweenService:Create(GlowStroke, TweenInfo.new(2.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {Transparency = 0.6}):Play()
-    
-    -- 背景图
+    -- 背景图片层
     local BgImage = Create("ImageLabel", {
         Name = "BackgroundImage",
         Size = UDim2.new(1, 0, 1, 0),
@@ -394,69 +391,58 @@ function WindUI:CreateWindow(title, subtitle)
         ImageTransparency = Config.BackgroundImageTransparency,
         ImageColor3 = Config.BackgroundImageColor,
         ScaleType = Enum.ScaleType.Crop,
-        ZIndex = 11,
+        ZIndex = 0,
         Visible = Config.BackgroundImage ~= "",
-        Parent = ContentClip
+        Parent = ClipFrame
     })
-    Create("UICorner", {CornerRadius = UDim.new(0, Config.CornerRadius), Parent = BgImage})
+    Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = BgImage})
     
     -- 顶部标题栏
     local TopBar = Create("Frame", {
         Name = "TopBar",
-        Size = UDim2.new(1, 0, 0, 48),
+        Size = UDim2.new(1, 0, 0, 45),
         BackgroundColor3 = Config.Theme.Secondary,
-        BackgroundTransparency = Config.BackgroundImage ~= "" and 0.25 or 0,
+        BackgroundTransparency = Config.BackgroundImage ~= "" and 0.2 or 0,
         BorderSizePixel = 0,
-        ZIndex = 12,
-        Parent = ContentClip
+        ZIndex = 2,
+        Parent = Main
     })
-    Create("UICorner", {CornerRadius = UDim.new(0, Config.CornerRadius), Parent = TopBar})
+    Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = TopBar})
     Create("Frame", {
-        Size = UDim2.new(1, 0, 0, 20),
-        Position = UDim2.new(0, 0, 1, -20),
+        Size = UDim2.new(1, 0, 0, 12),
+        Position = UDim2.new(0, 0, 1, -12),
         BackgroundColor3 = Config.Theme.Secondary,
-        BackgroundTransparency = Config.BackgroundImage ~= "" and 0.25 or 0,
+        BackgroundTransparency = Config.BackgroundImage ~= "" and 0.2 or 0,
         BorderSizePixel = 0,
-        ZIndex = 12,
-        Parent = TopBar
-    })
-    
-    Create("Frame", {
-        Name = "TopBarDivider",
-        Size = UDim2.new(1, 0, 0, 1),
-        Position = UDim2.new(0, 0, 1, -1),
-        BackgroundColor3 = Config.Theme.Border,
-        BackgroundTransparency = 0.4,
-        BorderSizePixel = 0,
-        ZIndex = 13,
+        ZIndex = 2,
         Parent = TopBar
     })
     
     Create("TextLabel", {
         Name = "Title",
         Size = UDim2.new(0, 200, 1, 0),
-        Position = UDim2.new(0, 18, 0, 0),
+        Position = UDim2.new(0, 16, 0, 0),
         BackgroundTransparency = 1,
         Text = title or "WindUI",
         TextColor3 = Config.Theme.Text,
         Font = Config.FontBold,
         TextSize = 15,
         TextXAlignment = Enum.TextXAlignment.Left,
-        ZIndex = 14,
+        ZIndex = 3,
         Parent = TopBar
     })
     
     Create("TextLabel", {
         Name = "Subtitle",
         Size = UDim2.new(0, 200, 1, 0),
-        Position = UDim2.new(0, 18 + (#title * 8) + 10, 0, 0),
+        Position = UDim2.new(0, 16 + (#title * 8) + 10, 0, 0),
         BackgroundTransparency = 1,
         Text = subtitle or "",
         TextColor3 = Config.Theme.TextDim,
         Font = Config.Font,
         TextSize = 12,
         TextXAlignment = Enum.TextXAlignment.Left,
-        ZIndex = 14,
+        ZIndex = 3,
         Parent = TopBar
     })
     
@@ -464,80 +450,72 @@ function WindUI:CreateWindow(title, subtitle)
     local CloseBtn = Create("TextButton", {
         Name = "Close",
         Size = UDim2.new(0, 30, 0, 30),
-        Position = UDim2.new(1, -42, 0.5, -15),
-        BackgroundColor3 = Config.Theme.Tertiary,
+        Position = UDim2.new(1, -40, 0.5, -15),
+        BackgroundColor3 = Config.Theme.Danger,
         Text = "×",
-        TextColor3 = Config.Theme.TextDim,
+        TextColor3 = Config.Theme.Text,
         Font = Config.FontBold,
         TextSize = 18,
         AutoButtonColor = false,
-        ZIndex = 14,
+        ZIndex = 3,
         Parent = TopBar
     })
-    Create("UICorner", {CornerRadius = UDim.new(0, 8), Parent = CloseBtn})
+    Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = CloseBtn})
     
     CloseBtn.MouseEnter:Connect(function()
-        Tween(CloseBtn, 0.15, {BackgroundColor3 = Config.Theme.Danger, TextColor3 = Config.Theme.Text})
+        Tween(CloseBtn, 0.15, {BackgroundColor3 = Color3.fromRGB(255, 100, 110)})
     end)
     CloseBtn.MouseLeave:Connect(function()
-        Tween(CloseBtn, 0.15, {BackgroundColor3 = Config.Theme.Tertiary, TextColor3 = Config.Theme.TextDim})
+        Tween(CloseBtn, 0.15, {BackgroundColor3 = Config.Theme.Danger})
     end)
     
     -- 最小化按钮
     local MinBtn = Create("TextButton", {
         Name = "Minimize",
         Size = UDim2.new(0, 30, 0, 30),
-        Position = UDim2.new(1, -78, 0.5, -15),
+        Position = UDim2.new(1, -75, 0.5, -15),
         BackgroundColor3 = Config.Theme.Tertiary,
         Text = "−",
-        TextColor3 = Config.Theme.TextDim,
+        TextColor3 = Config.Theme.Text,
         Font = Config.FontBold,
         TextSize = 18,
         AutoButtonColor = false,
-        ZIndex = 14,
+        ZIndex = 3,
         Parent = TopBar
     })
-    Create("UICorner", {CornerRadius = UDim.new(0, 8), Parent = MinBtn})
-    
-    MinBtn.MouseEnter:Connect(function()
-        Tween(MinBtn, 0.15, {BackgroundColor3 = Config.Theme.Elevated, TextColor3 = Config.Theme.Text})
-    end)
-    MinBtn.MouseLeave:Connect(function()
-        Tween(MinBtn, 0.15, {BackgroundColor3 = Config.Theme.Tertiary, TextColor3 = Config.Theme.TextDim})
-    end)
+    Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = MinBtn})
     
     -- 侧边栏
     local Sidebar = Create("Frame", {
         Name = "Sidebar",
-        Size = UDim2.new(0, 148, 1, -48),
-        Position = UDim2.new(0, 0, 0, 48),
+        Size = UDim2.new(0, 140, 1, -45),
+        Position = UDim2.new(0, 0, 0, 45),
         BackgroundColor3 = Config.Theme.Secondary,
-        BackgroundTransparency = Config.BackgroundImage ~= "" and 0.2 or 0,
+        BackgroundTransparency = Config.BackgroundImage ~= "" and 0.15 or 0,
         BorderSizePixel = 0,
-        ZIndex = 12,
-        Parent = ContentClip
+        ZIndex = 2,
+        Parent = Main
     })
     
     Create("Frame", {
         Size = UDim2.new(0, 1, 1, 0),
         Position = UDim2.new(1, -1, 0, 0),
         BackgroundColor3 = Config.Theme.Border,
-        BackgroundTransparency = 0.4,
         BorderSizePixel = 0,
-        ZIndex = 13,
+        ZIndex = 3,
         Parent = Sidebar
     })
     
     local TabContainer = Create("ScrollingFrame", {
         Name = "Tabs",
-        Size = UDim2.new(1, -12, 1, -20),
-        Position = UDim2.new(0, 6, 0, 10),
+        Size = UDim2.new(1, -8, 1, -16),
+        Position = UDim2.new(0, 4, 0, 8),
         BackgroundTransparency = 1,
         BorderSizePixel = 0,
         ScrollBarThickness = 2,
         ScrollBarImageColor3 = Config.Theme.Border,
         CanvasSize = UDim2.new(0, 0, 0, 0),
-        ZIndex = 13,
+        ZIndex = 3,
         Parent = Sidebar
     })
     Create("UIListLayout", {
@@ -549,192 +527,77 @@ function WindUI:CreateWindow(title, subtitle)
     -- 内容区
     local Content = Create("Frame", {
         Name = "Content",
-        Size = UDim2.new(1, -148, 1, -48),
-        Position = UDim2.new(0, 148, 0, 48),
+        Size = UDim2.new(1, -140, 1, -45),
+        Position = UDim2.new(0, 140, 0, 45),
         BackgroundTransparency = 1,
-        ZIndex = 12,
-        Parent = ContentClip
+        ZIndex = 2,
+        Parent = Main
     })
     
     local Pages = {}
     local Tabs = {}
     local activeTab = nil
     
+    -- 状态管理
     local minimized = false
     local WINDOW_W, WINDOW_H = 580, 400
-    local SQUARE_SIZE = 52
+    local SQUARE_SIZE = 50
     
     MakeDraggable(Main, TopBar, function() return minimized end)
     MakeDraggable(Main, Main, function() return not minimized end)
     
     local function CenterWindow()
         Main.Position = UDim2.new(0.5, -WINDOW_W / 2, 0.5, -WINDOW_H / 2)
-        SyncShadows()
-        SyncGlow()
     end
     CenterWindow()
     
-    Main.Size = UDim2.new(0, WINDOW_W - 40, 0, WINDOW_H - 30)
-    Main.BackgroundTransparency = 0.5
-    SyncShadows()
-    SyncGlow()
-    task.wait()
-    Tween(Main, 0.35, {Size = UDim2.new(0, WINDOW_W, 0, WINDOW_H)})
-    Tween(Main, 0.35, {BackgroundTransparency = 0})
+    -- 打开动画（等卡密验证后触发）
+    local function PlayOpenAnimation()
+        Main.Visible = true
+        Main.Size = UDim2.new(0, WINDOW_W - 30, 0, WINDOW_H - 20)
+        Main.BackgroundTransparency = 0.4
+        task.wait()
+        Tween(Main, 0.3, {Size = UDim2.new(0, WINDOW_W, 0, WINDOW_H)})
+        Tween(Main, 0.3, {BackgroundTransparency = 0})
+    end
     
-    -- 关闭确认
-    local closeConfirmOpen = false
-    
-    local function CreateCloseConfirm()
-        if closeConfirmOpen then return end
-        closeConfirmOpen = true
-        
-        local Overlay = Create("Frame", {
-            Size = UDim2.new(1, 0, 1, 0),
-            BackgroundColor3 = Color3.new(0, 0, 0),
-            BackgroundTransparency = 1,
-            ZIndex = 200,
-            Parent = ScreenGui
-        })
-        
-        local Modal = Create("Frame", {
-            Size = UDim2.new(0, 320, 0, 0),
-            Position = UDim2.new(0.5, -160, 0.5, 0),
-            BackgroundColor3 = Config.Theme.Background,
-            BorderSizePixel = 0,
-            ZIndex = 201,
-            Parent = Overlay
-        })
-        Create("UICorner", {CornerRadius = UDim.new(0, 16), Parent = Modal})
-        Create("UIStroke", {Color = Config.Theme.Border, Thickness = 1, Parent = Modal})
-        
-        Create("TextLabel", {
-            Size = UDim2.new(1, -32, 0, 24),
-            Position = UDim2.new(0, 20, 0, 20),
-            BackgroundTransparency = 1,
-            Text = "确认关闭脚本",
-            TextColor3 = Config.Theme.Text,
-            Font = Config.FontBold,
-            TextSize = 15,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            ZIndex = 202,
-            Parent = Modal
-        })
-        
-        Create("TextLabel", {
-            Size = UDim2.new(1, -40, 0, 60),
-            Position = UDim2.new(0, 20, 0, 52),
-            BackgroundTransparency = 1,
-            Text = "关闭后将无法恢复,需要重新执行脚本才能再次打开界面。\n确定要彻底关闭吗?",
-            TextColor3 = Config.Theme.TextDim,
-            Font = Config.Font,
-            TextSize = 13,
-            TextWrapped = true,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            TextYAlignment = Enum.TextYAlignment.Top,
-            ZIndex = 202,
-            Parent = Modal
-        })
-        
-        local CancelBtn = Create("TextButton", {
-            Size = UDim2.new(0, 120, 0, 36),
-            Position = UDim2.new(0, 20, 1, -56),
-            BackgroundColor3 = Config.Theme.Tertiary,
-            Text = "取消",
-            TextColor3 = Config.Theme.Text,
-            Font = Config.Font,
-            TextSize = 13,
-            AutoButtonColor = false,
-            ZIndex = 202,
-            Parent = Modal
-        })
-        Create("UICorner", {CornerRadius = UDim.new(0, Config.ButtonRadius), Parent = CancelBtn})
-        
-        local ConfirmBtn = Create("TextButton", {
-            Size = UDim2.new(0, 120, 0, 36),
-            Position = UDim2.new(1, -140, 1, -56),
-            BackgroundColor3 = Config.Theme.Danger,
-            Text = "确认关闭",
-            TextColor3 = Config.Theme.Text,
-            Font = Config.FontBold,
-            TextSize = 13,
-            AutoButtonColor = false,
-            ZIndex = 202,
-            Parent = Modal
-        })
-        Create("UICorner", {CornerRadius = UDim.new(0, Config.ButtonRadius), Parent = ConfirmBtn})
-        
-        CancelBtn.MouseEnter:Connect(function()
-            Tween(CancelBtn, 0.15, {BackgroundColor3 = Config.Theme.Elevated})
-        end)
-        CancelBtn.MouseLeave:Connect(function()
-            Tween(CancelBtn, 0.15, {BackgroundColor3 = Config.Theme.Tertiary})
-        end)
-        ConfirmBtn.MouseEnter:Connect(function()
-            Tween(ConfirmBtn, 0.15, {BackgroundColor3 = Config.Theme.DangerHover})
-        end)
-        ConfirmBtn.MouseLeave:Connect(function()
-            Tween(ConfirmBtn, 0.15, {BackgroundColor3 = Config.Theme.Danger})
-        end)
-        
-        Tween(Overlay, 0.2, {BackgroundTransparency = 0.55})
-        Tween(Modal, 0.35, {Size = UDim2.new(0, 320, 0, 190), Position = UDim2.new(0.5, -160, 0.5, -95)}, Enum.EasingStyle.Back)
-        
-        local function CloseConfirm()
-            Tween(Overlay, 0.2, {BackgroundTransparency = 1})
-            Tween(Modal, 0.2, {Size = UDim2.new(0, 320, 0, 0), Position = UDim2.new(0.5, -160, 0.5, 0)})
-            task.wait(0.2)
-            Overlay:Destroy()
-            closeConfirmOpen = false
-        end
-        
-        CancelBtn.MouseButton1Click:Connect(CloseConfirm)
-        
-        ConfirmBtn.MouseButton1Click:Connect(function()
-            CloseConfirm()
-            task.wait(0.2)
-            Tween(Main, 0.25, {Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0)})
-            Tween(ShadowLayer1, 0.25, {Size = UDim2.new(0, 20, 0, 20), Position = UDim2.new(0.5, -10, 0.5, -10)})
-            Tween(ShadowLayer2, 0.25, {Size = UDim2.new(0, 12, 0, 12), Position = UDim2.new(0.5, -6, 0.5, -6)})
-            Tween(GlowLayer1, 0.25, {Size = UDim2.new(0, 6, 0, 6), Position = UDim2.new(0.5, -3, 0.5, -3), BackgroundTransparency = 1})
-            task.wait(0.25)
-            ScreenGui:Destroy()
+    -- ============================================
+    -- 卡密验证流程
+    -- ============================================
+    if KeyManager.HasValidKey() then
+        -- 已有有效卡密，直接进入
+        PlayOpenAnimation()
+    else
+        -- 需要输入卡密
+        ShowKeyPrompt(ScreenGui, function()
+            PlayOpenAnimation()
         end)
     end
     
-    CloseBtn.MouseButton1Click:Connect(CreateCloseConfirm)
+    -- 关闭
+    CloseBtn.MouseButton1Click:Connect(function()
+        Tween(Main, 0.2, {Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0)})
+        task.wait(0.2)
+        ScreenGui:Destroy()
+    end)
     
     -- 最小化
     local normalPos = UDim2.new(0.5, -WINDOW_W / 2, 0.5, -WINDOW_H / 2)
-    local squarePos = UDim2.new(0.5, -SQUARE_SIZE / 2, 0, 24)
+    local squarePos = UDim2.new(0.5, -SQUARE_SIZE / 2, 0, 20)
     
     local MinIcon = Create("TextLabel", {
         Name = "MinIcon",
         Size = UDim2.new(1, 0, 1, 0),
         BackgroundTransparency = 1,
-        Text = Config.MinIconImage == "" and "W" or "",
-        TextColor3 = Config.MinIconColor,
+        Text = "W",
+        TextColor3 = Config.Theme.Text,
         Font = Config.FontBold,
         TextSize = 22,
-        ZIndex = 20,
+        ZIndex = 10,
         Visible = false,
         Parent = Main
     })
-    Create("UICorner", {CornerRadius = UDim.new(0, Config.CornerRadius), Parent = MinIcon})
-    
-    local MinIconImage = Create("ImageLabel", {
-        Name = "MinIconImage",
-        Size = UDim2.new(1, -14, 1, -14),
-        Position = UDim2.new(0, 7, 0, 7),
-        BackgroundTransparency = 1,
-        Image = Config.MinIconImage,
-        ImageColor3 = Config.MinIconColor,
-        ScaleType = Enum.ScaleType.Fit,
-        ZIndex = 21,
-        Visible = false,
-        Parent = Main
-    })
-    Create("UICorner", {CornerRadius = UDim.new(0, Config.CornerRadius - 4), Parent = MinIconImage})
+    Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = MinIcon})
     
     local squarePressTime = 0
     local squareMoved = false
@@ -744,23 +607,13 @@ function WindUI:CreateWindow(title, subtitle)
             minimized = true
             normalPos = Main.Position
             
-            ContentClip.Visible = false
+            Content.Visible = false
+            Sidebar.Visible = false
+            TopBar.Visible = false
+            BgImage.Visible = false
             MinIcon.Visible = true
             
-            if Config.MinIconImage ~= "" then
-                MinIcon.Text = ""
-                MinIconImage.Visible = true
-            else
-                MinIcon.Text = "W"
-                MinIconImage.Visible = false
-            end
-            
-            Tween(ShadowLayer1, 0.35, {Size = UDim2.new(0, SQUARE_SIZE + 16, 0, SQUARE_SIZE + 16), Position = UDim2.new(0.5, -(SQUARE_SIZE + 16)/2, 0, 24 - 8)})
-            Tween(ShadowLayer2, 0.35, {Size = UDim2.new(0, SQUARE_SIZE + 8, 0, SQUARE_SIZE + 8), Position = UDim2.new(0.5, -(SQUARE_SIZE + 8)/2, 0, 24 - 4)})
-            Tween(GlowLayer1, 0.35, {Size = UDim2.new(0, SQUARE_SIZE + 6, 0, SQUARE_SIZE + 6), Position = UDim2.new(0.5, -(SQUARE_SIZE + 6)/2, 0, 24 - 3), BackgroundTransparency = 0.7})
-            GlowStroke.Transparency = 0.2
-            
-            Tween(Main, 0.4, {
+            Tween(Main, 0.35, {
                 Size = UDim2.new(0, SQUARE_SIZE, 0, SQUARE_SIZE),
                 Position = squarePos,
                 BackgroundColor3 = Config.Theme.Accent
@@ -787,23 +640,20 @@ function WindUI:CreateWindow(title, subtitle)
         if minimized and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
             if not squareMoved and (tick() - squarePressTime) < 0.3 then
                 minimized = false
+                
                 MinIcon.Visible = false
-                MinIconImage.Visible = false
                 
-                Tween(ShadowLayer1, 0.35, {Size = UDim2.new(normalPos.X.Scale, WINDOW_W + 20, normalPos.Y.Scale, WINDOW_H + 20), Position = UDim2.new(normalPos.X.Scale, normalPos.X.Offset - 10, normalPos.Y.Scale, normalPos.Y.Offset - 10)})
-                Tween(ShadowLayer2, 0.35, {Size = UDim2.new(normalPos.X.Scale, WINDOW_W + 12, normalPos.Y.Scale, WINDOW_H + 12), Position = UDim2.new(normalPos.X.Scale, normalPos.X.Offset - 6, normalPos.Y.Scale, normalPos.Y.Offset - 6)})
-                Tween(GlowLayer1, 0.35, {Size = UDim2.new(normalPos.X.Scale, WINDOW_W + 6, normalPos.Y.Scale, WINDOW_H + 6), Position = UDim2.new(normalPos.X.Scale, normalPos.X.Offset - 3, normalPos.Y.Scale, normalPos.Y.Offset - 3), BackgroundTransparency = 0.88})
-                
-                Tween(Main, 0.4, {
+                Tween(Main, 0.35, {
                     Size = UDim2.new(0, WINDOW_W, 0, WINDOW_H),
                     Position = normalPos,
                     BackgroundColor3 = Config.Theme.Background
                 }, Enum.EasingStyle.Back)
                 
-                task.wait(0.15)
-                ContentClip.Visible = true
-                task.wait(0.2)
-                Tween(GlowStroke, 0.3, {Transparency = 0.4})
+                task.wait(0.1)
+                Content.Visible = true
+                Sidebar.Visible = true
+                TopBar.Visible = true
+                BgImage.Visible = Config.BackgroundImage ~= ""
             end
             squarePressTime = 0
             squareMoved = false
@@ -820,77 +670,60 @@ function WindUI:CreateWindow(title, subtitle)
             Name = name .. "Tab",
             Size = UDim2.new(1, 0, 0, 34),
             BackgroundColor3 = Config.Theme.Secondary,
-            BackgroundTransparency = 1,
+            BackgroundTransparency = Config.BackgroundImage ~= "" and 0.3 or 0,
             Text = "",
             AutoButtonColor = false,
-            ZIndex = 14,
+            ZIndex = 4,
             Parent = TabContainer
         })
-        Create("UICorner", {CornerRadius = UDim.new(0, Config.ElementRadius), Parent = TabBtn})
+        Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = TabBtn})
         
         local TabLabel = Create("TextLabel", {
-            Size = UDim2.new(1, -32, 1, 0),
-            Position = UDim2.new(0, 32, 0, 0),
+            Size = UDim2.new(1, -30, 1, 0),
+            Position = UDim2.new(0, 30, 0, 0),
             BackgroundTransparency = 1,
             Text = name,
             TextColor3 = Config.Theme.TextDim,
             Font = Config.Font,
             TextSize = 13,
             TextXAlignment = Enum.TextXAlignment.Left,
-            ZIndex = 15,
+            ZIndex = 5,
             Parent = TabBtn
         })
         
         local TabIcon = Create("TextLabel", {
             Size = UDim2.new(0, 24, 1, 0),
-            Position = UDim2.new(0, 8, 0, 0),
+            Position = UDim2.new(0, 6, 0, 0),
             BackgroundTransparency = 1,
             Text = icon or "●",
             TextColor3 = Config.Theme.TextDim,
             Font = Config.Font,
             TextSize = 14,
-            ZIndex = 15,
+            ZIndex = 5,
             Parent = TabBtn
         })
         
         local Indicator = Create("Frame", {
             Size = UDim2.new(0, 3, 0, 0),
-            Position = UDim2.new(0, 2, 0.5, 0),
+            Position = UDim2.new(0, 0, 0.5, 0),
             BackgroundColor3 = Config.Theme.Accent,
             BorderSizePixel = 0,
-            ZIndex = 15,
+            ZIndex = 5,
             Parent = TabBtn
         })
-        Create("UICorner", {CornerRadius = UDim.new(1, 0), Parent = Indicator})
+        Create("UICorner", {CornerRadius = UDim.new(0, 2), Parent = Indicator})
         
-        -- ============================================
-        -- 可滑动的功能页面 (核心更新)
-        -- ============================================
-        local PageScroll = Create("ScrollingFrame", {
-            Name = name .. "PageScroll",
+        local Page = Create("ScrollingFrame", {
+            Name = name .. "Page",
             Size = UDim2.new(1, 0, 1, 0),
             BackgroundTransparency = 1,
             BorderSizePixel = 0,
-            ScrollBarThickness = 4,
-            ScrollBarImageColor3 = Config.Theme.Accent,
-            ScrollBarImageTransparency = 0.3,
-            ScrollingDirection = Enum.ScrollingDirection.Y,
-            ElasticBehavior = Enum.ElasticBehavior.Never,
+            ScrollBarThickness = 3,
+            ScrollBarImageColor3 = Config.Theme.Border,
             CanvasSize = UDim2.new(0, 0, 0, 0),
             Visible = false,
-            ZIndex = 13,
+            ZIndex = 3,
             Parent = Content
-        })
-        Create("UICorner", {CornerRadius = UDim.new(0, 8), Parent = PageScroll})
-        
-        -- 内部容器 (用于自动布局)
-        local Page = Create("Frame", {
-            Name = name .. "Page",
-            Size = UDim2.new(1, 0, 0, 0),
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            ZIndex = 13,
-            Parent = PageScroll
         })
         Create("UIListLayout", {
             Padding = UDim.new(0, 8),
@@ -898,81 +731,42 @@ function WindUI:CreateWindow(title, subtitle)
             Parent = Page
         })
         Create("UIPadding", {
-            PaddingTop = UDim.new(0, 12),
-            PaddingBottom = UDim.new(0, 12),
-            PaddingLeft = UDim.new(0, 14),
-            PaddingRight = UDim.new(0, 14),
+            PaddingTop = UDim.new(0, 10),
+            PaddingBottom = UDim.new(0, 10),
+            PaddingLeft = UDim.new(0, 12),
+            PaddingRight = UDim.new(0, 12),
             Parent = Page
         })
-        
-        -- 自动更新 CanvasSize
-        local function UpdateCanvas()
-            local layout = Page:FindFirstChildOfClass("UIListLayout")
-            if layout then
-                Page.Size = UDim2.new(1, 0, 0, layout.AbsoluteContentSize.Y + 24)
-                PageScroll.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 24)
-            end
-        end
-        
-        Page.ChildAdded:Connect(function()
-            task.wait()
-            UpdateCanvas()
-        end)
-        Page.ChildRemoved:Connect(function()
-            task.wait()
-            UpdateCanvas()
-        end)
-        
-        -- 监听内容大小变化
-        local layout = Page:FindFirstChildOfClass("UIListLayout")
-        if layout then
-            layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(UpdateCanvas)
-        end
-        
-        -- 启用平滑滚动
-        local scrollController = SetupSmoothScroll(PageScroll)
-        Tab.ScrollController = scrollController
-        
-        -- 悬停时改变滚动条颜色
-        PageScroll.MouseEnter:Connect(function()
-            Tween(PageScroll, 0.15, {ScrollBarImageTransparency = 0.1})
-        end)
-        PageScroll.MouseLeave:Connect(function()
-            Tween(PageScroll, 0.15, {ScrollBarImageTransparency = 0.3})
-        end)
         
         local function SelectTab()
             if activeTab == Tab then return end
             
             for _, t in pairs(Tabs) do
-                t.Scroll.Visible = false
+                Tween(t.Page, 0.2, {BackgroundTransparency = 1})
+                t.Page.Visible = false
                 Tween(t.Label, 0.15, {TextColor3 = Config.Theme.TextDim})
                 Tween(t.Icon, 0.15, {TextColor3 = Config.Theme.TextDim})
-                Tween(t.Btn, 0.15, {BackgroundColor3 = Config.Theme.Secondary, BackgroundTransparency = 1})
+                Tween(t.Btn, 0.15, {BackgroundColor3 = Config.Theme.Secondary, BackgroundTransparency = Config.BackgroundImage ~= "" and 0.3 or 0})
                 Tween(t.Indicator, 0.15, {Size = UDim2.new(0, 3, 0, 0)})
             end
             
-            PageScroll.Visible = true
+            Page.Visible = true
             Tween(TabLabel, 0.15, {TextColor3 = Config.Theme.Text})
             Tween(TabIcon, 0.15, {TextColor3 = Config.Theme.Accent})
-            Tween(TabBtn, 0.15, {BackgroundColor3 = Config.Theme.Tertiary, BackgroundTransparency = 0})
-            Tween(Indicator, 0.2, {Size = UDim2.new(0, 3, 0, 16)})
+            Tween(TabBtn, 0.15, {BackgroundColor3 = Config.Theme.Tertiary, BackgroundTransparency = Config.BackgroundImage ~= "" and 0.2 or 0})
+            Tween(Indicator, 0.2, {Size = UDim2.new(0, 3, 0, 18)})
             activeTab = Tab
-            
-            -- 切换后重置滚动位置
-            task.wait()
-            scrollController.SetY(0)
         end
         
         TabBtn.MouseButton1Click:Connect(SelectTab)
         TabBtn.MouseEnter:Connect(function()
             if activeTab ~= Tab then
-                Tween(TabBtn, 0.15, {BackgroundColor3 = Config.Theme.Tertiary, BackgroundTransparency = 0.5})
+                Tween(TabBtn, 0.15, {BackgroundColor3 = Config.Theme.Tertiary})
             end
         end)
         TabBtn.MouseLeave:Connect(function()
             if activeTab ~= Tab then
-                Tween(TabBtn, 0.15, {BackgroundColor3 = Config.Theme.Secondary, BackgroundTransparency = 1})
+                Tween(TabBtn, 0.15, {BackgroundColor3 = Config.Theme.Secondary, BackgroundTransparency = Config.BackgroundImage ~= "" and 0.3 or 0})
             end
         end)
         
@@ -981,19 +775,17 @@ function WindUI:CreateWindow(title, subtitle)
         Tab.Icon = TabIcon
         Tab.Indicator = Indicator
         Tab.Page = Page
-        Tab.Scroll = PageScroll
-        Tab.UpdateCanvas = UpdateCanvas
         Tabs[#Tabs + 1] = Tab
         
         if #Tabs == 1 then
             SelectTab()
         end
         
-        -- ========== 组件 (全部添加到 Page 容器) ==========
+        -- ========== 组件 ==========
         
         function Tab:AddSection(text)
             local Section = Create("Frame", {
-                Size = UDim2.new(1, 0, 0, 28),
+                Size = UDim2.new(1, 0, 0, 30),
                 BackgroundTransparency = 1,
                 Parent = Page
             })
@@ -1003,87 +795,61 @@ function WindUI:CreateWindow(title, subtitle)
                 Text = text,
                 TextColor3 = Config.Theme.TextDim,
                 Font = Config.FontBold,
-                TextSize = 11,
+                TextSize = 12,
                 TextXAlignment = Enum.TextXAlignment.Left,
                 Parent = Section
             })
-            task.wait()
-            UpdateCanvas()
             return Section
         end
         
         function Tab:AddDivider()
-            local d = Create("Frame", {
+            return Create("Frame", {
                 Size = UDim2.new(1, 0, 0, 1),
                 BackgroundColor3 = Config.Theme.Border,
-                BackgroundTransparency = 0.4,
                 BorderSizePixel = 0,
                 Parent = Page
             })
-            task.wait()
-            UpdateCanvas()
-            return d
         end
         
         function Tab:AddToggle(name, default, callback)
             local state = default or false
             local Toggle = {}
             
-            local Container = Create("Frame", {
-                Size = UDim2.new(1, 0, 0, 40),
-                BackgroundTransparency = 1,
-                Parent = Page
-            })
-            
-            local ShadowFrame = Create("Frame", {
-                Size = UDim2.new(1, 0, 1, 0),
-                Position = UDim2.new(0, 0, 0, 2),
-                BackgroundColor3 = Color3.new(0, 0, 0),
-                BackgroundTransparency = 0.65,
-                BorderSizePixel = 0,
-                Parent = Container
-            })
-            Create("UICorner", {CornerRadius = UDim.new(0, Config.ElementRadius), Parent = ShadowFrame})
-            
             local Frame = Create("Frame", {
-                Size = UDim2.new(1, 0, 1, 0),
+                Size = UDim2.new(1, 0, 0, 36),
                 BackgroundColor3 = Config.Theme.Secondary,
                 BackgroundTransparency = Config.BackgroundImage ~= "" and 0.2 or 0,
                 BorderSizePixel = 0,
-                ZIndex = 15,
-                Parent = Container
+                Parent = Page
             })
-            Create("UICorner", {CornerRadius = UDim.new(0, Config.ElementRadius), Parent = Frame})
+            Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = Frame})
             
             Create("TextLabel", {
                 Size = UDim2.new(0, 200, 1, 0),
-                Position = UDim2.new(0, 14, 0, 0),
+                Position = UDim2.new(0, 12, 0, 0),
                 BackgroundTransparency = 1,
                 Text = name,
                 TextColor3 = Config.Theme.Text,
                 Font = Config.Font,
                 TextSize = 13,
                 TextXAlignment = Enum.TextXAlignment.Left,
-                ZIndex = 16,
                 Parent = Frame
             })
             
             local Switch = Create("Frame", {
-                Size = UDim2.new(0, 38, 0, 22),
-                Position = UDim2.new(1, -52, 0.5, -11),
+                Size = UDim2.new(0, 36, 0, 20),
+                Position = UDim2.new(1, -48, 0.5, -10),
                 BackgroundColor3 = state and Config.Theme.Accent or Config.Theme.Tertiary,
                 BorderSizePixel = 0,
-                ZIndex = 16,
                 Parent = Frame
             })
             Create("UICorner", {CornerRadius = UDim.new(1, 0), Parent = Switch})
             
             local Knob = Create("Frame", {
-                Size = UDim2.new(0, 16, 0, 16),
-                Position = state and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 3, 0.5, -8),
+                Size = UDim2.new(0, 14, 0, 14),
+                Position = state and UDim2.new(1, -17, 0.5, -7) or UDim2.new(0, 3, 0.5, -7),
                 BackgroundColor3 = Config.Theme.Text,
                 BorderSizePixel = 0,
-                ZIndex = 17,
                 Parent = Switch
             })
             Create("UICorner", {CornerRadius = UDim.new(1, 0), Parent = Knob})
@@ -1092,14 +858,13 @@ function WindUI:CreateWindow(title, subtitle)
                 Size = UDim2.new(1, 0, 1, 0),
                 BackgroundTransparency = 1,
                 Text = "",
-                ZIndex = 18,
                 Parent = Frame
             })
             
             function Toggle:Set(value)
                 state = value
                 Tween(Switch, 0.2, {BackgroundColor3 = state and Config.Theme.Accent or Config.Theme.Tertiary})
-                Tween(Knob, 0.2, {Position = state and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 3, 0.5, -8)})
+                Tween(Knob, 0.2, {Position = state and UDim2.new(1, -17, 0.5, -7) or UDim2.new(0, 3, 0.5, -7)})
                 if callback then callback(state) end
             end
             
@@ -1108,8 +873,6 @@ function WindUI:CreateWindow(title, subtitle)
             end)
             
             Toggle.Value = state
-            task.wait()
-            UpdateCanvas()
             return Toggle
         end
         
@@ -1118,64 +881,44 @@ function WindUI:CreateWindow(title, subtitle)
             local value = default or min
             local dragging = false
             
-            local Container = Create("Frame", {
-                Size = UDim2.new(1, 0, 0, 54),
-                BackgroundTransparency = 1,
-                Parent = Page
-            })
-            
-            local ShadowFrame = Create("Frame", {
-                Size = UDim2.new(1, 0, 1, 0),
-                Position = UDim2.new(0, 0, 0, 2),
-                BackgroundColor3 = Color3.new(0, 0, 0),
-                BackgroundTransparency = 0.65,
-                BorderSizePixel = 0,
-                Parent = Container
-            })
-            Create("UICorner", {CornerRadius = UDim.new(0, Config.ElementRadius), Parent = ShadowFrame})
-            
             local Frame = Create("Frame", {
-                Size = UDim2.new(1, 0, 1, 0),
+                Size = UDim2.new(1, 0, 0, 50),
                 BackgroundColor3 = Config.Theme.Secondary,
                 BackgroundTransparency = Config.BackgroundImage ~= "" and 0.2 or 0,
                 BorderSizePixel = 0,
-                ZIndex = 15,
-                Parent = Container
+                Parent = Page
             })
-            Create("UICorner", {CornerRadius = UDim.new(0, Config.ElementRadius), Parent = Frame})
+            Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = Frame})
             
             Create("TextLabel", {
                 Size = UDim2.new(0.6, 0, 0, 20),
-                Position = UDim2.new(0, 14, 0, 6),
+                Position = UDim2.new(0, 12, 0, 4),
                 BackgroundTransparency = 1,
                 Text = name,
                 TextColor3 = Config.Theme.Text,
                 Font = Config.Font,
                 TextSize = 13,
                 TextXAlignment = Enum.TextXAlignment.Left,
-                ZIndex = 16,
                 Parent = Frame
             })
             
             local ValueLabel = Create("TextLabel", {
                 Size = UDim2.new(0.35, 0, 0, 20),
-                Position = UDim2.new(0.63, 0, 0, 6),
+                Position = UDim2.new(0.63, 0, 0, 4),
                 BackgroundTransparency = 1,
                 Text = tostring(value),
                 TextColor3 = Config.Theme.Accent,
                 Font = Config.FontBold,
                 TextSize = 13,
                 TextXAlignment = Enum.TextXAlignment.Right,
-                ZIndex = 16,
                 Parent = Frame
             })
             
             local BarBg = Create("Frame", {
-                Size = UDim2.new(1, -28, 0, 8),
-                Position = UDim2.new(0, 14, 0, 34),
+                Size = UDim2.new(1, -24, 0, 6),
+                Position = UDim2.new(0, 12, 0, 32),
                 BackgroundColor3 = Config.Theme.Tertiary,
                 BorderSizePixel = 0,
-                ZIndex = 16,
                 Parent = Frame
             })
             Create("UICorner", {CornerRadius = UDim.new(1, 0), Parent = BarBg})
@@ -1184,28 +927,16 @@ function WindUI:CreateWindow(title, subtitle)
                 Size = UDim2.new((value - min) / (max - min), 0, 1, 0),
                 BackgroundColor3 = Config.Theme.Accent,
                 BorderSizePixel = 0,
-                ZIndex = 17,
                 Parent = BarBg
             })
             Create("UICorner", {CornerRadius = UDim.new(1, 0), Parent = BarFill})
             
-            local KnobShadow = Create("Frame", {
-                Size = UDim2.new(0, 18, 0, 18),
-                Position = UDim2.new((value - min) / (max - min), -9, 0.5, -7),
-                BackgroundColor3 = Color3.new(0, 0, 0),
-                BackgroundTransparency = 0.6,
-                BorderSizePixel = 0,
-                ZIndex = 17,
-                Parent = BarBg
-            })
-            Create("UICorner", {CornerRadius = UDim.new(1, 0), Parent = KnobShadow})
-            
             local Knob = Create("Frame", {
-                Size = UDim2.new(0, 16, 0, 16),
-                Position = UDim2.new((value - min) / (max - min), -8, 0.5, -8),
+                Size = UDim2.new(0, 14, 0, 14),
+                Position = UDim2.new((value - min) / (max - min), -7, 0.5, -7),
                 BackgroundColor3 = Config.Theme.Text,
                 BorderSizePixel = 0,
-                ZIndex = 18,
+                ZIndex = 2,
                 Parent = BarBg
             })
             Create("UICorner", {CornerRadius = UDim.new(1, 0), Parent = Knob})
@@ -1214,8 +945,7 @@ function WindUI:CreateWindow(title, subtitle)
                 local relX = math.clamp((input.Position.X - BarBg.AbsolutePosition.X) / BarBg.AbsoluteSize.X, 0, 1)
                 value = math.floor(min + (max - min) * relX + 0.5)
                 BarFill.Size = UDim2.new(relX, 0, 1, 0)
-                Knob.Position = UDim2.new(relX, -8, 0.5, -8)
-                KnobShadow.Position = UDim2.new(relX, -9, 0.5, -7)
+                Knob.Position = UDim2.new(relX, -7, 0.5, -7)
                 ValueLabel.Text = tostring(value)
                 if callback then callback(value) end
             end
@@ -1243,15 +973,12 @@ function WindUI:CreateWindow(title, subtitle)
                 value = math.clamp(val, min, max)
                 local relX = (value - min) / (max - min)
                 BarFill.Size = UDim2.new(relX, 0, 1, 0)
-                Knob.Position = UDim2.new(relX, -8, 0.5, -8)
-                KnobShadow.Position = UDim2.new(relX, -9, 0.5, -7)
+                Knob.Position = UDim2.new(relX, -7, 0.5, -7)
                 ValueLabel.Text = tostring(value)
                 if callback then callback(value) end
             end
             
             Slider.Value = value
-            task.wait()
-            UpdateCanvas()
             return Slider
         end
         
@@ -1260,51 +987,35 @@ function WindUI:CreateWindow(title, subtitle)
             local selected = default or options[1]
             local expanded = false
             
-            local Container = Create("Frame", {
-                Size = UDim2.new(1, 0, 0, 40),
-                BackgroundTransparency = 1,
-                Parent = Page
-            })
-            
-            local ShadowFrame = Create("Frame", {
-                Size = UDim2.new(1, 0, 1, 0),
-                Position = UDim2.new(0, 0, 0, 2),
-                BackgroundColor3 = Color3.new(0, 0, 0),
-                BackgroundTransparency = 0.65,
-                BorderSizePixel = 0,
-                Parent = Container
-            })
-            Create("UICorner", {CornerRadius = UDim.new(0, Config.ElementRadius), Parent = ShadowFrame})
-            
             local Frame = Create("Frame", {
-                Size = UDim2.new(1, 0, 1, 0),
+                Size = UDim2.new(1, 0, 0, 36),
                 BackgroundColor3 = Config.Theme.Secondary,
                 BackgroundTransparency = Config.BackgroundImage ~= "" and 0.2 or 0,
                 BorderSizePixel = 0,
                 ClipsDescendants = true,
-                ZIndex = 15,
-                Parent = Container
+                ZIndex = 10,
+                Parent = Page
             })
-            Create("UICorner", {CornerRadius = UDim.new(0, Config.ElementRadius), Parent = Frame})
+            Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = Frame})
             
             local Header = Create("TextButton", {
-                Size = UDim2.new(1, 0, 0, 40),
+                Size = UDim2.new(1, 0, 0, 36),
                 BackgroundTransparency = 1,
                 Text = "",
-                ZIndex = 16,
+                ZIndex = 11,
                 Parent = Frame
             })
             
             Create("TextLabel", {
                 Size = UDim2.new(0.5, 0, 1, 0),
-                Position = UDim2.new(0, 14, 0, 0),
+                Position = UDim2.new(0, 12, 0, 0),
                 BackgroundTransparency = 1,
                 Text = name,
                 TextColor3 = Config.Theme.Text,
                 Font = Config.Font,
                 TextSize = 13,
                 TextXAlignment = Enum.TextXAlignment.Left,
-                ZIndex = 16,
+                ZIndex = 12,
                 Parent = Header
             })
             
@@ -1317,31 +1028,31 @@ function WindUI:CreateWindow(title, subtitle)
                 Font = Config.Font,
                 TextSize = 13,
                 TextXAlignment = Enum.TextXAlignment.Right,
-                ZIndex = 16,
+                ZIndex = 12,
                 Parent = Header
             })
             
             local Arrow = Create("TextLabel", {
                 Size = UDim2.new(0, 20, 1, 0),
-                Position = UDim2.new(1, -28, 0, 0),
+                Position = UDim2.new(1, -26, 0, 0),
                 BackgroundTransparency = 1,
                 Text = "▾",
                 TextColor3 = Config.Theme.TextDim,
                 Font = Config.Font,
                 TextSize = 14,
-                ZIndex = 16,
+                ZIndex = 12,
                 Parent = Header
             })
             
             local OptionContainer = Create("Frame", {
                 Size = UDim2.new(1, -16, 0, 0),
-                Position = UDim2.new(0, 8, 0, 44),
+                Position = UDim2.new(0, 8, 0, 40),
                 BackgroundTransparency = 1,
-                ZIndex = 16,
+                ZIndex = 11,
                 Parent = Frame
             })
             Create("UIListLayout", {
-                Padding = UDim.new(0, 3),
+                Padding = UDim.new(0, 2),
                 SortOrder = Enum.SortOrder.LayoutOrder,
                 Parent = OptionContainer
             })
@@ -1350,18 +1061,17 @@ function WindUI:CreateWindow(title, subtitle)
             
             for i, opt in ipairs(options) do
                 local OptBtn = Create("TextButton", {
-                    Size = UDim2.new(1, 0, 0, 30),
+                    Size = UDim2.new(1, 0, 0, 28),
                     BackgroundColor3 = Config.Theme.Tertiary,
                     Text = opt,
                     TextColor3 = Config.Theme.Text,
                     Font = Config.Font,
                     TextSize = 12,
                     AutoButtonColor = false,
-                    ZIndex = 17,
+                    ZIndex = 12,
                     Parent = OptionContainer
                 })
-                Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = OptBtn})
-                Create("UIPadding", {PaddingLeft = UDim.new(0, 10), Parent = OptBtn})
+                Create("UICorner", {CornerRadius = UDim.new(0, 4), Parent = OptBtn})
                 
                 OptBtn.MouseEnter:Connect(function()
                     Tween(OptBtn, 0.1, {BackgroundColor3 = Config.Theme.Accent})
@@ -1377,7 +1087,8 @@ function WindUI:CreateWindow(title, subtitle)
                         b.BackgroundColor3 = b.Text == selected and Config.Theme.Accent or Config.Theme.Tertiary
                     end
                     expanded = false
-                    Tween(Frame, 0.2, {Size = UDim2.new(1, 0, 1, 0)})
+                    Frame.ZIndex = 10
+                    Tween(Frame, 0.2, {Size = UDim2.new(1, 0, 0, 36)})
                     Tween(Arrow, 0.2, {Rotation = 0})
                     if callback then callback(selected) end
                 end)
@@ -1391,15 +1102,22 @@ function WindUI:CreateWindow(title, subtitle)
             Header.MouseButton1Click:Connect(function()
                 expanded = not expanded
                 if expanded then
-                    local h = 44 + (#options * 33) + 8
+                    -- 提升层级到最上层，避免被其他控件遮挡
+                    Frame.ZIndex = 100
+                    Header.ZIndex = 101
+                    OptionContainer.ZIndex = 101
+                    for _, b in pairs(optionButtons) do
+                        b.ZIndex = 102
+                    end
+                    local h = 36 + (#options * 30) + 8
                     Tween(Frame, 0.25, {Size = UDim2.new(1, 0, 0, h)})
                     Tween(Arrow, 0.2, {Rotation = 180})
                 else
-                    Tween(Frame, 0.25, {Size = UDim2.new(1, 0, 1, 0)})
+                    Frame.ZIndex = 10
+                    local h = 36
+                    Tween(Frame, 0.25, {Size = UDim2.new(1, 0, 0, h)})
                     Tween(Arrow, 0.2, {Rotation = 0})
                 end
-                task.wait()
-                UpdateCanvas()
             end)
             
             function Dropdown:Set(val)
@@ -1412,8 +1130,6 @@ function WindUI:CreateWindow(title, subtitle)
             end
             
             Dropdown.Value = selected
-            task.wait()
-            UpdateCanvas()
             return Dropdown
         end
         
@@ -1425,51 +1141,35 @@ function WindUI:CreateWindow(title, subtitle)
                 for _, v in ipairs(default) do selected[v] = true end
             end
             
-            local Container = Create("Frame", {
-                Size = UDim2.new(1, 0, 0, 40),
-                BackgroundTransparency = 1,
-                Parent = Page
-            })
-            
-            local ShadowFrame = Create("Frame", {
-                Size = UDim2.new(1, 0, 1, 0),
-                Position = UDim2.new(0, 0, 0, 2),
-                BackgroundColor3 = Color3.new(0, 0, 0),
-                BackgroundTransparency = 0.65,
-                BorderSizePixel = 0,
-                Parent = Container
-            })
-            Create("UICorner", {CornerRadius = UDim.new(0, Config.ElementRadius), Parent = ShadowFrame})
-            
             local Frame = Create("Frame", {
-                Size = UDim2.new(1, 0, 1, 0),
+                Size = UDim2.new(1, 0, 0, 36),
                 BackgroundColor3 = Config.Theme.Secondary,
                 BackgroundTransparency = Config.BackgroundImage ~= "" and 0.2 or 0,
                 BorderSizePixel = 0,
                 ClipsDescendants = true,
-                ZIndex = 15,
-                Parent = Container
+                ZIndex = 10,
+                Parent = Page
             })
-            Create("UICorner", {CornerRadius = UDim.new(0, Config.ElementRadius), Parent = Frame})
+            Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = Frame})
             
             local Header = Create("TextButton", {
-                Size = UDim2.new(1, 0, 0, 40),
+                Size = UDim2.new(1, 0, 0, 36),
                 BackgroundTransparency = 1,
                 Text = "",
-                ZIndex = 16,
+                ZIndex = 11,
                 Parent = Frame
             })
             
             Create("TextLabel", {
                 Size = UDim2.new(0.5, 0, 1, 0),
-                Position = UDim2.new(0, 14, 0, 0),
+                Position = UDim2.new(0, 12, 0, 0),
                 BackgroundTransparency = 1,
                 Text = name,
                 TextColor3 = Config.Theme.Text,
                 Font = Config.Font,
                 TextSize = 13,
                 TextXAlignment = Enum.TextXAlignment.Left,
-                ZIndex = 16,
+                ZIndex = 12,
                 Parent = Header
             })
             
@@ -1485,31 +1185,31 @@ function WindUI:CreateWindow(title, subtitle)
                 Font = Config.Font,
                 TextSize = 13,
                 TextXAlignment = Enum.TextXAlignment.Right,
-                ZIndex = 16,
+                ZIndex = 12,
                 Parent = Header
             })
             
             local Arrow = Create("TextLabel", {
                 Size = UDim2.new(0, 20, 1, 0),
-                Position = UDim2.new(1, -28, 0, 0),
+                Position = UDim2.new(1, -26, 0, 0),
                 BackgroundTransparency = 1,
                 Text = "▾",
                 TextColor3 = Config.Theme.TextDim,
                 Font = Config.Font,
                 TextSize = 14,
-                ZIndex = 16,
+                ZIndex = 12,
                 Parent = Header
             })
             
             local OptionContainer = Create("Frame", {
                 Size = UDim2.new(1, -16, 0, 0),
-                Position = UDim2.new(0, 8, 0, 44),
+                Position = UDim2.new(0, 8, 0, 40),
                 BackgroundTransparency = 1,
-                ZIndex = 16,
+                ZIndex = 11,
                 Parent = Frame
             })
             Create("UIListLayout", {
-                Padding = UDim.new(0, 3),
+                Padding = UDim.new(0, 2),
                 SortOrder = Enum.SortOrder.LayoutOrder,
                 Parent = OptionContainer
             })
@@ -1519,24 +1219,24 @@ function WindUI:CreateWindow(title, subtitle)
             
             for i, opt in ipairs(options) do
                 local OptBtn = Create("TextButton", {
-                    Size = UDim2.new(1, 0, 0, 30),
+                    Size = UDim2.new(1, 0, 0, 28),
                     BackgroundColor3 = selected[opt] and Config.Theme.Accent or Config.Theme.Tertiary,
-                    Text = (selected[opt] and "✓ " or "   ") .. opt,
+                    Text = (selected[opt] and "✓ " or "  ") .. opt,
                     TextColor3 = Config.Theme.Text,
                     Font = Config.Font,
                     TextSize = 12,
                     AutoButtonColor = false,
                     TextXAlignment = Enum.TextXAlignment.Left,
-                    ZIndex = 17,
+                    ZIndex = 12,
                     Parent = OptionContainer
                 })
-                Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = OptBtn})
-                Create("UIPadding", {PaddingLeft = UDim.new(0, 10), Parent = OptBtn})
+                Create("UICorner", {CornerRadius = UDim.new(0, 4), Parent = OptBtn})
+                Create("UIPadding", {PaddingLeft = UDim.new(0, 8), Parent = OptBtn})
                 
                 OptBtn.MouseButton1Click:Connect(function()
                     selected[opt] = not selected[opt] or nil
                     OptBtn.BackgroundColor3 = selected[opt] and Config.Theme.Accent or Config.Theme.Tertiary
-                    OptBtn.Text = (selected[opt] and "✓ " or "   ") .. opt
+                    OptBtn.Text = (selected[opt] and "✓ " or "  ") .. opt
                     
                     local c = 0
                     local list = {}
@@ -1553,15 +1253,20 @@ function WindUI:CreateWindow(title, subtitle)
             Header.MouseButton1Click:Connect(function()
                 expanded = not expanded
                 if expanded then
-                    local h = 44 + (#options * 33) + 8
+                    Frame.ZIndex = 100
+                    Header.ZIndex = 101
+                    OptionContainer.ZIndex = 101
+                    for _, b in pairs(optionButtons) do
+                        b.ZIndex = 102
+                    end
+                    local h = 36 + (#options * 30) + 8
                     Tween(Frame, 0.25, {Size = UDim2.new(1, 0, 0, h)})
                     Tween(Arrow, 0.2, {Rotation = 180})
                 else
-                    Tween(Frame, 0.25, {Size = UDim2.new(1, 0, 1, 0)})
+                    Frame.ZIndex = 10
+                    Tween(Frame, 0.25, {Size = UDim2.new(1, 0, 0, 36)})
                     Tween(Arrow, 0.2, {Rotation = 0})
                 end
-                task.wait()
-                UpdateCanvas()
             end)
             
             function Multi:GetSelected()
@@ -1572,122 +1277,62 @@ function WindUI:CreateWindow(title, subtitle)
                 return list
             end
             
-            task.wait()
-            UpdateCanvas()
             return Multi
         end
         
         function Tab:AddButton(name, callback)
-            local Container = Create("Frame", {
-                Size = UDim2.new(1, 0, 0, 38),
-                BackgroundTransparency = 1,
-                Parent = Page
-            })
-            
-            local shadow = Create("Frame", {
-                Size = UDim2.new(1, 0, 1, 0),
-                Position = UDim2.new(0, 0, 0, 3),
-                BackgroundColor3 = Color3.new(0, 0, 0),
-                BackgroundTransparency = 0.5,
-                BorderSizePixel = 0,
-                ZIndex = 15,
-                Parent = Container
-            })
-            Create("UICorner", {CornerRadius = UDim.new(0, Config.ButtonRadius), Parent = shadow})
-            
             local Btn = Create("TextButton", {
-                Size = UDim2.new(1, 0, 1, 0),
+                Size = UDim2.new(1, 0, 0, 34),
                 BackgroundColor3 = Config.Theme.Accent,
                 Text = name,
                 TextColor3 = Config.Theme.Text,
                 Font = Config.FontBold,
                 TextSize = 13,
                 AutoButtonColor = false,
-                ZIndex = 16,
-                Parent = Container
+                Parent = Page
             })
-            Create("UICorner", {CornerRadius = UDim.new(0, Config.ButtonRadius), Parent = Btn})
-            
-            Create("Frame", {
-                Size = UDim2.new(1, -4, 0, 1),
-                Position = UDim2.new(0, 2, 0, 1),
-                BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-                BackgroundTransparency = 0.82,
-                BorderSizePixel = 0,
-                ZIndex = 17,
-                Parent = Btn
-            })
+            Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = Btn})
             
             Btn.MouseEnter:Connect(function()
                 Tween(Btn, 0.15, {BackgroundColor3 = Config.Theme.AccentHover})
-                Tween(shadow, 0.15, {BackgroundTransparency = 0.6, Position = UDim2.new(0, 0, 0, 4)})
             end)
             Btn.MouseLeave:Connect(function()
                 Tween(Btn, 0.15, {BackgroundColor3 = Config.Theme.Accent})
-                Tween(shadow, 0.15, {BackgroundTransparency = 0.5, Position = UDim2.new(0, 0, 0, 3)})
-            end)
-            Btn.MouseButton1Down:Connect(function()
-                Tween(Btn, 0.08, {BackgroundColor3 = Config.Theme.AccentPressed, Position = UDim2.new(0, 0, 0, 1)})
-                Tween(shadow, 0.08, {BackgroundTransparency = 0.85, Position = UDim2.new(0, 0, 0, 1)})
-            end)
-            Btn.MouseButton1Up:Connect(function()
-                Tween(Btn, 0.12, {BackgroundColor3 = Config.Theme.AccentHover, Position = UDim2.new(0, 0, 0, 0)})
-                Tween(shadow, 0.12, {BackgroundTransparency = 0.55, Position = UDim2.new(0, 0, 0, 3)})
             end)
             Btn.MouseButton1Click:Connect(function()
                 if callback then callback() end
             end)
             
-            task.wait()
-            UpdateCanvas()
             return Btn
         end
         
         function Tab:AddInput(name, placeholder, callback)
             local Input = {}
             
-            local Container = Create("Frame", {
-                Size = UDim2.new(1, 0, 0, 40),
-                BackgroundTransparency = 1,
-                Parent = Page
-            })
-            
-            local ShadowFrame = Create("Frame", {
-                Size = UDim2.new(1, 0, 1, 0),
-                Position = UDim2.new(0, 0, 0, 2),
-                BackgroundColor3 = Color3.new(0, 0, 0),
-                BackgroundTransparency = 0.65,
-                BorderSizePixel = 0,
-                Parent = Container
-            })
-            Create("UICorner", {CornerRadius = UDim.new(0, Config.ElementRadius), Parent = ShadowFrame})
-            
             local Frame = Create("Frame", {
-                Size = UDim2.new(1, 0, 1, 0),
+                Size = UDim2.new(1, 0, 0, 36),
                 BackgroundColor3 = Config.Theme.Secondary,
                 BackgroundTransparency = Config.BackgroundImage ~= "" and 0.2 or 0,
                 BorderSizePixel = 0,
-                ZIndex = 15,
-                Parent = Container
+                Parent = Page
             })
-            Create("UICorner", {CornerRadius = UDim.new(0, Config.ElementRadius), Parent = Frame})
+            Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = Frame})
             
             Create("TextLabel", {
                 Size = UDim2.new(0.35, 0, 1, 0),
-                Position = UDim2.new(0, 14, 0, 0),
+                Position = UDim2.new(0, 12, 0, 0),
                 BackgroundTransparency = 1,
                 Text = name,
                 TextColor3 = Config.Theme.Text,
                 Font = Config.Font,
                 TextSize = 13,
                 TextXAlignment = Enum.TextXAlignment.Left,
-                ZIndex = 16,
                 Parent = Frame
             })
             
             local Box = Create("TextBox", {
-                Size = UDim2.new(0.6, -24, 0, 28),
-                Position = UDim2.new(0.38, 0, 0.5, -14),
+                Size = UDim2.new(0.6, -20, 0, 26),
+                Position = UDim2.new(0.38, 0, 0.5, -13),
                 BackgroundColor3 = Config.Theme.Tertiary,
                 Text = "",
                 PlaceholderText = placeholder or "输入...",
@@ -1696,11 +1341,10 @@ function WindUI:CreateWindow(title, subtitle)
                 Font = Config.Font,
                 TextSize = 12,
                 ClearTextOnFocus = false,
-                ZIndex = 16,
                 Parent = Frame
             })
-            Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = Box})
-            Create("UIPadding", {PaddingLeft = UDim.new(0, 8), PaddingRight = UDim.new(0, 8), Parent = Box})
+            Create("UICorner", {CornerRadius = UDim.new(0, 4), Parent = Box})
+            Create("UIPadding", {PaddingLeft = UDim.new(0, 6), PaddingRight = UDim.new(0, 6), Parent = Box})
             
             Box.FocusLost:Connect(function()
                 if callback then callback(Box.Text) end
@@ -1714,13 +1358,11 @@ function WindUI:CreateWindow(title, subtitle)
                 Box.Text = text
             end
             
-            task.wait()
-            UpdateCanvas()
             return Input
         end
         
         function Tab:AddLabel(text)
-            local lbl = Create("TextLabel", {
+            return Create("TextLabel", {
                 Size = UDim2.new(1, 0, 0, 24),
                 BackgroundTransparency = 1,
                 Text = text,
@@ -1730,9 +1372,6 @@ function WindUI:CreateWindow(title, subtitle)
                 TextXAlignment = Enum.TextXAlignment.Left,
                 Parent = Page
             })
-            task.wait()
-            UpdateCanvas()
-            return lbl
         end
         
         function Tab:AddImage(assetId, height)
@@ -1743,65 +1382,43 @@ function WindUI:CreateWindow(title, subtitle)
                 ScaleType = Enum.ScaleType.Fit,
                 Parent = Page
             })
-            Create("UICorner", {CornerRadius = UDim.new(0, Config.ElementRadius), Parent = Image})
-            task.wait()
-            UpdateCanvas()
+            Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = Image})
             return Image
         end
         
         function Tab:AddNotice(title, text)
-            local Container = Create("Frame", {
-                Size = UDim2.new(1, 0, 0, 64),
-                BackgroundTransparency = 1,
-                Parent = Page
-            })
-            
-            local ShadowFrame = Create("Frame", {
-                Size = UDim2.new(1, 0, 1, 0),
-                Position = UDim2.new(0, 0, 0, 2),
-                BackgroundColor3 = Color3.new(0, 0, 0),
-                BackgroundTransparency = 0.7,
-                BorderSizePixel = 0,
-                Parent = Container
-            })
-            Create("UICorner", {CornerRadius = UDim.new(0, Config.ElementRadius), Parent = ShadowFrame})
-            
             local Frame = Create("Frame", {
-                Size = UDim2.new(1, 0, 1, 0),
+                Size = UDim2.new(1, 0, 0, 60),
                 BackgroundColor3 = Config.Theme.Secondary,
                 BackgroundTransparency = Config.BackgroundImage ~= "" and 0.2 or 0,
                 BorderSizePixel = 0,
-                ZIndex = 15,
-                Parent = Container
+                Parent = Page
             })
-            Create("UICorner", {CornerRadius = UDim.new(0, Config.ElementRadius), Parent = Frame})
+            Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = Frame})
             
-            local bar = Create("Frame", {
-                Size = UDim2.new(0, 3, 1, -16),
-                Position = UDim2.new(0, 10, 0, 8),
+            Create("Frame", {
+                Size = UDim2.new(0, 3, 1, -12),
+                Position = UDim2.new(0, 0, 0, 6),
                 BackgroundColor3 = Config.Theme.Warning,
                 BorderSizePixel = 0,
-                ZIndex = 16,
                 Parent = Frame
             })
-            Create("UICorner", {CornerRadius = UDim.new(1, 0), Parent = bar})
             
             Create("TextLabel", {
-                Size = UDim2.new(1, -30, 0, 20),
-                Position = UDim2.new(0, 20, 0, 10),
+                Size = UDim2.new(1, -20, 0, 20),
+                Position = UDim2.new(0, 14, 0, 8),
                 BackgroundTransparency = 1,
-                Text = title,
+                Text = "⚠ " .. title,
                 TextColor3 = Config.Theme.Warning,
                 Font = Config.FontBold,
                 TextSize = 13,
                 TextXAlignment = Enum.TextXAlignment.Left,
-                ZIndex = 16,
                 Parent = Frame
             })
             
             Create("TextLabel", {
-                Size = UDim2.new(1, -30, 0, 26),
-                Position = UDim2.new(0, 20, 0, 30),
+                Size = UDim2.new(1, -20, 0, 24),
+                Position = UDim2.new(0, 14, 0, 28),
                 BackgroundTransparency = 1,
                 Text = text,
                 TextColor3 = Config.Theme.TextDim,
@@ -1809,53 +1426,30 @@ function WindUI:CreateWindow(title, subtitle)
                 TextSize = 12,
                 TextWrapped = true,
                 TextXAlignment = Enum.TextXAlignment.Left,
-                ZIndex = 16,
                 Parent = Frame
             })
             
-            task.wait()
-            UpdateCanvas()
             return Frame
         end
         
         function Tab:AddPopup(title, content)
-            local Container = Create("Frame", {
-                Size = UDim2.new(1, 0, 0, 38),
-                BackgroundTransparency = 1,
-                Parent = Page
-            })
-            
-            local shadow = Create("Frame", {
-                Size = UDim2.new(1, 0, 1, 0),
-                Position = UDim2.new(0, 0, 0, 3),
-                BackgroundColor3 = Color3.new(0, 0, 0),
-                BackgroundTransparency = 0.5,
-                BorderSizePixel = 0,
-                ZIndex = 15,
-                Parent = Container
-            })
-            Create("UICorner", {CornerRadius = UDim.new(0, Config.ButtonRadius), Parent = shadow})
-            
             local Btn = Create("TextButton", {
-                Size = UDim2.new(1, 0, 1, 0),
+                Size = UDim2.new(1, 0, 0, 34),
                 BackgroundColor3 = Config.Theme.Tertiary,
                 Text = title,
                 TextColor3 = Config.Theme.Text,
                 Font = Config.Font,
                 TextSize = 13,
                 AutoButtonColor = false,
-                ZIndex = 16,
-                Parent = Container
+                Parent = Page
             })
-            Create("UICorner", {CornerRadius = UDim.new(0, Config.ButtonRadius), Parent = Btn})
+            Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = Btn})
             
             Btn.MouseEnter:Connect(function()
                 Tween(Btn, 0.15, {BackgroundColor3 = Config.Theme.Accent})
-                Tween(shadow, 0.15, {BackgroundTransparency = 0.6, Position = UDim2.new(0, 0, 0, 4)})
             end)
             Btn.MouseLeave:Connect(function()
                 Tween(Btn, 0.15, {BackgroundColor3 = Config.Theme.Tertiary})
-                Tween(shadow, 0.15, {BackgroundTransparency = 0.5, Position = UDim2.new(0, 0, 0, 3)})
             end)
             
             Btn.MouseButton1Click:Connect(function()
@@ -1875,12 +1469,13 @@ function WindUI:CreateWindow(title, subtitle)
                     ZIndex = 101,
                     Parent = Overlay
                 })
-                Create("UICorner", {CornerRadius = UDim.new(0, 14), Parent = Modal})
+                Create("UICorner", {CornerRadius = UDim.new(0, 10), Parent = Modal})
                 Create("UIStroke", {Color = Config.Theme.Border, Thickness = 1, Parent = Modal})
+                ApplyShadow(Modal)
                 
                 Create("TextLabel", {
-                    Size = UDim2.new(1, -32, 0, 30),
-                    Position = UDim2.new(0, 18, 0, 14),
+                    Size = UDim2.new(1, -24, 0, 30),
+                    Position = UDim2.new(0, 12, 0, 10),
                     BackgroundTransparency = 1,
                     Text = title,
                     TextColor3 = Config.Theme.Text,
@@ -1892,8 +1487,8 @@ function WindUI:CreateWindow(title, subtitle)
                 })
                 
                 local ContentLabel = Create("TextLabel", {
-                    Size = UDim2.new(1, -32, 0, 0),
-                    Position = UDim2.new(0, 18, 0, 50),
+                    Size = UDim2.new(1, -24, 0, 0),
+                    Position = UDim2.new(0, 12, 0, 44),
                     BackgroundTransparency = 1,
                     Text = content,
                     TextColor3 = Config.Theme.TextDim,
@@ -1906,13 +1501,13 @@ function WindUI:CreateWindow(title, subtitle)
                     Parent = Modal
                 })
                 
-                local textBounds = TextService:GetTextSize(content, 13, Config.Font, Vector2.new(268, 1000))
-                local contentHeight = textBounds.Y + 80
-                ContentLabel.Size = UDim2.new(1, -32, 0, contentHeight - 60)
+                local textBounds = TextService:GetTextSize(content, 13, Config.Font, Vector2.new(276, 1000))
+                local contentHeight = textBounds.Y + 70
+                ContentLabel.Size = UDim2.new(1, -24, 0, contentHeight - 50)
                 
                 local ConfirmBtn = Create("TextButton", {
-                    Size = UDim2.new(0, 100, 0, 34),
-                    Position = UDim2.new(1, -120, 1, -48),
+                    Size = UDim2.new(0, 100, 0, 32),
+                    Position = UDim2.new(1, -112, 1, -44),
                     BackgroundColor3 = Config.Theme.Accent,
                     Text = "确定",
                     TextColor3 = Config.Theme.Text,
@@ -1922,11 +1517,11 @@ function WindUI:CreateWindow(title, subtitle)
                     ZIndex = 102,
                     Parent = Modal
                 })
-                Create("UICorner", {CornerRadius = UDim.new(0, Config.ButtonRadius), Parent = ConfirmBtn})
+                Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = ConfirmBtn})
                 
                 local CancelBtn = Create("TextButton", {
-                    Size = UDim2.new(0, 100, 0, 34),
-                    Position = UDim2.new(1, -228, 1, -48),
+                    Size = UDim2.new(0, 100, 0, 32),
+                    Position = UDim2.new(1, -220, 1, -44),
                     BackgroundColor3 = Config.Theme.Tertiary,
                     Text = "取消",
                     TextColor3 = Config.Theme.Text,
@@ -1936,9 +1531,9 @@ function WindUI:CreateWindow(title, subtitle)
                     ZIndex = 102,
                     Parent = Modal
                 })
-                Create("UICorner", {CornerRadius = UDim.new(0, Config.ButtonRadius), Parent = CancelBtn})
+                Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = CancelBtn})
                 
-                Tween(Overlay, 0.2, {BackgroundTransparency = 0.55})
+                Tween(Overlay, 0.2, {BackgroundTransparency = 0.5})
                 Tween(Modal, 0.3, {Size = UDim2.new(0, 300, 0, contentHeight), Position = UDim2.new(0.5, -150, 0.5, -contentHeight/2)})
                 
                 local function Close()
@@ -1952,74 +1547,108 @@ function WindUI:CreateWindow(title, subtitle)
                 CancelBtn.MouseButton1Click:Connect(Close)
             end)
             
-            task.wait()
-            UpdateCanvas()
             return Btn
         end
         
         return Tab
     end
     
+    -- ============================================
+    -- 通知（带进度条动画）
+    -- ============================================
     function Window:Notify(title, text, duration)
+        duration = duration or 3
+        
         local NotifFrame = Create("Frame", {
             Size = UDim2.new(0, 280, 0, 0),
             Position = UDim2.new(1, -300, 1, -10),
             BackgroundColor3 = Config.Theme.Secondary,
             BorderSizePixel = 0,
-            ZIndex = 50,
+            ZIndex = 200,
             Parent = ScreenGui
         })
-        Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = NotifFrame})
+        Create("UICorner", {CornerRadius = UDim.new(0, 8), Parent = NotifFrame})
         Create("UIStroke", {Color = Config.Theme.Border, Thickness = 1, Parent = NotifFrame})
+        ApplyShadow(NotifFrame)
         
+        -- 左侧强调条
         Create("Frame", {
-            Size = UDim2.new(0, 3, 1, -16),
-            Position = UDim2.new(0, 8, 0, 8),
+            Size = UDim2.new(0, 3, 1, -12),
+            Position = UDim2.new(0, 0, 0, 6),
             BackgroundColor3 = Config.Theme.Accent,
             BorderSizePixel = 0,
-            ZIndex = 51,
+            ZIndex = 201,
             Parent = NotifFrame
         })
         
         Create("TextLabel", {
-            Size = UDim2.new(1, -30, 0, 20),
-            Position = UDim2.new(0, 18, 0, 10),
+            Size = UDim2.new(1, -20, 0, 20),
+            Position = UDim2.new(0, 14, 0, 8),
             BackgroundTransparency = 1,
             Text = title,
             TextColor3 = Config.Theme.Text,
             Font = Config.FontBold,
             TextSize = 13,
             TextXAlignment = Enum.TextXAlignment.Left,
-            ZIndex = 51,
+            ZIndex = 201,
             Parent = NotifFrame
         })
         
         Create("TextLabel", {
-            Size = UDim2.new(1, -30, 0, 20),
-            Position = UDim2.new(0, 18, 0, 30),
+            Size = UDim2.new(1, -20, 0, 20),
+            Position = UDim2.new(0, 14, 0, 28),
             BackgroundTransparency = 1,
             Text = text,
             TextColor3 = Config.Theme.TextDim,
             Font = Config.Font,
             TextSize = 12,
             TextXAlignment = Enum.TextXAlignment.Left,
-            ZIndex = 51,
+            ZIndex = 201,
             Parent = NotifFrame
         })
         
-        Tween(NotifFrame, 0.3, {Size = UDim2.new(0, 280, 0, 56), Position = UDim2.new(1, -300, 1, -70)})
+        -- 进度条背景
+        local ProgressBg = Create("Frame", {
+            Size = UDim2.new(1, -16, 0, 3),
+            Position = UDim2.new(0, 8, 1, -6),
+            BackgroundColor3 = Config.Theme.Tertiary,
+            BorderSizePixel = 0,
+            ZIndex = 201,
+            Parent = NotifFrame
+        })
+        Create("UICorner", {CornerRadius = UDim.new(1, 0), Parent = ProgressBg})
         
-        task.delay(duration or 3, function()
+        -- 进度条填充
+        local ProgressFill = Create("Frame", {
+            Size = UDim2.new(1, 0, 1, 0),
+            BackgroundColor3 = Config.Theme.Accent,
+            BorderSizePixel = 0,
+            ZIndex = 202,
+            Parent = ProgressBg
+        })
+        Create("UICorner", {CornerRadius = UDim.new(1, 0), Parent = ProgressFill})
+        
+        -- 入场动画
+        Tween(NotifFrame, 0.3, {Size = UDim2.new(0, 280, 0, 62), Position = UDim2.new(1, -300, 1, -74)}, Enum.EasingStyle.Back)
+        
+        -- 进度条动画（duration 秒内从 1 到 0）
+        local progressTween = TweenService:Create(ProgressFill, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Size = UDim2.new(0, 0, 1, 0)})
+        progressTween:Play()
+        
+        -- 自动消失
+        task.delay(duration, function()
             Tween(NotifFrame, 0.3, {Size = UDim2.new(0, 280, 0, 0), Position = UDim2.new(1, -300, 1, -10)})
             task.wait(0.3)
             NotifFrame:Destroy()
         end)
     end
     
+    -- 切换显示
     function Window:Toggle()
         Main.Visible = not Main.Visible
     end
     
+    -- 设置背景图
     function Window:SetBackground(assetId, transparency, color)
         Config.BackgroundImage = assetId or ""
         Config.BackgroundImageTransparency = transparency or 0.3
@@ -2030,8 +1659,8 @@ function WindUI:CreateWindow(title, subtitle)
             BgImage.ImageTransparency = Config.BackgroundImageTransparency
             BgImage.ImageColor3 = Config.BackgroundImageColor
             BgImage.Visible = true
-            TopBar.BackgroundTransparency = 0.25
-            Sidebar.BackgroundTransparency = 0.2
+            TopBar.BackgroundTransparency = 0.2
+            Sidebar.BackgroundTransparency = 0.15
         else
             BgImage.Visible = false
             TopBar.BackgroundTransparency = 0
@@ -2039,33 +1668,23 @@ function WindUI:CreateWindow(title, subtitle)
         end
     end
     
-    function Window:SetMinimizeIcon(assetId, color)
-        Config.MinIconImage = assetId or ""
-        Config.MinIconColor = color or Color3.fromRGB(255, 255, 255)
-        
-        MinIconImage.Image = Config.MinIconImage
-        MinIconImage.ImageColor3 = Config.MinIconColor
-        
-        if minimized then
-            if Config.MinIconImage ~= "" then
-                MinIcon.Text = ""
-                MinIconImage.Visible = true
-            else
-                MinIcon.Text = "W"
-                MinIconImage.Visible = false
-            end
-        end
-    end
-    
+    -- 手动居中
     function Window:Center()
         CenterWindow()
     end
     
-    -- 设置滑动参数
-    function Window:SetScrollConfig(speed, smooth, smoothTime)
-        if speed then Config.ScrollSpeed = speed end
-        if smooth ~= nil then Config.SmoothScroll = smooth end
-        if smoothTime then Config.SmoothTime = smoothTime end
+    -- 重置卡密（用于测试）
+    function Window:ResetKey()
+        local gui = LocalPlayer:FindFirstChild("PlayerGui")
+        if gui then
+            local cache = gui:FindFirstChild(KeyConfig.SaveFileName)
+            if cache then cache:Destroy() end
+        end
+    end
+    
+    -- 添加卡密
+    function Window:AddKey(key)
+        KeyConfig.ValidKeys[key] = true
     end
     
     return Window
