@@ -2,6 +2,7 @@
     WindUI - 原创风格界面库
     作者: 自定义
     特点: 无AI味,简洁现代,功能完整
+    更新: 最小化为正方形 + 支持图片背景
 --]]
 
 local WindUI = {}
@@ -9,6 +10,7 @@ local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
+local TextService = game:GetService("TextService")
 
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
@@ -30,7 +32,11 @@ local Config = {
     },
     Font = Enum.Font.GothamMedium,
     FontBold = Enum.Font.GothamBold,
-    CornerRadius = UDim.new(0, 8)
+    CornerRadius = UDim.new(0, 8),
+    -- 背景图配置 (留空则不使用图片背景)
+    BackgroundImage = "",           -- 例如 "rbxassetid://1234567890"
+    BackgroundImageTransparency = 0.3, -- 背景图透明度 (0-1, 越大越透明)
+    BackgroundImageColor = Color3.fromRGB(255, 255, 255) -- 图片染色
 }
 
 -- 工具函数
@@ -104,17 +110,35 @@ function WindUI:CreateWindow(title, subtitle)
         Position = UDim2.new(0.5, -290, 0.5, -200),
         BackgroundColor3 = Config.Theme.Background,
         BorderSizePixel = 0,
+        ClipsDescendants = true,
         Parent = ScreenGui
     })
     Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = Main})
     Create("UIStroke", {Color = Config.Theme.Border, Thickness = 1, Parent = Main})
+    
+    -- 背景图片层 (在内容之下)
+    local BgImage = Create("ImageLabel", {
+        Name = "BackgroundImage",
+        Size = UDim2.new(1, 0, 1, 0),
+        BackgroundTransparency = 1,
+        Image = Config.BackgroundImage,
+        ImageTransparency = Config.BackgroundImageTransparency,
+        ImageColor3 = Config.BackgroundImageColor,
+        ScaleType = Enum.ScaleType.Crop,
+        ZIndex = 0,
+        Visible = Config.BackgroundImage ~= "",
+        Parent = Main
+    })
+    Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = BgImage})
     
     -- 顶部标题栏
     local TopBar = Create("Frame", {
         Name = "TopBar",
         Size = UDim2.new(1, 0, 0, 45),
         BackgroundColor3 = Config.Theme.Secondary,
+        BackgroundTransparency = Config.BackgroundImage ~= "" and 0.2 or 0,
         BorderSizePixel = 0,
+        ZIndex = 2,
         Parent = Main
     })
     Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = TopBar})
@@ -122,7 +146,9 @@ function WindUI:CreateWindow(title, subtitle)
         Size = UDim2.new(1, 0, 0, 12),
         Position = UDim2.new(0, 0, 1, -12),
         BackgroundColor3 = Config.Theme.Secondary,
+        BackgroundTransparency = Config.BackgroundImage ~= "" and 0.2 or 0,
         BorderSizePixel = 0,
+        ZIndex = 2,
         Parent = TopBar
     })
     
@@ -137,6 +163,7 @@ function WindUI:CreateWindow(title, subtitle)
         Font = Config.FontBold,
         TextSize = 15,
         TextXAlignment = Enum.TextXAlignment.Left,
+        ZIndex = 3,
         Parent = TopBar
     })
     
@@ -150,6 +177,7 @@ function WindUI:CreateWindow(title, subtitle)
         Font = Config.Font,
         TextSize = 12,
         TextXAlignment = Enum.TextXAlignment.Left,
+        ZIndex = 3,
         Parent = TopBar
     })
     
@@ -164,6 +192,7 @@ function WindUI:CreateWindow(title, subtitle)
         Font = Config.FontBold,
         TextSize = 18,
         AutoButtonColor = false,
+        ZIndex = 3,
         Parent = TopBar
     })
     Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = CloseBtn})
@@ -186,6 +215,7 @@ function WindUI:CreateWindow(title, subtitle)
         Font = Config.FontBold,
         TextSize = 18,
         AutoButtonColor = false,
+        ZIndex = 3,
         Parent = TopBar
     })
     Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = MinBtn})
@@ -196,7 +226,9 @@ function WindUI:CreateWindow(title, subtitle)
         Size = UDim2.new(0, 140, 1, -45),
         Position = UDim2.new(0, 0, 0, 45),
         BackgroundColor3 = Config.Theme.Secondary,
+        BackgroundTransparency = Config.BackgroundImage ~= "" and 0.15 or 0,
         BorderSizePixel = 0,
+        ZIndex = 2,
         Parent = Main
     })
     
@@ -205,6 +237,7 @@ function WindUI:CreateWindow(title, subtitle)
         Position = UDim2.new(1, -1, 0, 0),
         BackgroundColor3 = Config.Theme.Border,
         BorderSizePixel = 0,
+        ZIndex = 3,
         Parent = Sidebar
     })
     
@@ -217,6 +250,7 @@ function WindUI:CreateWindow(title, subtitle)
         ScrollBarThickness = 2,
         ScrollBarImageColor3 = Config.Theme.Border,
         CanvasSize = UDim2.new(0, 0, 0, 0),
+        ZIndex = 3,
         Parent = Sidebar
     })
     Create("UIListLayout", {
@@ -231,10 +265,10 @@ function WindUI:CreateWindow(title, subtitle)
         Size = UDim2.new(1, -140, 1, -45),
         Position = UDim2.new(0, 140, 0, 45),
         BackgroundTransparency = 1,
+        ZIndex = 2,
         Parent = Main
     })
     
-    -- 页面容器
     local Pages = {}
     local Tabs = {}
     local activeTab = nil
@@ -249,18 +283,70 @@ function WindUI:CreateWindow(title, subtitle)
         ScreenGui:Destroy()
     end)
     
-    -- 最小化
+    -- ============================================
+    -- 最小化: 收缩成正方形图标
+    -- ============================================
     local minimized = false
+    local normalSize = UDim2.new(0, 580, 0, 400)
+    local normalPos = UDim2.new(0.5, -290, 0.5, -200)
+    
     MinBtn.MouseButton1Click:Connect(function()
         minimized = not minimized
         if minimized then
-            Tween(Main, 0.25, {Size = UDim2.new(0, 580, 0, 45)})
+            -- 记录当前位置
+            normalPos = Main.Position
+            
+            -- 隐藏内容
             Content.Visible = false
             Sidebar.Visible = false
+            TopBar.Visible = false
+            BgImage.Visible = false
+            
+            -- 收缩成正方形
+            Tween(Main, 0.3, {
+                Size = UDim2.new(0, 50, 0, 50),
+                Position = UDim2.new(normalPos.X.Scale, normalPos.X.Offset + 265, normalPos.Y.Scale, normalPos.Y.Offset + 175),
+                BackgroundColor3 = Config.Theme.Accent
+            })
+            
+            -- 正方形图标
+            if not Main:FindFirstChild("MinIcon") then
+                local MinIcon = Create("TextLabel", {
+                    Name = "MinIcon",
+                    Size = UDim2.new(1, 0, 1, 0),
+                    BackgroundTransparency = 1,
+                    Text = "W",
+                    TextColor3 = Config.Theme.Text,
+                    Font = Config.FontBold,
+                    TextSize = 24,
+                    ZIndex = 10,
+                    Parent = Main
+                })
+                Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = MinIcon})
+            end
+            Main.MinIcon.Visible = true
         else
-            Tween(Main, 0.25, {Size = UDim2.new(0, 580, 0, 400)})
+            -- 恢复
+            Main.MinIcon.Visible = false
+            
+            Tween(Main, 0.3, {
+                Size = normalSize,
+                Position = normalPos,
+                BackgroundColor3 = Config.Theme.Background
+            })
+            
+            task.wait(0.15)
             Content.Visible = true
             Sidebar.Visible = true
+            TopBar.Visible = true
+            BgImage.Visible = Config.BackgroundImage ~= ""
+        end
+    end)
+    
+    -- 点击正方形图标也可以恢复
+    Main.InputBegan:Connect(function(input)
+        if minimized and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+            MinBtn.MouseButton1Click:Fire()
         end
     end)
     
@@ -268,13 +354,14 @@ function WindUI:CreateWindow(title, subtitle)
     function Window:AddTab(name, icon)
         local Tab = {}
         
-        -- 标签按钮
         local TabBtn = Create("TextButton", {
             Name = name .. "Tab",
             Size = UDim2.new(1, 0, 0, 34),
             BackgroundColor3 = Config.Theme.Secondary,
+            BackgroundTransparency = Config.BackgroundImage ~= "" and 0.3 or 0,
             Text = "",
             AutoButtonColor = false,
+            ZIndex = 4,
             Parent = TabContainer
         })
         Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = TabBtn})
@@ -288,6 +375,7 @@ function WindUI:CreateWindow(title, subtitle)
             Font = Config.Font,
             TextSize = 13,
             TextXAlignment = Enum.TextXAlignment.Left,
+            ZIndex = 5,
             Parent = TabBtn
         })
         
@@ -299,20 +387,20 @@ function WindUI:CreateWindow(title, subtitle)
             TextColor3 = Config.Theme.TextDim,
             Font = Config.Font,
             TextSize = 14,
+            ZIndex = 5,
             Parent = TabBtn
         })
         
-        -- 指示条
         local Indicator = Create("Frame", {
             Size = UDim2.new(0, 3, 0, 0),
             Position = UDim2.new(0, 0, 0.5, 0),
             BackgroundColor3 = Config.Theme.Accent,
             BorderSizePixel = 0,
+            ZIndex = 5,
             Parent = TabBtn
         })
         Create("UICorner", {CornerRadius = UDim.new(0, 2), Parent = Indicator})
         
-        -- 页面
         local Page = Create("ScrollingFrame", {
             Name = name .. "Page",
             Size = UDim2.new(1, 0, 1, 0),
@@ -322,6 +410,7 @@ function WindUI:CreateWindow(title, subtitle)
             ScrollBarImageColor3 = Config.Theme.Border,
             CanvasSize = UDim2.new(0, 0, 0, 0),
             Visible = false,
+            ZIndex = 3,
             Parent = Content
         })
         Create("UIListLayout", {
@@ -337,7 +426,6 @@ function WindUI:CreateWindow(title, subtitle)
             Parent = Page
         })
         
-        -- 切换逻辑
         local function SelectTab()
             if activeTab == Tab then return end
             
@@ -346,14 +434,14 @@ function WindUI:CreateWindow(title, subtitle)
                 t.Page.Visible = false
                 Tween(t.Label, 0.15, {TextColor3 = Config.Theme.TextDim})
                 Tween(t.Icon, 0.15, {TextColor3 = Config.Theme.TextDim})
-                Tween(t.Btn, 0.15, {BackgroundColor3 = Config.Theme.Secondary})
+                Tween(t.Btn, 0.15, {BackgroundColor3 = Config.Theme.Secondary, BackgroundTransparency = Config.BackgroundImage ~= "" and 0.3 or 0})
                 Tween(t.Indicator, 0.15, {Size = UDim2.new(0, 3, 0, 0)})
             end
             
             Page.Visible = true
             Tween(TabLabel, 0.15, {TextColor3 = Config.Theme.Text})
             Tween(TabIcon, 0.15, {TextColor3 = Config.Theme.Accent})
-            Tween(TabBtn, 0.15, {BackgroundColor3 = Config.Theme.Tertiary})
+            Tween(TabBtn, 0.15, {BackgroundColor3 = Config.Theme.Tertiary, BackgroundTransparency = Config.BackgroundImage ~= "" and 0.2 or 0})
             Tween(Indicator, 0.2, {Size = UDim2.new(0, 3, 0, 18)})
             activeTab = Tab
         end
@@ -366,7 +454,7 @@ function WindUI:CreateWindow(title, subtitle)
         end)
         TabBtn.MouseLeave:Connect(function()
             if activeTab ~= Tab then
-                Tween(TabBtn, 0.15, {BackgroundColor3 = Config.Theme.Secondary})
+                Tween(TabBtn, 0.15, {BackgroundColor3 = Config.Theme.Secondary, BackgroundTransparency = Config.BackgroundImage ~= "" and 0.3 or 0})
             end
         end)
         
@@ -380,8 +468,6 @@ function WindUI:CreateWindow(title, subtitle)
         if #Tabs == 1 then
             SelectTab()
         end
-        
-        -- ========== 组件创建 ==========
         
         -- 段落标题
         function Tab:AddSection(text)
@@ -405,13 +491,12 @@ function WindUI:CreateWindow(title, subtitle)
         
         -- 分隔线
         function Tab:AddDivider()
-            local Div = Create("Frame", {
+            return Create("Frame", {
                 Size = UDim2.new(1, 0, 0, 1),
                 BackgroundColor3 = Config.Theme.Border,
                 BorderSizePixel = 0,
                 Parent = Page
             })
-            return Div
         end
         
         -- 开关
@@ -422,6 +507,7 @@ function WindUI:CreateWindow(title, subtitle)
             local Frame = Create("Frame", {
                 Size = UDim2.new(1, 0, 0, 36),
                 BackgroundColor3 = Config.Theme.Secondary,
+                BackgroundTransparency = Config.BackgroundImage ~= "" and 0.2 or 0,
                 BorderSizePixel = 0,
                 Parent = Page
             })
@@ -488,12 +574,13 @@ function WindUI:CreateWindow(title, subtitle)
             local Frame = Create("Frame", {
                 Size = UDim2.new(1, 0, 0, 50),
                 BackgroundColor3 = Config.Theme.Secondary,
+                BackgroundTransparency = Config.BackgroundImage ~= "" and 0.2 or 0,
                 BorderSizePixel = 0,
                 Parent = Page
             })
             Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = Frame})
             
-            local NameLabel = Create("TextLabel", {
+            Create("TextLabel", {
                 Size = UDim2.new(0.6, 0, 0, 20),
                 Position = UDim2.new(0, 12, 0, 4),
                 BackgroundTransparency = 1,
@@ -594,6 +681,7 @@ function WindUI:CreateWindow(title, subtitle)
             local Frame = Create("Frame", {
                 Size = UDim2.new(1, 0, 0, 36),
                 BackgroundColor3 = Config.Theme.Secondary,
+                BackgroundTransparency = Config.BackgroundImage ~= "" and 0.2 or 0,
                 BorderSizePixel = 0,
                 ClipsDescendants = true,
                 Parent = Page
@@ -731,6 +819,7 @@ function WindUI:CreateWindow(title, subtitle)
             local Frame = Create("Frame", {
                 Size = UDim2.new(1, 0, 0, 36),
                 BackgroundColor3 = Config.Theme.Secondary,
+                BackgroundTransparency = Config.BackgroundImage ~= "" and 0.2 or 0,
                 BorderSizePixel = 0,
                 ClipsDescendants = true,
                 Parent = Page
@@ -886,6 +975,7 @@ function WindUI:CreateWindow(title, subtitle)
             local Frame = Create("Frame", {
                 Size = UDim2.new(1, 0, 0, 36),
                 BackgroundColor3 = Config.Theme.Secondary,
+                BackgroundTransparency = Config.BackgroundImage ~= "" and 0.2 or 0,
                 BorderSizePixel = 0,
                 Parent = Page
             })
@@ -934,9 +1024,9 @@ function WindUI:CreateWindow(title, subtitle)
             return Input
         end
         
-        -- 标签/徽章
+        -- 标签
         function Tab:AddLabel(text)
-            local Label = Create("TextLabel", {
+            return Create("TextLabel", {
                 Size = UDim2.new(1, 0, 0, 24),
                 BackgroundTransparency = 1,
                 Text = text,
@@ -946,7 +1036,6 @@ function WindUI:CreateWindow(title, subtitle)
                 TextXAlignment = Enum.TextXAlignment.Left,
                 Parent = Page
             })
-            return Label
         end
         
         -- 图片
@@ -967,6 +1056,7 @@ function WindUI:CreateWindow(title, subtitle)
             local Frame = Create("Frame", {
                 Size = UDim2.new(1, 0, 0, 60),
                 BackgroundColor3 = Config.Theme.Secondary,
+                BackgroundTransparency = Config.BackgroundImage ~= "" and 0.2 or 0,
                 BorderSizePixel = 0,
                 Parent = Page
             })
@@ -1030,7 +1120,6 @@ function WindUI:CreateWindow(title, subtitle)
             end)
             
             Btn.MouseButton1Click:Connect(function()
-                -- 弹窗遮罩
                 local Overlay = Create("Frame", {
                     Size = UDim2.new(1, 0, 1, 0),
                     BackgroundColor3 = Color3.new(0, 0, 0),
@@ -1078,8 +1167,7 @@ function WindUI:CreateWindow(title, subtitle)
                     Parent = Modal
                 })
                 
-                -- 计算高度
-                local textBounds = game:GetService("TextService"):GetTextSize(content, 13, Config.Font, Vector2.new(276, 1000))
+                local textBounds = TextService:GetTextSize(content, 13, Config.Font, Vector2.new(276, 1000))
                 local contentHeight = textBounds.Y + 70
                 ContentLabel.Size = UDim2.new(1, -24, 0, contentHeight - 50)
                 
@@ -1111,7 +1199,6 @@ function WindUI:CreateWindow(title, subtitle)
                 })
                 Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = CancelBtn})
                 
-                -- 打开动画
                 Tween(Overlay, 0.2, {BackgroundTransparency = 0.5})
                 Tween(Modal, 0.3, {Size = UDim2.new(0, 300, 0, contentHeight), Position = UDim2.new(0.5, -150, 0.5, -contentHeight/2)})
                 
@@ -1176,7 +1263,6 @@ function WindUI:CreateWindow(title, subtitle)
             Parent = NotifFrame
         })
         
-        -- 出现动画
         Tween(NotifFrame, 0.3, {Size = UDim2.new(0, 280, 0, 56), Position = UDim2.new(1, -300, 1, -70)})
         
         task.delay(duration or 3, function()
@@ -1189,6 +1275,27 @@ function WindUI:CreateWindow(title, subtitle)
     -- 切换显示
     function Window:Toggle()
         Main.Visible = not Main.Visible
+    end
+    
+    -- 设置背景图 (可在创建窗口后调用)
+    function Window:SetBackground(assetId, transparency, color)
+        Config.BackgroundImage = assetId or ""
+        Config.BackgroundImageTransparency = transparency or 0.3
+        Config.BackgroundImageColor = color or Color3.fromRGB(255, 255, 255)
+        
+        if assetId and assetId ~= "" then
+            BgImage.Image = assetId
+            BgImage.ImageTransparency = Config.BackgroundImageTransparency
+            BgImage.ImageColor3 = Config.BackgroundImageColor
+            BgImage.Visible = true
+            TopBar.BackgroundTransparency = 0.2
+            Sidebar.BackgroundTransparency = 0.15
+            Main.BackgroundColor3 = Config.Theme.Background
+        else
+            BgImage.Visible = false
+            TopBar.BackgroundTransparency = 0
+            Sidebar.BackgroundTransparency = 0
+        end
     end
     
     return Window
