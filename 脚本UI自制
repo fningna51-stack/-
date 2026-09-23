@@ -2,7 +2,7 @@
     WindUI - 原创风格界面库
     作者: 自定义
     特点: 无AI味,简洁现代,功能完整
-    更新: 图片标识 + 卡密验证系统 + 可滑动 + 大圆角 + 按键阴影
+    更新: 阴影同步修复 + 图片标识 + 卡密验证 + 可滑动 + 大圆角
 --]]
 
 local WindUI = {}
@@ -11,7 +11,6 @@ local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local TextService = game:GetService("TextService")
-local HttpService = game:GetService("HttpService")
 
 local LocalPlayer = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
@@ -44,11 +43,10 @@ local Config = {
     BackgroundImageColor = Color3.fromRGB(255, 255, 255),
     MinIconImage = "",
     MinIconColor = Color3.fromRGB(255, 255, 255),
-    -- 标题栏图片标识
-    TitleIcon = "",                -- 图片ID, 留空则不显示
-    TitleIconSize = 24,            -- 图片尺寸
+    TitleIcon = "",
+    TitleIconSize = 24,
     TitleIconColor = Color3.fromRGB(255, 255, 255),
-    TitleIconRound = true,         -- 是否圆角
+    TitleIconRound = true,
     CornerRadius = 18,
     ElementRadius = 10,
     ButtonRadius = 10,
@@ -59,141 +57,89 @@ local Config = {
 }
 
 -- ============================================
--- 卡密验证系统 (内置)
+-- 卡密验证系统
 -- ============================================
 local AuthSystem = {
-    -- 卡密列表 (可自行添加)
-    Keys = {
-        -- ["KEY-XXXX-XXXX-XXXX"] = { Expire = 0 (永久) 或 时间戳, Uses = -1 (无限) 或次数 },
-        -- 示例:
-        -- ["WIND-2024-PRO-0001"] = { Expire = 0, Uses = -1 },
-        -- ["WIND-TRIAL-7DAY-01"] = { Expire = os.time() + 7 * 86400, Uses = -1 },
-    },
-    
-    -- 已使用记录 (运行时缓存, 也可持久化)
+    Keys = {},
     UsedKeys = {},
-    
-    -- 当前登录信息
     CurrentKey = nil,
     CurrentInfo = nil,
-    
-    -- 验证状态
     Verified = false,
-    
-    -- 是否启用验证 (关闭后直接跳过)
     Enabled = true,
-    
-    -- 回调
     OnSuccess = nil,
     OnFail = nil
 }
 
--- 生成默认示例卡密 (仅用于演示)
 if next(AuthSystem.Keys) == nil then
     AuthSystem.Keys["WIND-2024-PRO-0001"] = { Expire = 0, Uses = -1 }
     AuthSystem.Keys["WIND-2024-PRO-0002"] = { Expire = 0, Uses = -1 }
     AuthSystem.Keys["WIND-TRIAL-7DAY-01"] = { Expire = os.time() + 7 * 86400, Uses = 1 }
 end
 
--- 验证卡密
 function AuthSystem:Verify(key)
-    if not key or key == "" then
-        return false, "请输入卡密"
-    end
-    
+    if not key or key == "" then return false, "请输入卡密" end
     key = string.upper(string.gsub(key, "%s", ""))
-    
-    if not self.Keys[key] then
-        return false, "卡密无效"
-    end
-    
+    if not self.Keys[key] then return false, "卡密无效" end
     local info = self.Keys[key]
-    
-    -- 检查过期
-    if info.Expire and info.Expire > 0 and os.time() > info.Expire then
-        return false, "卡密已过期"
-    end
-    
-    -- 检查使用次数
+    if info.Expire and info.Expire > 0 and os.time() > info.Expire then return false, "卡密已过期" end
     if info.Uses and info.Uses >= 0 then
         local used = self.UsedKeys[key] or 0
-        if used >= info.Uses then
-            return false, "卡密已用尽"
-        end
+        if used >= info.Uses then return false, "卡密已用尽" end
     end
-    
-    -- 记录使用
     self.UsedKeys[key] = (self.UsedKeys[key] or 0) + 1
     self.CurrentKey = key
     self.CurrentInfo = info
     self.Verified = true
-    
     return true, "验证成功"
 end
 
--- 登出
 function AuthSystem:Logout()
     self.CurrentKey = nil
     self.CurrentInfo = nil
     self.Verified = false
 end
 
--- 获取当前状态
 function AuthSystem:GetStatus()
-    if not self.Verified then
-        return "未登录"
-    end
+    if not self.Verified then return "未登录" end
     local info = self.CurrentInfo
     if info.Expire == 0 then
         return "永久卡密"
     else
         local remain = info.Expire - os.time()
-        if remain <= 0 then
-            return "已过期"
-        end
+        if remain <= 0 then return "已过期" end
         local days = math.floor(remain / 86400)
         return "剩余 " .. days .. " 天"
     end
 end
 
--- 添加卡密
 function AuthSystem:AddKey(key, expire, uses)
-    self.Keys[string.upper(key)] = {
-        Expire = expire or 0,
-        Uses = uses or -1
-    }
+    self.Keys[string.upper(key)] = { Expire = expire or 0, Uses = uses or -1 }
 end
 
--- 移除卡密
 function AuthSystem:RemoveKey(key)
     self.Keys[string.upper(key)] = nil
 end
 
--- 外部引用
 WindUI.AuthSystem = AuthSystem
 
 -- 工具函数
 local function Create(className, props)
     local instance = Instance.new(className)
     for k, v in pairs(props or {}) do
-        if k ~= "Parent" then
-            instance[k] = v
-        end
+        if k ~= "Parent" then instance[k] = v end
     end
-    if props and props.Parent then
-        instance.Parent = props.Parent
-    end
+    if props and props.Parent then instance.Parent = props.Parent end
     return instance
 end
 
-local function Tween(obj, time, props, style)
-    local tween = TweenService:Create(obj, TweenInfo.new(time, style or Enum.EasingStyle.Quart, Enum.EasingDirection.Out), props)
+local function Tween(obj, time, props, style, dir)
+    local tween = TweenService:Create(obj, TweenInfo.new(time, style or Enum.EasingStyle.Quart, dir or Enum.EasingDirection.Out), props)
     tween:Play()
     return tween
 end
 
 -- 拖动功能
-local function MakeDraggable(frame, handle, getLocked)
+local function MakeDraggable(frame, handle, getLocked, onChange)
     handle = handle or frame
     local dragging, dragStart, startPos
     
@@ -215,6 +161,7 @@ local function MakeDraggable(frame, handle, getLocked)
                 startPos.Y.Scale,
                 startPos.Y.Offset + delta.Y
             )
+            if onChange then onChange() end
         end
     end)
     
@@ -225,7 +172,7 @@ local function MakeDraggable(frame, handle, getLocked)
     end)
 end
 
--- 平滑滑动控制器
+-- 平滑滑动
 local function SetupSmoothScroll(scrollFrame)
     local targetY = 0
     local currentY = 0
@@ -256,8 +203,7 @@ local function SetupSmoothScroll(scrollFrame)
     end)
     
     RunService.RenderStepped:Connect(function(dt)
-        if isDragging then return end
-        if not Config.SmoothScroll then return end
+        if isDragging or not Config.SmoothScroll then return end
         local diff = targetY - currentY
         if math.abs(diff) > 0.5 then
             currentY = currentY + diff * math.min(1, dt * (1 / Config.SmoothTime) * 4)
@@ -320,12 +266,11 @@ function WindUI:CreateWindow(title, subtitle, options)
     options = options or {}
     local Window = {}
     
-    -- 窗口配置 (可覆盖)
     local winTitleIcon = options.TitleIcon or Config.TitleIcon
     local winTitleIconSize = options.TitleIconSize or Config.TitleIconSize
     local winTitleIconColor = options.TitleIconColor or Config.TitleIconColor
     local winTitleIconRound = options.TitleIconRound ~= nil and options.TitleIconRound or Config.TitleIconRound
-    local requireAuth = options.RequireAuth ~= false  -- 默认需要验证
+    local requireAuth = options.RequireAuth ~= false
     local onAuthSuccess = options.OnAuthSuccess
     local onAuthFail = options.OnAuthFail
     
@@ -364,7 +309,6 @@ function WindUI:CreateWindow(title, subtitle, options)
         Create("UICorner", {CornerRadius = UDim.new(0, Config.CornerRadius), Parent = AuthBox})
         Create("UIStroke", {Color = Config.Theme.Border, Thickness = 1, Parent = AuthBox})
         
-        -- 顶部光晕条
         local TopAccent = Create("Frame", {
             Size = UDim2.new(1, -40, 0, 3),
             Position = UDim2.new(0, 20, 0, 0),
@@ -375,12 +319,11 @@ function WindUI:CreateWindow(title, subtitle, options)
         })
         Create("UICorner", {CornerRadius = UDim.new(1, 0), Parent = TopAccent})
         
-        -- 图标
         local AuthIcon = Create("ImageLabel", {
             Size = UDim2.new(0, 48, 0, 48),
             Position = UDim2.new(0.5, -24, 0, 22),
             BackgroundTransparency = 1,
-            Image = winTitleIcon ~= "" and winTitleIcon or "rbxassetid://0",
+            Image = winTitleIcon ~= "" and winTitleIcon or "",
             ImageColor3 = winTitleIconColor,
             ScaleType = Enum.ScaleType.Fit,
             ZIndex = 302,
@@ -389,7 +332,6 @@ function WindUI:CreateWindow(title, subtitle, options)
         })
         Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = AuthIcon})
         
-        -- 标题
         Create("TextLabel", {
             Size = UDim2.new(1, -40, 0, 24),
             Position = UDim2.new(0, 20, 0, 78),
@@ -416,7 +358,6 @@ function WindUI:CreateWindow(title, subtitle, options)
             Parent = AuthBox
         })
         
-        -- 输入框容器
         local InputBox = Create("Frame", {
             Size = UDim2.new(1, -60, 0, 40),
             Position = UDim2.new(0, 30, 0, 132),
@@ -443,7 +384,6 @@ function WindUI:CreateWindow(title, subtitle, options)
             Parent = InputBox
         })
         
-        -- 提示文字
         local HintLabel = Create("TextLabel", {
             Size = UDim2.new(1, -60, 0, 18),
             Position = UDim2.new(0, 30, 0, 176),
@@ -457,7 +397,6 @@ function WindUI:CreateWindow(title, subtitle, options)
             Parent = AuthBox
         })
         
-        -- 验证按钮
         local VerifyBtn = Create("TextButton", {
             Size = UDim2.new(1, -60, 0, 40),
             Position = UDim2.new(0, 30, 1, -56),
@@ -479,7 +418,6 @@ function WindUI:CreateWindow(title, subtitle, options)
             Tween(VerifyBtn, 0.15, {BackgroundColor3 = Config.Theme.Accent})
         end)
         
-        -- 入场动画
         AuthBox.Size = UDim2.new(0, 300, 0, 0)
         AuthBox.Position = UDim2.new(0.5, -150, 0.5, 0)
         Tween(AuthBox, 0.35, {Size = UDim2.new(0, 360, 0, 260), Position = UDim2.new(0.5, -180, 0.5, -130)}, Enum.EasingStyle.Back)
@@ -505,8 +443,8 @@ function WindUI:CreateWindow(title, subtitle, options)
             else
                 HintLabel.TextColor3 = Config.Theme.Danger
                 HintLabel.Text = "✗ " .. msg
+                if onAuthFail then onAuthFail(msg) end
                 
-                -- 抖动动画
                 local origPos = InputBox.Position
                 for i = 1, 3 do
                     Tween(InputBox, 0.05, {Position = UDim2.new(0, 36, 0, 132)})
@@ -524,13 +462,12 @@ function WindUI:CreateWindow(title, subtitle, options)
         end)
     end
     
-    -- 如果需要验证, 先弹验证框
     if AuthSystem.Enabled and requireAuth and not AuthSystem.Verified then
         ShowAuthWindow()
     end
     
     -- ============================================
-    -- 主窗口 (验证后可显示)
+    -- 主窗口
     -- ============================================
     local Main = Create("Frame", {
         Name = "Main",
@@ -545,7 +482,6 @@ function WindUI:CreateWindow(title, subtitle, options)
     })
     Create("UICorner", {CornerRadius = UDim.new(0, Config.CornerRadius), Parent = Main})
     
-    -- 验证成功后显示主窗口
     task.spawn(function()
         while AuthSystem.Enabled and requireAuth and not AuthSystem.Verified do
             task.wait(0.1)
@@ -564,7 +500,9 @@ function WindUI:CreateWindow(title, subtitle, options)
     })
     Create("UICorner", {CornerRadius = UDim.new(0, Config.CornerRadius), Parent = ContentClip})
     
-    -- 外部阴影
+    -- ============================================
+    -- 阴影层 (使用同步 Tween 实现)
+    -- ============================================
     local ShadowLayer1 = Create("Frame", {
         Name = "ShadowLayer1",
         Size = UDim2.new(1, 20, 1, 20),
@@ -589,17 +527,7 @@ function WindUI:CreateWindow(title, subtitle, options)
     })
     Create("UICorner", {CornerRadius = UDim.new(0, Config.CornerRadius + 6), Parent = ShadowLayer2})
     
-    local function SyncShadows()
-        ShadowLayer1.Position = UDim2.new(Main.Position.X.Scale, Main.Position.X.Offset - 10, Main.Position.Y.Scale, Main.Position.Y.Offset - 10)
-        ShadowLayer2.Position = UDim2.new(Main.Position.X.Scale, Main.Position.X.Offset - 6, Main.Position.Y.Scale, Main.Position.Y.Offset - 6)
-        ShadowLayer1.Size = UDim2.new(Main.Size.X.Scale, Main.Size.X.Offset + 20, Main.Size.Y.Scale, Main.Size.Y.Offset + 20)
-        ShadowLayer2.Size = UDim2.new(Main.Size.X.Scale, Main.Size.X.Offset + 12, Main.Size.Y.Scale, Main.Size.Y.Offset + 12)
-    end
-    
-    Main:GetPropertyChangedSignal("Position"):Connect(SyncShadows)
-    Main:GetPropertyChangedSignal("Size"):Connect(SyncShadows)
-    
-    -- 光晕
+    -- 光晕层
     local GlowLayer1 = Create("Frame", {
         Name = "GlowLayer1",
         Size = UDim2.new(1, 6, 1, 6),
@@ -621,15 +549,37 @@ function WindUI:CreateWindow(title, subtitle, options)
         Parent = Main
     })
     
-    local function SyncGlow()
-        GlowLayer1.Position = UDim2.new(Main.Position.X.Scale, Main.Position.X.Offset - 3, Main.Position.Y.Scale, Main.Position.Y.Offset - 3)
-        GlowLayer1.Size = UDim2.new(Main.Size.X.Scale, Main.Size.X.Offset + 6, Main.Size.Y.Scale, Main.Size.Y.Offset + 6)
-    end
-    Main:GetPropertyChangedSignal("Position"):Connect(SyncGlow)
-    Main:GetPropertyChangedSignal("Size"):Connect(SyncGlow)
+    -- ============================================
+    -- 同步函数 (核心修复)
+    -- 阴影/光晕直接跟随 Main 的位置和大小
+    -- ============================================
+    local syncOffset1 = Vector2.new(-10, -10)
+    local syncOffset2 = Vector2.new(-6, -6)
+    local syncOffsetGlow = Vector2.new(-3, -3)
+    local syncSize1 = Vector2.new(20, 20)
+    local syncSize2 = Vector2.new(12, 12)
+    local syncSizeGlow = Vector2.new(6, 6)
     
-    TweenService:Create(GlowLayer1, TweenInfo.new(2.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {BackgroundTransparency = 0.95}):Play()
-    TweenService:Create(GlowStroke, TweenInfo.new(2.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {Transparency = 0.6}):Play()
+    local function SyncAll()
+        ShadowLayer1.Position = UDim2.new(Main.Position.X.Scale, Main.Position.X.Offset + syncOffset1.X, Main.Position.Y.Scale, Main.Position.Y.Offset + syncOffset1.Y)
+        ShadowLayer1.Size = UDim2.new(Main.Size.X.Scale, Main.Size.X.Offset + syncSize1.X, Main.Size.Y.Scale, Main.Size.Y.Offset + syncSize1.Y)
+        
+        ShadowLayer2.Position = UDim2.new(Main.Position.X.Scale, Main.Position.X.Offset + syncOffset2.X, Main.Position.Y.Scale, Main.Position.Y.Offset + syncOffset2.Y)
+        ShadowLayer2.Size = UDim2.new(Main.Size.X.Scale, Main.Size.X.Offset + syncSize2.X, Main.Size.Y.Scale, Main.Size.Y.Offset + syncSize2.Y)
+        
+        GlowLayer1.Position = UDim2.new(Main.Position.X.Scale, Main.Position.X.Offset + syncOffsetGlow.X, Main.Position.Y.Scale, Main.Position.Y.Offset + syncOffsetGlow.Y)
+        GlowLayer1.Size = UDim2.new(Main.Size.X.Scale, Main.Size.X.Offset + syncSizeGlow.X, Main.Size.Y.Scale, Main.Size.Y.Offset + syncSizeGlow.Y)
+    end
+    
+    -- ============================================
+    -- 同步动画函数 (修复核心)
+    -- 通过监听 Main 的属性变化实时同步, 保证动画同步
+    -- ============================================
+    Main:GetPropertyChangedSignal("Position"):Connect(SyncAll)
+    Main:GetPropertyChangedSignal("Size"):Connect(SyncAll)
+    
+    -- 初始同步
+    SyncAll()
     
     -- 背景图
     local BgImage = Create("ImageLabel", {
@@ -647,7 +597,7 @@ function WindUI:CreateWindow(title, subtitle, options)
     Create("UICorner", {CornerRadius = UDim.new(0, Config.CornerRadius), Parent = BgImage})
     
     -- ============================================
-    -- 顶部标题栏 (带图片标识)
+    -- 顶部标题栏
     -- ============================================
     local TopBar = Create("Frame", {
         Name = "TopBar",
@@ -680,9 +630,7 @@ function WindUI:CreateWindow(title, subtitle, options)
         Parent = TopBar
     })
     
-    -- ============================================
-    -- 图片标识 (核心新增)
-    -- ============================================
+    -- 图片标识
     local TitleIconImage = Create("ImageLabel", {
         Name = "TitleIcon",
         Size = UDim2.new(0, winTitleIconSize, 0, winTitleIconSize),
@@ -700,7 +648,6 @@ function WindUI:CreateWindow(title, subtitle, options)
         Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = TitleIconImage})
     end
     
-    -- 标识容器 (用于阴影, 增强立体感)
     local TitleIconShadow = Create("Frame", {
         Name = "TitleIconShadow",
         Size = UDim2.new(0, winTitleIconSize, 0, winTitleIconSize),
@@ -714,7 +661,6 @@ function WindUI:CreateWindow(title, subtitle, options)
     })
     Create("UICorner", {CornerRadius = UDim.new(0, winTitleIconRound and 6 or 0), Parent = TitleIconShadow})
     
-    -- 标题文字 (根据是否有图标动态调整位置)
     local titleStartX = winTitleIcon ~= "" and (18 + winTitleIconSize + 10) or 18
     
     local TitleLabel = Create("TextLabel", {
@@ -813,9 +759,7 @@ function WindUI:CreateWindow(title, subtitle, options)
         Parent = Sidebar
     })
     
-    -- ============================================
-    -- 卡密状态条 (侧边栏底部)
-    -- ============================================
+    -- 卡密状态条
     if AuthSystem.Enabled and requireAuth then
         local StatusBar = Create("Frame", {
             Name = "AuthStatusBar",
@@ -852,7 +796,6 @@ function WindUI:CreateWindow(title, subtitle, options)
             Parent = StatusBar
         })
         
-        -- 实时更新状态
         task.spawn(function()
             while StatusBar.Parent do
                 task.wait(1)
@@ -880,7 +823,6 @@ function WindUI:CreateWindow(title, subtitle, options)
         Parent = TabContainer
     })
     
-    -- 内容区
     local Content = Create("Frame", {
         Name = "Content",
         Size = UDim2.new(1, -148, 1, -48),
@@ -903,15 +845,12 @@ function WindUI:CreateWindow(title, subtitle, options)
     
     local function CenterWindow()
         Main.Position = UDim2.new(0.5, -WINDOW_W / 2, 0.5, -WINDOW_H / 2)
-        SyncShadows()
-        SyncGlow()
     end
     CenterWindow()
     
+    -- 入场动画 (阴影自动跟随)
     Main.Size = UDim2.new(0, WINDOW_W - 40, 0, WINDOW_H - 30)
     Main.BackgroundTransparency = 0.5
-    SyncShadows()
-    SyncGlow()
     task.wait()
     Tween(Main, 0.35, {Size = UDim2.new(0, WINDOW_W, 0, WINDOW_H)})
     Tween(Main, 0.35, {BackgroundTransparency = 0})
@@ -1027,10 +966,10 @@ function WindUI:CreateWindow(title, subtitle, options)
         ConfirmBtn.MouseButton1Click:Connect(function()
             CloseConfirm()
             task.wait(0.2)
+            
+            -- 关闭动画 (阴影自动同步)
             Tween(Main, 0.25, {Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0)})
-            Tween(ShadowLayer1, 0.25, {Size = UDim2.new(0, 20, 0, 20), Position = UDim2.new(0.5, -10, 0.5, -10)})
-            Tween(ShadowLayer2, 0.25, {Size = UDim2.new(0, 12, 0, 12), Position = UDim2.new(0.5, -6, 0.5, -6)})
-            Tween(GlowLayer1, 0.25, {Size = UDim2.new(0, 6, 0, 6), Position = UDim2.new(0.5, -3, 0.5, -3), BackgroundTransparency = 1})
+            Tween(GlowLayer1, 0.25, {BackgroundTransparency = 1})
             task.wait(0.25)
             ScreenGui:Destroy()
         end)
@@ -1038,7 +977,9 @@ function WindUI:CreateWindow(title, subtitle, options)
     
     CloseBtn.MouseButton1Click:Connect(CreateCloseConfirm)
     
-    -- 最小化
+    -- ============================================
+    -- 最小化 (核心修复: 阴影跟随同步)
+    -- ============================================
     local normalPos = UDim2.new(0.5, -WINDOW_W / 2, 0.5, -WINDOW_H / 2)
     local squarePos = UDim2.new(0.5, -SQUARE_SIZE / 2, 0, 24)
     
@@ -1073,6 +1014,17 @@ function WindUI:CreateWindow(title, subtitle, options)
     local squarePressTime = 0
     local squareMoved = false
     
+    -- 更新阴影偏移 (因为最小化时阴影要更紧凑)
+    local function UpdateShadowOffsets(off1, size1, off2, size2, offGlow, sizeGlow)
+        syncOffset1 = off1 or Vector2.new(-10, -10)
+        syncSize1 = size1 or Vector2.new(20, 20)
+        syncOffset2 = off2 or Vector2.new(-6, -6)
+        syncSize2 = size2 or Vector2.new(12, 12)
+        syncOffsetGlow = offGlow or Vector2.new(-3, -3)
+        syncSizeGlow = sizeGlow or Vector2.new(6, 6)
+        SyncAll()
+    end
+    
     MinBtn.MouseButton1Click:Connect(function()
         if not minimized then
             minimized = true
@@ -1089,11 +1041,19 @@ function WindUI:CreateWindow(title, subtitle, options)
                 MinIconImage.Visible = false
             end
             
-            Tween(ShadowLayer1, 0.35, {Size = UDim2.new(0, SQUARE_SIZE + 16, 0, SQUARE_SIZE + 16), Position = UDim2.new(0.5, -(SQUARE_SIZE + 16)/2, 0, 24 - 8)})
-            Tween(ShadowLayer2, 0.35, {Size = UDim2.new(0, SQUARE_SIZE + 8, 0, SQUARE_SIZE + 8), Position = UDim2.new(0.5, -(SQUARE_SIZE + 8)/2, 0, 24 - 4)})
-            Tween(GlowLayer1, 0.35, {Size = UDim2.new(0, SQUARE_SIZE + 6, 0, SQUARE_SIZE + 6), Position = UDim2.new(0.5, -(SQUARE_SIZE + 6)/2, 0, 24 - 3), BackgroundTransparency = 0.7})
-            GlowStroke.Transparency = 0.2
+            -- 缩小阴影偏移,让最小化时阴影紧凑
+            syncOffset1 = Vector2.new(-8, -8)
+            syncSize1 = Vector2.new(16, 16)
+            syncOffset2 = Vector2.new(-4, -4)
+            syncSize2 = Vector2.new(8, 8)
+            syncOffsetGlow = Vector2.new(-3, -3)
+            syncSizeGlow = Vector2.new(6, 6)
             
+            -- 光晕在最小化时更明显
+            Tween(GlowLayer1, 0.35, {BackgroundTransparency = 0.7})
+            Tween(GlowStroke, 0.35, {Transparency = 0.2})
+            
+            -- Main 变换 (阴影和光晕自动同步)
             Tween(Main, 0.4, {
                 Size = UDim2.new(0, SQUARE_SIZE, 0, SQUARE_SIZE),
                 Position = squarePos,
@@ -1124,10 +1084,19 @@ function WindUI:CreateWindow(title, subtitle, options)
                 MinIcon.Visible = false
                 MinIconImage.Visible = false
                 
-                Tween(ShadowLayer1, 0.35, {Size = UDim2.new(normalPos.X.Scale, WINDOW_W + 20, normalPos.Y.Scale, WINDOW_H + 20), Position = UDim2.new(normalPos.X.Scale, normalPos.X.Offset - 10, normalPos.Y.Scale, normalPos.Y.Offset - 10)})
-                Tween(ShadowLayer2, 0.35, {Size = UDim2.new(normalPos.X.Scale, WINDOW_W + 12, normalPos.Y.Scale, WINDOW_H + 12), Position = UDim2.new(normalPos.X.Scale, normalPos.X.Offset - 6, normalPos.Y.Scale, normalPos.Y.Offset - 6)})
-                Tween(GlowLayer1, 0.35, {Size = UDim2.new(normalPos.X.Scale, WINDOW_W + 6, normalPos.Y.Scale, WINDOW_H + 6), Position = UDim2.new(normalPos.X.Scale, normalPos.X.Offset - 3, normalPos.Y.Scale, normalPos.Y.Offset - 3), BackgroundTransparency = 0.88})
+                -- 恢复阴影偏移
+                syncOffset1 = Vector2.new(-10, -10)
+                syncSize1 = Vector2.new(20, 20)
+                syncOffset2 = Vector2.new(-6, -6)
+                syncSize2 = Vector2.new(12, 12)
+                syncOffsetGlow = Vector2.new(-3, -3)
+                syncSizeGlow = Vector2.new(6, 6)
                 
+                -- 恢复光晕
+                Tween(GlowLayer1, 0.4, {BackgroundTransparency = 0.88})
+                Tween(GlowStroke, 0.4, {Transparency = 0.4})
+                
+                -- Main 恢复 (阴影和光晕自动同步)
                 Tween(Main, 0.4, {
                     Size = UDim2.new(0, WINDOW_W, 0, WINDOW_H),
                     Position = normalPos,
@@ -1136,8 +1105,6 @@ function WindUI:CreateWindow(title, subtitle, options)
                 
                 task.wait(0.15)
                 ContentClip.Visible = true
-                task.wait(0.2)
-                Tween(GlowStroke, 0.3, {Transparency = 0.4})
             end
             squarePressTime = 0
             squareMoved = false
@@ -2380,9 +2347,6 @@ function WindUI:CreateWindow(title, subtitle, options)
         end
     end
     
-    -- ============================================
-    -- 动态更换标题图片标识
-    -- ============================================
     function Window:SetTitleIcon(assetId, color, size)
         if assetId ~= nil then
             TitleIconImage.Image = assetId
@@ -2400,13 +2364,11 @@ function WindUI:CreateWindow(title, subtitle, options)
             TitleIconShadow.Size = UDim2.new(0, size, 0, size)
             TitleIconShadow.Position = UDim2.new(0, 18, 0.5, -size / 2 + 2)
             winTitleIconSize = size
-            -- 调整标题文字位置
             local newStartX = assetId ~= "" and (18 + size + 10) or 18
             TitleLabel.Position = UDim2.new(0, newStartX, 0, 0)
         end
     end
     
-    -- 获取当前登录的卡密信息
     function Window:GetAuthInfo()
         return {
             Verified = AuthSystem.Verified,
@@ -2416,7 +2378,6 @@ function WindUI:CreateWindow(title, subtitle, options)
         }
     end
     
-    -- 手动触发登出
     function Window:Logout()
         AuthSystem:Logout()
         Main.Visible = false
