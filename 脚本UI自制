@@ -2,7 +2,7 @@
     WindUI - 原创风格界面库
     作者: 自定义
     特点: 无AI味,简洁现代,功能完整
-    更新: 最小化为正方形 + 支持图片背景
+    更新: 正方形最小化可拖动 + 点击恢复 + 居中加载 + 最小化到屏幕上方
 --]]
 
 local WindUI = {}
@@ -13,7 +13,7 @@ local Players = game:GetService("Players")
 local TextService = game:GetService("TextService")
 
 local LocalPlayer = Players.LocalPlayer
-local Mouse = LocalPlayer:GetMouse()
+local Camera = workspace.CurrentCamera
 
 -- 配置
 local Config = {
@@ -32,11 +32,10 @@ local Config = {
     },
     Font = Enum.Font.GothamMedium,
     FontBold = Enum.Font.GothamBold,
-    CornerRadius = UDim.new(0, 8),
-    -- 背景图配置 (留空则不使用图片背景)
-    BackgroundImage = "",           -- 例如 "rbxassetid://1234567890"
-    BackgroundImageTransparency = 0.3, -- 背景图透明度 (0-1, 越大越透明)
-    BackgroundImageColor = Color3.fromRGB(255, 255, 255) -- 图片染色
+    -- 背景图配置
+    BackgroundImage = "",
+    BackgroundImageTransparency = 0.3,
+    BackgroundImageColor = Color3.fromRGB(255, 255, 255)
 }
 
 -- 工具函数
@@ -59,12 +58,13 @@ local function Tween(obj, time, props, style)
     return tween
 end
 
--- 拖动功能
-local function MakeDraggable(frame, handle)
+-- 拖动功能 (支持取消/暂停)
+local function MakeDraggable(frame, handle, getLocked)
     handle = handle or frame
     local dragging, dragStart, startPos
     
     handle.InputBegan:Connect(function(input)
+        if getLocked and getLocked() then return end
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
@@ -100,10 +100,11 @@ function WindUI:CreateWindow(title, subtitle)
         Name = "WindUI",
         ResetOnSpawn = false,
         ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+        IgnoreGuiInset = true,
         Parent = LocalPlayer:WaitForChild("PlayerGui")
     })
     
-    -- 主框架
+    -- 主框架 (初始隐藏,用于居中计算)
     local Main = Create("Frame", {
         Name = "Main",
         Size = UDim2.new(0, 580, 0, 400),
@@ -116,7 +117,7 @@ function WindUI:CreateWindow(title, subtitle)
     Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = Main})
     Create("UIStroke", {Color = Config.Theme.Border, Thickness = 1, Parent = Main})
     
-    -- 背景图片层 (在内容之下)
+    -- 背景图片层
     local BgImage = Create("ImageLabel", {
         Name = "BackgroundImage",
         Size = UDim2.new(1, 0, 1, 0),
@@ -152,7 +153,6 @@ function WindUI:CreateWindow(title, subtitle)
         Parent = TopBar
     })
     
-    -- 标题
     Create("TextLabel", {
         Name = "Title",
         Size = UDim2.new(0, 200, 1, 0),
@@ -273,10 +273,37 @@ function WindUI:CreateWindow(title, subtitle)
     local Tabs = {}
     local activeTab = nil
     
-    -- 拖动
-    MakeDraggable(Main, TopBar)
+    -- ============================================
+    -- 状态管理
+    -- ============================================
+    local minimized = false
+    local WINDOW_W, WINDOW_H = 580, 400
+    local SQUARE_SIZE = 50
     
+    -- 拖动: 正常状态用 TopBar, 最小化状态用整个 Main
+    MakeDraggable(Main, TopBar, function() return minimized end)
+    
+    -- 最小化状态下整个正方形可拖动
+    MakeDraggable(Main, Main, function() return not minimized end)
+    
+    -- ============================================
+    -- 居中加载
+    -- ============================================
+    local function CenterWindow()
+        Main.Position = UDim2.new(0.5, -WINDOW_W / 2, 0.5, -WINDOW_H / 2)
+    end
+    CenterWindow()
+    
+    -- 打开动画: 从中心稍微放大进入
+    Main.Size = UDim2.new(0, WINDOW_W - 30, 0, WINDOW_H - 20)
+    Main.BackgroundTransparency = 0.4
+    task.wait()
+    Tween(Main, 0.3, {Size = UDim2.new(0, WINDOW_W, 0, WINDOW_H)})
+    Tween(Main, 0.3, {BackgroundTransparency = 0})
+    
+    -- ============================================
     -- 关闭
+    -- ============================================
     CloseBtn.MouseButton1Click:Connect(function()
         Tween(Main, 0.2, {Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0)})
         task.wait(0.2)
@@ -284,73 +311,95 @@ function WindUI:CreateWindow(title, subtitle)
     end)
     
     -- ============================================
-    -- 最小化: 收缩成正方形图标
+    -- 最小化: 收缩成正方形图标, 出现在屏幕上方
     -- ============================================
-    local minimized = false
-    local normalSize = UDim2.new(0, 580, 0, 400)
-    local normalPos = UDim2.new(0.5, -290, 0.5, -200)
+    local normalPos = UDim2.new(0.5, -WINDOW_W / 2, 0.5, -WINDOW_H / 2)
+    local squarePos = UDim2.new(0.5, -SQUARE_SIZE / 2, 0, 20) -- 屏幕上方居中
+    
+    -- 正方形图标 (初始隐藏)
+    local MinIcon = Create("TextLabel", {
+        Name = "MinIcon",
+        Size = UDim2.new(1, 0, 1, 0),
+        BackgroundTransparency = 1,
+        Text = "W",
+        TextColor3 = Config.Theme.Text,
+        Font = Config.FontBold,
+        TextSize = 22,
+        ZIndex = 10,
+        Visible = false,
+        Parent = Main
+    })
+    Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = MinIcon})
+    
+    -- 正方形点击恢复 (只响应短按, 不是拖动)
+    local squarePressTime = 0
+    local squareMoved = false
     
     MinBtn.MouseButton1Click:Connect(function()
-        minimized = not minimized
-        if minimized then
-            -- 记录当前位置
-            normalPos = Main.Position
+        if not minimized then
+            -- 进入最小化
+            minimized = true
+            normalPos = Main.Position -- 记录当前窗口位置
             
-            -- 隐藏内容
             Content.Visible = false
             Sidebar.Visible = false
             TopBar.Visible = false
             BgImage.Visible = false
+            MinIcon.Visible = true
             
-            -- 收缩成正方形
-            Tween(Main, 0.3, {
-                Size = UDim2.new(0, 50, 0, 50),
-                Position = UDim2.new(normalPos.X.Scale, normalPos.X.Offset + 265, normalPos.Y.Scale, normalPos.Y.Offset + 175),
+            -- 收缩到屏幕上方居中, 并变成正方形
+            Tween(Main, 0.35, {
+                Size = UDim2.new(0, SQUARE_SIZE, 0, SQUARE_SIZE),
+                Position = squarePos,
                 BackgroundColor3 = Config.Theme.Accent
-            })
-            
-            -- 正方形图标
-            if not Main:FindFirstChild("MinIcon") then
-                local MinIcon = Create("TextLabel", {
-                    Name = "MinIcon",
-                    Size = UDim2.new(1, 0, 1, 0),
-                    BackgroundTransparency = 1,
-                    Text = "W",
-                    TextColor3 = Config.Theme.Text,
-                    Font = Config.FontBold,
-                    TextSize = 24,
-                    ZIndex = 10,
-                    Parent = Main
-                })
-                Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = MinIcon})
-            end
-            Main.MinIcon.Visible = true
-        else
-            -- 恢复
-            Main.MinIcon.Visible = false
-            
-            Tween(Main, 0.3, {
-                Size = normalSize,
-                Position = normalPos,
-                BackgroundColor3 = Config.Theme.Background
-            })
-            
-            task.wait(0.15)
-            Content.Visible = true
-            Sidebar.Visible = true
-            TopBar.Visible = true
-            BgImage.Visible = Config.BackgroundImage ~= ""
+            }, Enum.EasingStyle.Back)
         end
     end)
     
-    -- 点击正方形图标也可以恢复
+    -- 点击正方形恢复
     Main.InputBegan:Connect(function(input)
         if minimized and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
-            MinBtn.MouseButton1Click:Fire()
+            squarePressTime = tick()
+            squareMoved = false
         end
     end)
     
+    UserInputService.InputChanged:Connect(function(input)
+        if minimized and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            if squarePressTime > 0 and tick() - squarePressTime < 0.5 then
+                squareMoved = true
+            end
+        end
+    end)
+    
+    Main.InputEnded:Connect(function(input)
+        if minimized and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+            -- 短按且没有明显拖动 → 恢复窗口
+            if not squareMoved and (tick() - squarePressTime) < 0.3 then
+                minimized = false
+                
+                MinIcon.Visible = false
+                
+                Tween(Main, 0.35, {
+                    Size = UDim2.new(0, WINDOW_W, 0, WINDOW_H),
+                    Position = normalPos,
+                    BackgroundColor3 = Config.Theme.Background
+                }, Enum.EasingStyle.Back)
+                
+                task.wait(0.1)
+                Content.Visible = true
+                Sidebar.Visible = true
+                TopBar.Visible = true
+                BgImage.Visible = Config.BackgroundImage ~= ""
+            end
+            squarePressTime = 0
+            squareMoved = false
+        end
+    end)
+    
+    -- ============================================
     -- 添加标签页
+    -- ============================================
     function Window:AddTab(name, icon)
         local Tab = {}
         
@@ -469,7 +518,8 @@ function WindUI:CreateWindow(title, subtitle)
             SelectTab()
         end
         
-        -- 段落标题
+        -- ========== 组件 ==========
+        
         function Tab:AddSection(text)
             local Section = Create("Frame", {
                 Size = UDim2.new(1, 0, 0, 30),
@@ -489,7 +539,6 @@ function WindUI:CreateWindow(title, subtitle)
             return Section
         end
         
-        -- 分隔线
         function Tab:AddDivider()
             return Create("Frame", {
                 Size = UDim2.new(1, 0, 0, 1),
@@ -499,7 +548,6 @@ function WindUI:CreateWindow(title, subtitle)
             })
         end
         
-        -- 开关
         function Tab:AddToggle(name, default, callback)
             local state = default or false
             local Toggle = {}
@@ -565,7 +613,6 @@ function WindUI:CreateWindow(title, subtitle)
             return Toggle
         end
         
-        -- 滑块
         function Tab:AddSlider(name, min, max, default, callback)
             local Slider = {}
             local value = default or min
@@ -672,7 +719,6 @@ function WindUI:CreateWindow(title, subtitle)
             return Slider
         end
         
-        -- 下拉选项(单选)
         function Tab:AddDropdown(name, options, default, callback)
             local Dropdown = {}
             local selected = default or options[1]
@@ -807,7 +853,6 @@ function WindUI:CreateWindow(title, subtitle)
             return Dropdown
         end
         
-        -- 多选
         function Tab:AddMultiSelect(name, options, default, callback)
             local Multi = {}
             local selected = {}
@@ -941,7 +986,6 @@ function WindUI:CreateWindow(title, subtitle)
             return Multi
         end
         
-        -- 按钮
         function Tab:AddButton(name, callback)
             local Btn = Create("TextButton", {
                 Size = UDim2.new(1, 0, 0, 34),
@@ -968,7 +1012,6 @@ function WindUI:CreateWindow(title, subtitle)
             return Btn
         end
         
-        -- 输入框
         function Tab:AddInput(name, placeholder, callback)
             local Input = {}
             
@@ -1024,7 +1067,6 @@ function WindUI:CreateWindow(title, subtitle)
             return Input
         end
         
-        -- 标签
         function Tab:AddLabel(text)
             return Create("TextLabel", {
                 Size = UDim2.new(1, 0, 0, 24),
@@ -1038,7 +1080,6 @@ function WindUI:CreateWindow(title, subtitle)
             })
         end
         
-        -- 图片
         function Tab:AddImage(assetId, height)
             local Image = Create("ImageLabel", {
                 Size = UDim2.new(1, 0, 0, height or 100),
@@ -1051,7 +1092,6 @@ function WindUI:CreateWindow(title, subtitle)
             return Image
         end
         
-        -- 公告
         function Tab:AddNotice(title, text)
             local Frame = Create("Frame", {
                 Size = UDim2.new(1, 0, 0, 60),
@@ -1098,7 +1138,6 @@ function WindUI:CreateWindow(title, subtitle)
             return Frame
         end
         
-        -- 弹窗
         function Tab:AddPopup(title, content)
             local Btn = Create("TextButton", {
                 Size = UDim2.new(1, 0, 0, 34),
@@ -1277,7 +1316,7 @@ function WindUI:CreateWindow(title, subtitle)
         Main.Visible = not Main.Visible
     end
     
-    -- 设置背景图 (可在创建窗口后调用)
+    -- 设置背景图
     function Window:SetBackground(assetId, transparency, color)
         Config.BackgroundImage = assetId or ""
         Config.BackgroundImageTransparency = transparency or 0.3
@@ -1290,12 +1329,16 @@ function WindUI:CreateWindow(title, subtitle)
             BgImage.Visible = true
             TopBar.BackgroundTransparency = 0.2
             Sidebar.BackgroundTransparency = 0.15
-            Main.BackgroundColor3 = Config.Theme.Background
         else
             BgImage.Visible = false
             TopBar.BackgroundTransparency = 0
             Sidebar.BackgroundTransparency = 0
         end
+    end
+    
+    -- 手动居中
+    function Window:Center()
+        CenterWindow()
     end
     
     return Window
