@@ -2,18 +2,16 @@
     WindUI - 原创风格界面库
     作者: 自定义
     特点: 无AI味,简洁现代,功能完整
-    更新: 正方形最小化可拖动 + 点击恢复 + 居中加载 + 最小化到屏幕上方
+    更新: 弹窗按钮排版修复 + 关闭确认 + 更多标签/控件 + 标签页图片支持
 --]]
 
 local WindUI = {}
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local TextService = game:GetService("TextService")
 
 local LocalPlayer = Players.LocalPlayer
-local Camera = workspace.CurrentCamera
 
 -- 配置
 local Config = {
@@ -32,7 +30,6 @@ local Config = {
     },
     Font = Enum.Font.GothamMedium,
     FontBold = Enum.Font.GothamBold,
-    -- 背景图配置
     BackgroundImage = "",
     BackgroundImageTransparency = 0.3,
     BackgroundImageColor = Color3.fromRGB(255, 255, 255)
@@ -58,11 +55,10 @@ local function Tween(obj, time, props, style)
     return tween
 end
 
--- 拖动功能 (支持取消/暂停)
 local function MakeDraggable(frame, handle, getLocked)
     handle = handle or frame
     local dragging, dragStart, startPos
-    
+
     handle.InputBegan:Connect(function(input)
         if getLocked and getLocked() then return end
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -71,7 +67,7 @@ local function MakeDraggable(frame, handle, getLocked)
             startPos = frame.Position
         end
     end)
-    
+
     UserInputService.InputChanged:Connect(function(input)
         if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
             local delta = input.Position - dragStart
@@ -83,7 +79,7 @@ local function MakeDraggable(frame, handle, getLocked)
             )
         end
     end)
-    
+
     UserInputService.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = false
@@ -94,8 +90,9 @@ end
 -- 创建主窗口
 function WindUI:CreateWindow(title, subtitle)
     local Window = {}
-    
-    -- 屏幕GUI
+    local WINDOW_W, WINDOW_H = 580, 400
+    local SQUARE_SIZE = 50
+
     local ScreenGui = Create("ScreenGui", {
         Name = "WindUI",
         ResetOnSpawn = false,
@@ -103,12 +100,12 @@ function WindUI:CreateWindow(title, subtitle)
         IgnoreGuiInset = true,
         Parent = LocalPlayer:WaitForChild("PlayerGui")
     })
-    
-    -- 主框架 (初始隐藏,用于居中计算)
+
+    -- 主框架
     local Main = Create("Frame", {
         Name = "Main",
-        Size = UDim2.new(0, 580, 0, 400),
-        Position = UDim2.new(0.5, -290, 0.5, -200),
+        Size = UDim2.new(0, WINDOW_W, 0, WINDOW_H),
+        Position = UDim2.new(0.5, -WINDOW_W / 2, 0.5, -WINDOW_H / 2),
         BackgroundColor3 = Config.Theme.Background,
         BorderSizePixel = 0,
         ClipsDescendants = true,
@@ -116,7 +113,7 @@ function WindUI:CreateWindow(title, subtitle)
     })
     Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = Main})
     Create("UIStroke", {Color = Config.Theme.Border, Thickness = 1, Parent = Main})
-    
+
     -- 背景图片层
     local BgImage = Create("ImageLabel", {
         Name = "BackgroundImage",
@@ -131,7 +128,7 @@ function WindUI:CreateWindow(title, subtitle)
         Parent = Main
     })
     Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = BgImage})
-    
+
     -- 顶部标题栏
     local TopBar = Create("Frame", {
         Name = "TopBar",
@@ -152,7 +149,7 @@ function WindUI:CreateWindow(title, subtitle)
         ZIndex = 2,
         Parent = TopBar
     })
-    
+
     Create("TextLabel", {
         Name = "Title",
         Size = UDim2.new(0, 200, 1, 0),
@@ -166,7 +163,7 @@ function WindUI:CreateWindow(title, subtitle)
         ZIndex = 3,
         Parent = TopBar
     })
-    
+
     Create("TextLabel", {
         Name = "Subtitle",
         Size = UDim2.new(0, 200, 1, 0),
@@ -180,7 +177,7 @@ function WindUI:CreateWindow(title, subtitle)
         ZIndex = 3,
         Parent = TopBar
     })
-    
+
     -- 关闭按钮
     local CloseBtn = Create("TextButton", {
         Name = "Close",
@@ -196,14 +193,14 @@ function WindUI:CreateWindow(title, subtitle)
         Parent = TopBar
     })
     Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = CloseBtn})
-    
+
     CloseBtn.MouseEnter:Connect(function()
         Tween(CloseBtn, 0.15, {BackgroundColor3 = Color3.fromRGB(255, 100, 110)})
     end)
     CloseBtn.MouseLeave:Connect(function()
         Tween(CloseBtn, 0.15, {BackgroundColor3 = Config.Theme.Danger})
     end)
-    
+
     -- 最小化按钮
     local MinBtn = Create("TextButton", {
         Name = "Minimize",
@@ -219,7 +216,7 @@ function WindUI:CreateWindow(title, subtitle)
         Parent = TopBar
     })
     Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = MinBtn})
-    
+
     -- 侧边栏
     local Sidebar = Create("Frame", {
         Name = "Sidebar",
@@ -231,7 +228,7 @@ function WindUI:CreateWindow(title, subtitle)
         ZIndex = 2,
         Parent = Main
     })
-    
+
     Create("Frame", {
         Size = UDim2.new(0, 1, 1, 0),
         Position = UDim2.new(1, -1, 0, 0),
@@ -240,7 +237,7 @@ function WindUI:CreateWindow(title, subtitle)
         ZIndex = 3,
         Parent = Sidebar
     })
-    
+
     local TabContainer = Create("ScrollingFrame", {
         Name = "Tabs",
         Size = UDim2.new(1, -8, 1, -16),
@@ -258,7 +255,7 @@ function WindUI:CreateWindow(title, subtitle)
         SortOrder = Enum.SortOrder.LayoutOrder,
         Parent = TabContainer
     })
-    
+
     -- 内容区
     local Content = Create("Frame", {
         Name = "Content",
@@ -268,55 +265,164 @@ function WindUI:CreateWindow(title, subtitle)
         ZIndex = 2,
         Parent = Main
     })
-    
-    local Pages = {}
+
     local Tabs = {}
     local activeTab = nil
-    
-    -- ============================================
-    -- 状态管理
-    -- ============================================
+
+    -- 状态
     local minimized = false
-    local WINDOW_W, WINDOW_H = 580, 400
-    local SQUARE_SIZE = 50
-    
-    -- 拖动: 正常状态用 TopBar, 最小化状态用整个 Main
+    local normalPos = UDim2.new(0.5, -WINDOW_W / 2, 0.5, -WINDOW_H / 2)
+    local squarePos = UDim2.new(0.5, -SQUARE_SIZE / 2, 0, 20)
+
+    -- 拖动
     MakeDraggable(Main, TopBar, function() return minimized end)
-    
-    -- 最小化状态下整个正方形可拖动
     MakeDraggable(Main, Main, function() return not minimized end)
-    
-    -- ============================================
-    -- 居中加载
-    -- ============================================
-    local function CenterWindow()
-        Main.Position = UDim2.new(0.5, -WINDOW_W / 2, 0.5, -WINDOW_H / 2)
-    end
-    CenterWindow()
-    
-    -- 打开动画: 从中心稍微放大进入
+
+    -- 打开动画
     Main.Size = UDim2.new(0, WINDOW_W - 30, 0, WINDOW_H - 20)
     Main.BackgroundTransparency = 0.4
     task.wait()
     Tween(Main, 0.3, {Size = UDim2.new(0, WINDOW_W, 0, WINDOW_H)})
     Tween(Main, 0.3, {BackgroundTransparency = 0})
-    
+
     -- ============================================
-    -- 关闭
+    -- 通用确认弹窗 (放在字的下方)
+    -- ============================================
+    local function ShowConfirm(title, content, confirmText, cancelText, onConfirm, onCancel)
+        local Overlay = Create("Frame", {
+            Size = UDim2.new(1, 0, 1, 0),
+            BackgroundColor3 = Color3.new(0, 0, 0),
+            BackgroundTransparency = 1,
+            ZIndex = 200,
+            Parent = ScreenGui
+        })
+
+        -- 计算文字高度
+        local textBounds = TextService:GetTextSize(content, 13, Config.Font, Vector2.new(276, 1000))
+        local contentH = math.max(textBounds.Y, 20)
+        -- 标题30 + 间距 + 内容H + 按钮间距 + 按钮34 + 底部padding
+        local modalH = 14 + 24 + 8 + contentH + 20 + 34 + 16
+
+        local Modal = Create("Frame", {
+            Size = UDim2.new(0, 300, 0, 0),
+            Position = UDim2.new(0.5, -150, 0.5, 0),
+            BackgroundColor3 = Config.Theme.Background,
+            BorderSizePixel = 0,
+            ZIndex = 201,
+            Parent = Overlay
+        })
+        Create("UICorner", {CornerRadius = UDim.new(0, 10), Parent = Modal})
+        Create("UIStroke", {Color = Config.Theme.Border, Thickness = 1, Parent = Modal})
+
+        -- 标题
+        Create("TextLabel", {
+            Size = UDim2.new(1, -28, 0, 24),
+            Position = UDim2.new(0, 14, 0, 14),
+            BackgroundTransparency = 1,
+            Text = title,
+            TextColor3 = Config.Theme.Text,
+            Font = Config.FontBold,
+            TextSize = 15,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            ZIndex = 202,
+            Parent = Modal
+        })
+
+        -- 内容
+        Create("TextLabel", {
+            Size = UDim2.new(1, -28, 0, contentH),
+            Position = UDim2.new(0, 14, 0, 46),
+            BackgroundTransparency = 1,
+            Text = content,
+            TextColor3 = Config.Theme.TextDim,
+            Font = Config.Font,
+            TextSize = 13,
+            TextWrapped = true,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            TextYAlignment = Enum.TextYAlignment.Top,
+            ZIndex = 202,
+            Parent = Modal
+        })
+
+        -- 按钮放在内容下方
+        local btnY = 46 + contentH + 20
+
+        local ConfirmBtn = Create("TextButton", {
+            Size = UDim2.new(1, -28, 0, 34),
+            Position = UDim2.new(0, 14, 0, btnY),
+            BackgroundColor3 = Config.Theme.Accent,
+            Text = confirmText or "确定",
+            TextColor3 = Config.Theme.Text,
+            Font = Config.FontBold,
+            TextSize = 13,
+            AutoButtonColor = false,
+            ZIndex = 202,
+            Parent = Modal
+        })
+        Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = ConfirmBtn})
+
+        local CancelBtn = Create("TextButton", {
+            Size = UDim2.new(1, -28, 0, 34),
+            Position = UDim2.new(0, 14, 0, btnY + 40),
+            BackgroundColor3 = Config.Theme.Tertiary,
+            Text = cancelText or "取消",
+            TextColor3 = Config.Theme.Text,
+            Font = Config.Font,
+            TextSize = 13,
+            AutoButtonColor = false,
+            ZIndex = 202,
+            Parent = Modal
+        })
+        Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = CancelBtn})
+
+        -- 记录总高度用于动画
+        local totalH = btnY + 40 + 34 + 16
+
+        Tween(Overlay, 0.2, {BackgroundTransparency = 0.5})
+        Tween(Modal, 0.3, {
+            Size = UDim2.new(0, 300, 0, totalH),
+            Position = UDim2.new(0.5, -150, 0.5, -totalH / 2)
+        })
+
+        local function Close()
+            Tween(Overlay, 0.2, {BackgroundTransparency = 1})
+            Tween(Modal, 0.2, {Size = UDim2.new(0, 300, 0, 0), Position = UDim2.new(0.5, -150, 0.5, 0)})
+            task.wait(0.2)
+            Overlay:Destroy()
+        end
+
+        ConfirmBtn.MouseButton1Click:Connect(function()
+            Close()
+            if onConfirm then onConfirm() end
+        end)
+        CancelBtn.MouseButton1Click:Connect(function()
+            Close()
+            if onCancel then onCancel() end
+        end)
+
+        return Modal
+    end
+
+    -- ============================================
+    -- 关闭按钮: 弹确认框
     -- ============================================
     CloseBtn.MouseButton1Click:Connect(function()
-        Tween(Main, 0.2, {Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0)})
-        task.wait(0.2)
-        ScreenGui:Destroy()
+        ShowConfirm(
+            "关闭界面",
+            "关闭后需要重新加载脚本才能再次打开此界面，确定要关闭吗？",
+            "确定关闭",
+            "取消",
+            function()
+                Tween(Main, 0.2, {Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0)})
+                task.wait(0.2)
+                ScreenGui:Destroy()
+            end
+        )
     end)
-    
+
     -- ============================================
-    -- 最小化: 收缩成正方形图标, 出现在屏幕上方
+    -- 最小化
     -- ============================================
-    local normalPos = UDim2.new(0.5, -WINDOW_W / 2, 0.5, -WINDOW_H / 2)
-    local squarePos = UDim2.new(0.5, -SQUARE_SIZE / 2, 0, 20) -- 屏幕上方居中
-    
-    -- 正方形图标 (初始隐藏)
     local MinIcon = Create("TextLabel", {
         Name = "MinIcon",
         Size = UDim2.new(1, 0, 1, 0),
@@ -330,24 +436,21 @@ function WindUI:CreateWindow(title, subtitle)
         Parent = Main
     })
     Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = MinIcon})
-    
-    -- 正方形点击恢复 (只响应短按, 不是拖动)
+
     local squarePressTime = 0
     local squareMoved = false
-    
+
     MinBtn.MouseButton1Click:Connect(function()
         if not minimized then
-            -- 进入最小化
             minimized = true
-            normalPos = Main.Position -- 记录当前窗口位置
-            
+            normalPos = Main.Position
+
             Content.Visible = false
             Sidebar.Visible = false
             TopBar.Visible = false
             BgImage.Visible = false
             MinIcon.Visible = true
-            
-            -- 收缩到屏幕上方居中, 并变成正方形
+
             Tween(Main, 0.35, {
                 Size = UDim2.new(0, SQUARE_SIZE, 0, SQUARE_SIZE),
                 Position = squarePos,
@@ -355,15 +458,14 @@ function WindUI:CreateWindow(title, subtitle)
             }, Enum.EasingStyle.Back)
         end
     end)
-    
-    -- 点击正方形恢复
+
     Main.InputBegan:Connect(function(input)
         if minimized and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
             squarePressTime = tick()
             squareMoved = false
         end
     end)
-    
+
     UserInputService.InputChanged:Connect(function(input)
         if minimized and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
             if squarePressTime > 0 and tick() - squarePressTime < 0.5 then
@@ -371,21 +473,19 @@ function WindUI:CreateWindow(title, subtitle)
             end
         end
     end)
-    
+
     Main.InputEnded:Connect(function(input)
         if minimized and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
-            -- 短按且没有明显拖动 → 恢复窗口
             if not squareMoved and (tick() - squarePressTime) < 0.3 then
                 minimized = false
-                
                 MinIcon.Visible = false
-                
+
                 Tween(Main, 0.35, {
                     Size = UDim2.new(0, WINDOW_W, 0, WINDOW_H),
                     Position = normalPos,
                     BackgroundColor3 = Config.Theme.Background
                 }, Enum.EasingStyle.Back)
-                
+
                 task.wait(0.1)
                 Content.Visible = true
                 Sidebar.Visible = true
@@ -396,13 +496,13 @@ function WindUI:CreateWindow(title, subtitle)
             squareMoved = false
         end
     end)
-    
+
     -- ============================================
-    -- 添加标签页
+    -- 添加标签页 (支持图片)
     -- ============================================
-    function Window:AddTab(name, icon)
+    function Window:AddTab(name, icon, imageId)
         local Tab = {}
-        
+
         local TabBtn = Create("TextButton", {
             Name = name .. "Tab",
             Size = UDim2.new(1, 0, 0, 34),
@@ -414,10 +514,37 @@ function WindUI:CreateWindow(title, subtitle)
             Parent = TabContainer
         })
         Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = TabBtn})
-        
+
+        local IconLabel
+        if imageId and imageId ~= "" then
+            -- 用图片作为标签图标
+            IconLabel = Create("ImageLabel", {
+                Size = UDim2.new(0, 20, 0, 20),
+                Position = UDim2.new(0, 8, 0.5, -10),
+                BackgroundTransparency = 1,
+                Image = imageId,
+                ImageColor3 = Config.Theme.TextDim,
+                ScaleType = Enum.ScaleType.Fit,
+                ZIndex = 5,
+                Parent = TabBtn
+            })
+        else
+            IconLabel = Create("TextLabel", {
+                Size = UDim2.new(0, 24, 1, 0),
+                Position = UDim2.new(0, 6, 0, 0),
+                BackgroundTransparency = 1,
+                Text = icon or "●",
+                TextColor3 = Config.Theme.TextDim,
+                Font = Config.Font,
+                TextSize = 14,
+                ZIndex = 5,
+                Parent = TabBtn
+            })
+        end
+
         local TabLabel = Create("TextLabel", {
-            Size = UDim2.new(1, -30, 1, 0),
-            Position = UDim2.new(0, 30, 0, 0),
+            Size = UDim2.new(1, -34, 1, 0),
+            Position = UDim2.new(0, 34, 0, 0),
             BackgroundTransparency = 1,
             Text = name,
             TextColor3 = Config.Theme.TextDim,
@@ -427,19 +554,7 @@ function WindUI:CreateWindow(title, subtitle)
             ZIndex = 5,
             Parent = TabBtn
         })
-        
-        local TabIcon = Create("TextLabel", {
-            Size = UDim2.new(0, 24, 1, 0),
-            Position = UDim2.new(0, 6, 0, 0),
-            BackgroundTransparency = 1,
-            Text = icon or "●",
-            TextColor3 = Config.Theme.TextDim,
-            Font = Config.Font,
-            TextSize = 14,
-            ZIndex = 5,
-            Parent = TabBtn
-        })
-        
+
         local Indicator = Create("Frame", {
             Size = UDim2.new(0, 3, 0, 0),
             Position = UDim2.new(0, 0, 0.5, 0),
@@ -449,7 +564,7 @@ function WindUI:CreateWindow(title, subtitle)
             Parent = TabBtn
         })
         Create("UICorner", {CornerRadius = UDim.new(0, 2), Parent = Indicator})
-        
+
         local Page = Create("ScrollingFrame", {
             Name = name .. "Page",
             Size = UDim2.new(1, 0, 1, 0),
@@ -474,27 +589,34 @@ function WindUI:CreateWindow(title, subtitle)
             PaddingRight = UDim.new(0, 12),
             Parent = Page
         })
-        
+
+        local function SetIconColor(c)
+            if IconLabel.ClassName == "ImageLabel" then
+                IconLabel.ImageColor3 = c
+            else
+                IconLabel.TextColor3 = c
+            end
+        end
+
         local function SelectTab()
             if activeTab == Tab then return end
-            
+
             for _, t in pairs(Tabs) do
-                Tween(t.Page, 0.2, {BackgroundTransparency = 1})
                 t.Page.Visible = false
                 Tween(t.Label, 0.15, {TextColor3 = Config.Theme.TextDim})
-                Tween(t.Icon, 0.15, {TextColor3 = Config.Theme.TextDim})
+                Tween(t.Icon, 0.15, {TextColor3 = Config.Theme.TextDim, ImageColor3 = Config.Theme.TextDim})
                 Tween(t.Btn, 0.15, {BackgroundColor3 = Config.Theme.Secondary, BackgroundTransparency = Config.BackgroundImage ~= "" and 0.3 or 0})
                 Tween(t.Indicator, 0.15, {Size = UDim2.new(0, 3, 0, 0)})
             end
-            
+
             Page.Visible = true
             Tween(TabLabel, 0.15, {TextColor3 = Config.Theme.Text})
-            Tween(TabIcon, 0.15, {TextColor3 = Config.Theme.Accent})
+            Tween(IconLabel, 0.15, {TextColor3 = Config.Theme.Accent, ImageColor3 = Config.Theme.Accent})
             Tween(TabBtn, 0.15, {BackgroundColor3 = Config.Theme.Tertiary, BackgroundTransparency = Config.BackgroundImage ~= "" and 0.2 or 0})
             Tween(Indicator, 0.2, {Size = UDim2.new(0, 3, 0, 18)})
             activeTab = Tab
         end
-        
+
         TabBtn.MouseButton1Click:Connect(SelectTab)
         TabBtn.MouseEnter:Connect(function()
             if activeTab ~= Tab then
@@ -506,20 +628,20 @@ function WindUI:CreateWindow(title, subtitle)
                 Tween(TabBtn, 0.15, {BackgroundColor3 = Config.Theme.Secondary, BackgroundTransparency = Config.BackgroundImage ~= "" and 0.3 or 0})
             end
         end)
-        
+
         Tab.Btn = TabBtn
         Tab.Label = TabLabel
-        Tab.Icon = TabIcon
+        Tab.Icon = IconLabel
         Tab.Indicator = Indicator
         Tab.Page = Page
         Tabs[#Tabs + 1] = Tab
-        
+
         if #Tabs == 1 then
             SelectTab()
         end
-        
+
         -- ========== 组件 ==========
-        
+
         function Tab:AddSection(text)
             local Section = Create("Frame", {
                 Size = UDim2.new(1, 0, 0, 30),
@@ -538,7 +660,7 @@ function WindUI:CreateWindow(title, subtitle)
             })
             return Section
         end
-        
+
         function Tab:AddDivider()
             return Create("Frame", {
                 Size = UDim2.new(1, 0, 0, 1),
@@ -547,11 +669,12 @@ function WindUI:CreateWindow(title, subtitle)
                 Parent = Page
             })
         end
-        
+
+        -- 开关
         function Tab:AddToggle(name, default, callback)
             local state = default or false
             local Toggle = {}
-            
+
             local Frame = Create("Frame", {
                 Size = UDim2.new(1, 0, 0, 36),
                 BackgroundColor3 = Config.Theme.Secondary,
@@ -560,7 +683,7 @@ function WindUI:CreateWindow(title, subtitle)
                 Parent = Page
             })
             Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = Frame})
-            
+
             Create("TextLabel", {
                 Size = UDim2.new(0, 200, 1, 0),
                 Position = UDim2.new(0, 12, 0, 0),
@@ -572,7 +695,7 @@ function WindUI:CreateWindow(title, subtitle)
                 TextXAlignment = Enum.TextXAlignment.Left,
                 Parent = Frame
             })
-            
+
             local Switch = Create("Frame", {
                 Size = UDim2.new(0, 36, 0, 20),
                 Position = UDim2.new(1, -48, 0.5, -10),
@@ -581,7 +704,7 @@ function WindUI:CreateWindow(title, subtitle)
                 Parent = Frame
             })
             Create("UICorner", {CornerRadius = UDim.new(1, 0), Parent = Switch})
-            
+
             local Knob = Create("Frame", {
                 Size = UDim2.new(0, 14, 0, 14),
                 Position = state and UDim2.new(1, -17, 0.5, -7) or UDim2.new(0, 3, 0.5, -7),
@@ -590,34 +713,35 @@ function WindUI:CreateWindow(title, subtitle)
                 Parent = Switch
             })
             Create("UICorner", {CornerRadius = UDim.new(1, 0), Parent = Knob})
-            
+
             local Btn = Create("TextButton", {
                 Size = UDim2.new(1, 0, 1, 0),
                 BackgroundTransparency = 1,
                 Text = "",
                 Parent = Frame
             })
-            
+
             function Toggle:Set(value)
                 state = value
                 Tween(Switch, 0.2, {BackgroundColor3 = state and Config.Theme.Accent or Config.Theme.Tertiary})
                 Tween(Knob, 0.2, {Position = state and UDim2.new(1, -17, 0.5, -7) or UDim2.new(0, 3, 0.5, -7)})
                 if callback then callback(state) end
             end
-            
+
             Btn.MouseButton1Click:Connect(function()
                 Toggle:Set(not state)
             end)
-            
+
             Toggle.Value = state
             return Toggle
         end
-        
+
+        -- 滑块
         function Tab:AddSlider(name, min, max, default, callback)
             local Slider = {}
             local value = default or min
             local dragging = false
-            
+
             local Frame = Create("Frame", {
                 Size = UDim2.new(1, 0, 0, 50),
                 BackgroundColor3 = Config.Theme.Secondary,
@@ -626,7 +750,7 @@ function WindUI:CreateWindow(title, subtitle)
                 Parent = Page
             })
             Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = Frame})
-            
+
             Create("TextLabel", {
                 Size = UDim2.new(0.6, 0, 0, 20),
                 Position = UDim2.new(0, 12, 0, 4),
@@ -638,7 +762,7 @@ function WindUI:CreateWindow(title, subtitle)
                 TextXAlignment = Enum.TextXAlignment.Left,
                 Parent = Frame
             })
-            
+
             local ValueLabel = Create("TextLabel", {
                 Size = UDim2.new(0.35, 0, 0, 20),
                 Position = UDim2.new(0.63, 0, 0, 4),
@@ -650,7 +774,7 @@ function WindUI:CreateWindow(title, subtitle)
                 TextXAlignment = Enum.TextXAlignment.Right,
                 Parent = Frame
             })
-            
+
             local BarBg = Create("Frame", {
                 Size = UDim2.new(1, -24, 0, 6),
                 Position = UDim2.new(0, 12, 0, 32),
@@ -659,7 +783,7 @@ function WindUI:CreateWindow(title, subtitle)
                 Parent = Frame
             })
             Create("UICorner", {CornerRadius = UDim.new(1, 0), Parent = BarBg})
-            
+
             local BarFill = Create("Frame", {
                 Size = UDim2.new((value - min) / (max - min), 0, 1, 0),
                 BackgroundColor3 = Config.Theme.Accent,
@@ -667,7 +791,7 @@ function WindUI:CreateWindow(title, subtitle)
                 Parent = BarBg
             })
             Create("UICorner", {CornerRadius = UDim.new(1, 0), Parent = BarFill})
-            
+
             local Knob = Create("Frame", {
                 Size = UDim2.new(0, 14, 0, 14),
                 Position = UDim2.new((value - min) / (max - min), -7, 0.5, -7),
@@ -677,7 +801,7 @@ function WindUI:CreateWindow(title, subtitle)
                 Parent = BarBg
             })
             Create("UICorner", {CornerRadius = UDim.new(1, 0), Parent = Knob})
-            
+
             local function UpdateValue(input)
                 local relX = math.clamp((input.Position.X - BarBg.AbsolutePosition.X) / BarBg.AbsoluteSize.X, 0, 1)
                 value = math.floor(min + (max - min) * relX + 0.5)
@@ -686,26 +810,26 @@ function WindUI:CreateWindow(title, subtitle)
                 ValueLabel.Text = tostring(value)
                 if callback then callback(value) end
             end
-            
+
             BarBg.InputBegan:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                     dragging = true
                     UpdateValue(input)
                 end
             end)
-            
+
             UserInputService.InputChanged:Connect(function(input)
                 if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
                     UpdateValue(input)
                 end
             end)
-            
+
             UserInputService.InputEnded:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                     dragging = false
                 end
             end)
-            
+
             function Slider:Set(val)
                 value = math.clamp(val, min, max)
                 local relX = (value - min) / (max - min)
@@ -714,16 +838,17 @@ function WindUI:CreateWindow(title, subtitle)
                 ValueLabel.Text = tostring(value)
                 if callback then callback(value) end
             end
-            
+
             Slider.Value = value
             return Slider
         end
-        
+
+        -- 下拉单选
         function Tab:AddDropdown(name, options, default, callback)
             local Dropdown = {}
             local selected = default or options[1]
             local expanded = false
-            
+
             local Frame = Create("Frame", {
                 Size = UDim2.new(1, 0, 0, 36),
                 BackgroundColor3 = Config.Theme.Secondary,
@@ -733,14 +858,14 @@ function WindUI:CreateWindow(title, subtitle)
                 Parent = Page
             })
             Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = Frame})
-            
+
             local Header = Create("TextButton", {
                 Size = UDim2.new(1, 0, 0, 36),
                 BackgroundTransparency = 1,
                 Text = "",
                 Parent = Frame
             })
-            
+
             Create("TextLabel", {
                 Size = UDim2.new(0.5, 0, 1, 0),
                 Position = UDim2.new(0, 12, 0, 0),
@@ -752,7 +877,7 @@ function WindUI:CreateWindow(title, subtitle)
                 TextXAlignment = Enum.TextXAlignment.Left,
                 Parent = Header
             })
-            
+
             local ValueLabel = Create("TextLabel", {
                 Size = UDim2.new(0.35, 0, 1, 0),
                 Position = UDim2.new(0.55, 0, 0, 0),
@@ -764,7 +889,7 @@ function WindUI:CreateWindow(title, subtitle)
                 TextXAlignment = Enum.TextXAlignment.Right,
                 Parent = Header
             })
-            
+
             local Arrow = Create("TextLabel", {
                 Size = UDim2.new(0, 20, 1, 0),
                 Position = UDim2.new(1, -26, 0, 0),
@@ -775,7 +900,7 @@ function WindUI:CreateWindow(title, subtitle)
                 TextSize = 14,
                 Parent = Header
             })
-            
+
             local OptionContainer = Create("Frame", {
                 Size = UDim2.new(1, -16, 0, 0),
                 Position = UDim2.new(0, 8, 0, 40),
@@ -787,10 +912,10 @@ function WindUI:CreateWindow(title, subtitle)
                 SortOrder = Enum.SortOrder.LayoutOrder,
                 Parent = OptionContainer
             })
-            
+
             local optionButtons = {}
-            
-            for i, opt in ipairs(options) do
+
+            for _, opt in ipairs(options) do
                 local OptBtn = Create("TextButton", {
                     Size = UDim2.new(1, 0, 0, 28),
                     BackgroundColor3 = Config.Theme.Tertiary,
@@ -802,14 +927,14 @@ function WindUI:CreateWindow(title, subtitle)
                     Parent = OptionContainer
                 })
                 Create("UICorner", {CornerRadius = UDim.new(0, 4), Parent = OptBtn})
-                
+
                 OptBtn.MouseEnter:Connect(function()
                     Tween(OptBtn, 0.1, {BackgroundColor3 = Config.Theme.Accent})
                 end)
                 OptBtn.MouseLeave:Connect(function()
                     Tween(OptBtn, 0.1, {BackgroundColor3 = opt == selected and Config.Theme.Accent or Config.Theme.Tertiary})
                 end)
-                
+
                 OptBtn.MouseButton1Click:Connect(function()
                     selected = opt
                     ValueLabel.Text = opt
@@ -821,13 +946,13 @@ function WindUI:CreateWindow(title, subtitle)
                     Tween(Arrow, 0.2, {Rotation = 0})
                     if callback then callback(selected) end
                 end)
-                
+
                 optionButtons[#optionButtons + 1] = OptBtn
                 if opt == selected then
                     OptBtn.BackgroundColor3 = Config.Theme.Accent
                 end
             end
-            
+
             Header.MouseButton1Click:Connect(function()
                 expanded = not expanded
                 if expanded then
@@ -839,7 +964,7 @@ function WindUI:CreateWindow(title, subtitle)
                     Tween(Arrow, 0.2, {Rotation = 0})
                 end
             end)
-            
+
             function Dropdown:Set(val)
                 selected = val
                 ValueLabel.Text = val
@@ -848,19 +973,19 @@ function WindUI:CreateWindow(title, subtitle)
                 end
                 if callback then callback(selected) end
             end
-            
+
             Dropdown.Value = selected
             return Dropdown
         end
-        
+
+        -- 多选
         function Tab:AddMultiSelect(name, options, default, callback)
             local Multi = {}
             local selected = {}
-            
             if default then
                 for _, v in ipairs(default) do selected[v] = true end
             end
-            
+
             local Frame = Create("Frame", {
                 Size = UDim2.new(1, 0, 0, 36),
                 BackgroundColor3 = Config.Theme.Secondary,
@@ -870,14 +995,14 @@ function WindUI:CreateWindow(title, subtitle)
                 Parent = Page
             })
             Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = Frame})
-            
+
             local Header = Create("TextButton", {
                 Size = UDim2.new(1, 0, 0, 36),
                 BackgroundTransparency = 1,
                 Text = "",
                 Parent = Frame
             })
-            
+
             Create("TextLabel", {
                 Size = UDim2.new(0.5, 0, 1, 0),
                 Position = UDim2.new(0, 12, 0, 0),
@@ -889,10 +1014,10 @@ function WindUI:CreateWindow(title, subtitle)
                 TextXAlignment = Enum.TextXAlignment.Left,
                 Parent = Header
             })
-            
+
             local count = 0
             for _ in pairs(selected) do count = count + 1 end
-            
+
             local ValueLabel = Create("TextLabel", {
                 Size = UDim2.new(0.35, 0, 1, 0),
                 Position = UDim2.new(0.55, 0, 0, 0),
@@ -904,7 +1029,7 @@ function WindUI:CreateWindow(title, subtitle)
                 TextXAlignment = Enum.TextXAlignment.Right,
                 Parent = Header
             })
-            
+
             local Arrow = Create("TextLabel", {
                 Size = UDim2.new(0, 20, 1, 0),
                 Position = UDim2.new(1, -26, 0, 0),
@@ -915,7 +1040,7 @@ function WindUI:CreateWindow(title, subtitle)
                 TextSize = 14,
                 Parent = Header
             })
-            
+
             local OptionContainer = Create("Frame", {
                 Size = UDim2.new(1, -16, 0, 0),
                 Position = UDim2.new(0, 8, 0, 40),
@@ -927,11 +1052,10 @@ function WindUI:CreateWindow(title, subtitle)
                 SortOrder = Enum.SortOrder.LayoutOrder,
                 Parent = OptionContainer
             })
-            
+
             local expanded = false
-            local optionButtons = {}
-            
-            for i, opt in ipairs(options) do
+
+            for _, opt in ipairs(options) do
                 local OptBtn = Create("TextButton", {
                     Size = UDim2.new(1, 0, 0, 28),
                     BackgroundColor3 = selected[opt] and Config.Theme.Accent or Config.Theme.Tertiary,
@@ -945,12 +1069,12 @@ function WindUI:CreateWindow(title, subtitle)
                 })
                 Create("UICorner", {CornerRadius = UDim.new(0, 4), Parent = OptBtn})
                 Create("UIPadding", {PaddingLeft = UDim.new(0, 8), Parent = OptBtn})
-                
+
                 OptBtn.MouseButton1Click:Connect(function()
                     selected[opt] = not selected[opt] or nil
                     OptBtn.BackgroundColor3 = selected[opt] and Config.Theme.Accent or Config.Theme.Tertiary
                     OptBtn.Text = (selected[opt] and "✓ " or "  ") .. opt
-                    
+
                     local c = 0
                     local list = {}
                     for k, v in pairs(selected) do
@@ -959,10 +1083,8 @@ function WindUI:CreateWindow(title, subtitle)
                     ValueLabel.Text = c .. " 项"
                     if callback then callback(list) end
                 end)
-                
-                optionButtons[#optionButtons + 1] = OptBtn
             end
-            
+
             Header.MouseButton1Click:Connect(function()
                 expanded = not expanded
                 if expanded then
@@ -974,7 +1096,7 @@ function WindUI:CreateWindow(title, subtitle)
                     Tween(Arrow, 0.2, {Rotation = 0})
                 end
             end)
-            
+
             function Multi:GetSelected()
                 local list = {}
                 for k, v in pairs(selected) do
@@ -982,10 +1104,11 @@ function WindUI:CreateWindow(title, subtitle)
                 end
                 return list
             end
-            
+
             return Multi
         end
-        
+
+        -- 按钮
         function Tab:AddButton(name, callback)
             local Btn = Create("TextButton", {
                 Size = UDim2.new(1, 0, 0, 34),
@@ -998,7 +1121,7 @@ function WindUI:CreateWindow(title, subtitle)
                 Parent = Page
             })
             Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = Btn})
-            
+
             Btn.MouseEnter:Connect(function()
                 Tween(Btn, 0.15, {BackgroundColor3 = Config.Theme.AccentHover})
             end)
@@ -1008,13 +1131,41 @@ function WindUI:CreateWindow(title, subtitle)
             Btn.MouseButton1Click:Connect(function()
                 if callback then callback() end
             end)
-            
+
             return Btn
         end
-        
+
+        -- 危险按钮
+        function Tab:AddDangerButton(name, callback)
+            local Btn = Create("TextButton", {
+                Size = UDim2.new(1, 0, 0, 34),
+                BackgroundColor3 = Config.Theme.Danger,
+                Text = name,
+                TextColor3 = Config.Theme.Text,
+                Font = Config.FontBold,
+                TextSize = 13,
+                AutoButtonColor = false,
+                Parent = Page
+            })
+            Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = Btn})
+
+            Btn.MouseEnter:Connect(function()
+                Tween(Btn, 0.15, {BackgroundColor3 = Color3.fromRGB(255, 100, 110)})
+            end)
+            Btn.MouseLeave:Connect(function()
+                Tween(Btn, 0.15, {BackgroundColor3 = Config.Theme.Danger})
+            end)
+            Btn.MouseButton1Click:Connect(function()
+                if callback then callback() end
+            end)
+
+            return Btn
+        end
+
+        -- 输入框
         function Tab:AddInput(name, placeholder, callback)
             local Input = {}
-            
+
             local Frame = Create("Frame", {
                 Size = UDim2.new(1, 0, 0, 36),
                 BackgroundColor3 = Config.Theme.Secondary,
@@ -1023,7 +1174,7 @@ function WindUI:CreateWindow(title, subtitle)
                 Parent = Page
             })
             Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = Frame})
-            
+
             Create("TextLabel", {
                 Size = UDim2.new(0.35, 0, 1, 0),
                 Position = UDim2.new(0, 12, 0, 0),
@@ -1035,7 +1186,7 @@ function WindUI:CreateWindow(title, subtitle)
                 TextXAlignment = Enum.TextXAlignment.Left,
                 Parent = Frame
             })
-            
+
             local Box = Create("TextBox", {
                 Size = UDim2.new(0.6, -20, 0, 26),
                 Position = UDim2.new(0.38, 0, 0.5, -13),
@@ -1051,22 +1202,18 @@ function WindUI:CreateWindow(title, subtitle)
             })
             Create("UICorner", {CornerRadius = UDim.new(0, 4), Parent = Box})
             Create("UIPadding", {PaddingLeft = UDim.new(0, 6), PaddingRight = UDim.new(0, 6), Parent = Box})
-            
+
             Box.FocusLost:Connect(function()
                 if callback then callback(Box.Text) end
             end)
-            
-            function Input:Get()
-                return Box.Text
-            end
-            
-            function Input:Set(text)
-                Box.Text = text
-            end
-            
+
+            function Input:Get() return Box.Text end
+            function Input:Set(text) Box.Text = text end
+
             return Input
         end
-        
+
+        -- 标签
         function Tab:AddLabel(text)
             return Create("TextLabel", {
                 Size = UDim2.new(1, 0, 0, 24),
@@ -1079,20 +1226,46 @@ function WindUI:CreateWindow(title, subtitle)
                 Parent = Page
             })
         end
-        
-        function Tab:AddImage(assetId, height)
-            local Image = Create("ImageLabel", {
+
+        -- 图片 (可点击)
+        function Tab:AddImage(assetId, height, callback)
+            local Image = Create("ImageButton", {
                 Size = UDim2.new(1, 0, 0, height or 100),
                 BackgroundColor3 = Config.Theme.Secondary,
                 Image = assetId,
                 ScaleType = Enum.ScaleType.Fit,
+                AutoButtonColor = false,
                 Parent = Page
             })
             Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = Image})
+
+            if callback then
+                Image.MouseButton1Click:Connect(callback)
+            end
             return Image
         end
-        
-        function Tab:AddNotice(title, text)
+
+        -- 圆形头像
+        function Tab:AddAvatar(assetId, size, callback)
+            local Avatar = Create("ImageButton", {
+                Size = UDim2.new(0, size or 60, 0, size or 60),
+                BackgroundColor3 = Config.Theme.Secondary,
+                Image = assetId,
+                ScaleType = Enum.ScaleType.Fit,
+                AutoButtonColor = false,
+                Parent = Page
+            })
+            Create("UICorner", {CornerRadius = UDim.new(1, 0), Parent = Avatar})
+            Create("UIStroke", {Color = Config.Theme.Accent, Thickness = 2, Parent = Avatar})
+
+            if callback then
+                Avatar.MouseButton1Click:Connect(callback)
+            end
+            return Avatar
+        end
+
+        -- 公告
+        function Tab:AddNotice(title, text, color)
             local Frame = Create("Frame", {
                 Size = UDim2.new(1, 0, 0, 60),
                 BackgroundColor3 = Config.Theme.Secondary,
@@ -1101,27 +1274,27 @@ function WindUI:CreateWindow(title, subtitle)
                 Parent = Page
             })
             Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = Frame})
-            
+
             Create("Frame", {
                 Size = UDim2.new(0, 3, 1, -12),
                 Position = UDim2.new(0, 0, 0, 6),
-                BackgroundColor3 = Config.Theme.Warning,
+                BackgroundColor3 = color or Config.Theme.Warning,
                 BorderSizePixel = 0,
                 Parent = Frame
             })
-            
+
             Create("TextLabel", {
                 Size = UDim2.new(1, -20, 0, 20),
                 Position = UDim2.new(0, 14, 0, 8),
                 BackgroundTransparency = 1,
                 Text = "⚠ " .. title,
-                TextColor3 = Config.Theme.Warning,
+                TextColor3 = color or Config.Theme.Warning,
                 Font = Config.FontBold,
                 TextSize = 13,
                 TextXAlignment = Enum.TextXAlignment.Left,
                 Parent = Frame
             })
-            
+
             Create("TextLabel", {
                 Size = UDim2.new(1, -20, 0, 24),
                 Position = UDim2.new(0, 14, 0, 28),
@@ -1134,10 +1307,11 @@ function WindUI:CreateWindow(title, subtitle)
                 TextXAlignment = Enum.TextXAlignment.Left,
                 Parent = Frame
             })
-            
+
             return Frame
         end
-        
+
+        -- 弹窗按钮 (点击弹出)
         function Tab:AddPopup(title, content)
             local Btn = Create("TextButton", {
                 Size = UDim2.new(1, 0, 0, 34),
@@ -1150,114 +1324,50 @@ function WindUI:CreateWindow(title, subtitle)
                 Parent = Page
             })
             Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = Btn})
-            
+
             Btn.MouseEnter:Connect(function()
                 Tween(Btn, 0.15, {BackgroundColor3 = Config.Theme.Accent})
             end)
             Btn.MouseLeave:Connect(function()
                 Tween(Btn, 0.15, {BackgroundColor3 = Config.Theme.Tertiary})
             end)
-            
+
             Btn.MouseButton1Click:Connect(function()
-                local Overlay = Create("Frame", {
-                    Size = UDim2.new(1, 0, 1, 0),
-                    BackgroundColor3 = Color3.new(0, 0, 0),
-                    BackgroundTransparency = 1,
-                    ZIndex = 100,
-                    Parent = ScreenGui
-                })
-                
-                local Modal = Create("Frame", {
-                    Size = UDim2.new(0, 300, 0, 0),
-                    Position = UDim2.new(0.5, -150, 0.5, 0),
-                    BackgroundColor3 = Config.Theme.Background,
-                    BorderSizePixel = 0,
-                    ZIndex = 101,
-                    Parent = Overlay
-                })
-                Create("UICorner", {CornerRadius = UDim.new(0, 10), Parent = Modal})
-                Create("UIStroke", {Color = Config.Theme.Border, Thickness = 1, Parent = Modal})
-                
-                Create("TextLabel", {
-                    Size = UDim2.new(1, -24, 0, 30),
-                    Position = UDim2.new(0, 12, 0, 10),
-                    BackgroundTransparency = 1,
-                    Text = title,
-                    TextColor3 = Config.Theme.Text,
-                    Font = Config.FontBold,
-                    TextSize = 15,
-                    TextXAlignment = Enum.TextXAlignment.Left,
-                    ZIndex = 102,
-                    Parent = Modal
-                })
-                
-                local ContentLabel = Create("TextLabel", {
-                    Size = UDim2.new(1, -24, 0, 0),
-                    Position = UDim2.new(0, 12, 0, 44),
-                    BackgroundTransparency = 1,
-                    Text = content,
-                    TextColor3 = Config.Theme.TextDim,
-                    Font = Config.Font,
-                    TextSize = 13,
-                    TextWrapped = true,
-                    TextXAlignment = Enum.TextXAlignment.Left,
-                    TextYAlignment = Enum.TextYAlignment.Top,
-                    ZIndex = 102,
-                    Parent = Modal
-                })
-                
-                local textBounds = TextService:GetTextSize(content, 13, Config.Font, Vector2.new(276, 1000))
-                local contentHeight = textBounds.Y + 70
-                ContentLabel.Size = UDim2.new(1, -24, 0, contentHeight - 50)
-                
-                local ConfirmBtn = Create("TextButton", {
-                    Size = UDim2.new(0, 100, 0, 32),
-                    Position = UDim2.new(1, -112, 1, -44),
-                    BackgroundColor3 = Config.Theme.Accent,
-                    Text = "确定",
-                    TextColor3 = Config.Theme.Text,
-                    Font = Config.FontBold,
-                    TextSize = 13,
-                    AutoButtonColor = false,
-                    ZIndex = 102,
-                    Parent = Modal
-                })
-                Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = ConfirmBtn})
-                
-                local CancelBtn = Create("TextButton", {
-                    Size = UDim2.new(0, 100, 0, 32),
-                    Position = UDim2.new(1, -220, 1, -44),
-                    BackgroundColor3 = Config.Theme.Tertiary,
-                    Text = "取消",
-                    TextColor3 = Config.Theme.Text,
-                    Font = Config.Font,
-                    TextSize = 13,
-                    AutoButtonColor = false,
-                    ZIndex = 102,
-                    Parent = Modal
-                })
-                Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = CancelBtn})
-                
-                Tween(Overlay, 0.2, {BackgroundTransparency = 0.5})
-                Tween(Modal, 0.3, {Size = UDim2.new(0, 300, 0, contentHeight), Position = UDim2.new(0.5, -150, 0.5, -contentHeight/2)})
-                
-                local function Close()
-                    Tween(Overlay, 0.2, {BackgroundTransparency = 1})
-                    Tween(Modal, 0.2, {Size = UDim2.new(0, 300, 0, 0), Position = UDim2.new(0.5, -150, 0.5, 0)})
-                    task.wait(0.2)
-                    Overlay:Destroy()
-                end
-                
-                ConfirmBtn.MouseButton1Click:Connect(Close)
-                CancelBtn.MouseButton1Click:Connect(Close)
+                ShowConfirm(title, content, "确定", "取消")
             end)
-            
+
             return Btn
         end
-        
+
+        -- 分组框 (带标题)
+        function Tab:AddGroup(title)
+            local Frame = Create("Frame", {
+                Size = UDim2.new(1, 0, 0, 40),
+                BackgroundColor3 = Config.Theme.Secondary,
+                BackgroundTransparency = Config.BackgroundImage ~= "" and 0.25 or 0,
+                BorderSizePixel = 0,
+                Parent = Page
+            })
+            Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = Frame})
+            Create("UIStroke", {Color = Config.Theme.Border, Thickness = 1, Parent = Frame})
+
+            Create("TextLabel", {
+                Size = UDim2.new(1, -20, 1, 0),
+                Position = UDim2.new(0, 12, 0, 0),
+                BackgroundTransparency = 1,
+                Text = title,
+                TextColor3 = Config.Theme.Accent,
+                Font = Config.FontBold,
+                TextSize = 13,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                Parent = Frame
+            })
+            return Frame
+        end
+
         return Tab
     end
-    
+
     -- 通知
     function Window:Notify(title, text, duration)
         local NotifFrame = Create("Frame", {
@@ -1269,7 +1379,7 @@ function WindUI:CreateWindow(title, subtitle)
         })
         Create("UICorner", {CornerRadius = UDim.new(0, 8), Parent = NotifFrame})
         Create("UIStroke", {Color = Config.Theme.Border, Thickness = 1, Parent = NotifFrame})
-        
+
         Create("Frame", {
             Size = UDim2.new(0, 3, 1, -12),
             Position = UDim2.new(0, 0, 0, 6),
@@ -1277,7 +1387,7 @@ function WindUI:CreateWindow(title, subtitle)
             BorderSizePixel = 0,
             Parent = NotifFrame
         })
-        
+
         Create("TextLabel", {
             Size = UDim2.new(1, -20, 0, 20),
             Position = UDim2.new(0, 14, 0, 8),
@@ -1289,7 +1399,7 @@ function WindUI:CreateWindow(title, subtitle)
             TextXAlignment = Enum.TextXAlignment.Left,
             Parent = NotifFrame
         })
-        
+
         Create("TextLabel", {
             Size = UDim2.new(1, -20, 0, 20),
             Position = UDim2.new(0, 14, 0, 28),
@@ -1301,27 +1411,25 @@ function WindUI:CreateWindow(title, subtitle)
             TextXAlignment = Enum.TextXAlignment.Left,
             Parent = NotifFrame
         })
-        
+
         Tween(NotifFrame, 0.3, {Size = UDim2.new(0, 280, 0, 56), Position = UDim2.new(1, -300, 1, -70)})
-        
+
         task.delay(duration or 3, function()
             Tween(NotifFrame, 0.3, {Size = UDim2.new(0, 280, 0, 0), Position = UDim2.new(1, -300, 1, -10)})
             task.wait(0.3)
             NotifFrame:Destroy()
         end)
     end
-    
-    -- 切换显示
+
     function Window:Toggle()
         Main.Visible = not Main.Visible
     end
-    
-    -- 设置背景图
+
     function Window:SetBackground(assetId, transparency, color)
         Config.BackgroundImage = assetId or ""
         Config.BackgroundImageTransparency = transparency or 0.3
         Config.BackgroundImageColor = color or Color3.fromRGB(255, 255, 255)
-        
+
         if assetId and assetId ~= "" then
             BgImage.Image = assetId
             BgImage.ImageTransparency = Config.BackgroundImageTransparency
@@ -1335,12 +1443,11 @@ function WindUI:CreateWindow(title, subtitle)
             Sidebar.BackgroundTransparency = 0
         end
     end
-    
-    -- 手动居中
+
     function Window:Center()
-        CenterWindow()
+        Main.Position = UDim2.new(0.5, -WINDOW_W / 2, 0.5, -WINDOW_H / 2)
     end
-    
+
     return Window
 end
 
