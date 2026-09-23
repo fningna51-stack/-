@@ -2,7 +2,7 @@
     WindUI - 原创风格界面库
     作者: 自定义
     特点: 无AI味,简洁现代,功能完整
-    更新: 功能页可滑动 + 大圆角 + 按键阴影 + 关闭确认 + 光晕
+    更新: 图片标识 + 卡密验证系统 + 可滑动 + 大圆角 + 按键阴影
 --]]
 
 local WindUI = {}
@@ -11,6 +11,7 @@ local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local TextService = game:GetService("TextService")
+local HttpService = game:GetService("HttpService")
 
 local LocalPlayer = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
@@ -43,15 +44,133 @@ local Config = {
     BackgroundImageColor = Color3.fromRGB(255, 255, 255),
     MinIconImage = "",
     MinIconColor = Color3.fromRGB(255, 255, 255),
+    -- 标题栏图片标识
+    TitleIcon = "",                -- 图片ID, 留空则不显示
+    TitleIconSize = 24,            -- 图片尺寸
+    TitleIconColor = Color3.fromRGB(255, 255, 255),
+    TitleIconRound = true,         -- 是否圆角
     CornerRadius = 18,
     ElementRadius = 10,
     ButtonRadius = 10,
     ShadowEnabled = true,
-    -- 滑动配置
-    ScrollSpeed = 60,         -- 滚轮速度 (像素)
-    SmoothScroll = true,      -- 平滑滚动
-    SmoothTime = 0.25         -- 平滑时间
+    ScrollSpeed = 60,
+    SmoothScroll = true,
+    SmoothTime = 0.25
 }
+
+-- ============================================
+-- 卡密验证系统 (内置)
+-- ============================================
+local AuthSystem = {
+    -- 卡密列表 (可自行添加)
+    Keys = {
+        -- ["KEY-XXXX-XXXX-XXXX"] = { Expire = 0 (永久) 或 时间戳, Uses = -1 (无限) 或次数 },
+        -- 示例:
+        -- ["WIND-2024-PRO-0001"] = { Expire = 0, Uses = -1 },
+        -- ["WIND-TRIAL-7DAY-01"] = { Expire = os.time() + 7 * 86400, Uses = -1 },
+    },
+    
+    -- 已使用记录 (运行时缓存, 也可持久化)
+    UsedKeys = {},
+    
+    -- 当前登录信息
+    CurrentKey = nil,
+    CurrentInfo = nil,
+    
+    -- 验证状态
+    Verified = false,
+    
+    -- 是否启用验证 (关闭后直接跳过)
+    Enabled = true,
+    
+    -- 回调
+    OnSuccess = nil,
+    OnFail = nil
+}
+
+-- 生成默认示例卡密 (仅用于演示)
+if next(AuthSystem.Keys) == nil then
+    AuthSystem.Keys["WIND-2024-PRO-0001"] = { Expire = 0, Uses = -1 }
+    AuthSystem.Keys["WIND-2024-PRO-0002"] = { Expire = 0, Uses = -1 }
+    AuthSystem.Keys["WIND-TRIAL-7DAY-01"] = { Expire = os.time() + 7 * 86400, Uses = 1 }
+end
+
+-- 验证卡密
+function AuthSystem:Verify(key)
+    if not key or key == "" then
+        return false, "请输入卡密"
+    end
+    
+    key = string.upper(string.gsub(key, "%s", ""))
+    
+    if not self.Keys[key] then
+        return false, "卡密无效"
+    end
+    
+    local info = self.Keys[key]
+    
+    -- 检查过期
+    if info.Expire and info.Expire > 0 and os.time() > info.Expire then
+        return false, "卡密已过期"
+    end
+    
+    -- 检查使用次数
+    if info.Uses and info.Uses >= 0 then
+        local used = self.UsedKeys[key] or 0
+        if used >= info.Uses then
+            return false, "卡密已用尽"
+        end
+    end
+    
+    -- 记录使用
+    self.UsedKeys[key] = (self.UsedKeys[key] or 0) + 1
+    self.CurrentKey = key
+    self.CurrentInfo = info
+    self.Verified = true
+    
+    return true, "验证成功"
+end
+
+-- 登出
+function AuthSystem:Logout()
+    self.CurrentKey = nil
+    self.CurrentInfo = nil
+    self.Verified = false
+end
+
+-- 获取当前状态
+function AuthSystem:GetStatus()
+    if not self.Verified then
+        return "未登录"
+    end
+    local info = self.CurrentInfo
+    if info.Expire == 0 then
+        return "永久卡密"
+    else
+        local remain = info.Expire - os.time()
+        if remain <= 0 then
+            return "已过期"
+        end
+        local days = math.floor(remain / 86400)
+        return "剩余 " .. days .. " 天"
+    end
+end
+
+-- 添加卡密
+function AuthSystem:AddKey(key, expire, uses)
+    self.Keys[string.upper(key)] = {
+        Expire = expire or 0,
+        Uses = uses or -1
+    }
+end
+
+-- 移除卡密
+function AuthSystem:RemoveKey(key)
+    self.Keys[string.upper(key)] = nil
+end
+
+-- 外部引用
+WindUI.AuthSystem = AuthSystem
 
 -- 工具函数
 local function Create(className, props)
@@ -106,9 +225,7 @@ local function MakeDraggable(frame, handle, getLocked)
     end)
 end
 
--- ============================================
--- 平滑滑动控制器 (核心)
--- ============================================
+-- 平滑滑动控制器
 local function SetupSmoothScroll(scrollFrame)
     local targetY = 0
     local currentY = 0
@@ -117,7 +234,6 @@ local function SetupSmoothScroll(scrollFrame)
     local dragStartCanvas = 0
     local lastInputTime = 0
     local velocity = 0
-    local momentumConn = nil
     
     local function GetMaxScroll()
         return math.max(0, scrollFrame.AbsoluteCanvasSize.Y - scrollFrame.AbsoluteWindowSize.Y)
@@ -130,26 +246,18 @@ local function SetupSmoothScroll(scrollFrame)
         targetY = y
     end
     
-    -- 滚轮滚动 (平滑)
     scrollFrame.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseWheel then
             if GetMaxScroll() <= 0 then return end
-            
             local delta = -input.Position.Z * Config.ScrollSpeed
             targetY = math.clamp(targetY + delta, 0, GetMaxScroll())
-            
-            if not Config.SmoothScroll then
-                SetCanvasY(targetY)
-            end
+            if not Config.SmoothScroll then SetCanvasY(targetY) end
         end
     end)
     
-    -- 平滑滚动更新
     RunService.RenderStepped:Connect(function(dt)
         if isDragging then return end
         if not Config.SmoothScroll then return end
-        
-        -- 阻尼平滑
         local diff = targetY - currentY
         if math.abs(diff) > 0.5 then
             currentY = currentY + diff * math.min(1, dt * (1 / Config.SmoothTime) * 4)
@@ -160,30 +268,15 @@ local function SetupSmoothScroll(scrollFrame)
         end
     end)
     
-    -- 触摸 / 鼠标拖动滑动
-    local dragInput
     scrollFrame.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-            -- 检查是否点在交互组件上, 是则不触发拖动滚动
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                -- 鼠标: 允许拖动空白区域
-                isDragging = true
-                dragStartY = input.Position.Y
-                dragStartCanvas = scrollFrame.CanvasPosition.Y
-                targetY = dragStartCanvas
-                currentY = dragStartCanvas
-                velocity = 0
-                lastInputTime = tick()
-            else
-                -- 触摸: 直接拖动
-                isDragging = true
-                dragStartY = input.Position.Y
-                dragStartCanvas = scrollFrame.CanvasPosition.Y
-                targetY = dragStartCanvas
-                currentY = dragStartCanvas
-                velocity = 0
-                lastInputTime = tick()
-            end
+            isDragging = true
+            dragStartY = input.Position.Y
+            dragStartCanvas = scrollFrame.CanvasPosition.Y
+            targetY = dragStartCanvas
+            currentY = dragStartCanvas
+            velocity = 0
+            lastInputTime = tick()
         end
     end)
     
@@ -192,15 +285,10 @@ local function SetupSmoothScroll(scrollFrame)
         if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
             local deltaY = input.Position.Y - dragStartY
             local newY = math.clamp(dragStartCanvas - deltaY, 0, GetMaxScroll())
-            
-            -- 计算速度
             local now = tick()
             local dt = now - lastInputTime
-            if dt > 0 then
-                velocity = (newY - currentY) / dt
-            end
+            if dt > 0 then velocity = (newY - currentY) / dt end
             lastInputTime = now
-            
             currentY = newY
             targetY = newY
             scrollFrame.CanvasPosition = Vector2.new(0, currentY)
@@ -211,8 +299,6 @@ local function SetupSmoothScroll(scrollFrame)
         if not isDragging then return end
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             isDragging = false
-            
-            -- 惯性滚动
             if math.abs(velocity) > 30 then
                 local momentum = velocity * 0.15
                 targetY = math.clamp(currentY + momentum, 0, GetMaxScroll())
@@ -220,71 +306,28 @@ local function SetupSmoothScroll(scrollFrame)
         end
     end)
     
-    -- 阻止子组件上的滚轮冒泡
-    scrollFrame.MouseEnter:Connect(function()
-        -- 确保鼠标进入时, 滚轮响应正常
-    end)
-    
     return {
         SetY = function(y) SetCanvasY(y) end,
         GetY = function() return currentY end,
-        ScrollTo = function(y) 
-            targetY = math.clamp(y, 0, GetMaxScroll())
-        end
+        ScrollTo = function(y) targetY = math.clamp(y, 0, GetMaxScroll()) end
     }
 end
 
--- 阴影生成器
-local function AddShadow(parent, radius, spread, transparency)
-    if not Config.ShadowEnabled then return end
-    
-    local shadowContainer = Create("Frame", {
-        Name = "Shadow",
-        Size = UDim2.new(1, spread or 12, 1, spread or 12),
-        Position = UDim2.new(0, -(spread or 12)/2, 0, -(spread or 12)/2),
-        BackgroundTransparency = 1,
-        ZIndex = -10,
-        Parent = parent
-    })
-    
-    local outer = Create("Frame", {
-        Size = UDim2.new(1, 0, 1, 0),
-        BackgroundColor3 = Config.Theme.Shadow,
-        BackgroundTransparency = transparency or 0.75,
-        BorderSizePixel = 0,
-        ZIndex = -10,
-        Parent = shadowContainer
-    })
-    Create("UICorner", {CornerRadius = UDim.new(0, radius or 20), Parent = outer})
-    
-    local mid = Create("Frame", {
-        Size = UDim2.new(1, -4, 1, -4),
-        Position = UDim2.new(0, 2, 0, 2),
-        BackgroundColor3 = Config.Theme.Shadow,
-        BackgroundTransparency = (transparency or 0.75) + 0.1,
-        BorderSizePixel = 0,
-        ZIndex = -9,
-        Parent = shadowContainer
-    })
-    Create("UICorner", {CornerRadius = UDim.new(0, radius or 20), Parent = mid})
-    
-    local inner = Create("Frame", {
-        Size = UDim2.new(1, -8, 1, -8),
-        Position = UDim2.new(0, 4, 0, 4),
-        BackgroundColor3 = Config.Theme.Shadow,
-        BackgroundTransparency = (transparency or 0.75) + 0.2,
-        BorderSizePixel = 0,
-        ZIndex = -8,
-        Parent = shadowContainer
-    })
-    Create("UICorner", {CornerRadius = UDim.new(0, radius or 20), Parent = inner})
-    
-    return shadowContainer
-end
-
+-- ============================================
 -- 创建主窗口
-function WindUI:CreateWindow(title, subtitle)
+-- ============================================
+function WindUI:CreateWindow(title, subtitle, options)
+    options = options or {}
     local Window = {}
+    
+    -- 窗口配置 (可覆盖)
+    local winTitleIcon = options.TitleIcon or Config.TitleIcon
+    local winTitleIconSize = options.TitleIconSize or Config.TitleIconSize
+    local winTitleIconColor = options.TitleIconColor or Config.TitleIconColor
+    local winTitleIconRound = options.TitleIconRound ~= nil and options.TitleIconRound or Config.TitleIconRound
+    local requireAuth = options.RequireAuth ~= false  -- 默认需要验证
+    local onAuthSuccess = options.OnAuthSuccess
+    local onAuthFail = options.OnAuthFail
     
     local ScreenGui = Create("ScreenGui", {
         Name = "WindUI",
@@ -294,7 +337,201 @@ function WindUI:CreateWindow(title, subtitle)
         Parent = LocalPlayer:WaitForChild("PlayerGui")
     })
     
-    -- 主框架
+    -- ============================================
+    -- 卡密验证界面
+    -- ============================================
+    local AuthGui = nil
+    local function ShowAuthWindow()
+        if AuthGui then return end
+        
+        AuthGui = Create("Frame", {
+            Name = "AuthWindow",
+            Size = UDim2.new(1, 0, 1, 0),
+            BackgroundColor3 = Color3.new(0, 0, 0),
+            BackgroundTransparency = 0.4,
+            ZIndex = 300,
+            Parent = ScreenGui
+        })
+        
+        local AuthBox = Create("Frame", {
+            Size = UDim2.new(0, 360, 0, 260),
+            Position = UDim2.new(0.5, -180, 0.5, -130),
+            BackgroundColor3 = Config.Theme.Background,
+            BorderSizePixel = 0,
+            ZIndex = 301,
+            Parent = AuthGui
+        })
+        Create("UICorner", {CornerRadius = UDim.new(0, Config.CornerRadius), Parent = AuthBox})
+        Create("UIStroke", {Color = Config.Theme.Border, Thickness = 1, Parent = AuthBox})
+        
+        -- 顶部光晕条
+        local TopAccent = Create("Frame", {
+            Size = UDim2.new(1, -40, 0, 3),
+            Position = UDim2.new(0, 20, 0, 0),
+            BackgroundColor3 = Config.Theme.Accent,
+            BorderSizePixel = 0,
+            ZIndex = 302,
+            Parent = AuthBox
+        })
+        Create("UICorner", {CornerRadius = UDim.new(1, 0), Parent = TopAccent})
+        
+        -- 图标
+        local AuthIcon = Create("ImageLabel", {
+            Size = UDim2.new(0, 48, 0, 48),
+            Position = UDim2.new(0.5, -24, 0, 22),
+            BackgroundTransparency = 1,
+            Image = winTitleIcon ~= "" and winTitleIcon or "rbxassetid://0",
+            ImageColor3 = winTitleIconColor,
+            ScaleType = Enum.ScaleType.Fit,
+            ZIndex = 302,
+            Visible = winTitleIcon ~= "",
+            Parent = AuthBox
+        })
+        Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = AuthIcon})
+        
+        -- 标题
+        Create("TextLabel", {
+            Size = UDim2.new(1, -40, 0, 24),
+            Position = UDim2.new(0, 20, 0, 78),
+            BackgroundTransparency = 1,
+            Text = "卡密验证",
+            TextColor3 = Config.Theme.Text,
+            Font = Config.FontBold,
+            TextSize = 17,
+            TextXAlignment = Enum.TextXAlignment.Center,
+            ZIndex = 302,
+            Parent = AuthBox
+        })
+        
+        Create("TextLabel", {
+            Size = UDim2.new(1, -40, 0, 18),
+            Position = UDim2.new(0, 20, 0, 102),
+            BackgroundTransparency = 1,
+            Text = "请输入您的卡密以继续使用",
+            TextColor3 = Config.Theme.TextDim,
+            Font = Config.Font,
+            TextSize = 12,
+            TextXAlignment = Enum.TextXAlignment.Center,
+            ZIndex = 302,
+            Parent = AuthBox
+        })
+        
+        -- 输入框容器
+        local InputBox = Create("Frame", {
+            Size = UDim2.new(1, -60, 0, 40),
+            Position = UDim2.new(0, 30, 0, 132),
+            BackgroundColor3 = Config.Theme.Secondary,
+            BorderSizePixel = 0,
+            ZIndex = 302,
+            Parent = AuthBox
+        })
+        Create("UICorner", {CornerRadius = UDim.new(0, Config.ElementRadius), Parent = InputBox})
+        Create("UIStroke", {Color = Config.Theme.Border, Thickness = 1, Parent = InputBox})
+        
+        local KeyInput = Create("TextBox", {
+            Size = UDim2.new(1, -20, 1, 0),
+            Position = UDim2.new(0, 10, 0, 0),
+            BackgroundTransparency = 1,
+            Text = "",
+            PlaceholderText = "输入卡密...",
+            PlaceholderColor3 = Config.Theme.TextDim,
+            TextColor3 = Config.Theme.Text,
+            Font = Config.Font,
+            TextSize = 13,
+            ClearTextOnFocus = false,
+            ZIndex = 303,
+            Parent = InputBox
+        })
+        
+        -- 提示文字
+        local HintLabel = Create("TextLabel", {
+            Size = UDim2.new(1, -60, 0, 18),
+            Position = UDim2.new(0, 30, 0, 176),
+            BackgroundTransparency = 1,
+            Text = "",
+            TextColor3 = Config.Theme.Danger,
+            Font = Config.Font,
+            TextSize = 12,
+            TextXAlignment = Enum.TextXAlignment.Center,
+            ZIndex = 302,
+            Parent = AuthBox
+        })
+        
+        -- 验证按钮
+        local VerifyBtn = Create("TextButton", {
+            Size = UDim2.new(1, -60, 0, 40),
+            Position = UDim2.new(0, 30, 1, -56),
+            BackgroundColor3 = Config.Theme.Accent,
+            Text = "验证",
+            TextColor3 = Config.Theme.Text,
+            Font = Config.FontBold,
+            TextSize = 14,
+            AutoButtonColor = false,
+            ZIndex = 303,
+            Parent = AuthBox
+        })
+        Create("UICorner", {CornerRadius = UDim.new(0, Config.ButtonRadius), Parent = VerifyBtn})
+        
+        VerifyBtn.MouseEnter:Connect(function()
+            Tween(VerifyBtn, 0.15, {BackgroundColor3 = Config.Theme.AccentHover})
+        end)
+        VerifyBtn.MouseLeave:Connect(function()
+            Tween(VerifyBtn, 0.15, {BackgroundColor3 = Config.Theme.Accent})
+        end)
+        
+        -- 入场动画
+        AuthBox.Size = UDim2.new(0, 300, 0, 0)
+        AuthBox.Position = UDim2.new(0.5, -150, 0.5, 0)
+        Tween(AuthBox, 0.35, {Size = UDim2.new(0, 360, 0, 260), Position = UDim2.new(0.5, -180, 0.5, -130)}, Enum.EasingStyle.Back)
+        
+        local function CloseAuth()
+            Tween(AuthGui, 0.25, {BackgroundTransparency = 1})
+            Tween(AuthBox, 0.25, {Size = UDim2.new(0, 300, 0, 0), Position = UDim2.new(0.5, -150, 0.5, 0)})
+            task.wait(0.25)
+            AuthGui:Destroy()
+            AuthGui = nil
+        end
+        
+        local function DoVerify()
+            local key = KeyInput.Text
+            local ok, msg = AuthSystem:Verify(key)
+            
+            if ok then
+                HintLabel.TextColor3 = Config.Theme.Success
+                HintLabel.Text = "✓ " .. msg
+                task.wait(0.5)
+                CloseAuth()
+                if onAuthSuccess then onAuthSuccess(key) end
+            else
+                HintLabel.TextColor3 = Config.Theme.Danger
+                HintLabel.Text = "✗ " .. msg
+                
+                -- 抖动动画
+                local origPos = InputBox.Position
+                for i = 1, 3 do
+                    Tween(InputBox, 0.05, {Position = UDim2.new(0, 36, 0, 132)})
+                    task.wait(0.05)
+                    Tween(InputBox, 0.05, {Position = UDim2.new(0, 24, 0, 132)})
+                    task.wait(0.05)
+                end
+                InputBox.Position = origPos
+            end
+        end
+        
+        VerifyBtn.MouseButton1Click:Connect(DoVerify)
+        KeyInput.FocusLost:Connect(function(enterPressed)
+            if enterPressed then DoVerify() end
+        end)
+    end
+    
+    -- 如果需要验证, 先弹验证框
+    if AuthSystem.Enabled and requireAuth and not AuthSystem.Verified then
+        ShowAuthWindow()
+    end
+    
+    -- ============================================
+    -- 主窗口 (验证后可显示)
+    -- ============================================
     local Main = Create("Frame", {
         Name = "Main",
         Size = UDim2.new(0, 580, 0, 400),
@@ -303,9 +540,18 @@ function WindUI:CreateWindow(title, subtitle)
         BorderSizePixel = 0,
         ClipsDescendants = false,
         ZIndex = 10,
+        Visible = not (AuthSystem.Enabled and requireAuth and not AuthSystem.Verified),
         Parent = ScreenGui
     })
     Create("UICorner", {CornerRadius = UDim.new(0, Config.CornerRadius), Parent = Main})
+    
+    -- 验证成功后显示主窗口
+    task.spawn(function()
+        while AuthSystem.Enabled and requireAuth and not AuthSystem.Verified do
+            task.wait(0.1)
+        end
+        Main.Visible = true
+    end)
     
     -- 内容裁剪层
     local ContentClip = Create("Frame", {
@@ -400,7 +646,9 @@ function WindUI:CreateWindow(title, subtitle)
     })
     Create("UICorner", {CornerRadius = UDim.new(0, Config.CornerRadius), Parent = BgImage})
     
-    -- 顶部标题栏
+    -- ============================================
+    -- 顶部标题栏 (带图片标识)
+    -- ============================================
     local TopBar = Create("Frame", {
         Name = "TopBar",
         Size = UDim2.new(1, 0, 0, 48),
@@ -432,10 +680,47 @@ function WindUI:CreateWindow(title, subtitle)
         Parent = TopBar
     })
     
-    Create("TextLabel", {
+    -- ============================================
+    -- 图片标识 (核心新增)
+    -- ============================================
+    local TitleIconImage = Create("ImageLabel", {
+        Name = "TitleIcon",
+        Size = UDim2.new(0, winTitleIconSize, 0, winTitleIconSize),
+        Position = UDim2.new(0, 18, 0.5, -winTitleIconSize / 2),
+        BackgroundTransparency = 1,
+        Image = winTitleIcon,
+        ImageColor3 = winTitleIconColor,
+        ScaleType = Enum.ScaleType.Fit,
+        ZIndex = 15,
+        Visible = winTitleIcon ~= "",
+        Parent = TopBar
+    })
+    
+    if winTitleIconRound then
+        Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = TitleIconImage})
+    end
+    
+    -- 标识容器 (用于阴影, 增强立体感)
+    local TitleIconShadow = Create("Frame", {
+        Name = "TitleIconShadow",
+        Size = UDim2.new(0, winTitleIconSize, 0, winTitleIconSize),
+        Position = UDim2.new(0, 18, 0.5, -winTitleIconSize / 2 + 2),
+        BackgroundColor3 = Color3.new(0, 0, 0),
+        BackgroundTransparency = 0.75,
+        BorderSizePixel = 0,
+        ZIndex = 14,
+        Visible = winTitleIcon ~= "",
+        Parent = TopBar
+    })
+    Create("UICorner", {CornerRadius = UDim.new(0, winTitleIconRound and 6 or 0), Parent = TitleIconShadow})
+    
+    -- 标题文字 (根据是否有图标动态调整位置)
+    local titleStartX = winTitleIcon ~= "" and (18 + winTitleIconSize + 10) or 18
+    
+    local TitleLabel = Create("TextLabel", {
         Name = "Title",
         Size = UDim2.new(0, 200, 1, 0),
-        Position = UDim2.new(0, 18, 0, 0),
+        Position = UDim2.new(0, titleStartX, 0, 0),
         BackgroundTransparency = 1,
         Text = title or "WindUI",
         TextColor3 = Config.Theme.Text,
@@ -449,7 +734,7 @@ function WindUI:CreateWindow(title, subtitle)
     Create("TextLabel", {
         Name = "Subtitle",
         Size = UDim2.new(0, 200, 1, 0),
-        Position = UDim2.new(0, 18 + (#title * 8) + 10, 0, 0),
+        Position = UDim2.new(0, titleStartX + (#title * 8) + 10, 0, 0),
         BackgroundTransparency = 1,
         Text = subtitle or "",
         TextColor3 = Config.Theme.TextDim,
@@ -527,6 +812,55 @@ function WindUI:CreateWindow(title, subtitle)
         ZIndex = 13,
         Parent = Sidebar
     })
+    
+    -- ============================================
+    -- 卡密状态条 (侧边栏底部)
+    -- ============================================
+    if AuthSystem.Enabled and requireAuth then
+        local StatusBar = Create("Frame", {
+            Name = "AuthStatusBar",
+            Size = UDim2.new(1, -12, 0, 32),
+            Position = UDim2.new(0, 6, 1, -40),
+            BackgroundColor3 = Config.Theme.Tertiary,
+            BackgroundTransparency = 0.3,
+            BorderSizePixel = 0,
+            ZIndex = 14,
+            Parent = Sidebar
+        })
+        Create("UICorner", {CornerRadius = UDim.new(0, 8), Parent = StatusBar})
+        
+        local StatusDot = Create("Frame", {
+            Size = UDim2.new(0, 6, 0, 6),
+            Position = UDim2.new(0, 10, 0.5, -3),
+            BackgroundColor3 = AuthSystem.Verified and Config.Theme.Success or Config.Theme.Danger,
+            BorderSizePixel = 0,
+            ZIndex = 15,
+            Parent = StatusBar
+        })
+        Create("UICorner", {CornerRadius = UDim.new(1, 0), Parent = StatusDot})
+        
+        local StatusText = Create("TextLabel", {
+            Size = UDim2.new(1, -28, 1, 0),
+            Position = UDim2.new(0, 22, 0, 0),
+            BackgroundTransparency = 1,
+            Text = AuthSystem:GetStatus(),
+            TextColor3 = Config.Theme.TextDim,
+            Font = Config.Font,
+            TextSize = 11,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            ZIndex = 15,
+            Parent = StatusBar
+        })
+        
+        -- 实时更新状态
+        task.spawn(function()
+            while StatusBar.Parent do
+                task.wait(1)
+                StatusText.Text = AuthSystem:GetStatus()
+                StatusDot.BackgroundColor3 = AuthSystem.Verified and Config.Theme.Success or Config.Theme.Danger
+            end
+        end)
+    end
     
     local TabContainer = Create("ScrollingFrame", {
         Name = "Tabs",
@@ -863,9 +1197,6 @@ function WindUI:CreateWindow(title, subtitle)
         })
         Create("UICorner", {CornerRadius = UDim.new(1, 0), Parent = Indicator})
         
-        -- ============================================
-        -- 可滑动的功能页面 (核心更新)
-        -- ============================================
         local PageScroll = Create("ScrollingFrame", {
             Name = name .. "PageScroll",
             Size = UDim2.new(1, 0, 1, 0),
@@ -883,7 +1214,6 @@ function WindUI:CreateWindow(title, subtitle)
         })
         Create("UICorner", {CornerRadius = UDim.new(0, 8), Parent = PageScroll})
         
-        -- 内部容器 (用于自动布局)
         local Page = Create("Frame", {
             Name = name .. "Page",
             Size = UDim2.new(1, 0, 0, 0),
@@ -905,7 +1235,6 @@ function WindUI:CreateWindow(title, subtitle)
             Parent = Page
         })
         
-        -- 自动更新 CanvasSize
         local function UpdateCanvas()
             local layout = Page:FindFirstChildOfClass("UIListLayout")
             if layout then
@@ -923,17 +1252,14 @@ function WindUI:CreateWindow(title, subtitle)
             UpdateCanvas()
         end)
         
-        -- 监听内容大小变化
         local layout = Page:FindFirstChildOfClass("UIListLayout")
         if layout then
             layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(UpdateCanvas)
         end
         
-        -- 启用平滑滚动
         local scrollController = SetupSmoothScroll(PageScroll)
         Tab.ScrollController = scrollController
         
-        -- 悬停时改变滚动条颜色
         PageScroll.MouseEnter:Connect(function()
             Tween(PageScroll, 0.15, {ScrollBarImageTransparency = 0.1})
         end)
@@ -959,7 +1285,6 @@ function WindUI:CreateWindow(title, subtitle)
             Tween(Indicator, 0.2, {Size = UDim2.new(0, 3, 0, 16)})
             activeTab = Tab
             
-            -- 切换后重置滚动位置
             task.wait()
             scrollController.SetY(0)
         end
@@ -989,7 +1314,7 @@ function WindUI:CreateWindow(title, subtitle)
             SelectTab()
         end
         
-        -- ========== 组件 (全部添加到 Page 容器) ==========
+        -- ========== 组件 ==========
         
         function Tab:AddSection(text)
             local Section = Create("Frame", {
@@ -2042,10 +2367,8 @@ function WindUI:CreateWindow(title, subtitle)
     function Window:SetMinimizeIcon(assetId, color)
         Config.MinIconImage = assetId or ""
         Config.MinIconColor = color or Color3.fromRGB(255, 255, 255)
-        
         MinIconImage.Image = Config.MinIconImage
         MinIconImage.ImageColor3 = Config.MinIconColor
-        
         if minimized then
             if Config.MinIconImage ~= "" then
                 MinIcon.Text = ""
@@ -2057,11 +2380,56 @@ function WindUI:CreateWindow(title, subtitle)
         end
     end
     
+    -- ============================================
+    -- 动态更换标题图片标识
+    -- ============================================
+    function Window:SetTitleIcon(assetId, color, size)
+        if assetId ~= nil then
+            TitleIconImage.Image = assetId
+            TitleIconShadow.Visible = assetId ~= ""
+            TitleIconImage.Visible = assetId ~= ""
+            winTitleIcon = assetId
+        end
+        if color then
+            TitleIconImage.ImageColor3 = color
+            winTitleIconColor = color
+        end
+        if size then
+            TitleIconImage.Size = UDim2.new(0, size, 0, size)
+            TitleIconImage.Position = UDim2.new(0, 18, 0.5, -size / 2)
+            TitleIconShadow.Size = UDim2.new(0, size, 0, size)
+            TitleIconShadow.Position = UDim2.new(0, 18, 0.5, -size / 2 + 2)
+            winTitleIconSize = size
+            -- 调整标题文字位置
+            local newStartX = assetId ~= "" and (18 + size + 10) or 18
+            TitleLabel.Position = UDim2.new(0, newStartX, 0, 0)
+        end
+    end
+    
+    -- 获取当前登录的卡密信息
+    function Window:GetAuthInfo()
+        return {
+            Verified = AuthSystem.Verified,
+            Key = AuthSystem.CurrentKey,
+            Info = AuthSystem.CurrentInfo,
+            Status = AuthSystem:GetStatus()
+        }
+    end
+    
+    -- 手动触发登出
+    function Window:Logout()
+        AuthSystem:Logout()
+        Main.Visible = false
+        ShadowLayer1.Visible = false
+        ShadowLayer2.Visible = false
+        GlowLayer1.Visible = false
+        ShowAuthWindow()
+    end
+    
     function Window:Center()
         CenterWindow()
     end
     
-    -- 设置滑动参数
     function Window:SetScrollConfig(speed, smooth, smoothTime)
         if speed then Config.ScrollSpeed = speed end
         if smooth ~= nil then Config.SmoothScroll = smooth end
