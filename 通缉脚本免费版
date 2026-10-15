@@ -77,27 +77,31 @@ end
 local NotifGui = new("ScreenGui", {Name="MoonNotifs", ResetOnSpawn=false, ZIndexBehavior=Enum.ZIndexBehavior.Sibling})
 NotifGui.Parent = Player:WaitForChild("PlayerGui")
 
+local notifCount = 0
+
 function MoonLib:Notify(title, text, dur, icon)
     dur = dur or 3
-    local holder = new("Frame", {
-        Name="Holder", AnchorPoint=Vector2.new(1,0), Position=UDim2.new(1,-15,0,15),
-        Size=UDim2.new(0,300,1,-30), BackgroundTransparency=1,
-        Parent=NotifGui
-    })
-    local layout = new("UIListLayout", {Padding=UDim.new(0,8), SortOrder=Enum.SortOrder.LayoutOrder, VerticalAlignment=Enum.VerticalAlignment.Top, Parent=holder})
-    layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        holder.CanvasSize = UDim2.new(0,0,0,layout.AbsoluteContentSize.Y)
-    end)
+    local holder = NotifGui:FindFirstChild("Holder")
+    if not holder then
+        holder = new("Frame", {
+            Name="Holder", AnchorPoint=Vector2.new(1,0), Position=UDim2.new(1,-15,0,15),
+            Size=UDim2.new(0,300,1,-30), BackgroundTransparency=1,
+            Parent=NotifGui
+        })
+        new("UIListLayout", {Padding=UDim.new(0,8), SortOrder=Enum.SortOrder.LayoutOrder,
+            VerticalAlignment=Enum.VerticalAlignment.Top, Parent=holder})
+    end
 
+    notifCount += 1
     local notif = new("Frame", {
         Size=UDim2.new(1,0,0,64), BackgroundColor3=THEME.Background2,
-        BackgroundTransparency=1, LayoutOrder=#holder:GetChildren(),
+        BackgroundTransparency=1, LayoutOrder=notifCount,
         Parent=holder
     })
     round(notif, 10); stroke(notif); shadow(notif)
     local bar = new("Frame", {Size=UDim2.new(0,4,1,0), BackgroundColor3=THEME.Accent, BackgroundTransparency=1, Parent=notif})
     round(bar, 4)
-    local img = new("ImageLabel", {Size=UDim2.new(0,34,0,34), Position=UDim2.new(=UDim2.new(0,14,0.5,-17),
+    local img = new("ImageLabel", {Size=UDim2.new(0,34,0,34), Position=UDim2.new(0,14,0.5,-17),
         BackgroundTransparency=1, Image=icon or "rbxassetid://7733964719", ImageColor3=THEME.Accent, ImageTransparency=1, Parent=notif})
     local t = new("TextLabel", {Size=UDim2.new(1,-64,0,20), Position=UDim2.new(0,56,0,8),
         BackgroundTransparency=1, Text=title or "通知", TextColor3=THEME.Text, Font=Enum.Font.GothamBold,
@@ -168,7 +172,7 @@ function MoonLib:CreateWindow(config)
     self.Main = main
 
     -- 背景渐变
-    local grad = new("UIGradient", {
+    new("UIGradient", {
         Color=ColorSequence.new{
             ColorSequenceKeypoint.new(0, Color3.fromRGB(28,28,36)),
             ColorSequenceKeypoint.new(1, Color3.fromRGB(18,18,24))
@@ -179,12 +183,12 @@ function MoonLib:CreateWindow(config)
     -- ── 标题栏 ──
     local topbar = new("Frame", {Size=UDim2.new(1,0,0,38), BackgroundColor3=THEME.Background2, Parent=main})
     round(topbar, 12)
-    local topbarFix = new("Frame", {Size=UDim2.new(1,0,0,12), Position=UDim2.new(0,0,1,-12), BackgroundColor3=THEME.Background2, Parent=topbar})
+    new("Frame", {Size=UDim2.new(1,0,0,12), Position=UDim2.new(0,0,1,-12), BackgroundColor3=THEME.Background2, Parent=topbar})
     stroke(topbar, Color3.fromRGB(55,55,70), 0.5)
 
-    local titleIcon = new("ImageLabel", {Size=UDim2.new(0,22,0,22), Position=UDim2.new(0,12,0.5,-11),
+    new("ImageLabel", {Size=UDim2.new(0,22,0,22), Position=UDim2.new(0,12,0.5,-11),
         BackgroundTransparency=1, Image=self.Icon, Parent=topbar})
-    local title = new("TextLabel", {Size=UDim2.new(0,400,1,0), Position=UDim2.new(0,42,0,0),
+    new("TextLabel", {Size=UDim2.new(0,400,1,0), Position=UDim2.new(0,42,0,0),
         BackgroundTransparency=1, Text=self.Name, TextColor3=THEME.Text, Font=Enum.Font.GothamBold, TextSize=15,
         TextXAlignment=Enum.TextXAlignment.Left, Parent=topbar})
 
@@ -218,7 +222,7 @@ function MoonLib:CreateWindow(config)
     -- ── 搜索栏（顶部） ──
     local searchBox = new("Frame", {Size=UDim2.new(1,-24,0,30), Position=UDim2.new(0,12,0,48), BackgroundColor3=THEME.Element, Parent=main})
     round(searchBox, 8)
-    local searchIcon = new("ImageLabel", {Size=UDim2.new(0,16,0,16), Position=UDim2.new(0,10,0.5,-8), BackgroundTransparency=1,
+    new("ImageLabel", {Size=UDim2.new(0,16,0,16), Position=UDim2.new(0,10,0.5,-8), BackgroundTransparency=1,
         Image="rbxassetid://7734053495", ImageColor3=THEME.SubText, Parent=searchBox})
     local searchInput = new("TextBox", {Size=UDim2.new(1,-44,1,0), Position=UDim2.new(0,32,0,0),
         BackgroundTransparency=1, Text="", PlaceholderText="🔍 搜索功能...", PlaceholderColor3=THEME.SubText,
@@ -227,7 +231,7 @@ function MoonLib:CreateWindow(config)
     -- ── 标签栏（左侧） ──
     local tabBar = new("Frame", {Size=UDim2.new(0,140,1,-128), Position=UDim2.new(0,12,0,86), BackgroundColor3=THEME.Background2, Parent=main})
     round(tabBar, 10)
-    local tabList = new("UIListLayout", {Padding=UDim.new(0,4), HorizontalAlignment=Enum.HorizontalAlignment.Center,
+    new("UIListLayout", {Padding=UDim.new(0,4), HorizontalAlignment=Enum.HorizontalAlignment.Center,
         SortOrder=Enum.SortOrder.LayoutOrder, Parent=tabBar})
     new("UIPadding", {PaddingTop=UDim.new(0,6), Parent=tabBar})
 
@@ -240,7 +244,7 @@ function MoonLib:CreateWindow(config)
     round(bottombar, 8)
     local fpsLabel = new("TextLabel", {Size=UDim2.new(0.4,0,1,0), Position=UDim2.new(0,10,0,0), BackgroundTransparency=1,
         Text="⚡ FPS: 60", TextColor3=THEME.SubText, Font=Enum.Font.Gotham, TextSize=11, TextXAlignment=Enum.TextXAlignment.Left, Parent=bottombar})
-    local keyLabel = new("TextLabel", {Size=UDim2.new(0.55,0,1,0), Position=UDim2.new(0.45,0,0,0), BackgroundTransparency=1,
+    new("TextLabel", {Size=UDim2.new(0.55,0,1,0), Position=UDim2.new(0.45,0,0,0), BackgroundTransparency=1,
         Text="按键 ["..self.ToggleKey.Name.."] 隐藏/显示", TextColor3=THEME.SubText, Font=Enum.Font.Gotham, TextSize=11,
         TextXAlignment=Enum.TextXAlignment.Right, Parent=bottombar})
     local accDot = new("Frame", {Size=UDim2.new(0,6,0,6), Position=UDim2.new(1,-14,0.5,-3), BackgroundColor3=THEME.ToggleOn, Parent=bottombar})
@@ -268,11 +272,10 @@ function MoonLib:CreateWindow(config)
         for _, tab in ipairs(self.Tabs) do
             local any = false
             for _, el in ipairs(tab.Elements) do
-                local show = q == "" or string.find(string.lower(el.SearchText), q, 1, true)
+                local show = q == "" or string.find(string.lower(el.SearchText), q, 1, true) ~= nil
                 el.Frame.Visible = show
                 if show then any = true end
             end
-            -- 搜索时自动切到有结果的标签
             if any and q ~= "" then self:SelectTab(tab) end
         end
     end)
@@ -309,13 +312,12 @@ function MoonLib:CreateWindow(config)
     -- ══════════ 关闭（带确认框 + 动画） ══════════
     closeBtn.MouseButton1Click:Connect(function()
         if config.CloseConfirm == false then self:Destroy(); return end
-        -- 确认框
         local confirm = new("Frame", {AnchorPoint=Vector2.new(0.5,0.5), Position=UDim2.new(0.5,0,0.5,0),
             Size=UDim2.new(0,320,0,150), BackgroundColor3=THEME.Background2, ZIndex=10, Parent=gui})
         round(confirm, 12); stroke(confirm); shadow(confirm)
-        local ct = new("TextLabel", {Size=UDim2.new(1,-20,0,24), Position=UDim2.new(0,10,0,14), ZIndex=11,
+        new("TextLabel", {Size=UDim2.new(1,-20,0,24), Position=UDim2.new(0,10,0,14), ZIndex=11,
             BackgroundTransparency=1, Text="⚠️ 确认关闭", TextColor3=THEME.Text, Font=Enum.Font.GothamBold, TextSize=16, Parent=confirm})
-        local cd = new("TextLabel", {Size=UDim2.new(1,-20,0,40), Position=UDim2.new(0,10,0,44), ZIndex=11,
+        new("TextLabel", {Size=UDim2.new(1,-20,0,40), Position=UDim2.new(0,10,0,44), ZIndex=11,
             BackgroundTransparency=1, Text="确定要关闭脚本吗？此操作不可撤销。", TextColor3=THEME.SubText,
             Font=Enum.Font.Gotham, TextSize=13, TextWrapped=true, Parent=confirm})
         local yesBtn = new("TextButton", {Size=UDim2.new(0.45,-16,0,32), Position=UDim2.new(0,10,1,-44), ZIndex=11,
@@ -363,10 +365,10 @@ function MoonLib:CreateWindow(config)
         local page = new("ScrollingFrame", {Size=UDim2.new(1,0,1,0), BackgroundTransparency=1,
             ScrollBarThickness=3, ScrollBarImageColor3=THEME.Accent, CanvasSize=UDim2.new(0,0,0,0),
             Visible=false, Parent=container})
-        new("UIListLayout", {Padding=UDim.new(0,6), SortOrder=Enum.SortOrder.LayoutOrder, Parent=page})
+        local pLayout = new("UIListLayout", {Padding=UDim.new(0,6), SortOrder=Enum.SortOrder.LayoutOrder, Parent=page})
         new("UIPadding", {PaddingTop=UDim.new(0,2), Parent=page})
-        page.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            page.CanvasSize = UDim2.new(0,0,0,page.UIListLayout.AbsoluteContentSize.Y + 4)
+        pLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            page.CanvasSize = UDim2.new(0,0,0,pLayout.AbsoluteContentSize.Y + 4)
         end)
 
         tab.Page = page; tab.Button = btn
@@ -390,7 +392,6 @@ function MoonLib:CreateWindow(config)
             t.Button.TextLabel.TextColor3 = active and Color3.new(1,1,1) or THEME.SubText
         end
         self.CurrentTab = tab
-        -- 切换标签动画
         tab.Page.Position = UDim2.new(0,0,0,14)
         tween(tab.Page, 0.3, {Position=UDim2.new(0,0,0,0)})
     end
@@ -400,15 +401,14 @@ function MoonLib:CreateWindow(config)
         local el = new("Frame", {Size=UDim2.new(1,0,0,height), BackgroundColor3=THEME.Element,
             LayoutOrder=#tab.Elements + 1, Parent=tab.Page})
         round(el, 8)
-        local lIcon
         if icon then
-            lIcon = new("ImageLabel", {Size=UDim2.new(0,18,0,18), Position=UDim2.new(0,10,0,10),
+            new("ImageLabel", {Size=UDim2.new(0,18,0,18), Position=UDim2.new(0,10,0,10),
                 BackgroundTransparency=1, Image=icon, ImageColor3=THEME.Accent, Parent=el})
         end
-        local label = new("TextLabel", {Size=UDim2.new(1,-20,0,20), Position=UDim2.new(0, icon and 34 or 10,0,8),
+        new("TextLabel", {Size=UDim2.new(1,-20,0,20), Position=UDim2.new(0, icon and 34 or 10, 0, 8),
             BackgroundTransparency=1, Text=titleText, TextColor3=THEME.Text, Font=Enum.Font.GothamSemibold,
             TextSize=13, TextXAlignment=Enum.TextXAlignment.Left, Parent=el})
-        return el, label
+        return el
     end
 
     -- ── 按钮 ──
@@ -437,7 +437,6 @@ function MoonLib:CreateWindow(config)
             Font=Enum.Font.GothamSemibold, TextSize=12, AutoButtonColor=false, Parent=el})
         round(btn, 6)
         btn.MouseButton1Click:Connect(function()
-            -- 抖动提示
             for i=1,3 do
                 tween(btn, 0.05, {Position=UDim2.new(0,12,1,-32)})
                 tween(btn, 0.05, {Position=UDim2.new(0,8,1,-32)})
@@ -526,16 +525,17 @@ function MoonLib:CreateWindow(config)
         local open = false
         local el = makeElement(tab, cfg.Title, 62, cfg.Icon)
         local btn = new("TextButton", {Size=UDim2.new(1,-20,0,26), Position=UDim2.new(0,10,1,-32),
-            BackgroundColor3=THEME.Background, Text="  "..selected, TextColor3=THEME.Text, Font=Enum.Font.Gotham,
+            BackgroundColor3=THEME.Background, Text="  "..tostring(selected), TextColor3=THEME.Text, Font=Enum.Font.Gotham,
             TextSize=12, TextXAlignment=Enum.TextXAlignment.Left, Parent=el})
         round(btn, 6); stroke(btn)
         local arrow = new("TextLabel", {Size=UDim2.new(0,20,0,20), Position=UDim2.new(1,-24,0.5,-10),
             BackgroundTransparency=1, Text="▼", TextColor3=THEME.SubText, Font=Enum.Font.GothamBold, TextSize=10, Parent=btn})
 
-        local drop = new("Frame", {Size=UDim2.new(1,-20,0,0), Position=UDim2.new(0,10,0,0),
+        local drop = new("Frame", {Size=UDim2.new(1,-20,0,0), Position=UDim2.new(0,10,1,-34),
             BackgroundColor3=THEME.Background2, ClipsDescendants=true, Visible=false, ZIndex=8, Parent=el})
         round(drop, 8); stroke(drop)
-        local dLayout = new("UIListLayout", {SortOrder=Enum.SortOrder.LayoutOrder, Parent=drop})
+        new("UIListLayout", {SortOrder=Enum.SortOrder.LayoutOrder, Padding=UDim.new(0,4), Parent=drop})
+        new("UIPadding", {PaddingTop=UDim.new(0,4), Parent=drop})
 
         local function close()
             open = false; clickBg.Visible = false
@@ -543,11 +543,12 @@ function MoonLib:CreateWindow(config)
             tween(drop, 0.25, {Size=UDim2.new(1,-20,0,0)})
             task.delay(0.26, function() drop.Visible=false end)
         end
-        for i, opt in ipairs(cfg.Options) do
-            local ob = new("TextButton", {Size=UDim2.new(1,0,0,26), BackgroundColor3=THEME.Transparent,
-                BackgroundTransparency=1, Text="  "..tostring(opt), TextColor3=THEME.Text, Font=Enum.Font.Gotham,
+
+        local function addOption(opt, i)
+            local ob = new("TextButton", {Size=UDim2.new(1,0,0,26), BackgroundTransparency=1,
+                BackgroundColor3=THEME.ElementHover, Text="  "..tostring(opt), TextColor3=THEME.Text, Font=Enum.Font.Gotham,
                 TextSize=12, TextXAlignment=Enum.TextXAlignment.Left, LayoutOrder=i, ZIndex=9, Parent=drop})
-            ob.MouseEnter:Connect(function() tween(ob,0.1,{BackgroundTransparency=0.5,BackgroundColor3=THEME.ElementHover}) end)
+            ob.MouseEnter:Connect(function() tween(ob,0.1,{BackgroundTransparency=0.5}) end)
             ob.MouseLeave:Connect(function() tween(ob,0.1,{BackgroundTransparency=1}) end)
             ob.MouseButton1Click:Connect(function()
                 selected = opt; btn.Text = "  "..tostring(opt)
@@ -555,26 +556,25 @@ function MoonLib:CreateWindow(config)
                 close()
             end)
         end
+
+        for i, opt in ipairs(cfg.Options) do addOption(opt, i) end
+
         btn.MouseButton1Click:Connect(function()
             open = not open
             if open then
                 drop.Visible = true; clickBg.Visible = true
                 tween(arrow, 0.2, {Rotation=180})
-                tween(drop, 0.28, {Size=UDim2.new(1,-20,0,#cfg.Options*26 + 8)})
+                tween(drop, 0.28, {Size=UDim2.new(1,-20,0,#cfg.Options*30 + 8)})
             else close() end
         end)
         clickBg.MouseButton1Click:Connect(function() if open then close() end end)
+
         tab:RegisterElement(el, cfg.Title.." 下拉 "..table.concat(cfg.Options, " "))
         return {Get=function() return selected end,
-            Refresh=function(opts) cfg.Options=opts
+            Refresh=function(opts)
+                cfg.Options = opts
                 for _, c in ipairs(drop:GetChildren()) do if c:IsA("TextButton") then c:Destroy() end end
-                for i, opt in ipairs(opts) do
-                    local ob = new("TextButton", {Size=UDim2.new(1,0,0,26), BackgroundTransparency=1,
-                        Text="  "..tostring(opt), TextColor3=THEME.Text, Font=Enum.Font.Gotham, TextSize=12,
-                        TextXAlignment=Enum.TextXAlignment.Left, LayoutOrder=i, ZIndex=9, Parent=drop})
-                    ob.MouseButton1Click:Connect(function() selected=opt; btn.Text="  "..tostring(opt); close()
-                        if cfg.Callback then cfg.Callback(opt) end end)
-                end
+                for i, opt in ipairs(opts) do addOption(opt, i) end
             end}
     end
 
@@ -651,47 +651,48 @@ function MoonLib:CreateWindow(config)
             rBox.Text = tostring(math.floor(color.R*255 + 0.5))
             gBox.Text = tostring(math.floor(color.G*255 + 0.5))
             bBox.Text = tostring(math.floor(color.B*255 + 0.5))
+            svCursor.Position = UDim2.new(s, 0, 1-v, 0)
+            hueCursor.Position = UDim2.new(0.5, 0, h, 0)
             if emit and cfg.Callback then cfg.Callback(color) end
         end
-        fromRGB(color)
+        fromRGB(color); update(false)
 
         local pickingSV, pickingHue = false, false
         svMap.InputBegan:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 then pickingSV=true
             s = math.clamp((i.Position.X-svMap.AbsolutePosition.X)/svMap.AbsoluteSize.X,0,1)
             v = 1-math.clamp((i.Position.Y-svMap.AbsolutePosition.Y)/svMap.AbsoluteSize.Y,0,1)
-            tween(svCursor,0.1,{Position=UDim2.new(s,0,1-v,0)}); update(true) end end)
+            update(true) end end)
         hueBar.InputBegan:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 then pickingHue=true
             h = math.clamp((i.Position.Y-hueBar.AbsolutePosition.Y)/hueBar.AbsoluteSize.Y,0,1)
-            tween(hueCursor,0.1,{Position=UDim2.new(0.5,0,h,0)}); update(true) end end)
+            update(true) end end)
         UserInputService.InputChanged:Connect(function(i)
             if i.UserInputType ~= Enum.UserInputType.MouseMovement then return end
             if pickingSV then
                 s = math.clamp((i.Position.X-svMap.AbsolutePosition.X)/svMap.AbsoluteSize.X,0,1)
                 v = 1-math.clamp((i.Position.Y-svMap.AbsolutePosition.Y)/svMap.AbsoluteSize.Y,0,1)
-                svCursor.Position = UDim2.new(s,0,1-v,0); update(true)
+                update(true)
             elseif pickingHue then
                 h = math.clamp((i.Position.Y-hueBar.AbsolutePosition.Y)/hueBar.AbsoluteSize.Y,0,1)
-                hueCursor.Position = UDim2.new(0.5,0,h,0); update(true)
+                update(true)
             end
         end)
         UserInputService.InputEnded:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 then pickingSV=false pickingHue=false end end)
 
-        local rgbBoxes = {{rBox,"R"},{gBox,"G"},{bBox,"B"}}
-        for _, pair in ipairs(rgbBoxes) do
+        for _, pair in ipairs({{rBox,"R"},{gBox,"G"},{bBox,"B"}}) do
             pair[1].FocusLost:Connect(function()
                 local n = tonumber(pair[1].Text)
                 if n then
                     n = math.clamp(math.floor(n), 0, 255)
                     local c = color
-                    if pair[2]=="R" then c = Color3.fromRGB(n, c.G*255, c.B*255)
-                    elseif pair[2]=="G" then c = Color3.fromRGB(c.R*255, n, c.B*255)
-                    else c = Color3.fromRGB(c.R*255, c.G*255, n) end
+                    if pair[2]=="R" then c = Color3.fromRGB(n, math.floor(c.G*255), math.floor(c.B*255))
+                    elseif pair[2]=="G" then c = Color3.fromRGB(math.floor(c.R*255), n, math.floor(c.B*255))
+                    else c = Color3.fromRGB(math.floor(c.R*255), math.floor(c.G*255), n) end
                     fromRGB(c); update(true)
                 end
             end)
         end
 
-        preview.MouseButton1Click:Connect(function()
+        local function togglePicker()
             open = not open
             if open then
                 picker.Visible = true; clickBg.Visible = true
@@ -701,8 +702,10 @@ function MoonLib:CreateWindow(config)
                 tween(picker, 0.25, {Size=UDim2.new(1,-20,0,0)})
                 task.delay(0.26, function() picker.Visible=false end)
             end
-        end)
-        clickBg.MouseButton1Click:Connect(function() if open then preview.MouseButton1Click:Fire() end end)
+        end
+        preview.MouseButton1Click:Connect(togglePicker)
+        clickBg.MouseButton1Click:Connect(function() if open then togglePicker() end end)
+
         tab:RegisterElement(el, cfg.Title.." 颜色")
         return {Set=function(c) fromRGB(c); update(false) end, Get=function() return color end}
     end
@@ -714,7 +717,7 @@ function MoonLib:CreateWindow(config)
             BackgroundColor3=THEME.Background, Image=cfg.Image or "", ScaleType=Enum.ScaleType.Fit, Parent=el})
         round(img, 8)
         if cfg.Description then
-            local d = new("TextLabel", {Size=UDim2.new(1,-20,0,16), Position=UDim2.new(0,10,1,-18),
+            new("TextLabel", {Size=UDim2.new(1,-20,0,16), Position=UDim2.new(0,10,1,-18),
                 BackgroundTransparency=1, Text=cfg.Description, TextColor3=THEME.SubText, Font=Enum.Font.Gotham,
                 TextSize=11, TextXAlignment=Enum.TextXAlignment.Left, Parent=el})
         end
@@ -725,7 +728,7 @@ function MoonLib:CreateWindow(config)
     -- ── 文本标签 ──
     function tab:AddLabel(cfg)
         cfg = type(cfg)=="string" and {Text=cfg} or cfg
-        local el = new("TextLabel", {Size=UDim2.new(1,0,0,26), BackgroundColor3=THEME.Transparent, BackgroundTransparency=1,
+        local el = new("TextLabel", {Size=UDim2.new(1,0,0,26), BackgroundTransparency=1,
             Text=cfg.Text or "", TextColor3=cfg.Color or THEME.SubText, Font=Enum.Font.Gotham, TextSize=12,
             TextWrapped=true, LayoutOrder=#tab.Elements+1, Parent=tab.Page})
         tab:RegisterElement(el, cfg.Text or "标签")
