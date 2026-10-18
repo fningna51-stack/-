@@ -223,7 +223,7 @@ local Library = {
 
     TabTransitionInfo = TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
     TabSwipeOffset = 26,
-    TabSwipeFrom = "bottom",
+    TabSwipeFrom = "right",
 
     WindowAnimationInfo = TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
     DropdownTransitionInfo = TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
@@ -268,17 +268,17 @@ local Library = {
     OriginalMinSize = Vector2.new(480, 360),
     MinSize = Vector2.new(480, 360),
     DPIScale = 1,
-    CornerRadius = 10,
+    CornerRadius = 12,
 
     --// Scheme \\--
     IsLightTheme = false,
     Scheme = {
-        BackgroundColor = Color3.fromRGB(16, 20, 28),
-        MainColor = Color3.fromRGB(26, 31, 42),
-        AccentColor = Color3.fromRGB(135, 206, 250),
-        OutlineColor = Color3.fromRGB(56, 66, 84),
+        BackgroundColor = Color3.fromRGB(7, 23, 19),
+        MainColor = Color3.fromRGB(12, 33, 27),
+        AccentColor = Color3.fromRGB(46, 213, 168),
+        OutlineColor = Color3.fromRGB(23, 51, 42),
         FontColor = Color3.new(1, 1, 1),
-        Font = Font.fromEnum(Enum.Font.Code),
+        Font = Font.fromEnum(Enum.Font.Gotham),
 
         RedColor = Color3.fromRGB(248, 113, 113),
         DestructiveColor = Color3.fromRGB(239, 68, 68),
@@ -383,11 +383,11 @@ local Templates = {
         SearchbarSize = UDim2.fromScale(1, 1),
         GlobalSearch = false,
 
-        CornerRadius = 10,
+        CornerRadius = 12,
         NotifySide = "Right",
         ShowCustomCursor = true,
 
-        Font = Enum.Font.Code,
+        Font = Enum.Font.Gotham,
         ToggleKeybind = Enum.KeyCode.RightControl,
 
         ShowMobileButtons = true,
@@ -424,7 +424,19 @@ local Templates = {
 
         TabTransitionTime = 0.22,
         TabSwipeOffset = 26,
-        TabSwipeFrom = "bottom"
+        TabSwipeFrom = "right",
+
+        --// Scroll Effects \\--
+        ScrollFX = {
+            Enabled = true,
+            Reveal = true,        --// 滚动触发：元素进入视口时浮现
+            Link = true,          --// 滚动联动：左右两栏同步滚动
+            Parallax = true,      --// 视差滚动：背景/光晕差速移动
+            ParallaxSpeed = 0.12,
+            Sticky = true,        --// 吸顶：滚动后吸出当前标签页标题栏
+            Snap = true,          --// 滚动吸：停滚后吸附到最近元素边缘
+            HorizontalTabbox = true, --// 横向滚动：标签盒按钮横向滑动
+        }
     },
     Dialog = {
         Title = "Dialog",
@@ -450,7 +462,7 @@ local Templates = {
         NotifySide = "Right",
         ShowCustomCursor = true,
 
-        Font = Enum.Font.Code,
+        Font = Enum.Font.Gotham,
 
         UnlockMouseWhileOpen = true,
 
@@ -9426,6 +9438,7 @@ function Library:CreateWindow(WindowInfo)
     Library.Scheme.Font = WindowInfo.Font
     Library.ToggleKeybind = WindowInfo.ToggleKeybind
     Library.GlobalSearch = WindowInfo.GlobalSearch
+    Library.ScrollFX = Library:Validate(WindowInfo.ScrollFX, Templates.Window.ScrollFX)
     
     Library.Animations = WindowInfo.Animations
     Library.TabTransitionInfo = TweenInfo.new(
@@ -9521,8 +9534,8 @@ function Library:CreateWindow(WindowInfo)
             Image = BackgroundIcon and BackgroundIcon.Url or "",
             ImageRectOffset = BackgroundIcon and BackgroundIcon.ImageRectOffset or Vector2.zero,
             ImageRectSize = BackgroundIcon and BackgroundIcon.ImageRectSize or Vector2.zero,
-            Position = UDim2.fromScale(0, 0),
-            Size = UDim2.fromScale(1, 1),
+            Position = UDim2.fromOffset(0, -60),
+            Size = UDim2.new(1, 0, 1, 120),
             ScaleType = Enum.ScaleType.Stretch,
             ZIndex = 999,
             BackgroundTransparency = 1,
@@ -9670,7 +9683,7 @@ function Library:CreateWindow(WindowInfo)
         table.insert(
             Library.Corners,
             New("UICorner", {
-                CornerRadius = UDim.new(0, WindowInfo.CornerRadius),
+                CornerRadius = UDim.new(1, 0),
                 Parent = SearchBox,
             })
         )
@@ -10413,6 +10426,252 @@ function Library:CreateWindow(WindowInfo)
             DependencyGroupboxes = {},
         }
 
+
+        --// Scroll Effects \\--
+        do
+            local FX = Library.ScrollFX
+            if FX and FX.Enabled ~= false then
+                local Sides = { TabLeft, TabRight }
+
+                --// 吸顶：滚动后吸出当前页标题栏
+                if FX.Sticky and not Library.ScrollFXSticky then
+                    local Sticky = New("Frame", {
+                        Name = "ScrollFXSticky",
+                        BackgroundColor3 = function()
+                            return Library:GetBetterColor(Library.Scheme.BackgroundColor, 4)
+                        end,
+                        Position = UDim2.new(0, 8, 0, -48),
+                        Size = UDim2.new(1, -16, 0, 36),
+                        Visible = false,
+                        ZIndex = 100,
+                        Parent = Container,
+                    })
+                    New("UICorner", {
+                        CornerRadius = UDim.new(1, 0),
+                        Parent = Sticky,
+                    })
+                    New("UIStroke", {
+                        Color = "OutlineColor",
+                        Parent = Sticky,
+                    })
+                    local StickyTitle = New("TextLabel", {
+                        BackgroundTransparency = 1,
+                        Position = UDim2.fromOffset(16, 0),
+                        Size = UDim2.new(1, -32, 1, 0),
+                        Text = "",
+                        TextSize = 16,
+                        TextXAlignment = Enum.TextXAlignment.Left,
+                        ZIndex = 101,
+                        Parent = Sticky,
+                    })
+                    CurrentTabLabel:GetPropertyChangedSignal("Text"):Connect(function()
+                        StickyTitle.Text = CurrentTabLabel.Text
+                    end)
+                    Library.ScrollFXSticky = Sticky
+                end
+                local Sticky = Library.ScrollFXSticky
+                local StickyShown = false
+
+                for _, Side in Sides do
+                    if Side then
+                        local RevealWraps = setmetatable({}, { __mode = "k" })
+                        local SnapToken = 0
+                        local SnapTween
+
+                        --// 滚动触发：包裹子元素，进入视口时播放浮现动画
+                        local function WrapChild(Child)
+                            if typeof(Child) ~= "Instance" or not Child:IsA("GuiObject") then
+                                return
+                            end
+                            if Child.Name == "ScrollFXWrap" or Child.Name == "ScrollFXSticky" then
+                                return
+                            end
+                            if Child:GetAttribute("ScrollFXWrapped") then
+                                return
+                            end
+                            Child:SetAttribute("ScrollFXWrapped", true)
+
+                            local Wrap = New("CanvasGroup", {
+                                Name = "ScrollFXWrap",
+                                BackgroundTransparency = 1,
+                                AutomaticSize = Enum.AutomaticSize.Y,
+                                Size = UDim2.new(1, 0, 0, 0),
+                                GroupTransparency = 1,
+                                LayoutOrder = Child.LayoutOrder,
+                            })
+                            New("UIScale", {
+                                Scale = 0.96,
+                                Parent = Wrap,
+                            })
+
+                            Child.LayoutOrder = 0
+                            Child.Size = UDim2.new(1, 0, 0, 0)
+                            Child.AutomaticSize = Enum.AutomaticSize.Y
+                            Child.Parent = Wrap
+                            Wrap.Parent = Side
+
+                            RevealWraps[Wrap] = false
+                        end
+
+                        for _, Child in Side:GetChildren() do
+                            WrapChild(Child)
+                        end
+                        Side.ChildAdded:Connect(WrapChild)
+
+                        local function UpdateReveal()
+                            if not FX.Reveal then
+                                return
+                            end
+                            local Top = Side.AbsolutePosition.Y
+                            local Height = Side.AbsoluteSize.Y
+                            if Height <= 0 then
+                                return
+                            end
+
+                            for Wrap, Shown in RevealWraps do
+                                local H = Wrap.AbsoluteSize.Y
+                                local Y = Wrap.AbsolutePosition.Y
+                                local InView = (Y + H > Top + 2) and (Y < Top + Height - 2)
+                                local FarOut = (Y + H < Top - 120) or (Y > Top + Height + 120)
+
+                                if InView and not Shown and H > 0 then
+                                    RevealWraps[Wrap] = true
+                                    Wrap.GroupTransparency = 1
+                                    local Scale = Wrap:FindFirstChildOfClass("UIScale")
+                                    if Scale then
+                                        Scale.Scale = 0.96
+                                        TweenService:Create(Scale, Library.TabTransitionInfo, { Scale = 1 }):Play()
+                                    end
+                                    TweenService:Create(Wrap, Library.TabTransitionInfo, { GroupTransparency = 0 }):Play()
+                                elseif FarOut and Shown then
+                                    RevealWraps[Wrap] = false
+                                    Wrap.GroupTransparency = 1
+                                end
+                            end
+                        end
+
+                        --// 滚动吸：停滚后吸附到最近的元素边缘
+                        local function UpdateSnap()
+                            if not FX.Snap then
+                                return
+                            end
+
+                            SnapToken += 1
+                            local Token = SnapToken
+
+                            task.delay(0.18, function()
+                                if Token ~= SnapToken or not Side.Parent then
+                                    return
+                                end
+
+                                local Layout = Side:FindFirstChildOfClass("UIListLayout")
+                                local Pad = 0
+                                if Layout then
+                                    Pad = Layout.Padding.Offset
+                                end
+
+                                local DPIScale = Library.DPIScale
+                                local Edges = {}
+                                local Acc = 0
+                                for _, Child in Side:GetChildren() do
+                                    if Child:IsA("GuiObject") and Child.Visible and Child.AbsoluteSize.Y > 0 then
+                                        table.insert(Edges, Acc)
+                                        Acc += Child.AbsoluteSize.Y / DPIScale + Pad
+                                    end
+                                end
+                                if #Edges < 2 then
+                                    return
+                                end
+
+                                local MaxY = math.max(0, Side.CanvasSize.Y.Offset - Side.AbsoluteSize.Y / DPIScale)
+                                local CurrentY = Side.CanvasPosition.Y
+                                local BestY = Edges[1]
+                                local BestDist = math.abs(BestY - CurrentY)
+                                for _, Edge in Edges do
+                                    local Dist = math.abs(Edge - CurrentY)
+                                    if Dist < BestDist then
+                                        BestDist = Dist
+                                        BestY = Edge
+                                    end
+                                end
+                                BestY = math.clamp(BestY, 0, MaxY)
+
+                                if math.abs(BestY - CurrentY) > 2 then
+                                    if SnapTween then
+                                        StopTween(SnapTween, true)
+                                    end
+                                    SnapTween = TweenService:Create(Side, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                                        CanvasPosition = Vector2.new(Side.CanvasPosition.X, BestY),
+                                    })
+                                    SnapTween:Play()
+                                end
+                            end)
+                        end
+
+                        local function OnScroll()
+                            local Y = Side.CanvasPosition.Y
+
+                            --// 滚动联动：左右两栏同步
+                            if FX.Link then
+                                for _, Other in Sides do
+                                    if Other and Other ~= Side and math.abs(Other.CanvasPosition.Y - Y) > 0.5 then
+                                        Other.CanvasPosition = Vector2.new(Other.CanvasPosition.X, Y)
+                                    end
+                                end
+                            end
+
+                            --// 视差滚动：背景图与光晕差速移动
+                            if FX.Parallax then
+                                local Speed = FX.ParallaxSpeed or 0.12
+                                if BackgroundImage and BackgroundImage.Visible then
+                                    BackgroundImage.Position = UDim2.new(0, 0, 0, -60 - Y * Speed)
+                                end
+                                if Glow then
+                                    Glow.Position = UDim2.fromOffset(-20, -20 - Y * 0.06)
+                                end
+                            end
+
+                            --// 吸顶
+                            if Sticky then
+                                local Show = Y > 64
+                                if Show ~= StickyShown then
+                                    StickyShown = Show
+                                    if Show then
+                                        Sticky.Visible = true
+                                        Sticky.Position = UDim2.new(0, 8, 0, -48)
+                                        TweenService:Create(Sticky, Library.TabTransitionInfo, {
+                                            Position = UDim2.new(0, 8, 0, 8),
+                                        }):Play()
+                                    else
+                                        local Tween = TweenService:Create(Sticky, Library.TabTransitionInfo, {
+                                            Position = UDim2.new(0, 8, 0, -48),
+                                        })
+                                        Tween:Play()
+                                        Tween.Completed:Once(function()
+                                            if not StickyShown then
+                                                Sticky.Visible = false
+                                            end
+                                        end)
+                                    end
+                                end
+                            end
+
+                            UpdateReveal()
+                            UpdateSnap()
+                        end
+
+                        Side:GetPropertyChangedSignal("CanvasPosition"):Connect(OnScroll)
+                        TabCanvas:GetPropertyChangedSignal("Visible"):Connect(function()
+                            if TabCanvas.Visible then
+                                task.defer(UpdateReveal)
+                            end
+                        end)
+                        task.defer(UpdateReveal)
+                    end
+                end
+            end
+        end
+
         function Tab:UpdateWarningBox(Info)
             if typeof(Info.IsNormal) == "boolean" then
                 Tab.WarningBox.IsNormal = Info.IsNormal
@@ -10581,14 +10840,20 @@ function Library:CreateWindow(WindowInfo)
                 )
                 Library:AddOutline(TabboxHolder)
 
-                TabboxButtons = New("Frame", {
+                TabboxButtons = New("ScrollingFrame", {
+                    AutomaticCanvasSize = Enum.AutomaticSize.X,
                     BackgroundTransparency = 1,
+                    CanvasSize = UDim2.fromOffset(0, 0),
+                    ClipsDescendants = true,
+                    ScrollingDirection = Enum.ScrollingDirection.X,
+                    ScrollBarThickness = 0,
                     Size = UDim2.new(1, 0, 0, 34),
                     Parent = TabboxHolder,
                 })
                 New("UIListLayout", {
                     FillDirection = Enum.FillDirection.Horizontal,
-                    HorizontalFlex = Enum.UIFlexAlignment.Fill,
+                    SortOrder = Enum.SortOrder.LayoutOrder,
+                    Padding = UDim.new(0, 2),
                     Parent = TabboxButtons,
                 })
             end
@@ -10627,6 +10892,7 @@ function Library:CreateWindow(WindowInfo)
                 local TabStoringIndex = IsNameEmpty and tostring(TabIndex) or Name
 
                 local Button = New("TextButton", {
+                    AutomaticSize = Enum.AutomaticSize.X,
                     BackgroundColor3 = "MainColor",
                     BackgroundTransparency = 0,
                     Size = UDim2.fromOffset(0, 34),
@@ -10740,6 +11006,20 @@ function Library:CreateWindow(WindowInfo)
                     Line.Visible = false
 
                     Container.Visible = true
+
+                    do
+                        local BtnW = Button.AbsoluteSize.X
+                        if BtnW > 0 then
+                            local FrameX = TabboxButtons.AbsolutePosition.X
+                            local ViewW = TabboxButtons.AbsoluteSize.X
+                            local AbsX = Button.AbsolutePosition.X
+                            if AbsX < FrameX + 4 then
+                                TabboxButtons.CanvasPosition = Vector2.new(math.max(0, TabboxButtons.CanvasPosition.X - (FrameX + 4 - AbsX)), 0)
+                            elseif AbsX + BtnW > FrameX + ViewW - 4 then
+                                TabboxButtons.CanvasPosition = Vector2.new(TabboxButtons.CanvasPosition.X + (AbsX + BtnW - FrameX - ViewW + 8), 0)
+                            end
+                        end
+                    end
 
                     Tabbox.ActiveTab = Tab
                     Tab:Resize()
