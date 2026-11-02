@@ -53,8 +53,8 @@
 
 local WobsinsUI = {}
 WobsinsUI.__index = WobsinsUI
-WobsinsUI.Version = "2.4.0"
-WobsinsUI.Build = "20261103e"
+WobsinsUI.Version = "2.5.0"
+WobsinsUI.Build = "20261103f"
 WobsinsUI.Name = "WobsinsUI"
 
 -- 同一个执行器里重复执行脚本时复用已有实例，避免出现两个 ScreenGui 叠在一起。
@@ -2063,7 +2063,9 @@ function WobsinsUI:_createWindow(config)
     end
     local theme = Themes[themeName]
 
-    -- 尺寸：窗口永远不超过视口，手机上直接铺满可用区域
+    -- 尺寸：设计尺寸固定，实际大小交给 UIScale 整体缩。
+    -- 以前是「窗口直接撑到 vp-20」，在手机上一开就顶满整屏，字也大得离谱；
+    -- 现在留出边距，屏幕越小缩得越多，看着像一块面板而不是整页网页。
     local width = 880
     local height = 560
     if typeof(config.Size) == "UDim2" then
@@ -2074,10 +2076,15 @@ function WobsinsUI:_createWindow(config)
             height = config.Size.Y.Offset
         end
     end
-    width = math.floor(math.min(width, vp.X - 20))
-    height = math.floor(math.min(height, vp.Y - 20))
-    width = math.max(width, 360)
-    height = math.max(height, 300)
+    width = math.max(math.floor(width), 360)
+    height = math.max(math.floor(height), 300)
+
+    local scale = tonumber(config.Scale)
+    if not scale or scale <= 0 then
+        -- 视口的 88% 高 / 82% 宽是上限，再大就缩，1920x1080 上刚好 1:1
+        scale = math.min(1, (vp.Y * 0.88) / height, (vp.X * 0.82) / width)
+    end
+    scale = U.clamp(scale, 0.58, 1.3)
 
     local sidebarWidth = config.SideBarWidth or 168
     if width < 620 then
@@ -2116,7 +2123,8 @@ function WobsinsUI:_createWindow(config)
         ToggleKey = config.ToggleKey or Enum.KeyCode.RightShift,
         OpenButton = nil,
         ActiveTab = nil,
-        ScaleValue = 1,
+        ScaleValue = scale,
+        AutoScale = not (tonumber(config.Scale) and tonumber(config.Scale) > 0),
         PageCount = 0,
     }, Window)
 
@@ -2175,6 +2183,50 @@ end
 --// 9.3 外壳（Stage / 阴影 / 主体）
 --//----------------------------------------------------------------------------
 
+-- Stage 用左上角锚点 + 显式像素坐标：整体缩放（UIScale）之后「渲染出来的尺寸」
+-- 和「Position 指的左上角」是同一个坐标系，拖拽、居中、常驻开关定位全都好算。
+function Window:_stageSize()
+    local s = self.ScaleValue or 1
+    return Vector2.new(self.Width * s, self.Height * s)
+end
+
+-- 自动缩放：屏幕越小缩得越多，桌面上就是 1
+function Window:_autoScaleValue()
+    local vp = WobsinsUI:_viewport()
+    return U.clamp(math.min(1, (vp.Y * 0.88) / self.Height, (vp.X * 0.82) / self.Width), 0.58, 1.3)
+end
+
+function Window:_placeStageAt(left, top)
+    if not self.Stage then
+        return left, top
+    end
+    local vp = WobsinsUI:_viewport()
+    local size = self:_stageSize()
+    left = U.clamp(left, 0, math.max(0, vp.X - size.X))
+    top = U.clamp(top, 0, math.max(0, vp.Y - size.Y))
+    self._stageLeft, self._stageTop = left, top
+    self.Stage.Position = UDim2.fromOffset(math.floor(left), math.floor(top))
+    -- 常驻开关贴在窗口右上角，窗口一动它跟着动
+    if self._switchPinned ~= false and self._placeSwitch then
+        self:_placeSwitch()
+    end
+    return left, top
+end
+
+function Window:_centerStage()
+    local vp = WobsinsUI:_viewport()
+    local size = self:_stageSize()
+    local left = (vp.X - size.X) / 2
+    local top = (vp.Y - size.Y) / 2
+    -- 左上角挂着 FPS 水印（高度 34 + 16 边距），别让窗口标题栏被它压住
+    local gui = WobsinsUI.ScreenGui
+    local hasWatermark = gui and gui.FindFirstChild and gui:FindFirstChild("WobsinsWatermark")
+    if hasWatermark then
+        top = math.max(top, math.min(46, math.max(0, vp.Y - size.Y)))
+    end
+    return self:_placeStageAt(left, top)
+end
+
 function Window:_buildShell(config)
     local screen = self.Root or WobsinsUI:_screen()
     self.Root = screen
@@ -2183,12 +2235,14 @@ function Window:_buildShell(config)
         Name = "WobsinsStage",
         BackgroundTransparency = 1,
         Size = UDim2.fromOffset(self.Width, self.Height),
-        Position = UDim2.fromScale(0.5, 0.5),
-        AnchorPoint = Vector2.new(0.5, 0.5),
+        Position = UDim2.fromOffset(0, 0),
+        AnchorPoint = Vector2.new(0, 0),
         ZIndex = WobsinsUI.Layers.Main,
     }, screen)
     self.Stage = stage
-    self.Scale = new("UIScale", { Scale = 1 }, stage)
+    -- 整体缩放：字体、圆角、间距一起缩，才是「界面变小」而不是「窗口被挤扁」
+    self.Scale = new("UIScale", { Scale = self.ScaleValue or 1 }, stage)
+    self:_centerStage()
 
     -- 阴影单独一层，比主体低 5 级，永远不会盖住内容
     local shadow = new("Frame", {
@@ -2287,27 +2341,8 @@ end
 
 function Window:_makeDraggable(handle)
     local dragging = false
-    local startAbs = nil
+    local startLeft, startTop = 0, 0
     local startPointer = nil
-
-    -- Stage 的锚点在中心、Position 用 0.5 缩放，所以不能直接改 Offset。
-    -- 统一按「左上角绝对坐标」算，再换算回 Position，拖动时顺手夹在屏幕内，
-    -- 免得手一滑把窗口甩到屏幕外找不回来。
-    local function placeAt(left, top)
-        local vp = WobsinsUI:_viewport()
-        local size = self.Stage.AbsoluteSize
-        local maxLeft = math.max(4, vp.X - size.X - 4)
-        local maxTop = math.max(4, vp.Y - size.Y - 4)
-        left = U.clamp(left, 4, maxLeft)
-        top = U.clamp(top, 4, maxTop)
-        self.Stage.Position = UDim2.new(
-            0.5, left + size.X / 2 - vp.X * 0.5,
-            0.5, top + size.Y / 2 - vp.Y * 0.5
-        )
-        return left, top
-    end
-
-    self._placeStageAt = placeAt
 
     handle.InputBegan:Connect(function(input)
         if input.UserInputType ~= Enum.UserInputType.MouseButton1
@@ -2320,7 +2355,8 @@ function Window:_makeDraggable(handle)
         end
         dragging = true
         self._dragDistance = 0
-        startAbs = self.Stage.AbsolutePosition
+        startLeft = self._stageLeft or 0
+        startTop = self._stageTop or 0
         startPointer = input.Position
     end)
 
@@ -2333,7 +2369,7 @@ function Window:_makeDraggable(handle)
 
     if S.UserInputService then
         S.UserInputService.InputChanged:Connect(function(input)
-            if not dragging then
+            if not dragging or not self.Stage then
                 return
             end
             if input.UserInputType ~= Enum.UserInputType.MouseMovement
@@ -2342,7 +2378,8 @@ function Window:_makeDraggable(handle)
             end
             local delta = input.Position - startPointer
             self._dragDistance = math.max(self._dragDistance or 0, math.abs(delta.X) + math.abs(delta.Y))
-            placeAt(startAbs.X + delta.X, startAbs.Y + delta.Y)
+            -- 左上角坐标直接加位移，边界由 _placeStageAt 夹住，窗口永远拖不出屏幕
+            self:_placeStageAt(startLeft + delta.X, startTop + delta.Y)
         end)
     end
 end
@@ -2391,12 +2428,15 @@ function Window:_buildHeader(config)
         end
     end
 
-    -- 标题 / 副标题（右侧要留出搜索框 + 两个按钮的位置）
+    -- 标题 / 副标题（右侧要留出搜索框 + 开关位 + 关闭按钮的位置）
+    local showSwitch = config.FloatSwitch ~= false
     local searchWidth = 236
     if self.Width < 700 or self.ThemeTable.SearchInSidebar then
         searchWidth = 0
     end
-    local rightCluster = 14 + 26 + 4 + 26 + 10 + (searchWidth > 0 and searchWidth + 10 or 0)
+    -- 关闭按钮 26 + 开关槽位（4 + 46 + 8）或旧的「—」按钮 26 + 10
+    local rightCluster = 14 + 26 + 4 + (showSwitch and 4 + 46 + 8 or 26 + 10)
+        + (searchWidth > 0 and searchWidth + 10 or 0)
     local titleWidth = -(48 + rightCluster + 12)
 
     local title = new("TextLabel", {
@@ -2429,7 +2469,8 @@ function Window:_buildHeader(config)
     }, header)
     self:_bind(author, "TextColor3", "Muted")
 
-    -- 右侧按钮：关闭脚本（带确认）/ 最小化
+    -- 右侧按钮：关闭脚本（带确认）。最小化不再是一个「—」按钮 ——
+    -- 右上角常驻开关（23_shell）就浮在这个位置，收起后也不会跟着消失。
     local buttonSize = 26
     local rightX = -14
 
@@ -2440,12 +2481,16 @@ function Window:_buildHeader(config)
 
     rightX = rightX - buttonSize - 4
 
-    local minimize = self:_headerButton(header, "minus", UDim2.new(1, rightX - buttonSize, 0, 9), buttonSize, function()
-        self:Minimize()
-    end, "SubText")
-    U.tooltip(minimize, "最小化")
-
-    rightX = rightX - buttonSize - 10
+    if showSwitch then
+        -- 只留槽位（4 + 46 + 8），真正的开关是挂在 ScreenGui 上的常驻控件
+        rightX = rightX - 4 - 46 - 8
+    else
+        local minimize = self:_headerButton(header, "minus", UDim2.new(1, rightX - buttonSize, 0, 9), buttonSize, function()
+            self:Minimize()
+        end, "SubText")
+        U.tooltip(minimize, "最小化")
+        rightX = rightX - buttonSize - 10
+    end
 
     -- 搜索框（放标题栏还是侧栏，由主题决定）
     if searchWidth > 0 then
@@ -2941,17 +2986,41 @@ function Window:SetTheme(name)
     self:_applyTransparency()
 end
 
-function Window:SetScale(scale)
+-- 整体缩放：窗口、字体、间距一起缩，1 = 原始大小，nil = 重新按屏幕自动算
+function Window:SetUIScale(scale)
+    if scale == nil then
+        self.AutoScale = true
+        scale = self:_autoScaleValue()
+    else
+        self.AutoScale = false
+        scale = U.clamp(tonumber(scale) or 1, 0.5, 1.6)
+    end
+    if math.abs(scale - (self.ScaleValue or 1)) < 0.001 then
+        self:_centerStage()
+        return self
+    end
+    self.ScaleValue = scale
     if self.Scale and self.Scale:IsA("UIScale") then
         self.Scale.Scale = scale
     end
+    -- 缩完尺寸变了，重新居中（原来贴着屏幕边缘的话会露出半截）
+    self:_centerStage()
+    return self
+end
+
+-- 旧名字
+function Window:SetScale(scale)
+    return self:SetUIScale(scale)
+end
+
+function Window:GetUIScale()
+    return self.ScaleValue or 1
 end
 
 -- 重新计算窗口尺寸（屏幕旋转 / 设备变化时用）
 function Window:Resize(width, height)
-    local vp = WobsinsUI:_viewport()
-    self.Width = math.max(360, math.min(width or self.Width, vp.X - 20))
-    self.Height = math.max(300, math.min(height or self.Height, vp.Y - 20))
+    self.Width = math.max(360, math.floor(width or self.Width))
+    self.Height = math.max(300, math.floor(height or self.Height))
     if self.Stage then
         self.Stage.Size = UDim2.fromOffset(self.Width, self.Height)
     end
@@ -2964,6 +3033,7 @@ function Window:Resize(width, height)
     if self._relayoutColumns then
         self:_relayoutColumns()
     end
+    self:_centerStage()
     return self
 end
 
@@ -6024,7 +6094,8 @@ function Window:Close()
     end
     self.Visible = false
     if self.Scale then
-        U.tween(self.Scale, 0.14, { Scale = 0.96 }, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+        local base = self.ScaleValue or 1
+        U.tween(self.Scale, 0.14, { Scale = base * 0.96 }, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
     end
     local token = (self._toggleToken or 0) + 1
     self._toggleToken = token
@@ -6058,8 +6129,9 @@ function Window:Open()
         self:SetMinimized(false)
     end
     if self.Scale then
-        self.Scale.Scale = 0.96
-        U.tween(self.Scale, 0.2, { Scale = 1 }, Enum.EasingStyle.Back)
+        local base = self.ScaleValue or 1
+        self.Scale.Scale = base * 0.96
+        U.tween(self.Scale, 0.2, { Scale = base }, Enum.EasingStyle.Back)
     end
     if self.OpenButton and self.OpenButton.Frame then
         self.OpenButton.Frame.Visible = false
@@ -7034,81 +7106,11 @@ end
 --//============================================================================
 
 --//----------------------------------------------------------------------------
---// 19.1 拖拽时把窗口约束在屏幕内
+--// 19.1 拖拽
 --//----------------------------------------------------------------------------
 --
--- 原来的实现可以让窗口被拖到屏幕外，手机上拖一次就再也找不回来了。
-
-local _makeDraggableRaw = Window._makeDraggable
-
-function Window:_makeDraggable(handle)
-    local dragging = false
-    local startPos = nil
-    local startPointer = nil
-
-    handle.InputBegan:Connect(function(input)
-        if input.UserInputType ~= Enum.UserInputType.MouseButton1
-            and input.UserInputType ~= Enum.UserInputType.Touch then
-            return
-        end
-        if S.UserInputService:GetFocusedTextBox() then
-            return
-        end
-        dragging = true
-        -- 记录本次按压移动了多少：最小化胶囊靠它区分「拖」和「点」
-        self._dragDistance = 0
-        startPos = self.Stage.Position
-        startPointer = input.Position
-    end)
-
-    handle.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1
-            or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = false
-        end
-    end)
-
-    if S.UserInputService then
-        S.UserInputService.InputChanged:Connect(function(input)
-            if not dragging or not self.Stage then
-                return
-            end
-            if input.UserInputType ~= Enum.UserInputType.MouseMovement
-                and input.UserInputType ~= Enum.UserInputType.Touch then
-                return
-            end
-
-            local delta = input.Position - startPointer
-            self._dragDistance = (self._dragDistance or 0) + math.abs(delta.X) + math.abs(delta.Y)
-
-            local vp = WobsinsUI:_viewport()
-            -- 用「当前」尺寸而不是创建时的尺寸：最小化成胶囊后照着 880x560
-            -- 算边界，胶囊会被弹回屏幕中间。
-            local size = self.Stage.AbsoluteSize
-            local w, h = size.X, size.Y
-            if w <= 0 or h <= 0 then
-                w, h = self.Width, self.Height
-            end
-
-            -- 允许拖出边界，但至少留 96px 在屏幕里
-            local minX = -(vp.X + w) / 2 + 96
-            local maxX = (vp.X + w) / 2 - 96
-            local minY = -(vp.Y + h) / 2 + 40
-            local maxY = (vp.Y + h) / 2 - 40
-
-            local x = U.clamp(startPos.X.Offset + delta.X, minX, maxX)
-            local y = U.clamp(startPos.Y.Offset + delta.Y, minY, maxY)
-
-            self.Stage.Position = UDim2.new(startPos.X.Scale, x, startPos.Y.Scale, y)
-
-            -- 最小化胶囊的坐标跟着改，恢复时才知道它现在在哪
-            if self.Minimized then
-                self._minBarLeft = self.Stage.AbsolutePosition.X
-                self._minBarTop = self.Stage.AbsolutePosition.Y
-            end
-        end)
-    end
-end
+-- 拖动逻辑收进 04_window（Stage 现在是左上角锚点 + 像素坐标，边界直接夹在
+-- 屏幕里）。这里以前还有一套按「中心锚点」算的旧实现，会把窗口算飞，删掉。
 
 --//----------------------------------------------------------------------------
 --// 19.2 右下角缩放手柄
@@ -7175,8 +7177,10 @@ function Window:AddResizeGrip(config)
             end
             local delta = input.Position - startPointer
             local vp = WobsinsUI:_viewport()
-            local w = U.clamp(startSize.X + delta.X, config.MinWidth or 420, vp.X - 12)
-            local h = U.clamp(startSize.Y + delta.Y, config.MinHeight or 300, vp.Y - 12)
+            -- 鼠标位移是屏幕像素，设计尺寸要除回缩放倍数
+            local k = self.ScaleValue or 1
+            local w = U.clamp(startSize.X + delta.X / k, config.MinWidth or 420, vp.X / k - 12)
+            local h = U.clamp(startSize.Y + delta.Y / k, config.MinHeight or 300, vp.Y / k - 12)
             self:Resize(w, h)
             if self.SidebarWidth > w * 0.36 then
                 self.SidebarWidth = math.floor(w * 0.36)
@@ -7195,16 +7199,12 @@ end
 --//----------------------------------------------------------------------------
 
 function Window:Center()
-    if self.Stage then
-        self.Stage.Position = UDim2.fromScale(0.5, 0.5)
-    end
+    self:_centerStage()
     return self
 end
 
 function Window:SetPosition(x, y)
-    if self.Stage then
-        self.Stage.Position = UDim2.fromOffset(x, y)
-    end
+    self:_placeStageAt(tonumber(x) or 0, tonumber(y) or 0)
     return self
 end
 
@@ -7601,11 +7601,10 @@ function Window:WatchViewport()
             local vp = WobsinsUI:_viewport()
             if vp.X ~= last.X or vp.Y ~= last.Y then
                 last = vp
-                self:Resize(
-                    math.min(self.Width, vp.X - 20),
-                    math.min(self.Height, vp.Y - 20)
-                )
-                self:Center()
+                if self.AutoScale then
+                    self:SetUIScale(nil)   -- 重新按新屏幕算缩放
+                end
+                self:_centerStage()
             end
         end
     end)
@@ -10650,37 +10649,38 @@ end
 --
 -- 这一节做两件事：
 --
---   1. 常驻开关。不再是「最小化成一条胶囊再点回来」——那玩意儿一收起就只剩
---      一条黑条，想找回来得先找到它。现在改成屏幕上一个圆形小开关：
---      · 永远在屏幕上，窗口开 / 关它都在；
---      · 按住可以拖到任意位置，拖到哪下次就在哪；
---      · 点一下切换：开 → 窗口出现，关 → 窗口整个藏起来；
---      · 开关本身带一个小滑块，一眼能看出当前是开还是关。
+--   1. 常驻开关。窗口右上角那枚小开关 —— 它不在标题栏里，而是单独挂在
+--      ScreenGui 上，正好浮在标题栏给关闭按钮左边留出的槽位上：
+--      · 窗口开 / 关它都在，收起来之后想找回来还是点它；
+--      · 按住可以拖走，拖过就算挪位置，不算点击；
+--      · 点一下切换：开 → 窗口出现，关 → 整个窗口藏起来；
+--      · 滑块在左 = 关，在右 = 开，一眼能看出来。
 --
---   2. 关闭脚本。右上角 × 不弹确认就真退出，确认后销毁整个界面、清掉单例、
+--   2. 关闭脚本。右上角 × 弹确认，确认后销毁整个界面、清掉单例、
 --      触发 OnShutdown 回调，脚本主循环据此退出。
 --
 --//----------------------------------------------------------------------------
 --// 23.1 常量
 --//----------------------------------------------------------------------------
 
-local SWITCH_HEIGHT = 34
+local SWITCH_WIDTH = 46      -- 设计尺寸，实际大小跟着窗口缩放走
+local SWITCH_HEIGHT = 26
+local SWITCH_GAP = 8         -- 和关闭按钮之间的间距
 local SWITCH_MARGIN = 16
-local SWITCH_MIN_WIDTH = 96
+local TAP_SLOP = 12          -- 手指抖动容忍：位移超过这个数才算拖动
+
+-- 开关在标题栏里占的槽位（设计坐标，右上角起算）
+function Window:_switchSlot()
+    -- 关闭按钮占 14 + 26，再往左空 8px 就是开关
+    return 14 + 26 + SWITCH_GAP
+end
 
 --//----------------------------------------------------------------------------
 --// 23.2 常驻开关本体
 --//----------------------------------------------------------------------------
 
 function Window:_switchText()
-    return self.SwitchText or "开关"
-end
-
-function Window:_switchWidth()
-    local textWidth = U.textWidth(self:_switchText(), 11.5)
-    -- [8] icon 18 [7] label [?] [9] track 26 [10]
-    local width = 8 + 18 + 7 + textWidth + 9 + 26 + 10
-    return math.floor(U.clamp(width, SWITCH_MIN_WIDTH, 172))
+    return self.SwitchText or "显示界面"
 end
 
 function Window:_buildFloatSwitch(config)
@@ -10692,103 +10692,77 @@ function Window:_buildFloatSwitch(config)
         return self
     end
 
-    local width = self:_switchWidth()
-    local position = config.SwitchPosition
-    if typeof(position) ~= "UDim2" then
-        -- 默认贴在右上角，离屏幕边 16px。
-        -- 开多个窗口时往下排，别让两个开关叠在一起。
-        local above = 0
-        for _, other in ipairs(WobsinsUI.Windows or {}) do
-            if other ~= self and other.FloatSwitch and not other.Destroyed then
-                above = above + 1
-            end
-        end
-        position = UDim2.new(
-            1, -SWITCH_MARGIN - width,
-            0, SWITCH_MARGIN + above * (SWITCH_HEIGHT + 8)
-        )
-    end
-
     local btn = new("TextButton", {
         Name = "FloatSwitch",
         BackgroundTransparency = 1,
         AutoButtonColor = false,
         Text = "",
-        Size = UDim2.fromOffset(width, SWITCH_HEIGHT),
-        Position = position,
+        Size = UDim2.fromOffset(SWITCH_WIDTH, SWITCH_HEIGHT),
+        Position = UDim2.new(1, -SWITCH_MARGIN - SWITCH_WIDTH, 0, SWITCH_MARGIN),
         ClipsDescendants = false,
-        ZIndex = WobsinsUI.Layers.Toast - 1,
+        ZIndex = WobsinsUI.Layers.Modal - 1,
     }, self.Root)
     self.FloatSwitch = btn
 
-    -- 深色药丸底：不跟主题走。它浮在游戏画面上，浅色主题配深底反而更清楚
-    local bg = new("Frame", {
-        Name = "SwitchBg",
-        BackgroundColor3 = Color3.fromRGB(19, 20, 22),
-        BackgroundTransparency = 0.06,
-        Size = UDim2.fromScale(1, 1),
-        ZIndex = WobsinsUI.Layers.Toast - 1,
-    }, btn)
-    U.corner(bg, SWITCH_HEIGHT / 2)
-    local bgStroke = U.stroke(bg, Color3.fromRGB(58, 60, 64), 1, 0.3)
-    btn.Bg = bg
+    -- 和窗口一起缩放，尺寸才对得上标题栏
+    self.SwitchScale = new("UIScale", { Scale = self.ScaleValue or 1 }, btn)
 
-    -- 左侧小方块：放脚本图标，和标题栏那个 logo 一致
-    local dot = new("Frame", {
-        BackgroundColor3 = Color3.fromRGB(238, 239, 242),
-        Size = UDim2.fromOffset(18, 18),
-        Position = UDim2.new(0, 8, 0.5, 0),
-        AnchorPoint = Vector2.new(0, 0.5),
-        ZIndex = WobsinsUI.Layers.Toast,
-    }, bg)
-    U.corner(dot, 5)
-    U.stroke(dot, Color3.fromRGB(255, 255, 255), 1, 0.7)
-
-    local dotIcon = U.icon(dot, self.Icon, 10, Color3.fromRGB(18, 19, 21), WobsinsUI.Layers.Toast + 1)
-    if dotIcon then
-        dotIcon.AnchorPoint = Vector2.new(0.5, 0.5)
-        dotIcon.Position = UDim2.fromScale(0.5, 0.5)
-    end
-
-    local label = new("TextLabel", {
-        BackgroundTransparency = 1,
-        Position = UDim2.fromOffset(33, 0),
-        Size = UDim2.new(1, -33 - 45, 1, 0),
-        Font = Enum.Font.GothamMedium,
-        Text = self:_switchText(),
-        TextColor3 = Color3.fromRGB(236, 237, 240),
-        TextSize = 11.5,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        TextTruncate = Enum.TextTruncate.AtEnd,
-        ZIndex = WobsinsUI.Layers.Toast,
-    }, bg)
-    btn.Label = label
-
-    -- 右侧小滑块：开 = 亮底深点，关 = 灰底浅点
+    -- 轨道跟着主题走：开 = 反色轨道 + 底色滑块，暗色主题上是「白底深点」，
+    -- 浅色主题上自动变成「深底白点」，不会在浅色面板上糊成一片。
+    local trackColor, knobColor = self:_switchColors(true)
     local track = new("Frame", {
-        BackgroundColor3 = Color3.fromRGB(235, 236, 239),
-        Size = UDim2.fromOffset(26, 14),
-        Position = UDim2.new(1, -36, 0.5, 0),
-        AnchorPoint = Vector2.new(0, 0.5),
-        ZIndex = WobsinsUI.Layers.Toast,
-    }, bg)
-    U.corner(track, 7)
+        Name = "Track",
+        BackgroundColor3 = trackColor,
+        Size = UDim2.fromOffset(SWITCH_WIDTH, SWITCH_HEIGHT),
+        ZIndex = WobsinsUI.Layers.Modal - 1,
+    }, btn)
+    U.corner(track, SWITCH_HEIGHT / 2)
+    local trackStroke = U.stroke(track, self:Color("Outline"), 1, 0.5)
+    self.SwitchStroke = trackStroke
     btn.Track = track
 
     local knob = new("Frame", {
-        BackgroundColor3 = Color3.fromRGB(19, 20, 22),
-        Size = UDim2.fromOffset(10, 10),
-        Position = UDim2.fromOffset(2, 2),
-        ZIndex = WobsinsUI.Layers.Toast + 1,
+        Name = "Knob",
+        BackgroundColor3 = knobColor,
+        Size = UDim2.fromOffset(SWITCH_HEIGHT - 6, SWITCH_HEIGHT - 6),
+        Position = UDim2.fromOffset(3, 3),
+        ZIndex = WobsinsUI.Layers.Modal,
     }, track)
-    U.corner(knob, 5)
+    U.corner(knob, (SWITCH_HEIGHT - 6) / 2)
     btn.Knob = knob
 
-    -- 交互：点一下切换；按住拖动则只挪位置
-    local dragging = false
-    local startPointer = nil
-    local startLeft, startTop = 0, 0
-    local moved = 0
+    -- 滑块上的小图标：开着是闪电（窗口在），关着是斜杠（窗口收起了）。
+    -- 不写字，46x26 塞不下字，图标一眼就够。
+    local knobIcon = U.icon(knob, "bolt", 11, self:Color("Text"), WobsinsUI.Layers.Modal + 1)
+    if knobIcon then
+        knobIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+        knobIcon.Position = UDim2.fromScale(0.5, 0.5)
+        btn.KnobIcon = knobIcon
+    end
+
+    -- 位置：默认贴窗口右上角，跟着窗口走
+    self._switchPinned = true
+    if typeof(config.SwitchPosition) == "UDim2" then
+        btn.Position = config.SwitchPosition
+        self._switchPinned = false
+    end
+    self:_placeSwitch()
+
+    --//-- 交互 ----------------------------------------------------------------
+    local dragging, moved = false, 0
+    local startPointer, startLeft, startTop = nil, 0, 0
+    local lastFire = 0
+
+    local function fire()
+        -- 触屏上 InputEnded 和 Activated 会各来一发，别切两次；
+        -- 每次新的按压（InputBegan）都把闸门重置，连点不受影响。
+        local now = os.clock()
+        if now - lastFire < 0.12 then
+            return
+        end
+        lastFire = now
+        self:ToggleSwitch()
+    end
 
     btn.InputBegan:Connect(function(input)
         if input.UserInputType ~= Enum.UserInputType.MouseButton1
@@ -10797,15 +10771,24 @@ function Window:_buildFloatSwitch(config)
         end
         dragging = true
         moved = 0
+        lastFire = -1
         startPointer = input.Position
         startLeft = btn.AbsolutePosition.X
         startTop = btn.AbsolutePosition.Y
     end)
 
     btn.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1
-            or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = false
+        if input.UserInputType ~= Enum.UserInputType.MouseButton1
+            and input.UserInputType ~= Enum.UserInputType.Touch then
+            return
+        end
+        if not dragging then
+            return
+        end
+        dragging = false
+        -- 手指在屏幕上永远会抖几像素，严格按「没动过」判点击就永远点不动
+        if moved <= TAP_SLOP then
+            fire()
         end
     end)
 
@@ -10820,9 +10803,11 @@ function Window:_buildFloatSwitch(config)
             end
             local delta = input.Position - startPointer
             moved = math.max(moved, math.abs(delta.X) + math.abs(delta.Y))
-            if moved < 3 then
+            if moved <= TAP_SLOP then
                 return
             end
+            -- 拖动就脱离窗口：以后窗口怎么动它都不跟着跑了
+            self._switchPinned = false
             local vp = WobsinsUI:_viewport()
             local size = btn.AbsoluteSize
             local left = U.clamp(startLeft + delta.X, 4, math.max(4, vp.X - size.X - 4))
@@ -10832,47 +10817,80 @@ function Window:_buildFloatSwitch(config)
     end
 
     btn.Activated:Connect(function()
-        -- 拖过就不算点击，避免「想挪个位置结果把窗口关了」
-        if moved > 5 then
-            moved = 0
+        -- 有些执行器在触屏上只发 Activated，不发 InputEnded
+        if dragging then
             return
         end
-        self:ToggleSwitch()
+        if moved <= TAP_SLOP then
+            fire()
+        end
     end)
 
     btn.MouseEnter:Connect(function()
-        U.tween(bg, 0.12, { BackgroundColor3 = Color3.fromRGB(30, 31, 34) })
-        bgStroke.Transparency = 0.18
+        trackStroke.Transparency = 0.25
     end)
     btn.MouseLeave:Connect(function()
-        U.tween(bg, 0.12, { BackgroundColor3 = Color3.fromRGB(19, 20, 22) })
-        bgStroke.Transparency = 0.3
+        trackStroke.Transparency = 0.5
     end)
 
-    U.tooltip(btn, "点击开关界面，按住可拖动")
+    -- 切主题时重新上色（开关挂在 ScreenGui 上，不继承窗口的绑定）
+    self:_onTheme(function()
+        self:_paintSwitch()
+        if self.SwitchStroke then
+            self.SwitchStroke.Color = self:Color("Outline")
+        end
+    end)
+
+    U.tooltip(btn, "点一下收起 / 展开界面，按住可拖动")
 
     self:_paintSwitch()
     return self
 end
 
--- 开关的视觉状态：窗口开着滑块在右（亮），关着在左（灰）
+-- 返回 轨道色, 滑块色。开 = 前景色底 + 背景色滑块（暗色反白、浅色反黑）
+function Window:_switchColors(on)
+    if on then
+        return self:Color("Text"), self:Color("Background")
+    end
+    return self:Color("SurfaceHover"), self:Color("Muted")
+end
+
+-- 把开关摆到窗口右上角（跟着缩放和拖动走）
+function Window:_placeSwitch()
+    local sw = self.FloatSwitch
+    if not sw or not self._switchPinned then
+        return
+    end
+    local s = self.ScaleValue or 1
+    local left = (self._stageLeft or 0) + (self.Width - self:_switchSlot() - SWITCH_WIDTH) * s
+    local top = (self._stageTop or 0) + 9 * s        -- 标题栏 44 高，(44-26)/2 = 9
+    sw.Position = UDim2.fromOffset(math.floor(left), math.floor(top))
+    if self.SwitchScale then
+        self.SwitchScale.Scale = s
+    end
+end
+
+-- 开关的视觉状态：窗口开着滑块在右（白底深点），关着在左（灰底浅点）
 function Window:_paintSwitch()
     local sw = self.FloatSwitch
     if not sw then
         return
     end
     local shown = self:IsShown()
+    local travel = SWITCH_WIDTH - SWITCH_HEIGHT
+    local trackColor, knobColor = self:_switchColors(shown)
 
     U.tween(sw.Track, 0.18, {
-        BackgroundColor3 = shown and Color3.fromRGB(236, 237, 240) or Color3.fromRGB(62, 64, 68),
+        BackgroundColor3 = trackColor,
     }, Enum.EasingStyle.Quad)
     U.tween(sw.Knob, 0.18, {
-        Position = UDim2.fromOffset(shown and 14 or 2, 2),
-        BackgroundColor3 = shown and Color3.fromRGB(19, 20, 22) or Color3.fromRGB(152, 154, 160),
+        Position = UDim2.fromOffset(shown and (3 + travel) or 3, 3),
+        BackgroundColor3 = knobColor,
     }, Enum.EasingStyle.Quad)
-    U.tween(sw.Label, 0.18, {
-        TextColor3 = shown and Color3.fromRGB(236, 237, 240) or Color3.fromRGB(148, 150, 156),
-    }, Enum.EasingStyle.Quad)
+    if sw.KnobIcon then
+        -- 图标压在滑块上，取和滑块相反的颜色
+        U.tint(sw.KnobIcon, shown and self:Color("Text") or self:Color("Background"))
+    end
 end
 
 function Window:IsShown()
@@ -10883,13 +10901,7 @@ function Window:IsShown()
 end
 
 function Window:SetSwitchText(text)
-    self.SwitchText = tostring(text or "开关")
-    local sw = self.FloatSwitch
-    if sw and sw.Label then
-        sw.Label.Text = self.SwitchText
-        local width = self:_switchWidth()
-        sw.Size = UDim2.fromOffset(width, SWITCH_HEIGHT)
-    end
+    self.SwitchText = tostring(text or "显示界面")
     return self
 end
 
@@ -10897,6 +10909,13 @@ function Window:SetSwitchVisible(state)
     if self.FloatSwitch then
         self.FloatSwitch.Visible = state ~= false
     end
+    return self
+end
+
+-- 把开关挪回窗口右上角（被拖走之后想复位就调这个）
+function Window:ResetSwitchPosition()
+    self._switchPinned = true
+    self:_placeSwitch()
     return self
 end
 
@@ -10931,9 +10950,15 @@ function Window:SetMinimized(state)
             self:SetBackgroundImage(source)
         end
         if self.Scale then
-            self.Scale.Scale = 0.97
-            U.tween(self.Scale, 0.18, { Scale = 1 }, Enum.EasingStyle.Quad)
+            local base = self.ScaleValue or 1
+            self.Scale.Scale = base * 0.97
+            U.tween(self.Scale, 0.18, { Scale = base }, Enum.EasingStyle.Quad)
         end
+    end
+
+    -- 没有常驻开关（FloatSwitch = false）时，用旧的悬浮按钮兜底，不然收起来就没入口
+    if not self.FloatSwitch and self.OpenButton and self.OpenButton.Frame then
+        self.OpenButton.Frame.Visible = state
     end
 
     self:_paintSwitch()
@@ -11005,7 +11030,7 @@ function Window:Shutdown()
     end
     self.ShutdownRequested = true
 
-    -- 先淡出再销毁，别「啪一下全没」
+    -- 先收起再销毁，别「啪一下全没」
     if self.Stage and not self.Minimized then
         pcall(function()
             self:SetMinimized(true)
@@ -11096,13 +11121,6 @@ function WobsinsUI:_createWindow(config)
     if win and not win.Destroyed then
         pcall(function()
             win:_buildFloatSwitch(config)
-
-            -- 标题改过之后，开关上的文字跟着变
-            local rawSetTitle = win.SetTitle
-            win.SetTitle = function(self_, text)
-                local result = rawSetTitle(self_, text)
-                return result
-            end
         end)
     end
     return win
