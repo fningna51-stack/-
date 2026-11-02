@@ -53,9 +53,14 @@
 
 local WobsinsUI = {}
 WobsinsUI.__index = WobsinsUI
-WobsinsUI.Version = "2.5.0"
-WobsinsUI.Build = "20261103f"
+WobsinsUI.Version = "2.6.0"
+WobsinsUI.Build = "20261103g"
 WobsinsUI.Name = "WobsinsUI"
+
+-- 全局字号系数：所有 TextSize 在构造时统一乘这个值。
+-- 手机端窗口整体缩到 0.78 左右，字号不补回来就小得看不清；桌面端 1.2 也还宽松。
+-- 做成全局是因为 TextSize 是逐组件写死的，运行时改不回来 —— 改了要重建窗口。
+WobsinsUI.TextScale = 1.22
 
 -- 同一个执行器里重复执行脚本时复用已有实例，避免出现两个 ScreenGui 叠在一起。
 -- 但如果拿到的是旧构建（比如上次跑的是坏掉的版本），先把旧界面清掉再重建，
@@ -142,11 +147,20 @@ end
 U.safeCall = safeCall
 
 -- Instance 构造：先写属性再挂父级，避免父级布局在属性未就绪时先跑一遍
+--
+-- 这里顺便把全局字号系数（TextScale）乘进去：手机上窗口整体缩到 0.78 之后，
+-- 10.5pt 的正文渲染出来只有 8px 左右，字小得看不清。统一在构造时放大字号，
+-- 组件里的固定高度（26 / 34 / 44）不用逐个改，行高靠 AutomaticSize 自己长。
 function U.new(class, props, parent)
     local inst = Instance.new(class)
     if props then
+        local textScale = WobsinsUI.TextScale or 1
         for key, value in pairs(props) do
             if value ~= nil then
+                if key == "TextSize" and textScale ~= 1 and type(value) == "number" then
+                    -- 取到 0.5 的整数倍，避免出现 12.599999 这种字号
+                    value = math.floor(value * textScale * 2 + 0.5) / 2
+                end
                 inst[key] = value
             end
         end
@@ -281,7 +295,7 @@ end
 -- Roblox 没有跨执行器一致的字宽 API，这里只用来把「图标 + 文字」整体居中。
 function U.textWidth(text, size)
     text = tostring(text or "")
-    size = size or 12
+    size = (size or 12) * (WobsinsUI.TextScale or 1)
     local width = 0
     local ok = pcall(function()
         for _, code in utf8.codes(text) do
@@ -1155,9 +1169,9 @@ local function ensureNotifyStack()
 
     notifyStack = new("Frame", {
         BackgroundTransparency = 1,
-        Size = UDim2.new(0, 300, 0, 0),
+        Size = UDim2.new(0, 318, 0, 0),
         AutomaticSize = Enum.AutomaticSize.Y,
-        -- 往下让 46px：右上角留给常驻开关，通知不要压在它身上
+        -- 往下让 46px：顶上是标题栏 / 常驻开关，通知不要压在它身上
         Position = UDim2.new(1, -16, 0, 62),
         AnchorPoint = Vector2.new(1, 0),
         ZIndex = WobsinsUI.Layers.Toast,
@@ -1321,7 +1335,7 @@ function WobsinsUI:Notify(config)
 
     local title = new("TextLabel", {
         BackgroundTransparency = 1,
-        Size = UDim2.new(1, 0, 0, 16),
+        Size = UDim2.new(1, 0, 0, 18),
         Font = Enum.Font.GothamMedium,
         Text = config.Title or "提示",
         TextColor3 = theme.Text,
@@ -1601,9 +1615,10 @@ function WobsinsUI:_modal(config)
     if contentText ~= "" then
         local textService = service("TextService")
         local ok, bounds = false, nil
+        local bodySize = 11 * (WobsinsUI.TextScale or 1)
         if textService and textService.GetTextSize then
             ok, bounds = pcall(function()
-                return textService:GetTextSize(contentText, 11, Enum.Font.Gotham, Vector2.new(wrapWidth, 2000))
+                return textService:GetTextSize(contentText, bodySize, Enum.Font.Gotham, Vector2.new(wrapWidth, 2000))
             end)
         end
         if ok and bounds and (bounds.Y or 0) > 0 then
@@ -1614,11 +1629,11 @@ function WobsinsUI:_modal(config)
             for line in tostring(contentText):gmatch("[^\n]*") do
                 local width = 0
                 for _, code in utf8.codes(line) do
-                    width = width + (code >= 0x2E80 and 11 or 6.2)
+                    width = width + (code >= 0x2E80 and bodySize or bodySize * 0.56)
                 end
                 lines = lines + math.max(1, math.ceil(width / wrapWidth))
             end
-            bodyHeight = math.max(14, lines * 15)
+            bodyHeight = math.max(14, lines * bodySize * 1.36)
         end
     end
 
@@ -2040,6 +2055,10 @@ end
 
 function WobsinsUI:CreateWindow(config)
     config = config or {}
+    -- 字号系数要在建任何组件之前定下来（TextSize 是构造时写死的）
+    if tonumber(config.TextScale) and tonumber(config.TextScale) > 0 then
+        self.TextScale = U.clamp(tonumber(config.TextScale), 0.8, 1.8)
+    end
     local ok, result = xpcall(function()
         return self:_createWindow(config)
     end, function(err)
@@ -2085,6 +2104,18 @@ function WobsinsUI:_createWindow(config)
         scale = math.min(1, (vp.Y * 0.88) / height, (vp.X * 0.82) / width)
     end
     scale = U.clamp(scale, 0.58, 1.3)
+
+    -- 竖屏手机：0.58 的下限也可能撑出屏幕（880 x 0.58 = 510 > 390），
+    -- 这时候反过来把设计尺寸压到能塞下的大小，字号比例就保住了，
+    -- 而不是硬让窗口跑出屏幕右边。
+    local fitWidth = math.floor((vp.X - 16) / scale)
+    local fitHeight = math.floor((vp.Y - 16) / scale)
+    if width > fitWidth then
+        width = math.max(320, fitWidth)
+    end
+    if height > fitHeight then
+        height = math.max(280, fitHeight)
+    end
 
     local sidebarWidth = config.SideBarWidth or 168
     if width < 620 then
@@ -2428,8 +2459,9 @@ function Window:_buildHeader(config)
         end
     end
 
-    -- 标题 / 副标题（右侧要留出搜索框 + 开关位 + 关闭按钮的位置）
-    local showSwitch = config.FloatSwitch ~= false
+    -- 标题 / 副标题（右侧要留出搜索框 + 最小化 + 关闭按钮的位置）
+    -- 只有显式 FloatSwitch = true 才用药丸开关的槽位，默认走「—」收起成小条
+    local showSwitch = config.FloatSwitch == true
     local searchWidth = 236
     if self.Width < 700 or self.ThemeTable.SearchInSidebar then
         searchWidth = 0
@@ -2469,8 +2501,8 @@ function Window:_buildHeader(config)
     }, header)
     self:_bind(author, "TextColor3", "Muted")
 
-    -- 右侧按钮：关闭脚本（带确认）。最小化不再是一个「—」按钮 ——
-    -- 右上角常驻开关（23_shell）就浮在这个位置，收起后也不会跟着消失。
+    -- 右侧按钮：关闭脚本（带确认）+ 最小化。
+    -- 点「—」把整窗收成 23_shell 里那条小胶囊，再点小条展开。
     local buttonSize = 26
     local rightX = -14
 
@@ -2497,8 +2529,11 @@ function Window:_buildHeader(config)
         self:_buildSearchBox(header, searchWidth, 26, UDim2.new(1, rightX - searchWidth, 0, 9), 7, 11)
     end
 
-    -- 拖动区域只用标题文字，避免点击按钮 / 搜索框时把窗口拖走
+    -- 标题栏整条都能拖：空白处、标题、副标题都算。
+    -- 按钮 / 搜索框是子控件，命中它们时 InputBegan 不会冒泡到这里，不会误拖。
+    self:_makeDraggable(header)
     self:_makeDraggable(title)
+    self:_makeDraggable(author)
 end
 
 function Window:_buildSearchBox(parent, width, height, position, radius, textSize)
@@ -2782,6 +2817,10 @@ function Window:_buildContent(config)
 
     self.Pages = {}
     self.Layout = config.Layout or "Single"
+    -- 双列在窄屏上会挤成两根手指宽，自动退回单列
+    if self.Layout == "Double" and self.Width * (self.ScaleValue or 1) < 600 then
+        self.Layout = "Single"
+    end
 end
 
 function Window:_buildFooter(config)
@@ -2845,11 +2884,9 @@ end
 --//----------------------------------------------------------------------------
 
 function Window:_buildOpenButton(config)
-    if config.OpenButton == false then
-        return
-    end
-    -- 常驻开关（23_shell）本身就能把窗口叫回来，再挂一个悬浮按钮是重复的
-    if config.OpenButton ~= true and config.FloatSwitch ~= false then
+    -- 默认不建：收起后的小条（23_shell 的 MinBar）本身就是入口，
+    -- 再挂一个悬浮圆按钮纯属重复。要就显式写 OpenButton = true。
+    if config.OpenButton ~= true then
         return
     end
 
@@ -3005,6 +3042,10 @@ function Window:SetUIScale(scale)
     end
     -- 缩完尺寸变了，重新居中（原来贴着屏幕边缘的话会露出半截）
     self:_centerStage()
+    -- 收起状态时小条也要跟着换大小
+    if self.Minimized and self._placeMinBar then
+        self:_placeMinBar()
+    end
     return self
 end
 
@@ -4367,7 +4408,7 @@ function Build.Paragraph(card, config)
     local title = new("TextLabel", {
         BackgroundTransparency = 1,
         Position = UDim2.fromOffset(textX, 0),
-        Size = UDim2.new(1, -textX, 0, 15),
+        Size = UDim2.new(1, -textX, 0, 18),
         Font = Enum.Font.GothamMedium,
         Text = config.Title or "标题",
         TextColor3 = theme.Text,
@@ -4382,7 +4423,7 @@ function Build.Paragraph(card, config)
     if config.Desc and config.Desc ~= "" then
         desc = new("TextLabel", {
             BackgroundTransparency = 1,
-            Position = UDim2.fromOffset(textX, 17),
+            Position = UDim2.fromOffset(textX, 20),
             Size = UDim2.new(1, -textX, 0, 0),
             AutomaticSize = Enum.AutomaticSize.Y,
             Font = Enum.Font.Gotham,
@@ -4406,7 +4447,7 @@ function Build.Paragraph(card, config)
     if config.Buttons and #config.Buttons > 0 then
         local row = new("Frame", {
             BackgroundTransparency = 1,
-            Size = UDim2.new(1, 0, 0, 24),
+            Size = UDim2.new(1, 0, 0, 26),
             LayoutOrder = 2,
             ZIndex = WobsinsUI.Layers.RowItem,
         }, holder)
@@ -4419,10 +4460,12 @@ function Build.Paragraph(card, config)
 
         for index, info in ipairs(config.Buttons) do
             local primary = info.Variant == "Primary"
+            -- 宽度至少塞得下自己的文字（字号是可调的，写死 72 会挤出去）
+            local btnWidth = math.max(info.Width or 72, U.textWidth(info.Title or "按钮", 10) + 26)
             local btn = new("TextButton", {
                 BackgroundColor3 = primary and theme.Accent or theme.SurfaceAlt,
                 AutoButtonColor = false,
-                Size = UDim2.fromOffset(info.Width or 72, 24),
+                Size = UDim2.fromOffset(math.ceil(btnWidth), 26),
                 Text = "",
                 LayoutOrder = index,
                 ZIndex = WobsinsUI.Layers.RowItem + 1,
@@ -6076,6 +6119,9 @@ function Window:SetTitle(text)
     if self.TitleLabel then
         self.TitleLabel.Text = self.Title
     end
+    if self.MinBarTitle then
+        self.MinBarTitle.Text = self.Title
+    end
     return self
 end
 
@@ -6088,31 +6134,13 @@ end
 --// 17.1 显示 / 隐藏 / 最小化
 --//----------------------------------------------------------------------------
 
+-- 隐藏窗口 = 收起成小条，保证屏幕上始终有入口（以前只把 Stage 藏了，
+-- 没挂悬浮按钮的配置收起来就再也找不回来）。
 function Window:Close()
     if not self.Visible or not self.Stage then
         return
     end
-    self.Visible = false
-    if self.Scale then
-        local base = self.ScaleValue or 1
-        U.tween(self.Scale, 0.14, { Scale = base * 0.96 }, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
-    end
-    local token = (self._toggleToken or 0) + 1
-    self._toggleToken = token
-    U.delay(0.15, function()
-        if self._toggleToken ~= token then
-            return
-        end
-        if not self.Visible and self.Stage then
-            self.Stage.Visible = false
-        end
-    end)
-    if self.OpenButton and self.OpenButton.Frame then
-        self.OpenButton.Frame.Visible = true
-    end
-    if self._paintSwitch then
-        self:_paintSwitch()
-    end
+    self:SetMinimized(true)
     for _, callback in ipairs(self.CloseCallbacks) do
         safeCall(callback)
     end
@@ -6147,35 +6175,6 @@ function Window:Toggle()
         self:Close()
     else
         self:Open()
-    end
-end
-
-function Window:Minimize()
-    if not self.Stage then
-        return
-    end
-    self.Minimized = not self.Minimized
-    local show = not self.Minimized
-
-    if self.Sidebar then
-        self.Sidebar.Visible = show
-    end
-    if self.Content then
-        self.Content.Visible = show
-    end
-    if self.Footer then
-        self.Footer.Visible = show
-    end
-    if self.Header then
-        -- 最小化时只留标题栏，分隔线也一起收掉
-        self.Header.Size = UDim2.new(1, 0, 0, HEADER_HEIGHT)
-    end
-
-    local target = show and self.Height or HEADER_HEIGHT
-    U.tween(self.Stage, 0.22, { Size = UDim2.fromOffset(self.Width, target) }, Enum.EasingStyle.Quint)
-
-    if self.Shadow then
-        U.tween(self.Shadow, 0.22, { Size = UDim2.new(1, 4, 1, show and 10 or 4) })
     end
 end
 
@@ -6408,6 +6407,10 @@ function Window:Destroy()
         self.FloatSwitch:Destroy()
         self.FloatSwitch = nil
     end
+    if self.MinBar then
+        self.MinBar:Destroy()
+        self.MinBar = nil
+    end
     if self.Stage then
         self.Stage:Destroy()
         self.Stage = nil
@@ -6427,6 +6430,17 @@ end
 
 function WobsinsUI:GetWindows()
     return self.Windows
+end
+
+-- 全局字号：TextSize 在构造时写死，改完要重建窗口才看得到
+function WobsinsUI:SetTextScale(scale)
+    scale = U.clamp(tonumber(scale) or 1.22, 0.8, 1.8)
+    self.TextScale = scale
+    return self
+end
+
+function WobsinsUI:GetTextScale()
+    return self.TextScale or 1
 end
 
 function WobsinsUI:DestroyAll()
@@ -10649,12 +10663,14 @@ end
 --
 -- 这一节做两件事：
 --
---   1. 常驻开关。窗口右上角那枚小开关 —— 它不在标题栏里，而是单独挂在
---      ScreenGui 上，正好浮在标题栏给关闭按钮左边留出的槽位上：
---      · 窗口开 / 关它都在，收起来之后想找回来还是点它；
---      · 按住可以拖走，拖过就算挪位置，不算点击；
---      · 点一下切换：开 → 窗口出现，关 → 整个窗口藏起来；
---      · 滑块在左 = 关，在右 = 开，一眼能看出来。
+--   1. 最小化小条（默认）。点标题栏的「—」收起后，整窗缩成一颗 236x38 的
+--      小胶囊钉在屏幕上：左边图标、中间脚本名、右边 ×，和 v2.3 那版一样。
+--      · 点条身 → 展开回完整窗口；
+--      · 按住条身可以拖到任意位置，位置会记住；
+--      · 点 × → 走关闭确认，不会一点就没。
+--
+--   1b. 常驻药丸开关（可选，FloatSwitch = true）。不用小条、想在屏幕上留一颗
+--      可拖动的开关时用，见 23.2。
 --
 --   2. 关闭脚本。右上角 × 弹确认，确认后销毁整个界面、清掉单例、
 --      触发 OnShutdown 回调，脚本主循环据此退出。
@@ -10663,20 +10679,24 @@ end
 --// 23.1 常量
 --//----------------------------------------------------------------------------
 
-local SWITCH_WIDTH = 46      -- 设计尺寸，实际大小跟着窗口缩放走
+local SWITCH_WIDTH = 46      -- 药丸开关（可选）设计尺寸
 local SWITCH_HEIGHT = 26
-local SWITCH_GAP = 8         -- 和关闭按钮之间的间距
+local SWITCH_GAP = 8
 local SWITCH_MARGIN = 16
 local TAP_SLOP = 12          -- 手指抖动容忍：位移超过这个数才算拖动
 
--- 开关在标题栏里占的槽位（设计坐标，右上角起算）
+local MINBAR_WIDTH = 236     -- 最小化小条设计尺寸
+local MINBAR_HEIGHT = 38
+local MINBAR_TAP = 9         -- 小条上点一下展开的容忍位移
+
+-- 药丸开关在标题栏里占的槽位（设计坐标，右上角起算）
 function Window:_switchSlot()
     -- 关闭按钮占 14 + 26，再往左空 8px 就是开关
     return 14 + 26 + SWITCH_GAP
 end
 
 --//----------------------------------------------------------------------------
---// 23.2 常驻开关本体
+--// 23.2 常驻药丸开关（可选，FloatSwitch = true 才建）
 --//----------------------------------------------------------------------------
 
 function Window:_switchText()
@@ -10688,7 +10708,7 @@ function Window:_buildFloatSwitch(config)
         return self
     end
     config = config or self.Config or {}
-    if config.FloatSwitch == false then
+    if config.FloatSwitch ~= true then
         return self
     end
 
@@ -10731,8 +10751,6 @@ function Window:_buildFloatSwitch(config)
     U.corner(knob, (SWITCH_HEIGHT - 6) / 2)
     btn.Knob = knob
 
-    -- 滑块上的小图标：开着是闪电（窗口在），关着是斜杠（窗口收起了）。
-    -- 不写字，46x26 塞不下字，图标一眼就够。
     local knobIcon = U.icon(knob, "bolt", 11, self:Color("Text"), WobsinsUI.Layers.Modal + 1)
     if knobIcon then
         knobIcon.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -10786,7 +10804,6 @@ function Window:_buildFloatSwitch(config)
             return
         end
         dragging = false
-        -- 手指在屏幕上永远会抖几像素，严格按「没动过」判点击就永远点不动
         if moved <= TAP_SLOP then
             fire()
         end
@@ -10893,6 +10910,231 @@ function Window:_paintSwitch()
     end
 end
 
+--//----------------------------------------------------------------------------
+--// 23.3 最小化小条（默认）
+--//----------------------------------------------------------------------------
+--
+-- 收起后屏幕上只留这一条：图标 + 脚本名 + ×。位置默认贴在窗口左上角，
+-- 拖过之后记住新位置；点条身展开，点 × 走关闭确认。
+
+function Window:_buildMinBar(config)
+    config = config or self.Config or {}
+    if self.MinBar or not self.Root then
+        return self
+    end
+    -- 用了常驻药丸就不再建小条，两个入口会打架
+    if config.FloatSwitch == true or config.MinBar == false then
+        return self
+    end
+
+    local bar = new("Frame", {
+        Name = "MinBar",
+        -- Active：点击不要穿透到后面的游戏画面，按住拖动才稳
+        Active = true,
+        BackgroundColor3 = self:Color("Surface"),
+        Size = UDim2.fromOffset(MINBAR_WIDTH, MINBAR_HEIGHT),
+        Visible = false,
+        ClipsDescendants = false,
+        ZIndex = WobsinsUI.Layers.Header,
+    }, self.Root)
+    U.corner(bar, 10)
+    local stroke = U.stroke(bar, self:Color("Outline"), 1, 0.35)
+    self.MinBar = bar
+    self.MinBarStroke = stroke
+    self.MinBarScale = new("UIScale", { Scale = self.ScaleValue or 1 }, bar)
+
+    -- 左边的图标方块，和标题栏那个 logo 一个路子
+    local logo = new("Frame", {
+        Name = "Logo",
+        BackgroundColor3 = self:Color("SurfaceAlt"),
+        Size = UDim2.fromOffset(24, 24),
+        Position = UDim2.fromOffset(7, 7),
+        ZIndex = WobsinsUI.Layers.Header + 1,
+    }, bar)
+    U.corner(logo, 6)
+    self.MinBarLogo = logo
+    local logoIcon = U.icon(logo, self.Icon, 13, self:Color("Text"), WobsinsUI.Layers.Header + 2)
+    if logoIcon then
+        logoIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+        logoIcon.Position = UDim2.fromScale(0.5, 0.5)
+        self.MinBarIcon = logoIcon
+    end
+
+    -- 脚本名（只留一行，长了截断）
+    local label = new("TextLabel", {
+        Name = "Title",
+        BackgroundTransparency = 1,
+        Position = UDim2.fromOffset(39, 0),
+        Size = UDim2.new(1, -(39 + 34 + 8), 1, 0),
+        Font = Enum.Font.GothamMedium,
+        Text = self.Title,
+        TextColor3 = self:Color("Text"),
+        TextSize = 12,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextTruncate = Enum.TextTruncate.AtEnd,
+        ZIndex = WobsinsUI.Layers.Header + 1,
+    }, bar)
+    self.MinBarTitle = label
+    self:_bind(label, "TextColor3", "Text")
+
+    -- 右边那颗 ×：红底白叉，一看看得出是「关掉脚本」，不是在拖动区域里的装饰
+    local close = new("TextButton", {
+        Name = "Close",
+        BackgroundColor3 = self:Color("Danger"),
+        BackgroundTransparency = 0.12,
+        AutoButtonColor = false,
+        Text = "",
+        Size = UDim2.fromOffset(26, 26),
+        Position = UDim2.new(1, -33, 0, 6),
+        ZIndex = WobsinsUI.Layers.Header + 1,
+    }, bar)
+    U.corner(close, 6)
+    self.MinBarClose = close
+
+    U.icon(close, "close", 12, Color3.new(1, 1, 1), WobsinsUI.Layers.Header + 2)
+    U.hover(close, function()
+        U.tween(close, 0.12, { BackgroundTransparency = 0 })
+    end, function()
+        U.tween(close, 0.12, { BackgroundTransparency = 0.12 })
+    end)
+
+    --//-- 交互 ----------------------------------------------------------------
+    local dragging, moved = false, 0
+    local startPointer, startLeft, startTop = nil, 0, 0
+
+    local function stageIn()
+        -- 收起状态下点条身 / 按快捷键，都回到完整窗口
+        self:SetMinimized(false)
+    end
+
+    bar.InputBegan:Connect(function(input)
+        if input.UserInputType ~= Enum.UserInputType.MouseButton1
+            and input.UserInputType ~= Enum.UserInputType.Touch then
+            return
+        end
+        dragging = true
+        moved = 0
+        startPointer = input.Position
+        startLeft = bar.AbsolutePosition.X
+        startTop = bar.AbsolutePosition.Y
+    end)
+
+    bar.InputEnded:Connect(function(input)
+        if input.UserInputType ~= Enum.UserInputType.MouseButton1
+            and input.UserInputType ~= Enum.UserInputType.Touch then
+            return
+        end
+        if not dragging then
+            return
+        end
+        dragging = false
+        -- 手指抖几像素仍然算「点」，超过阈值就只是挪位置
+        if moved <= MINBAR_TAP then
+            stageIn()
+        end
+    end)
+
+    if S.UserInputService then
+        S.UserInputService.InputChanged:Connect(function(input)
+            if not dragging then
+                return
+            end
+            if input.UserInputType ~= Enum.UserInputType.MouseMovement
+                and input.UserInputType ~= Enum.UserInputType.Touch then
+                return
+            end
+            local delta = input.Position - startPointer
+            moved = math.max(moved, math.abs(delta.X) + math.abs(delta.Y))
+            if moved <= MINBAR_TAP then
+                return
+            end
+            local vp = WobsinsUI:_viewport()
+            local size = bar.AbsoluteSize
+            local left = U.clamp(startLeft + delta.X, 4, math.max(4, vp.X - size.X - 4))
+            local top = U.clamp(startTop + delta.Y, 4, math.max(4, vp.Y - size.Y - 4))
+            -- 手动拖过之后就不再跟着窗口走
+            self._minBarPinned = true
+            self._minBarPos = { x = left, y = top }
+            bar.Position = UDim2.fromOffset(math.floor(left), math.floor(top))
+        end)
+    end
+
+    close.Activated:Connect(function()
+        self:RequestClose()
+    end)
+    U.tooltip(close, "关闭脚本")
+
+    U.tooltip(bar, "点一下展开界面，按住可拖动")
+
+    -- 主题切换时重新上色（挂在 ScreenGui 上，不继承窗口绑定）
+    self:_onTheme(function()
+        self:_paintMinBar()
+    end)
+
+    return self
+end
+
+function Window:_paintMinBar()
+    local bar = self.MinBar
+    if not bar then
+        return
+    end
+    bar.BackgroundColor3 = self:Color("Surface")
+    if self.MinBarLogo then
+        self.MinBarLogo.BackgroundColor3 = self:Color("SurfaceAlt")
+    end
+    if self.MinBarClose then
+        self.MinBarClose.BackgroundColor3 = self:Color("Danger")
+    end
+    if self.MinBarStroke then
+        self.MinBarStroke.Color = self:Color("Outline")
+    end
+end
+
+-- 摆位置：第一次贴在窗口左上角，之后跟着上次拖到的地方走
+function Window:_placeMinBar()
+    local bar = self.MinBar
+    if not bar then
+        return
+    end
+    local s = self.ScaleValue or 1
+    if self.MinBarScale then
+        self.MinBarScale.Scale = s
+    end
+
+    local vp = WobsinsUI:_viewport()
+    local w, h = MINBAR_WIDTH * s, MINBAR_HEIGHT * s
+    local pos = self._minBarPos
+    -- 没被手动拖过时，每次收起都贴到窗口当前所在的位置
+    if not pos or not self._minBarPinned then
+        pos = {
+            x = self._stageLeft or (vp.X - w) / 2,
+            y = self._stageTop or 16,
+        }
+    end
+    pos.x = U.clamp(pos.x, 4, math.max(4, vp.X - w - 4))
+    pos.y = U.clamp(pos.y, 4, math.max(4, vp.Y - h - 4))
+    self._minBarPos = pos
+    bar.Position = UDim2.fromOffset(math.floor(pos.x), math.floor(pos.y))
+end
+
+function Window:_showMinBar(show)
+    local bar = self.MinBar
+    if not bar then
+        return
+    end
+    if show then
+        self:_placeMinBar()
+        bar.Visible = true
+    else
+        bar.Visible = false
+    end
+end
+
+--//----------------------------------------------------------------------------
+--// 23.3b 开 / 关
+--//----------------------------------------------------------------------------
+
 function Window:IsShown()
     if self.Destroyed then
         return false
@@ -10900,47 +11142,28 @@ function Window:IsShown()
     return self.Visible ~= false and self.Minimized ~= true
 end
 
-function Window:SetSwitchText(text)
-    self.SwitchText = tostring(text or "显示界面")
-    return self
-end
-
-function Window:SetSwitchVisible(state)
-    if self.FloatSwitch then
-        self.FloatSwitch.Visible = state ~= false
-    end
-    return self
-end
-
--- 把开关挪回窗口右上角（被拖走之后想复位就调这个）
-function Window:ResetSwitchPosition()
-    self._switchPinned = true
-    self:_placeSwitch()
-    return self
-end
-
---//----------------------------------------------------------------------------
---// 23.3 开 / 关
---//----------------------------------------------------------------------------
-
 function Window:SetMinimized(state)
     state = state and true or false
     if self.Destroyed or not self.Stage then
         return self
     end
     if self.Minimized == state and self.Stage.Visible == (not state) then
-        self:_paintSwitch()
+        if self.FloatSwitch then
+            self:_paintSwitch()
+        end
         return self
     end
 
     self.Minimized = state
 
     if state then
-        -- 关：整窗藏起来，屏幕上只留那个开关
+        -- 关：整窗藏起来，屏幕上只留小条（或药丸开关）
         self.Visible = false
+        self:_showMinBar(true)
         self.Stage.Visible = false
     else
         self.Visible = true
+        self:_showMinBar(false)
         self.Stage.Visible = true
         -- 收起期间被设置 / 换过的背景图，这时候补建
         if self._hasPendingBg then
@@ -10956,12 +11179,14 @@ function Window:SetMinimized(state)
         end
     end
 
-    -- 没有常驻开关（FloatSwitch = false）时，用旧的悬浮按钮兜底，不然收起来就没入口
-    if not self.FloatSwitch and self.OpenButton and self.OpenButton.Frame then
+    -- 只有显式开了悬浮按钮兜底时才管它
+    if not self.MinBar and not self.FloatSwitch and self.OpenButton and self.OpenButton.Frame then
         self.OpenButton.Frame.Visible = state
     end
 
-    self:_paintSwitch()
+    if self.FloatSwitch then
+        self:_paintSwitch()
+    end
     return self
 end
 
@@ -10982,9 +11207,32 @@ function Window:IsMinimized()
     return self.Minimized == true
 end
 
--- 旧名字留着，别让已经写在脚本里的调用直接断掉
-function Window:_buildMinBar(config)
-    return self:_buildFloatSwitch(config)
+function Window:SetSwitchText(text)
+    self.SwitchText = tostring(text or "显示界面")
+    return self
+end
+
+function Window:SetSwitchVisible(state)
+    if self.FloatSwitch then
+        self.FloatSwitch.Visible = state ~= false
+    end
+    if self.MinBar then
+        -- 小条是收起后的唯一入口，不允许藏（藏了就找不回来了）
+        self.MinBar.Visible = (state ~= false) and self.Minimized == true
+    end
+    return self
+end
+
+-- 把开关 / 小条挪回窗口右上角（被拖走之后想复位就调这个）
+function Window:ResetSwitchPosition()
+    self._switchPinned = true
+    self._minBarPos = nil
+    self._minBarPinned = false
+    self:_placeSwitch()
+    if self.Minimized then
+        self:_placeMinBar()
+    end
+    return self
 end
 
 --//----------------------------------------------------------------------------
@@ -11111,7 +11359,7 @@ function Window:RequestClose()
 end
 
 --//----------------------------------------------------------------------------
---// 23.5 收尾：构建常驻开关
+--// 23.5 收尾：构建最小化小条 / 常驻开关
 --//----------------------------------------------------------------------------
 
 local _createWindowPrev = WobsinsUI._createWindow
@@ -11119,6 +11367,9 @@ local _createWindowPrev = WobsinsUI._createWindow
 function WobsinsUI:_createWindow(config)
     local win = _createWindowPrev(self, config)
     if win and not win.Destroyed then
+        pcall(function()
+            win:_buildMinBar(config)
+        end)
         pcall(function()
             win:_buildFloatSwitch(config)
         end)
