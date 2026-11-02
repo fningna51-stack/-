@@ -1,7 +1,60 @@
+--[[
+    ██╗    ██╗ ██████╗ ██████╗ ███████╗██╗███╗   ██╗███████╗    ██╗   ██╗██╗
+    ██║    ██║██╔═══██╗██╔══██╗██╔════╝██║████╗  ██║██╔════╝    ██║   ██║██║
+    ██║ █╗ ██║██║   ██║██████╔╝███████╗██║██╔██╗ ██║███████╗    ██║   ██║██║
+    ██║███╗██║██║   ██║██╔══██╗╚════██║██║██║╚██╗██║╚════██║    ██║   ██║██║
+    ╚███╔███╔╝╚██████╔╝██████╔╝███████║██║██║ ╚████║███████║    ╚██████╔╝██║
+     ╚══╝╚══╝  ╚═════╝ ╚═════╝ ╚══════╝╚═╝╚═╝  ╚═══╝╚══════╝     ╚═════╝ ╚═╝
+
+    WobsinsUI · v2.0.0
+    单文件 Roblox 脚本 UI 库（Luau）
+
+    ============================================================================
+    设计来源
+    ============================================================================
+    · WindUI        —— 玻璃窗体、背景图、悬浮开启按钮、通知 / 弹窗 / 配置 / 主题
+    · Obsidian      —— 石墨面板、图标侧栏、可折叠卡片、双列布局、顶栏搜索、药丸开关
+    两者合并为同一套组件树，默认走 Obsidian 的冷黑扁平风，切主题即变 WindUI 玻璃风。
+
+    ============================================================================
+    可靠性设计（针对上一版“加载出空气”的问题）
+    ============================================================================
+    1. 全屏根节点固定 DisplayOrder，窗口、浮层、通知、弹窗各自分层，层级用常量表管理，
+       不会再出现阴影 / 蒙版盖住内容的情况。
+    2. 每个元素构建都包在 pcall 里，单个组件出错只会让这一行显示成错误条，
+       不会中断整个窗口的构建（以前一个报错会让后面全部不渲染）。
+    3. CreateWindow 外层 xpcall；真出异常时会弹一个可见的错误面板并 print 出来，
+       而不是静默给你一块黑屏。
+    4. 构建完成后做一次自检：窗口、侧栏、内容区尺寸必须大于 0，
+       否则补一张“空状态”卡片，保证屏幕上一定有可见内容。
+    5. 主题色全部显式绑定，不依赖 Roblox 默认值；文字色永远从主题取，
+       不会出现纯黑字压在纯黑底上。
+
+    ============================================================================
+    快速开始
+    ============================================================================
+      local WobsinsUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/你的名字/WobsinsUI/main/source/WobsinsUI.lua"))()
+
+      local Window = WobsinsUI:CreateWindow({
+          Title = "WobsinsUI",
+          Author = "by you",
+          Theme = "Graphite",
+      })
+
+      local Tab = Window:Tab({ Title = "通用", Icon = "home" })
+      Tab:Toggle({ Title = "自动执行", Value = false, Callback = function(v) print(v) end })
+
+    MIT License · 可自由修改、二次分发。
+]]
+
+--//============================================================================
+--// 0. 库对象 / 单例保护
+--//============================================================================
+
 local WobsinsUI = {}
 WobsinsUI.__index = WobsinsUI
-WobsinsUI.Version = "2.2.0"
-WobsinsUI.Build = "20261103c"
+WobsinsUI.Version = "2.3.0"
+WobsinsUI.Build = "20261103d"
 WobsinsUI.Name = "WobsinsUI"
 
 -- 同一个执行器里重复执行脚本时复用已有实例，避免出现两个 ScreenGui 叠在一起。
@@ -222,6 +275,27 @@ function U.color(value, fallback)
         end
     end
     return fallback or Color3.new(1, 1, 1)
+end
+
+-- 估算一段文字的宽度（CJK 按一个字号算，拉丁按 0.56 算）。
+-- Roblox 没有跨执行器一致的字宽 API，这里只用来把「图标 + 文字」整体居中。
+function U.textWidth(text, size)
+    text = tostring(text or "")
+    size = size or 12
+    local width = 0
+    local ok = pcall(function()
+        for _, code in utf8.codes(text) do
+            if code >= 0x2E80 then
+                width = width + size
+            else
+                width = width + size * 0.56
+            end
+        end
+    end)
+    if not ok then
+        width = #text * size * 0.72
+    end
+    return width
 end
 
 function U.clamp(value, minValue, maxValue)
@@ -592,6 +666,30 @@ WobsinsUI.Layers = {
 -- 白到灰的三级文字，没有渐变、没有发光。
 
 local RAW_THEMES = {
+    -- 默认主题：对着参考图取色。近黑底、比底色亮一档的卡片、1px 冷灰描边，
+    -- 强调色用纯白而不是彩色，避免那种一眼假的霓虹味。
+    Ink = {
+        Background = "#0A0A0B",
+        BackgroundAlt = "#0D0D0F",
+        Surface = "#101011",
+        SurfaceAlt = "#1A1A1C",
+        SurfaceHover = "#232326",
+        Outline = "#2A2A2E",
+        OutlineSoft = "#1B1B1E",
+        Text = "#EBEBED",
+        SubText = "#9A9AA1",
+        Muted = "#6C6C73",
+        Accent = "#FFFFFF",
+        Accent2 = "#EDEDEF",
+        OnAccent = "#0A0A0B",
+        Danger = "#E0575F",
+        Success = "#4FB98A",
+        Warning = "#CFA160",
+        Shadow = "#000000",
+        Mode = "Dark",
+        Radius = 9,
+    },
+
     -- 参考图主色：冷黑 + 石墨灰
     Graphite = {
         Background = "#0B0B0C",
@@ -730,60 +828,58 @@ local RAW_THEMES = {
         Radius = 6,
     },
 
-    -- 参考图 1：白玻璃 + 青色细描边 + 大圆角
+    -- 浅色玻璃：白底 + 冷灰描边 + 深色强调（不用荧光青，那是最容易显廉价的一档）
     Light = {
-        Background = "#F2FAFD",
-        BackgroundAlt = "#EAF6FB",
+        Background = "#F4F7F9",
+        BackgroundAlt = "#EDF2F5",
         Surface = "#FFFFFF",
-        SurfaceAlt = "#F5FBFE",
-        SurfaceHover = "#E8F4FA",
-        Outline = "#BFE6F5",
-        OutlineSoft = "#DCF1FA",
-        Text = "#17323D",
-        SubText = "#5E7D8A",
-        Muted = "#93B3BE",
-        Accent = "#25BEE8",
-        Accent2 = "#1FA8D6",
+        SurfaceAlt = "#F1F5F8",
+        SurfaceHover = "#E6ECF1",
+        Outline = "#D3DEE5",
+        OutlineSoft = "#E4EBF0",
+        Text = "#1B262C",
+        SubText = "#54646E",
+        Muted = "#88969F",
+        Accent = "#16242B",
+        Accent2 = "#22343D",
         OnAccent = "#FFFFFF",
-        Danger = "#D9536A",
-        Success = "#2E9E74",
-        Warning = "#B98430",
-        Shadow = "#7FB6C9",
+        Danger = "#C94F5B",
+        Success = "#2E8F68",
+        Warning = "#A87B2D",
+        Shadow = "#7A97A6",
         Mode = "Light",
-        Radius = 14,
+        Radius = 10,
         Glass = true,
     },
 
-    -- 纯白，不带玻璃
-
-    -- 参考图的「霜玻璃」：白底 + 背景图透视 + 青边 + 大圆角
+    -- 霜玻璃：白底 + 背景图透视。圆角收到 11，去掉外发光，
+    -- 描边也不再是荧光青，整块面板看着更像「磨砂玻璃」而不是塑料玩具。
     Frost = {
-        Background = "#FFFFFF",
-        BackgroundAlt = "#F6FCFE",
+        Background = "#FBFDFE",
+        BackgroundAlt = "#F3F8FB",
         Surface = "#FFFFFF",
-        SurfaceAlt = "#F1FAFE",
-        SurfaceHover = "#E6F5FD",
-        Outline = "#9FDFF4",
-        OutlineSoft = "#CFEDF9",
-        Text = "#0F2F3C",
-        SubText = "#456A78",
-        Muted = "#7FA1AD",
-        Accent = "#63DCF7",
-        Accent2 = "#3FC9E9",
-        OnAccent = "#062731",
-        Danger = "#EC5A6B",
-        Success = "#31A87B",
-        Warning = "#BE882F",
-        Shadow = "#6FB3C8",
+        SurfaceAlt = "#EEF4F8",
+        SurfaceHover = "#E2ECF2",
+        Outline = "#C9DCE6",
+        OutlineSoft = "#E1ECF2",
+        Text = "#15242B",
+        SubText = "#4E6370",
+        Muted = "#8298A4",
+        Accent = "#17272E",
+        Accent2 = "#22353D",
+        OnAccent = "#FFFFFF",
+        Danger = "#D2505C",
+        Success = "#2E9E74",
+        Warning = "#A97E33",
+        Shadow = "#5C7F8F",
         Mode = "Light",
-        Radius = 18,
+        Radius = 11,
         Glass = true,
-        Alpha = 0.1,
-        CardAlpha = 0.18,
+        Alpha = 0.12,
+        CardAlpha = 0.1,
         Pill = true,
-        Glow = true,
         SearchInSidebar = true,
-        LineAlpha = 0.82,
+        LineAlpha = 0.72,
     },
 
     Paper = {
@@ -811,11 +907,11 @@ local RAW_THEMES = {
 
 -- 把十六进制字符串转成 Color3，同时补齐默认键
 local THEME_DEFAULTS = {
-    Background = "#0B0B0C", BackgroundAlt = "#0E0E10",
-    Surface = "#121214", SurfaceAlt = "#171719", SurfaceHover = "#1C1C1F",
-    Outline = "#242427", OutlineSoft = "#1A1A1D",
-    Text = "#EDEDEF", SubText = "#9A9AA2", Muted = "#63636B",
-    Accent = "#E8E8EA", Accent2 = "#E8E8EA", OnAccent = "#0A0A0B",
+    Background = "#0A0A0B", BackgroundAlt = "#0D0D0F",
+    Surface = "#111112", SurfaceAlt = "#161617", SurfaceHover = "#1D1D1F",
+    Outline = "#242427", OutlineSoft = "#19191B",
+    Text = "#EBEBED", SubText = "#9A9AA1", Muted = "#6C6C73",
+    Accent = "#FFFFFF", Accent2 = "#EDEDEF", OnAccent = "#0A0A0B",
     Danger = "#E5636F", Success = "#5FBF8F", Warning = "#D9A85C",
     Shadow = "#000000",
 }
@@ -827,6 +923,17 @@ local COLOR_KEYS = {
 }
 
 local Themes = {}
+
+-- 每个窗口都拿一份自己的主题副本。
+-- 组件里普遍是 `local theme = win.ThemeTable` 先存起来、切主题时再读，
+-- 如果这里换成「指向新表」，那些闭包会一直读旧表，切主题就成了半截子活。
+local function cloneTheme(source)
+    local copy = {}
+    for key, value in pairs(source or {}) do
+        copy[key] = value
+    end
+    return copy
+end
 
 local function buildTheme(name, data)
     local theme = { Name = name }
@@ -852,7 +959,9 @@ for name, data in pairs(RAW_THEMES) do
 end
 
 WobsinsUI.Themes = Themes
-WobsinsUI.CurrentTheme = "Graphite"
+WobsinsUI.CurrentTheme = "Ink"
+WobsinsUI.ThemeTable = cloneTheme(Themes.Ink)
+L.cloneTheme = cloneTheme
 
 function WobsinsUI:GetThemes()
     return Themes
@@ -863,7 +972,7 @@ function WobsinsUI:GetCurrentTheme()
 end
 
 function WobsinsUI:GetTheme(name)
-    return Themes[name or self.CurrentTheme] or Themes.Graphite
+    return Themes[name or self.CurrentTheme] or Themes.Ink
 end
 
 -- 自定义主题：以某个内置主题为底，覆盖任意颜色键
@@ -908,9 +1017,10 @@ end
 -- 全局切换：影响所有窗口，且保留每个窗口自己的玻璃 / 圆角设置
 function WobsinsUI:SetTheme(name)
     if not Themes[name] then
-        name = "Graphite"
+        name = "Ink"
     end
     self.CurrentTheme = name
+    self.ThemeTable = cloneTheme(Themes[name])
     for _, window in ipairs(self.Windows or {}) do
         window.Theme = name
         window:_applyTheme(true)
@@ -972,7 +1082,15 @@ function WobsinsUI:_freeze(inst, prop)
 end
 
 function WobsinsUI:_applyTheme(rebuildRadius)
-    self.ThemeTable = Themes[self.Theme] or Themes.Graphite
+    local nextTheme = Themes[self.Theme] or Themes.Ink
+    if not self.ThemeTable or self.ThemeTable == nextTheme then
+        self.ThemeTable = cloneTheme(nextTheme)
+    else
+        -- 原地更新：组件里抓住的表引用继续有效
+        for key, value in pairs(nextTheme) do
+            self.ThemeTable[key] = value
+        end
+    end
     self.Glass = self.ThemeTable.Glass == true
     self.Radius = self.ThemeTable.Radius or 6
 
@@ -1838,7 +1956,7 @@ Window._onTheme = WobsinsUI._onTheme
 Window._freeze = WobsinsUI._freeze
 Window._applyTheme = WobsinsUI._applyTheme
 
-local HEADER_HEIGHT = 46
+local HEADER_HEIGHT = 44
 local FOOTER_HEIGHT = 28
 local CARD_GAP = 8
 local ROW_HEIGHT = 30
@@ -1973,7 +2091,8 @@ function WobsinsUI:_createWindow(config)
         Icon = config.Icon or "bolt",
         Folder = config.Folder or "WobsinsUI",
         Theme = themeName,
-        ThemeTable = theme,
+        -- 每个窗口一份副本，切主题时原地改，闭包里的引用才不会失效
+        ThemeTable = (L.cloneTheme and L.cloneTheme(theme)) or theme,
         Bindings = {},
         RawBindings = {},
         ThemeHooks = {},
@@ -2079,26 +2198,9 @@ function Window:_buildShell(config)
         Position = UDim2.fromOffset(-2, 6),
         ZIndex = WobsinsUI.Layers.Shadow,
     }, stage)
-    U.corner(shadow, (self.Radius or 6) + 3)
+    U.corner(shadow, (self.Radius or 6) + 2)
     self.Shadow = shadow
     self:_bind(shadow, "BackgroundColor3", "Shadow")
-
-    -- 外圈发光：玻璃主题下主体系半透明，没有这层边会整个糊进背景
-    if self.ThemeTable.Glow then
-        local glow = new("Frame", {
-            Name = "Glow",
-            BackgroundColor3 = self:Color("Accent"),
-            BackgroundTransparency = 0.8,
-            Size = UDim2.new(1, 8, 1, 8),
-            Position = UDim2.fromOffset(-3.5, -3.5),
-            ZIndex = WobsinsUI.Layers.Shadow + 1,
-        }, stage)
-        U.corner(glow, (self.Radius or 6) + 4)
-        self.Glow = glow
-        self:_onTheme(function()
-            glow.BackgroundColor3 = self:Color("Accent")
-        end)
-    end
 
     local main = new("Frame", {
         Name = "Main",
@@ -2111,76 +2213,71 @@ function Window:_buildShell(config)
     self.Main = main
     self:_bind(main, "BackgroundColor3", "Background")
     self:_onTheme(function()
-        local alpha = (self.ThemeTable and self.ThemeTable.Alpha) or 0
-        -- 有背景图时底色要让开，不然白色底会把图盖成一团糊
-        if self.BgImage then
-            alpha = math.max(alpha, 0.72)
-        end
-        main.BackgroundTransparency = alpha
+        main.BackgroundTransparency = self:_baseAlpha()
     end)
     self.Corner = U.corner(main, self.Radius or 6)
 
-    local outline = U.stroke(main, self:Color(self.Glass and "Accent" or "Outline"), self.Glass and 2 or 1, self.Glass and 0.08 or 0.55)
+    -- 描边永远是 1px 冷灰。玻璃主题稍微透一点，不用强调色描边 ——
+    -- 那圈彩边正是「AI 生成 UI」最典型的痕迹。
+    local outline = U.stroke(main, self:Color("Outline"), 1, self.Glass and 0.35 or 0.45)
     self.MainStroke = outline
     self:_onTheme(function()
-        outline.Color = self:Color(self.Glass and "Accent" or "Outline")
-        outline.Transparency = self.Glass and 0.2 or 0.55
+        outline.Color = self:Color("Outline")
+        outline.Transparency = self.Glass and 0.35 or 0.45
     end)
 
-    -- 背景图（可选）
-    if config.Background and config.Background ~= "" then
-        local art = new("ImageLabel", {
-            BackgroundTransparency = 1,
-            Size = UDim2.fromScale(1, 1),
-            Image = config.Background,
-            ImageTransparency = config.BackgroundTransparency or 0.65,
-            ScaleType = Enum.ScaleType.Crop,
-            ZIndex = WobsinsUI.Layers.Art,
-        }, main)
-        self.BgImage = art
-        U.corner(art, self.Radius or 6)
-
-        -- 有图时把底色让开，让画面真的能透出来
-        if self.Glass then
-            main.BackgroundTransparency = 0.72
-        end
-
-        local veil = new("Frame", {
-            BackgroundColor3 = self:Color("Background"),
-            BackgroundTransparency = self.ThemeTable.Glass and 0.42 or 0.45,
-            Size = UDim2.fromScale(1, 1),
-            ZIndex = WobsinsUI.Layers.Veil,
-        }, main)
-        U.corner(veil, self.Radius or 6)
-        self.Veil = veil
-        self:_bind(veil, "BackgroundColor3", "Background")
+    -- 背景图（可选）：图本身只是最底一层，上面压一层同色蒙版保证文字可读
+    if config.Background ~= nil and config.Background ~= "" then
+        self:SetBackgroundImage(config.Background, config.BackgroundTransparency, config.BackgroundDim)
     end
+end
 
-
+-- 主体底色透明度：没图时按主题走，有图时让开给图片
+function Window:_baseAlpha()
+    local alpha = (self.ThemeTable and self.ThemeTable.Alpha) or 0
+    if self.BgImage then
+        alpha = math.max(alpha, 0.32)
+    end
+    return alpha
 end
 
 function Window:_makeDraggable(handle)
     local dragging = false
-    local startPos = nil
+    local startAbs = nil
     local startPointer = nil
-    local guard = false
+
+    -- Stage 的锚点在中心、Position 用 0.5 缩放，所以不能直接改 Offset。
+    -- 统一按「左上角绝对坐标」算，再换算回 Position，拖动时顺手夹在屏幕内，
+    -- 免得手一滑把窗口甩到屏幕外找不回来。
+    local function placeAt(left, top)
+        local vp = WobsinsUI:_viewport()
+        local size = self.Stage.AbsoluteSize
+        local maxLeft = math.max(4, vp.X - size.X - 4)
+        local maxTop = math.max(4, vp.Y - size.Y - 4)
+        left = U.clamp(left, 4, maxLeft)
+        top = U.clamp(top, 4, maxTop)
+        self.Stage.Position = UDim2.new(
+            0.5, left + size.X / 2 - vp.X * 0.5,
+            0.5, top + size.Y / 2 - vp.Y * 0.5
+        )
+        return left, top
+    end
+
+    self._placeStageAt = placeAt
 
     handle.InputBegan:Connect(function(input)
         if input.UserInputType ~= Enum.UserInputType.MouseButton1
             and input.UserInputType ~= Enum.UserInputType.Touch then
             return
         end
-        -- 点在输入框 / 按钮上时不拖动
-        if S.UserInputService:GetFocusedTextBox() then
+        -- 点在输入框上时不拖动
+        if S.UserInputService and S.UserInputService:GetFocusedTextBox() then
             return
         end
         dragging = true
-        guard = true
-        startPos = self.Stage.Position
+        self._dragDistance = 0
+        startAbs = self.Stage.AbsolutePosition
         startPointer = input.Position
-        U.delay(0.05, function()
-            guard = false
-        end)
     end)
 
     handle.InputEnded:Connect(function(input)
@@ -2200,10 +2297,8 @@ function Window:_makeDraggable(handle)
                 return
             end
             local delta = input.Position - startPointer
-            self.Stage.Position = UDim2.new(
-                startPos.X.Scale, startPos.X.Offset + delta.X,
-                startPos.Y.Scale, startPos.Y.Offset + delta.Y
-            )
+            self._dragDistance = math.max(self._dragDistance or 0, math.abs(delta.X) + math.abs(delta.Y))
+            placeAt(startAbs.X + delta.X, startAbs.Y + delta.Y)
         end)
     end
 end
@@ -2253,11 +2348,11 @@ function Window:_buildHeader(config)
     end
 
     -- 标题 / 副标题（右侧要留出搜索框 + 两个按钮的位置）
-    local searchWidth = 190
-    if self.Width < 640 or self.ThemeTable.SearchInSidebar then
+    local searchWidth = 236
+    if self.Width < 700 or self.ThemeTable.SearchInSidebar then
         searchWidth = 0
     end
-    local rightCluster = 14 + 24 + 4 + 24 + 10 + (searchWidth > 0 and searchWidth + 10 or 0)
+    local rightCluster = 14 + 26 + 4 + 26 + 10 + (searchWidth > 0 and searchWidth + 10 or 0)
     local titleWidth = -(48 + rightCluster + 12)
 
     local title = new("TextLabel", {
@@ -2291,17 +2386,17 @@ function Window:_buildHeader(config)
     self:_bind(author, "TextColor3", "Muted")
 
     -- 右侧按钮：关闭脚本（带确认）/ 最小化
-    local buttonSize = 24
+    local buttonSize = 26
     local rightX = -14
 
-    local close = self:_headerButton(header, "close", UDim2.new(1, rightX - buttonSize, 0, 11), buttonSize, function()
+    local close = self:_headerButton(header, "close", UDim2.new(1, rightX - buttonSize, 0, 9), buttonSize, function()
         self:RequestClose()
     end, "Danger")
     U.tooltip(close, "关闭脚本")
 
     rightX = rightX - buttonSize - 4
 
-    local minimize = self:_headerButton(header, "minus", UDim2.new(1, rightX - buttonSize, 0, 11), buttonSize, function()
+    local minimize = self:_headerButton(header, "minus", UDim2.new(1, rightX - buttonSize, 0, 9), buttonSize, function()
         self:Minimize()
     end, "SubText")
     U.tooltip(minimize, "最小化")
@@ -2310,7 +2405,7 @@ function Window:_buildHeader(config)
 
     -- 搜索框（放标题栏还是侧栏，由主题决定）
     if searchWidth > 0 then
-        self:_buildSearchBox(header, searchWidth, 26, UDim2.new(1, rightX - searchWidth, 0, 10), 5, 11)
+        self:_buildSearchBox(header, searchWidth, 26, UDim2.new(1, rightX - searchWidth, 0, 9), 7, 11)
     end
 
     -- 拖动区域只用标题文字，避免点击按钮 / 搜索框时把窗口拖走
@@ -2468,6 +2563,15 @@ function Window:_buildSidebar(config)
 
     list:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
         scroll.CanvasSize = UDim2.new(0, 0, 0, list.AbsoluteContentSize.Y + 14)
+    end)
+
+    -- 切主题后重新刷一遍选中态（图标是 tint 上去的，不走颜色绑定）
+    self:_onTheme(function()
+        if self.ActiveTab then
+            for _, item in ipairs(self.Tabs or {}) do
+                self:_paintTab(item, item == self.ActiveTab)
+            end
+        end
     end)
 
     -- 用户卡片
@@ -2748,10 +2852,10 @@ function Window:_applyTransparency()
         return
     end
     -- 底色透明度以主题的 Alpha 为基准；Transparent=true 时再透一点
-    local base = (self.ThemeTable and self.ThemeTable.Alpha) or 0
+    local base = self:_baseAlpha()
     local target = base
     if self.Transparency then
-        target = math.min(0.92, base + (self.Glass and 0.12 or 0.18))
+        target = math.min(0.94, base + (self.Glass and 0.1 or 0.16))
     end
     U.tween(self.Main, 0.2, { BackgroundTransparency = target })
 
@@ -2800,6 +2904,9 @@ function Window:Resize(width, height)
     end
     if self.Content then
         self.Content.Size = UDim2.new(1, -(self.SidebarWidth + 1), 0, self.Height - HEADER_HEIGHT - FOOTER_HEIGHT)
+    end
+    if self._relayoutColumns then
+        self:_relayoutColumns()
     end
     return self
 end
@@ -2963,53 +3070,53 @@ function Window:_newTab(config, section)
     -- 侧栏按钮
     local parent = section.TabsHolder or section.Container
     local pill = self.ThemeTable.Pill == true
+    local rowH = pill and 34 or 32
     local button = new("TextButton", {
-        BackgroundColor3 = self:Color("Surface"),
-        BackgroundTransparency = pill and 0.82 or 1,
+        BackgroundColor3 = self:Color("SurfaceHover"),
+        BackgroundTransparency = 1,
         AutoButtonColor = false,
-        Size = UDim2.new(1, 0, 0, pill and 32 or 30),
+        Size = UDim2.new(1, 0, 0, rowH),
         Text = "",
         LayoutOrder = index,
         ZIndex = WobsinsUI.Layers.Sidebar + 2,
     }, parent)
-    U.corner(button, pill and 9 or 5)
+    U.corner(button, pill and 8 or 6)
     tab.SideButton = button
-    self:_bind(button, "BackgroundColor3", pill and "Surface" or "SurfaceAlt")
+    self:_bind(button, "BackgroundColor3", "SurfaceHover")
 
-    -- 选中时的左侧竖条
+    -- 选中态左侧竖条：所有主题都有，比只靠背景色好认
     local bar = new("Frame", {
         BackgroundColor3 = self:Color("Accent"),
-        Size = UDim2.new(0, 2, 0, 14),
+        Size = UDim2.new(0, 2, 0, 18),
         Position = UDim2.new(0, 0, 0.5, 0),
         AnchorPoint = Vector2.new(0, 0.5),
         BackgroundTransparency = 1,
-        Visible = not pill,
-        ZIndex = WobsinsUI.Layers.Sidebar + 3,
+        ZIndex = WobsinsUI.Layers.Sidebar + 4,
     }, button)
     U.corner(bar, 1)
     tab.SideBar = bar
     self:_bind(bar, "BackgroundColor3", "Accent")
 
-    local iconX = 10
+    local iconX = pill and 11 or 10
     if tab.Icon then
-        local icon = U.icon(button, tab.Icon, 13, self:Color("Muted"), WobsinsUI.Layers.Sidebar + 3)
+        local icon = U.icon(button, tab.Icon, 14, self:Color("Muted"), WobsinsUI.Layers.Sidebar + 3)
         if icon then
             icon.Position = UDim2.fromOffset(iconX, 0)
-            icon.Size = UDim2.fromOffset(13, pill and 32 or 30)
+            icon.Size = UDim2.fromOffset(14, rowH)
             icon.AnchorPoint = Vector2.new(0, 0)
         end
         tab.IconObj = icon
     end
 
-    local labelX = tab.Icon and 31 or 11
+    local labelX = tab.Icon and (iconX + 22) or (pill and 12 or 11)
     local label = new("TextLabel", {
         BackgroundTransparency = 1,
         Position = UDim2.fromOffset(labelX, 0),
         Size = UDim2.new(1, -labelX - 8, 1, 0),
-        Font = Enum.Font.GothamMedium,
+        Font = Enum.Font.Gotham,
         Text = tab.Title,
         TextColor3 = self:Color("SubText"),
-        TextSize = 11.5,
+        TextSize = 12,
         TextXAlignment = Enum.TextXAlignment.Left,
         TextTruncate = Enum.TextTruncate.AtEnd,
         ZIndex = WobsinsUI.Layers.Sidebar + 3,
@@ -3036,11 +3143,12 @@ function Window:_newTab(config, section)
 
     U.hover(button, function()
         if self.ActiveTab ~= tab then
-            U.tween(button, 0.12, { BackgroundTransparency = pill and 0.62 or 0.6 })
+            U.tween(button, 0.12, { BackgroundTransparency = 0.62 })
+            U.tween(label, 0.12, { TextColor3 = self:Color("Text") })
         end
     end, function()
         if self.ActiveTab ~= tab then
-            U.tween(button, 0.12, { BackgroundTransparency = pill and 0.82 or 1 })
+            self:_paintTab(tab, false)
         end
     end)
 
@@ -3081,55 +3189,59 @@ function Window:_buildPage(tab)
     }, content)
     tab.Page = page
 
-    local scroll = new("ScrollingFrame", {
-        BackgroundTransparency = 1,
-        Size = UDim2.fromScale(1, 1),
-        CanvasSize = UDim2.new(0, 0, 0, 0),
-        ScrollBarThickness = 0,
-        ScrollingDirection = Enum.ScrollingDirection.Y,
-        BorderSizePixel = 0,
-        ZIndex = WobsinsUI.Layers.Content + 1,
-    }, page)
-    tab.Scroll = scroll
+    -- 左右两列各用一个独立的 ScrollingFrame。
+    -- 之前是「一个滚动条套两列」，左边滑到底右边跟着走；
+    -- 分成两个之后，基础设置和快捷操作可以各自滚到自己的位置。
+    local function makeColumn(name, layoutOrder)
+        local scroll = new("ScrollingFrame", {
+            Name = name,
+            BackgroundTransparency = 1,
+            Size = UDim2.fromScale(1, 1),
+            CanvasSize = UDim2.new(0, 0, 0, 0),
+            ScrollBarThickness = 3,
+            ScrollBarImageColor3 = self:Color("Outline"),
+            ScrollingDirection = Enum.ScrollingDirection.Y,
+            BorderSizePixel = 0,
+            ZIndex = WobsinsUI.Layers.Content + 1,
+        }, page)
 
-    local holder = new("Frame", {
-        BackgroundTransparency = 1,
-        Size = UDim2.new(1, 0, 0, 0),
-        AutomaticSize = Enum.AutomaticSize.Y,
-        ZIndex = WobsinsUI.Layers.Content + 1,
-    }, scroll)
-    tab.Holder = holder
-    U.padding(holder, 12, 12, 10, 12)
+        -- 这两个属性是新版才有的，老执行器没有也不会让整页崩掉
+        pcall(function()
+            scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+            scroll.ElasticBehavior = Enum.ElasticBehavior.Never
+        end)
 
-    local col1 = new("Frame", {
-        BackgroundTransparency = 1,
-        Size = UDim2.new(1, 0, 0, 0),
-        AutomaticSize = Enum.AutomaticSize.Y,
-        ZIndex = WobsinsUI.Layers.Content + 2,
-    }, holder)
-    new("UIListLayout", {
-        FillDirection = Enum.FillDirection.Vertical,
-        Padding = UDim.new(0, CARD_GAP),
-        SortOrder = Enum.SortOrder.LayoutOrder,
-    }, col1)
-    tab.Col1 = col1
+        local holder = new("Frame", {
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 0, 0),
+            AutomaticSize = Enum.AutomaticSize.Y,
+            ZIndex = WobsinsUI.Layers.Content + 1,
+        }, scroll)
+        U.padding(holder, 12, 12, 12, 12)
+        new("UIListLayout", {
+            FillDirection = Enum.FillDirection.Vertical,
+            Padding = UDim.new(0, CARD_GAP),
+            SortOrder = Enum.SortOrder.LayoutOrder,
+        }, holder)
 
-    local col2 = new("Frame", {
-        BackgroundTransparency = 1,
-        Size = UDim2.new(0.5, -4, 0, 0),
-        Position = UDim2.new(0.5, 4, 0, 0),
-        AutomaticSize = Enum.AutomaticSize.Y,
-        Visible = false,
-        ZIndex = WobsinsUI.Layers.Content + 2,
-    }, holder)
-    new("UIListLayout", {
-        FillDirection = Enum.FillDirection.Vertical,
-        Padding = UDim.new(0, CARD_GAP),
-        SortOrder = Enum.SortOrder.LayoutOrder,
-    }, col2)
-    tab.Col2 = col2
+        scroll:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+            scroll.CanvasSize = UDim2.new(0, 0, 0, holder.AbsoluteSize.Y + 4)
+        end)
+        holder:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+            scroll.CanvasSize = UDim2.new(0, 0, 0, holder.AbsoluteSize.Y + 4)
+        end)
 
-    tab:_applyColumns()
+        return scroll, holder
+    end
+
+    local scroll1, holder1 = makeColumn("ScrollLeft", 1)
+    local scroll2, holder2 = makeColumn("ScrollRight", 2)
+
+    tab.Scroll = scroll1
+    tab.Scroll2 = scroll2
+    tab.Holder = holder1
+    tab.Col1 = holder1
+    tab.Col2 = holder2
 
     local empty = new("TextLabel", {
         BackgroundTransparency = 1,
@@ -3168,39 +3280,36 @@ function Window:_buildPage(tab)
         end
     end)
 
-    -- 两列高度变化时更新画布尺寸
     local function refreshCanvas()
-        local height = 0
-        if tab.Col1.Visible then
-            height = math.max(height, tab.Col1.AbsoluteSize.Y)
+        scroll1.CanvasSize = UDim2.new(0, 0, 0, holder1.AbsoluteSize.Y + 4)
+        if scroll2.Visible then
+            scroll2.CanvasSize = UDim2.new(0, 0, 0, holder2.AbsoluteSize.Y + 4)
         end
-        if tab.Col2.Visible then
-            height = math.max(height, tab.Col2.AbsoluteSize.Y)
-        end
-        scroll.CanvasSize = UDim2.new(0, 0, 0, height + 26)
-        scroll.ScrollBarThickness = 3
-        scroll.ScrollBarImageColor3 = self:Color("Outline")
+        scroll1.ScrollBarImageColor3 = self:Color("Outline")
+        scroll2.ScrollBarImageColor3 = self:Color("Outline")
     end
 
     tab._refreshCanvas = refreshCanvas
-
-    tab.Col1:GetPropertyChangedSignal("AbsoluteSize"):Connect(refreshCanvas)
-    tab.Col2:GetPropertyChangedSignal("AbsoluteSize"):Connect(refreshCanvas)
-    scroll:GetPropertyChangedSignal("AbsoluteSize"):Connect(refreshCanvas)
+    tab:_applyColumns()
 
     self.Pages[tab.Index] = page
 end
 
 function Tab:_applyColumns()
-    local double = self.Window.Layout == "Double"
+    local double = self.Window.Layout == "Double" and self.Window.Width >= 560
     if double then
-        self.Col1.Size = UDim2.new(0.5, -4, 0, 0)
-        self.Col1.Position = UDim2.fromOffset(0, 0)
-        self.Col2.Visible = true
+        self.Scroll.Size = UDim2.new(0.5, -4, 1, 0)
+        self.Scroll.Position = UDim2.fromOffset(0, 0)
+        self.Scroll2.Size = UDim2.new(0.5, -4, 1, 0)
+        self.Scroll2.Position = UDim2.new(0.5, 4, 0, 0)
+        self.Scroll2.Visible = true
     else
-        self.Col1.Size = UDim2.new(1, 0, 0, 0)
-        self.Col1.Position = UDim2.fromOffset(0, 0)
-        self.Col2.Visible = false
+        self.Scroll.Size = UDim2.fromScale(1, 1)
+        self.Scroll.Position = UDim2.fromOffset(0, 0)
+        self.Scroll2.Visible = false
+    end
+    if self._refreshCanvas then
+        self._refreshCanvas()
     end
 end
 
@@ -3219,9 +3328,52 @@ function Tab:_targetColumn(column)
     return self._colFlip and self.Col1 or self.Col2
 end
 
+-- 窗口尺寸 / 侧栏宽度变过之后重新决定列数（窄屏退回单列）
+function Window:_relayoutColumns()
+    for _, tab in ipairs(self.Tabs or {}) do
+        if tab._applyColumns then
+            tab:_applyColumns()
+        end
+        for _, page in ipairs(tab.Pages or {}) do
+            if page._applyColumns then
+                page:_applyColumns()
+            end
+        end
+    end
+end
+
 --//----------------------------------------------------------------------------
 --// 10.2 选中态
 --//----------------------------------------------------------------------------
+
+-- 选中态：左侧竖条 + 更亮的底 + 加粗文字 + 强调色图标，四层叠在一起，
+-- 扫一眼就知道现在停在哪一页（只靠背景色差在小屏上几乎看不出来）。
+function Window:_paintTab(tab, active)
+    if not tab.SideButton then
+        return
+    end
+    local pill = self.ThemeTable and self.ThemeTable.Pill
+    U.tween(tab.SideButton, 0.14, {
+        BackgroundColor3 = self:Color("SurfaceHover"),
+        BackgroundTransparency = active and (pill and 0.2 or 0) or 1,
+    })
+    if tab.SideBar then
+        U.tween(tab.SideBar, 0.14, {
+            BackgroundTransparency = active and 0 or 1,
+            Size = UDim2.new(0, 2, 0, active and 18 or 10),
+        })
+    end
+    if tab.SideLabel then
+        tab.SideLabel.Font = active and Enum.Font.GothamBold or Enum.Font.Gotham
+        U.tween(tab.SideLabel, 0.14, {
+            TextColor3 = self:Color(active and "Text" or "SubText"),
+        })
+    end
+    if tab.IconObj then
+        U.tint(tab.IconObj, self:Color(active and "Accent" or "Muted"))
+    end
+end
+
 
 function Window:SelectTab(target)
     local tab = target
@@ -3245,24 +3397,7 @@ function Window:SelectTab(target)
     self.ActiveTab = tab
 
     for _, item in ipairs(self.Tabs) do
-        local active = (item == tab)
-        if item.SideButton then
-            local usePill = self.ThemeTable and self.ThemeTable.Pill
-            U.tween(item.SideButton, 0.14, {
-                BackgroundTransparency = active and (usePill and 0.35 or 0.02) or (usePill and 0.82 or 1),
-            })
-            if item.SideBar then
-                U.tween(item.SideBar, 0.14, {
-                    BackgroundTransparency = (usePill or not active) and 1 or 0,
-                })
-            end
-            U.tween(item.SideLabel, 0.14, {
-                TextColor3 = self:Color(active and "Text" or "SubText"),
-            })
-            if item.IconObj then
-                U.tint(item.IconObj, self:Color(active and "Text" or "Muted"))
-            end
-        end
+        self:_paintTab(item, item == tab)
     end
 
     if self.SearchBox and self.SearchBox.Text ~= "" then
@@ -3390,7 +3525,7 @@ function Tab:Card(config)
     card.Frame = frame
     win:_bind(frame, "BackgroundColor3", "Surface")
 
-    U.corner(frame, math.min(win.Radius or 6, 12))
+    U.corner(frame, math.min(win.Radius or 6, 10))
     local cardStroke = U.stroke(frame, win:Color("Outline"), 1, win.Glass and 0.4 or 0.55)
     card.Stroke = cardStroke
 
@@ -3407,16 +3542,16 @@ function Tab:Card(config)
             BackgroundTransparency = 1,
             AutoButtonColor = false,
             Text = "",
-            Size = UDim2.new(1, 0, 0, 32),
+            Size = UDim2.new(1, 0, 0, 34),
             ZIndex = WobsinsUI.Layers.Card + 1,
         }, frame)
         card.Head = head
 
         local titleX = 8
         if card.Icon then
-            local icon = U.icon(head, card.Icon, 12, win:Color("SubText"), WobsinsUI.Layers.Card + 2)
+            local icon = U.icon(head, card.Icon, 13, win:Color("SubText"), WobsinsUI.Layers.Card + 2)
             if icon then
-                icon.Position = UDim2.fromOffset(9, 10)
+                icon.Position = UDim2.fromOffset(10, 11)
             end
             card.HeadIcon = icon
             titleX = 27
@@ -3429,7 +3564,7 @@ function Tab:Card(config)
             Font = Enum.Font.GothamMedium,
             Text = card.Title,
             TextColor3 = win:Color("Text"),
-            TextSize = 12,
+            TextSize = 12.5,
             TextXAlignment = Enum.TextXAlignment.Left,
             TextTruncate = Enum.TextTruncate.AtEnd,
             ZIndex = WobsinsUI.Layers.Card + 2,
@@ -3437,7 +3572,7 @@ function Tab:Card(config)
         card.TitleLabel = title
         win:_bind(title, "TextColor3", "Text")
 
-        local chevron = U.icon(head, "chevronDown", 11, win:Color("Muted"), WobsinsUI.Layers.Card + 2)
+        local chevron = U.icon(head, "chevronDown", 12, win:Color("Muted"), WobsinsUI.Layers.Card + 2)
         if chevron then
             chevron.AnchorPoint = Vector2.new(0.5, 0.5)
             chevron.Position = UDim2.new(1, -14, 0.5, 0)
@@ -3454,7 +3589,7 @@ function Tab:Card(config)
             U.tween(title, 0.12, { TextColor3 = win:Color("Text") })
         end)
 
-        bodyTop = 32
+        bodyTop = 34
     end
 
     -- 卡片内容
@@ -3521,7 +3656,7 @@ function I.row(card, config, controlWidth)
         ZIndex = WobsinsUI.Layers.Row,
     }, body)
     U.corner(row, 4)
-    U.padding(row, 6, 5, 6, 5)
+    U.padding(row, 8, 6, 8, 6)
 
     new("UIListLayout", {
         FillDirection = Enum.FillDirection.Vertical,
@@ -3537,7 +3672,7 @@ function I.row(card, config, controlWidth)
         ZIndex = WobsinsUI.Layers.RowItem,
     }, row)
 
-    local labelWidth = -(controlWidth or 0) - 12
+    local labelWidth = (controlWidth and controlWidth > 0) and -(controlWidth + 8) or 0
     local labelCol = new("Frame", {
         BackgroundTransparency = 1,
         Size = UDim2.new(1, labelWidth, 0, 0),
@@ -3553,11 +3688,11 @@ function I.row(card, config, controlWidth)
 
     local title = new("TextLabel", {
         BackgroundTransparency = 1,
-        Size = UDim2.new(1, 0, 0, 15),
+        Size = UDim2.new(1, 0, 0, 16),
         Font = Enum.Font.Gotham,
         Text = config.Title or "选项",
         TextColor3 = win:Color("Text"),
-        TextSize = 12,
+        TextSize = 12.5,
         TextXAlignment = Enum.TextXAlignment.Left,
         TextTruncate = Enum.TextTruncate.AtEnd,
         LayoutOrder = 1,
@@ -3574,7 +3709,7 @@ function I.row(card, config, controlWidth)
             Font = Enum.Font.Gotham,
             Text = config.Desc,
             TextColor3 = win:Color("SubText"),
-            TextSize = 10,
+            TextSize = 10.5,
             TextWrapped = true,
             TextXAlignment = Enum.TextXAlignment.Left,
             TextYAlignment = Enum.TextYAlignment.Top,
@@ -3769,7 +3904,7 @@ function Build.Button(card, config)
     local win = card.Window
     local theme = win.ThemeTable
     local variant = config.Variant or "Secondary"
-    local height = config.Height or 26
+    local height = config.Height or 28
 
     local locked = config.Locked == true
 
@@ -3785,45 +3920,44 @@ function Build.Button(card, config)
     U.corner(btn, 4)
     U.stroke(btn, theme.Outline, 1, variant == "Ghost" and 0.4 or 0.9)
 
-    -- 中央内容：图标 + 文字整体居中
-    local holder = new("Frame", {
-        BackgroundTransparency = 1,
-        Size = UDim2.new(0, 0, 1, 0),
-        AutomaticSize = Enum.AutomaticSize.X,
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        Position = UDim2.fromScale(0.5, 0.5),
-        ZIndex = WobsinsUI.Layers.RowItem,
-    }, btn)
+    -- 中央内容：图标 + 文字整体居中。
+    -- 这里不用 AutomaticSize + 列表布局 —— 那个写法在不同执行器上算出来的
+    -- 宽度不一致，图标会飘到按钮外面。改成先估文字宽度，再用 0.5 锚点手工摆，
+    -- 结果稳定，也不会因为字体差异而偏。
+    local iconSize = 12
+    local gap = 7
+    local textSize = config.TextSize or 12
+    local title = config.Title or "按钮"
+    if locked then
+        title = title .. "  ·  未解锁"
+    end
+    local textWidth = U.textWidth(title, textSize)
+    local totalWidth = textWidth + (config.Icon and (iconSize + gap) or 0)
+    local startX = -totalWidth / 2
 
-    new("UIListLayout", {
-        FillDirection = Enum.FillDirection.Horizontal,
-        Padding = UDim.new(0, 6),
-        SortOrder = Enum.SortOrder.LayoutOrder,
-        VerticalAlignment = Enum.VerticalAlignment.Center,
-        HorizontalAlignment = Enum.HorizontalAlignment.Center,
-    }, holder)
-
-    local iconColor = (variant == "Primary") and theme.OnAccent or theme.Text
     local iconObj = nil
     if config.Icon then
-        iconObj = U.icon(holder, config.Icon, 12, iconColor, WobsinsUI.Layers.RowItem + 1)
+        iconObj = U.icon(btn, config.Icon, iconSize, (variant == "Primary") and theme.OnAccent or theme.Text, WobsinsUI.Layers.RowItem + 1)
         if iconObj then
-            iconObj.LayoutOrder = 1
+            iconObj.AnchorPoint = Vector2.new(0, 0.5)
+            iconObj.Position = UDim2.new(0.5, startX, 0.5, 0)
+            iconObj.Size = UDim2.fromOffset(iconSize, iconSize)
         end
     end
 
     local label = new("TextLabel", {
         BackgroundTransparency = 1,
-        Size = UDim2.new(0, 0, 1, 0),
-        AutomaticSize = Enum.AutomaticSize.X,
+        AnchorPoint = Vector2.new(0, 0.5),
+        Position = UDim2.new(0.5, startX + (config.Icon and (iconSize + gap) or 0), 0.5, 0),
+        Size = UDim2.fromOffset(math.ceil(textWidth) + 2, height),
         Font = Enum.Font.GothamMedium,
-        Text = config.Title or "按钮",
-        TextColor3 = iconColor,
-        TextSize = 11,
-        TextXAlignment = Enum.TextXAlignment.Center,
-        LayoutOrder = 2,
+        Text = title,
+        TextColor3 = (variant == "Primary") and theme.OnAccent or theme.Text,
+        TextSize = textSize,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextTruncate = Enum.TextTruncate.AtEnd,
         ZIndex = WobsinsUI.Layers.RowItem + 1,
-    }, holder)
+    }, btn)
 
     local element = {
         Type = "Button",
@@ -3836,7 +3970,7 @@ function Build.Button(card, config)
         local base = on and theme.Accent or (variant == "Ghost" and theme.Background or theme.SurfaceAlt)
         local textColor = on and theme.OnAccent or theme.Text
         btn.BackgroundColor3 = base
-        btn.BackgroundTransparency = (variant == "Ghost") and 1 or 0
+        btn.BackgroundTransparency = (variant == "Ghost") and 0.72 or 0
         label.TextColor3 = textColor
         if iconObj then
             U.tint(iconObj, textColor)
@@ -3850,7 +3984,6 @@ function Build.Button(card, config)
         btn.BackgroundTransparency = 1
         U.tween(btn, 0.1, { BackgroundTransparency = 1 })
         label.TextColor3 = theme.Muted
-        label.Text = (config.Title or "按钮") .. "  ·  未解锁"
         if iconObj then
             U.tint(iconObj, theme.Muted)
         end
@@ -3935,10 +4068,15 @@ function Build.Label(card, config)
         ZIndex = WobsinsUI.Layers.Row,
     }, card.Body)
     U.padding(row, 6, 4, 6, 4)
+    new("UIListLayout", {
+        FillDirection = Enum.FillDirection.Vertical,
+        Padding = UDim.new(0, 2),
+        SortOrder = Enum.SortOrder.LayoutOrder,
+    }, row)
 
-    local color = config.Color
-    if typeof(color) ~= "Color3" then
-        color = win:Color(type(color) == "string" and color or "SubText")
+    local textColor = config.Color
+    if typeof(textColor) ~= "Color3" then
+        textColor = win:Color(type(textColor) == "string" and textColor or "SubText")
     end
 
     local label = new("TextLabel", {
@@ -3947,13 +4085,33 @@ function Build.Label(card, config)
         AutomaticSize = Enum.AutomaticSize.Y,
         Font = config.Bold and Enum.Font.GothamMedium or Enum.Font.Gotham,
         Text = config.Title or config.Text or "",
-        TextColor3 = color,
+        TextColor3 = textColor,
         TextSize = config.Size or 10.5,
         TextWrapped = true,
         TextXAlignment = Enum.TextXAlignment.Left,
         TextYAlignment = Enum.TextYAlignment.Top,
+        LayoutOrder = 1,
         ZIndex = WobsinsUI.Layers.RowItem,
     }, row)
+
+    -- 说明文字：以前直接吞掉了，现在真的画出来
+    if config.Desc and config.Desc ~= "" then
+        local sub = new("TextLabel", {
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 0, 0),
+            AutomaticSize = Enum.AutomaticSize.Y,
+            Font = Enum.Font.Gotham,
+            Text = config.Desc,
+            TextColor3 = win:Color("Muted"),
+            TextSize = (config.Size or 10.5) - 0.5,
+            TextWrapped = true,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            TextYAlignment = Enum.TextYAlignment.Top,
+            LayoutOrder = 2,
+            ZIndex = WobsinsUI.Layers.RowItem,
+        }, row)
+        win:_bind(sub, "TextColor3", "Muted")
+    end
 
     local element = {
         Type = "Label",
@@ -4267,25 +4425,25 @@ function Build.Toggle(card, config)
     local theme = win.ThemeTable
     local state = config.Value == true
 
-    local row, top, title, desc, control = I.row(card, config, 36)
+    local row, top, title, desc, control = I.row(card, config, 38)
 
     local track = new("Frame", {
         BackgroundColor3 = theme.SurfaceHover,
-        Size = UDim2.fromOffset(32, 18),
+        Size = UDim2.fromOffset(34, 19),
         Position = UDim2.new(1, 0, 0.5, 0),
         AnchorPoint = Vector2.new(1, 0.5),
         ZIndex = WobsinsUI.Layers.RowItem + 2,
     }, control)
-    U.corner(track, 9)
+    U.corner(track, 10)
     local trackStroke = U.stroke(track, theme.Outline, 1, 0.5)
 
     local knob = new("Frame", {
         BackgroundColor3 = theme.Muted,
-        Size = UDim2.fromOffset(14, 14),
+        Size = UDim2.fromOffset(15, 15),
         Position = UDim2.fromOffset(2, 2),
         ZIndex = WobsinsUI.Layers.RowItem + 3,
     }, track)
-    U.corner(knob, 7)
+    U.corner(knob, 8)
 
     local element = {
         Type = "Toggle",
@@ -4304,7 +4462,7 @@ function Build.Toggle(card, config)
             or win:Color("Outline")
         local knobOn = lightMode and Color3.fromRGB(255, 255, 255) or win:Color("OnAccent")
         local knobOff = lightMode and Color3.fromRGB(255, 255, 255) or win:Color("SubText")
-        local targetX = state and 16 or 2
+        local targetX = state and 17 or 2
 
         if animate then
             U.tween(knob, 0.16, { Position = UDim2.fromOffset(targetX, 2) }, Enum.EasingStyle.Quad)
@@ -4461,14 +4619,9 @@ function Build.Slider(card, config)
         ZIndex = WobsinsUI.Layers.RowItem + 3,
     }, rail)
     U.corner(knob, 6)
-    local knobStroke = U.stroke(knob, theme.Accent, 1.5, 0.1)
+    local knobStroke = U.stroke(knob, theme.Background, 1, 0.25)
     win:_onTheme(function()
         knob.BackgroundColor3 = theme.Mode == "Light" and Color3.fromRGB(255, 255, 255) or win:Color("Text")
-        knobStroke.Color = win:Color("Accent")
-    end)
-
-    local knobStroke = U.stroke(knob, theme.Background, 1, 0.2)
-    win:_onTheme(function()
         knobStroke.Color = win:Color("Background")
     end)
 
@@ -5871,14 +6024,37 @@ end
 --// 17.2 背景图 / 悬浮按钮
 --//----------------------------------------------------------------------------
 
-function Window:SetBackgroundImage(imageId, transparency)
+-- 背景图。三种写法都吃：
+--   win:SetBackgroundImage(123887383447725)              -- 纯数字资源 id
+--   win:SetBackgroundImage("rbxassetid://123887383447725")
+--   win:SetBackgroundImage("https://.../a.png")
+-- 传 nil / "" 就是关掉。
+function Window:SetBackgroundImage(imageId, transparency, dim)
     if not self.Main then
         return self
     end
 
-    if imageId and imageId ~= "" then
+    local source = nil
+    if typeof(imageId) == "number" then
+        source = "rbxassetid://" .. tostring(math.floor(imageId))
+    elseif type(imageId) == "string" and imageId ~= "" then
+        if tonumber(imageId) then
+            source = "rbxassetid://" .. imageId
+        else
+            source = imageId
+        end
+    end
+
+    if self.Minimized then
+        -- 最小化时不能建图，否则会糊在胶囊里
+        self._pendingBackground = source
+        return self
+    end
+
+    if source then
         if not self.BgImage then
             local art = new("ImageLabel", {
+                Name = "BackgroundArt",
                 BackgroundTransparency = 1,
                 Size = UDim2.fromScale(1, 1),
                 ScaleType = Enum.ScaleType.Crop,
@@ -5888,8 +6064,9 @@ function Window:SetBackgroundImage(imageId, transparency)
             self.BgImage = art
 
             local veil = new("Frame", {
+                Name = "BackgroundVeil",
                 BackgroundColor3 = self:Color("Background"),
-                BackgroundTransparency = 0.45,
+                BackgroundTransparency = 0.5,
                 Size = UDim2.fromScale(1, 1),
                 ZIndex = WobsinsUI.Layers.Veil,
             }, self.Main)
@@ -5897,10 +6074,25 @@ function Window:SetBackgroundImage(imageId, transparency)
             self:_bind(veil, "BackgroundColor3", "Background")
             self.Veil = veil
         end
-        self.BgImage.Image = imageId
-        self.BgImage.ImageTransparency = transparency or 0.65
+
+        self.BgImage.Image = source
+        self.BgImage.ImageTransparency = transparency or 0.12
+        self.BgImage.Visible = self.Visible ~= false
+        self.BackgroundSource = source
+
         if self.Veil then
+            -- dim 越大蒙版越浓，文字越清楚
+            local strength = dim
+            if strength == nil then
+                -- 深色面板压得重一点，白字才不会被亮图吃掉
+                strength = (self.ThemeTable and self.ThemeTable.Mode == "Light") and 0.34 or 0.7
+            end
+            self.Veil.BackgroundTransparency = U.clamp(1 - strength, 0, 0.94)
             self.Veil.Visible = true
+        end
+
+        if self.MainStroke then
+            self.MainStroke.Transparency = math.min(self.MainStroke.Transparency, 0.4)
         end
     else
         if self.BgImage then
@@ -5911,6 +6103,20 @@ function Window:SetBackgroundImage(imageId, transparency)
             self.Veil:Destroy()
             self.Veil = nil
         end
+        self.BackgroundSource = nil
+    end
+
+    if self.Main then
+        U.tween(self.Main, 0.18, { BackgroundTransparency = self:_baseAlpha() })
+    end
+    return self
+end
+
+-- 只调蒙版浓度，不换图：0 = 图很淡，0.9 = 几乎看不清图
+function Window:SetBackgroundDim(value)
+    self.BackgroundDim = U.clamp(value or 0, 0, 0.95)
+    if self.Veil then
+        U.tween(self.Veil, 0.16, { BackgroundTransparency = 1 - self.BackgroundDim })
     end
     return self
 end
@@ -6905,6 +7111,9 @@ function Window:SetSidebarWidth(width)
         self.Content.Position = UDim2.fromOffset(self.SidebarWidth + 1, HEADER_HEIGHT)
         self.Content.Size = UDim2.new(1, -(self.SidebarWidth + 1), 0, self.Height - HEADER_HEIGHT - FOOTER_HEIGHT)
     end
+    if self._relayoutColumns then
+        self:_relayoutColumns()
+    end
     return self
 end
 
@@ -7379,7 +7588,8 @@ local Page = L.Page
 --// 16.1 通用滚动容器
 --//----------------------------------------------------------------------------
 
--- 在 parent 里建一套 scroll/holder/col1/col2，返回表
+-- 在 parent 里建一套「左右两个独立滚动区」，返回表。
+-- 和主标签页一样：两列各滚各的，不联动。
 local function buildScroller(win, parent, index, withBackBar)
     local frame = new("Frame", {
         Name = "Page_" .. index,
@@ -7394,64 +7604,62 @@ local function buildScroller(win, parent, index, withBackBar)
     if withBackBar then
         navBar = new("Frame", {
             BackgroundColor3 = win:Color("Background"),
-            BackgroundTransparency = 0.4,
-            Size = UDim2.new(1, 0, 0, 34),
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 0, 36),
             ZIndex = WobsinsUI.Layers.Content + 3,
         }, frame)
         win:_bind(navBar, "BackgroundColor3", "Background")
-        topInset = 34
+        topInset = 36
     end
 
-    local scroll = new("ScrollingFrame", {
-        BackgroundTransparency = 1,
-        Position = UDim2.fromOffset(0, topInset),
-        Size = UDim2.new(1, 0, 1, -topInset),
-        CanvasSize = UDim2.new(0, 0, 0, 0),
-        ScrollBarThickness = 3,
-        ScrollingDirection = Enum.ScrollingDirection.Y,
-        BorderSizePixel = 0,
-        ZIndex = WobsinsUI.Layers.Content + 2,
-    }, frame)
+    local function makeColumn(name)
+        local scroll = new("ScrollingFrame", {
+            Name = name,
+            BackgroundTransparency = 1,
+            Position = UDim2.fromOffset(0, topInset),
+            Size = UDim2.new(1, 0, 1, -topInset),
+            CanvasSize = UDim2.new(0, 0, 0, 0),
+            ScrollBarThickness = 3,
+            ScrollBarImageColor3 = win:Color("Outline"),
+            ScrollingDirection = Enum.ScrollingDirection.Y,
+            BorderSizePixel = 0,
+            ZIndex = WobsinsUI.Layers.Content + 2,
+        }, frame)
 
-    local holder = new("Frame", {
-        BackgroundTransparency = 1,
-        Size = UDim2.new(1, 0, 0, 0),
-        AutomaticSize = Enum.AutomaticSize.Y,
-        ZIndex = WobsinsUI.Layers.Content + 2,
-    }, scroll)
-    U.padding(holder, 12, 12, 10, 12)
+        -- 这两个属性是新版才有的，老执行器没有也不会让整页崩掉
+        pcall(function()
+            scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+            scroll.ElasticBehavior = Enum.ElasticBehavior.Never
+        end)
 
-    local col1 = new("Frame", {
-        BackgroundTransparency = 1,
-        Size = UDim2.new(1, 0, 0, 0),
-        AutomaticSize = Enum.AutomaticSize.Y,
-        ZIndex = WobsinsUI.Layers.Content + 3,
-    }, holder)
-    new("UIListLayout", {
-        FillDirection = Enum.FillDirection.Vertical,
-        Padding = UDim.new(0, CARD_GAP),
-        SortOrder = Enum.SortOrder.LayoutOrder,
-    }, col1)
+        local holder = new("Frame", {
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 0, 0),
+            AutomaticSize = Enum.AutomaticSize.Y,
+            ZIndex = WobsinsUI.Layers.Content + 2,
+        }, scroll)
+        U.padding(holder, 12, 12, 12, 12)
+        new("UIListLayout", {
+            FillDirection = Enum.FillDirection.Vertical,
+            Padding = UDim.new(0, CARD_GAP),
+            SortOrder = Enum.SortOrder.LayoutOrder,
+        }, holder)
 
-    local col2 = new("Frame", {
-        BackgroundTransparency = 1,
-        Size = UDim2.new(0.5, -4, 0, 0),
-        Position = UDim2.new(0.5, 4, 0, 0),
-        AutomaticSize = Enum.AutomaticSize.Y,
-        Visible = false,
-        ZIndex = WobsinsUI.Layers.Content + 3,
-    }, holder)
-    new("UIListLayout", {
-        FillDirection = Enum.FillDirection.Vertical,
-        Padding = UDim.new(0, CARD_GAP),
-        SortOrder = Enum.SortOrder.LayoutOrder,
-    }, col2)
+        holder:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+            scroll.CanvasSize = UDim2.new(0, 0, 0, holder.AbsoluteSize.Y + 4)
+        end)
+        return scroll, holder
+    end
+
+    local scroll1, col1 = makeColumn("ScrollLeft")
+    local scroll2, col2 = makeColumn("ScrollRight")
+    scroll2.Visible = false
 
     return {
         Frame = frame,
         NavBar = navBar,
-        Scroll = scroll,
-        Holder = holder,
+        Scroll = scroll1,
+        Scroll2 = scroll2,
         Col1 = col1,
         Col2 = col2,
     }
@@ -7491,7 +7699,8 @@ function Tab:SubPage(config)
     page.Frame = parts.Frame
     page.NavBar = parts.NavBar
     page.Scroll = parts.Scroll
-    page.Holder = parts.Holder
+    page.Scroll2 = parts.Scroll2
+    page.Holder = parts.Col1
     page.Col1 = parts.Col1
     page.Col2 = parts.Col2
 
@@ -7555,14 +7764,10 @@ function Tab:SubPage(config)
     win:_bind(empty, "TextColor3", "Muted")
 
     function page:Refresh()
-        local height = 0
-        if self.Col1.Visible then
-            height = math.max(height, self.Col1.AbsoluteSize.Y)
+        self.Scroll.CanvasSize = UDim2.new(0, 0, 0, self.Col1.AbsoluteSize.Y + 4)
+        if self.Scroll2 and self.Scroll2.Visible then
+            self.Scroll2.CanvasSize = UDim2.new(0, 0, 0, self.Col2.AbsoluteSize.Y + 4)
         end
-        if self.Col2.Visible then
-            height = math.max(height, self.Col2.AbsoluteSize.Y)
-        end
-        self.Scroll.CanvasSize = UDim2.new(0, 0, 0, height + 26)
     end
 
     page:_applyColumns()
@@ -7586,15 +7791,17 @@ function Tab:SubPage(config)
 end
 
 function Page:_applyColumns()
-    local double = self.Window.Layout == "Double"
+    local double = self.Window.Layout == "Double" and self.Window.Width >= 560
     if double then
-        self.Col1.Size = UDim2.new(0.5, -4, 0, 0)
-        self.Col1.Position = UDim2.fromOffset(0, 0)
-        self.Col2.Visible = true
+        self.Scroll.Size = UDim2.new(0.5, -4, 1, -(self.NavBar and 36 or 0))
+        self.Scroll.Position = UDim2.fromOffset(0, self.NavBar and 36 or 0)
+        self.Scroll2.Size = UDim2.new(0.5, -4, 1, -(self.NavBar and 36 or 0))
+        self.Scroll2.Position = UDim2.new(0.5, 4, 0, self.NavBar and 36 or 0)
+        self.Scroll2.Visible = true
     else
-        self.Col1.Size = UDim2.new(1, 0, 0, 0)
-        self.Col1.Position = UDim2.fromOffset(0, 0)
-        self.Col2.Visible = false
+        self.Scroll.Size = UDim2.new(1, 0, 1, -(self.NavBar and 36 or 0))
+        self.Scroll.Position = UDim2.fromOffset(0, self.NavBar and 36 or 0)
+        self.Scroll2.Visible = false
     end
 end
 
@@ -7664,9 +7871,12 @@ end
 function Page:Open()
     local tab = self.Tab
 
-    -- 主页内容让位
+    -- 主页内容让位（左右两列一起让）
     if tab.Scroll then
         tab.Scroll.Visible = false
+    end
+    if tab.Scroll2 then
+        tab.Scroll2.Visible = false
     end
     if tab.Empty then
         tab.Empty.Visible = false
@@ -7694,6 +7904,9 @@ function Page:Close()
     local tab = self.Tab
     if tab.Scroll then
         tab.Scroll.Visible = true
+    end
+    if tab.Scroll2 then
+        tab.Scroll2.Visible = (tab.Window.Layout == "Double" and tab.Window.Width >= 560)
     end
     tab.ActivePage = nil
 
@@ -7724,6 +7937,9 @@ function Tab:Home()
     end
     if self.Scroll then
         self.Scroll.Visible = true
+    end
+    if self.Scroll2 then
+        self.Scroll2.Visible = (self.Window.Layout == "Double" and self.Window.Width >= 560)
     end
     self.ActivePage = nil
     return self
@@ -10399,19 +10615,19 @@ function Window:_buildMinBar(config)
     }, self.Main)
     self.MinBar = bar
 
-    -- 深色底：像图里那样贴在游戏画面上，不跟着浅色主题发白
+    -- 深色底，和参考图里的小条一致：不跟主题走，永远是黑的
     local bg = new("Frame", {
         Name = "MinBarBg",
-        BackgroundColor3 = Color3.fromRGB(14, 16, 18),
-        BackgroundTransparency = 0.12,
+        BackgroundColor3 = Color3.fromRGB(21, 22, 24),
+        BackgroundTransparency = 0.04,
         Size = UDim2.fromScale(1, 1),
         ZIndex = WobsinsUI.Layers.Header - 1,
     }, bar)
-    U.corner(bg, 10)
-    U.stroke(bg, Color3.fromRGB(120, 128, 134), 1, 0.62)
+    U.corner(bg, 9)
+    local bgStroke = U.stroke(bg, Color3.fromRGB(52, 54, 58), 1, 0.35)
     self.MinBarBg = bg
 
-    -- 左半部分既当拖动把手，也当「点一下展开」的按钮
+    -- 条身：既能拖，也能点开
     local handle = new("TextButton", {
         Name = "MinHandle",
         BackgroundTransparency = 1,
@@ -10423,15 +10639,15 @@ function Window:_buildMinBar(config)
     self.MinHandle = handle
 
     local dot = new("Frame", {
-        BackgroundColor3 = Color3.fromRGB(250, 250, 250),
-        Size = UDim2.fromOffset(18, 18),
-        Position = UDim2.new(0, 7, 0.5, 0),
+        BackgroundColor3 = Color3.fromRGB(240, 241, 243),
+        Size = UDim2.fromOffset(16, 16),
+        Position = UDim2.new(0, 8, 0.5, 0),
         AnchorPoint = Vector2.new(0, 0.5),
         ZIndex = WobsinsUI.Layers.HeaderItem + 1,
     }, handle)
-    U.corner(dot, 5)
+    U.corner(dot, 4)
 
-    local dotIcon = U.icon(dot, self.Icon, 10, Color3.fromRGB(20, 24, 26), WobsinsUI.Layers.HeaderItem + 2)
+    local dotIcon = U.icon(dot, self.Icon, 9, Color3.fromRGB(20, 22, 24), WobsinsUI.Layers.HeaderItem + 2)
     if dotIcon then
         dotIcon.AnchorPoint = Vector2.new(0.5, 0.5)
         dotIcon.Position = UDim2.fromScale(0.5, 0.5)
@@ -10440,11 +10656,11 @@ function Window:_buildMinBar(config)
 
     local label = new("TextLabel", {
         BackgroundTransparency = 1,
-        Position = UDim2.fromOffset(29, 0),
-        Size = UDim2.new(1, -33, 1, 0),
+        Position = UDim2.fromOffset(30, 0),
+        Size = UDim2.new(1, -34, 1, 0),
         Font = Enum.Font.GothamMedium,
         Text = (self.Title ~= "" and self.Title) or "WobsinsUI",
-        TextColor3 = Color3.fromRGB(245, 246, 247),
+        TextColor3 = Color3.fromRGB(232, 233, 236),
         TextSize = 11.5,
         TextXAlignment = Enum.TextXAlignment.Left,
         TextTruncate = Enum.TextTruncate.AtEnd,
@@ -10452,7 +10668,7 @@ function Window:_buildMinBar(config)
     }, handle)
     self.MinBarLabel = label
 
-    -- 右侧：红块 + 白 ×（和参考图一致）
+    -- 右侧：红底白 ×，和参考图一致
     local close = new("TextButton", {
         BackgroundColor3 = self:Color("Danger"),
         BackgroundTransparency = 0,
@@ -10461,10 +10677,10 @@ function Window:_buildMinBar(config)
         Position = UDim2.new(1, -25, 0.5, 0),
         AnchorPoint = Vector2.new(0, 0.5),
         Text = "",
-        ZIndex = WobsinsUI.Layers.HeaderItem + 2,
+        ZIndex = WobsinsUI.Layers.HeaderItem + 3,
     }, bar)
-    U.corner(close, 5)
-    local closeIcon = U.icon(close, "close", 10, Color3.fromRGB(255, 255, 255), WobsinsUI.Layers.HeaderItem + 3)
+    U.corner(close, 4)
+    local closeIcon = U.icon(close, "close", 10, Color3.fromRGB(255, 255, 255), WobsinsUI.Layers.HeaderItem + 4)
     if closeIcon then
         closeIcon.AnchorPoint = Vector2.new(0.5, 0.5)
         closeIcon.Position = UDim2.fromScale(0.5, 0.5)
@@ -10482,8 +10698,30 @@ function Window:_buildMinBar(config)
     U.tooltip(close, "关闭脚本")
     self.MinBarClose = close
 
-    -- 拖动 + 单击展开
+    -- 悬停时整条微微提亮，暗示「点一下就展开」
+    bar.MouseEnter:Connect(function()
+        U.tween(bg, 0.12, { BackgroundColor3 = Color3.fromRGB(30, 31, 34) })
+        bgStroke.Transparency = 0.2
+    end)
+    bar.MouseLeave:Connect(function()
+        U.tween(bg, 0.12, { BackgroundColor3 = Color3.fromRGB(21, 22, 24) })
+        bgStroke.Transparency = 0.35
+    end)
+
+    -- 拖动
     self:_makeDraggable(handle)
+    -- 拖完记住位置，下次最小化回到上次放的地方
+    handle.InputEnded:Connect(function(input)
+        if input.UserInputType ~= Enum.UserInputType.MouseButton1
+            and input.UserInputType ~= Enum.UserInputType.Touch then
+            return
+        end
+        if (self._dragDistance or 0) > 4 and self.Stage then
+            self._minBarLeft = self.Stage.AbsolutePosition.X
+            self._minBarTop = self.Stage.AbsolutePosition.Y
+        end
+    end)
+
     handle.Activated:Connect(function()
         if (self._dragDistance or 0) > 6 then
             return
@@ -10491,7 +10729,6 @@ function Window:_buildMinBar(config)
         self:SetMinimized(false)
     end)
 
-    -- 描边直接用 Main 自己那圈（会跟着圆角走），这里不再叠一层直角框
     self.MinBarWidth = self:_minBarWidth()
     return self
 end
@@ -10543,6 +10780,11 @@ function Window:SetMinimized(state)
     if self.Veil then
         self.Veil.Visible = show
     end
+    if show and self._pendingBackground then
+        local source = self._pendingBackground
+        self._pendingBackground = nil
+        self:SetBackgroundImage(source)
+    end
 
     local abs = self.Stage.AbsolutePosition
     local targetW = show and self.Width or (self.MinBarWidth or self:_minBarWidth())
@@ -10561,6 +10803,9 @@ function Window:SetMinimized(state)
         self._preMinTop = abs.Y
         if config.MinBarAnchor == false then
             left, top = abs.X, abs.Y
+        elseif self._minBarLeft and self._minBarTop then
+            -- 之前拖过：回到拖到的位置，不要每次都被拽回屏幕中央
+            left, top = self._minBarLeft, self._minBarTop
         else
             local vp = WobsinsUI:_viewport()
             left = (vp.X - targetW) / 2
@@ -10588,7 +10833,7 @@ function Window:SetMinimized(state)
     end
 
     if self.Corner then
-        self.Corner.CornerRadius = UDim.new(0, show and (self.Radius or 6) or 10)
+        self.Corner.CornerRadius = UDim.new(0, show and (self.Radius or 6) or 9)
     end
 
     return self
