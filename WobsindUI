@@ -6,7 +6,7 @@
     ╚███╔███╔╝╚██████╔╝██████╔╝███████║██║██║ ╚████║███████║    ╚██████╔╝██║
      ╚══╝╚══╝  ╚═════╝ ╚═════╝ ╚══════╝╚═╝╚═╝  ╚═══╝╚══════╝     ╚═════╝ ╚═╝
 
-    WobsinsUI · v2.4.0
+    WobsinsUI · v2.4.1
     单文件 Roblox 脚本 UI 库（Luau）
 
     ============================================================================
@@ -53,8 +53,8 @@
 
 local WobsinsUI = {}
 WobsinsUI.__index = WobsinsUI
-WobsinsUI.Version = "2.6.0"
-WobsinsUI.Build = "20261103g"
+WobsinsUI.Version = "2.7.0"
+WobsinsUI.Build = "20261103h"
 WobsinsUI.Name = "WobsinsUI"
 
 -- 全局字号系数：所有 TextSize 在构造时统一乘这个值。
@@ -2072,6 +2072,40 @@ function WobsinsUI:CreateWindow(config)
     return result
 end
 
+--//----------------------------------------------------------------------------
+--// 尺寸策略：宽度优先
+--//----------------------------------------------------------------------------
+--
+-- 参考的排版是「一块宽面板 + 左右两列卡片」，高度反而是紧的那一头。
+-- 所以放大倍数先按宽度算：
+--   · 宽度够（桌面 / 平板 / 手机横屏）→ 1:1，高度装不下就把设计高度压短，
+--     窗口变成宽扁的一块，两列都舒展；
+--   · 宽度不够（竖屏）→ 等比缩，最低 0.58，再不够就压窄设计宽度。
+-- 这样手机上不会再缩成屏幕中间一小坨，两列也不会被挤成两根手指宽。
+local function fitWindowSize(width, height, vp)
+    -- 左右各留 16，上下各留 44：顶上要给 FPS 水印让位，底下别贴着屏幕边
+    local maxW = math.max(320, vp.X - 32)
+    local maxH = math.max(280, vp.Y - 88)
+
+    -- 竖屏手机：880 的设计宽度怎么缩都塞不进去，硬缩只会把字缩成蚂蚁。
+    -- 换成 420 的窄版设计（单列），按宽度铺满，字反而更大。
+    if vp.X < 640 and width > 440 then
+        width = 420
+        height = math.min(height, 600)
+    end
+
+    local byWidth = maxW / width
+    local scale = byWidth >= 1 and 1 or U.clamp(byWidth, 0.58, 1)
+
+    if height * scale > maxH then
+        height = math.max(math.floor(maxH / scale), 380)
+    end
+    if width * scale > maxW then
+        width = math.max(math.floor(maxW / scale), 320)
+    end
+    return width, height, scale
+end
+
 function WobsinsUI:_createWindow(config)
     local screen = self:_screen()
     local vp = self:_viewport()
@@ -2100,14 +2134,11 @@ function WobsinsUI:_createWindow(config)
 
     local scale = tonumber(config.Scale)
     if not scale or scale <= 0 then
-        -- 视口的 88% 高 / 82% 宽是上限，再大就缩，1920x1080 上刚好 1:1
-        scale = math.min(1, (vp.Y * 0.88) / height, (vp.X * 0.82) / width)
+        width, height, scale = fitWindowSize(width, height, vp)
     end
-    scale = U.clamp(scale, 0.58, 1.3)
+    scale = U.clamp(scale, 0.5, 1.3)
 
-    -- 竖屏手机：0.58 的下限也可能撑出屏幕（880 x 0.58 = 510 > 390），
-    -- 这时候反过来把设计尺寸压到能塞下的大小，字号比例就保住了，
-    -- 而不是硬让窗口跑出屏幕右边。
+    -- 显式指定了 Scale 的话，同样保证不跑到屏幕外
     local fitWidth = math.floor((vp.X - 16) / scale)
     local fitHeight = math.floor((vp.Y - 16) / scale)
     if width > fitWidth then
@@ -2118,7 +2149,9 @@ function WobsinsUI:_createWindow(config)
     end
 
     local sidebarWidth = config.SideBarWidth or 168
-    if width < 620 then
+    if width < 460 then
+        sidebarWidth = 112
+    elseif width < 620 then
         sidebarWidth = 132
     end
     sidebarWidth = math.floor(math.min(sidebarWidth, width * 0.36))
@@ -2145,6 +2178,9 @@ function WobsinsUI:_createWindow(config)
         Locked = false,
         Width = width,
         Height = height,
+        -- 原始设计尺寸：屏幕变了要按它重新装一遍，不能拿压过的尺寸再压
+        BaseWidth = width,
+        BaseHeight = height,
         SidebarWidth = sidebarWidth,
         HeaderHeight = HEADER_HEIGHT,
         FooterHeight = FOOTER_HEIGHT,
@@ -3056,6 +3092,30 @@ end
 
 function Window:GetUIScale()
     return self.ScaleValue or 1
+end
+
+-- 屏幕尺寸变了（旋转 / 改分辨率）：按新视口重新装一遍。
+-- 设计高度是跟着屏幕算出来的，所以这里不能只改 UIScale。
+function Window:_autoFit()
+    if not self.AutoScale then
+        self:_centerStage()
+        return self
+    end
+    local vp = WobsinsUI:_viewport()
+    local w, h, s = fitWindowSize(self.BaseWidth or self.Width, self.BaseHeight or self.Height, vp)
+    self.ScaleValue = s
+    if self.Scale and self.Scale:IsA("UIScale") then
+        self.Scale.Scale = s
+    end
+    if w ~= self.Width or h ~= self.Height then
+        self:Resize(w, h)
+    else
+        self:_centerStage()
+    end
+    if self.Minimized and self._placeMinBar then
+        self:_placeMinBar()
+    end
+    return self
 end
 
 -- 重新计算窗口尺寸（屏幕旋转 / 设备变化时用）
@@ -4516,7 +4576,29 @@ function Build.Code(card, config)
     for _ in string.gmatch(code, "\n") do
         lines = lines + 1
     end
-    local bodyHeight = math.min(lines * 13 + 12, config.MaxHeight or 150)
+    -- 行高要跟着全局字号走，否则字号一放大代码就被卡片裁掉。
+    -- 代码开了 TextWrapped，长行会折成两三行，这里按可用宽度估一下行数。
+    local textScale = WobsinsUI.TextScale or 1
+    local lineHeight = 13 * textScale
+    -- 可用宽度按「双列时一列的宽度」估，别按整窗算，否则长行被算成一行
+    local contentW = (win.Width or 880) - (win.SidebarWidth or 168) - 1
+    local avail
+    if win.Layout == "Double" and (win.Width or 880) >= 560 then
+        avail = math.max(140, (contentW - 8) / 2 - 42)
+    else
+        avail = math.max(160, contentW - 42)
+    end
+    local charW = 10.5 * textScale * 0.6
+    local rows = 0
+    for line in (code .. "\n"):gmatch("(.-)\n") do
+        local w = 0
+        for _, cp in utf8.codes(line) do
+            w = w + ((cp >= 0x2E80) and charW * 1.8 or charW)
+        end
+        rows = rows + math.max(1, math.ceil(w / avail))
+    end
+    rows = math.max(rows, lines)
+    local bodyHeight = math.min(rows * lineHeight + 12, config.MaxHeight or (150 * textScale))
 
     local holder = new("Frame", {
         BackgroundColor3 = theme.BackgroundAlt,
@@ -7615,10 +7697,7 @@ function Window:WatchViewport()
             local vp = WobsinsUI:_viewport()
             if vp.X ~= last.X or vp.Y ~= last.Y then
                 last = vp
-                if self.AutoScale then
-                    self:SetUIScale(nil)   -- 重新按新屏幕算缩放
-                end
-                self:_centerStage()
+                self:_autoFit()   -- 按新屏幕重算缩放和设计高度
             end
         end
     end)
