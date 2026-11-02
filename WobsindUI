@@ -6,7 +6,7 @@
     ╚███╔███╔╝╚██████╔╝██████╔╝███████║██║██║ ╚████║███████║    ╚██████╔╝██║
      ╚══╝╚══╝  ╚═════╝ ╚═════╝ ╚══════╝╚═╝╚═╝  ╚═══╝╚══════╝     ╚═════╝ ╚═╝
 
-    WobsinsUI · v2.0.0
+    WobsinsUI · v2.4.0
     单文件 Roblox 脚本 UI 库（Luau）
 
     ============================================================================
@@ -53,8 +53,8 @@
 
 local WobsinsUI = {}
 WobsinsUI.__index = WobsinsUI
-WobsinsUI.Version = "2.3.0"
-WobsinsUI.Build = "20261103d"
+WobsinsUI.Version = "2.4.0"
+WobsinsUI.Build = "20261103e"
 WobsinsUI.Name = "WobsinsUI"
 
 -- 同一个执行器里重复执行脚本时复用已有实例，避免出现两个 ScreenGui 叠在一起。
@@ -1157,7 +1157,8 @@ local function ensureNotifyStack()
         BackgroundTransparency = 1,
         Size = UDim2.new(0, 300, 0, 0),
         AutomaticSize = Enum.AutomaticSize.Y,
-        Position = UDim2.new(1, -16, 0, 16),
+        -- 往下让 46px：右上角留给常驻开关，通知不要压在它身上
+        Position = UDim2.new(1, -16, 0, 62),
         AnchorPoint = Vector2.new(1, 0),
         ZIndex = WobsinsUI.Layers.Toast,
     }, screen)
@@ -2153,8 +2154,8 @@ function WobsinsUI:_createWindow(config)
                     win._hotkeyPanel:Close()
                     return
                 end
-                -- 最小化状态下按开关键：先展开，而不是直接藏起来
-                if win.Visible and win.Minimized then
+                -- 收起来的状态下按开关键：先展开，而不是直接藏起来
+                if win.Minimized then
                     win:SetMinimized(false)
                     return
                 end
@@ -2236,9 +2237,52 @@ end
 function Window:_baseAlpha()
     local alpha = (self.ThemeTable and self.ThemeTable.Alpha) or 0
     if self.BgImage then
-        alpha = math.max(alpha, 0.32)
+        alpha = math.max(alpha, 0.55)
     end
     return alpha
+end
+
+-- 卡片底色透明度。有背景图时卡片也要让开，不然整块面板就是一片黑，
+-- 图只在窗口边框外面露出一点点 —— 「背景图设置」形同虚设。
+function Window:_cardAlpha()
+    local base = (self.ThemeTable and self.ThemeTable.CardAlpha) or 0
+    if self.BgImage then
+        local light = self.ThemeTable and self.ThemeTable.Mode == "Light"
+        return math.max(base, light and 0.5 or 0.55)
+    end
+    return base
+end
+
+-- 侧栏同理：平时完全透明，有图时压一层薄底，把图挡掉一半保证侧栏文字能读
+function Window:_sidebarAlpha()
+    if self.BgImage then
+        return self.BackgroundSidebarDim or 0.45
+    end
+    return 1
+end
+
+-- 背景图相关的所有透明度都在这里统一刷一遍。
+-- 换图 / 调蒙版 / 切主题 / 关闭背景图 都走这一条路，不会出现「改了图但卡片还是实心」。
+function Window:_applyGlass()
+    if not self.Main then
+        return
+    end
+    if self.Sidebar then
+        U.tween(self.Sidebar, 0.2, { BackgroundTransparency = self:_sidebarAlpha() })
+    end
+    if self.Veil then
+        local dim = self.BackgroundDim
+        if dim == nil then
+            local light = self.ThemeTable and self.ThemeTable.Mode == "Light"
+            dim = light and 0.34 or 0.45
+        end
+        U.tween(self.Veil, 0.2, { BackgroundTransparency = U.clamp(1 - dim, 0.02, 0.98) })
+    end
+    for _, card in ipairs(self._cards or {}) do
+        if card.Frame then
+            card.Frame.BackgroundTransparency = self:_cardAlpha()
+        end
+    end
 end
 
 function Window:_makeDraggable(handle)
@@ -2514,12 +2558,17 @@ function Window:_buildSidebar(config)
 
     local sidebar = new("Frame", {
         Name = "Sidebar",
+        BackgroundColor3 = self:Color("Background"),
         BackgroundTransparency = 1,
         Size = UDim2.fromOffset(width, height),
         Position = UDim2.fromOffset(0, HEADER_HEIGHT),
         ZIndex = WobsinsUI.Layers.Sidebar,
     }, main)
     self.Sidebar = sidebar
+    self:_bind(sidebar, "BackgroundColor3", "Background")
+    self:_onTheme(function()
+        sidebar.BackgroundTransparency = self:_sidebarAlpha()
+    end)
 
     -- 侧栏右侧分隔线（玻璃主题不需要这条线，靠留白分区）
     local line = new("Frame", {
@@ -2754,6 +2803,10 @@ function Window:_buildOpenButton(config)
     if config.OpenButton == false then
         return
     end
+    -- 常驻开关（23_shell）本身就能把窗口叫回来，再挂一个悬浮按钮是重复的
+    if config.OpenButton ~= true and config.FloatSwitch ~= false then
+        return
+    end
 
     local screen = self.Root
     local size = 42
@@ -2859,9 +2912,12 @@ function Window:_applyTransparency()
     end
     U.tween(self.Main, 0.2, { BackgroundTransparency = target })
 
-    -- 侧栏本来就是透明的，别在这里把它刷成实心白块
+    -- 侧栏平时是透明的，有背景图时压一层薄底
     if self.Sidebar then
-        U.tween(self.Sidebar, 0.2, { BackgroundTransparency = 1 })
+        U.tween(self.Sidebar, 0.2, { BackgroundTransparency = self:_sidebarAlpha() })
+    end
+    if self._applyGlass then
+        self:_applyGlass()
     end
 end
 
@@ -3515,7 +3571,7 @@ function Tab:Card(config)
 
     local frame = new("Frame", {
         BackgroundColor3 = win:Color("Surface"),
-        BackgroundTransparency = win.ThemeTable.CardAlpha or 0,
+        BackgroundTransparency = win:_cardAlpha(),
         Size = UDim2.new(1, 0, 0, 0),
         AutomaticSize = Enum.AutomaticSize.Y,
         LayoutOrder = card.Index,
@@ -3531,9 +3587,13 @@ function Tab:Card(config)
 
     win:_onTheme(function()
         card.Frame.BackgroundColor3 = win:Color("Surface")
-        card.Frame.BackgroundTransparency = (win.ThemeTable and win.ThemeTable.CardAlpha) or 0
+        card.Frame.BackgroundTransparency = win:_cardAlpha()
         cardStroke.Transparency = win.Glass and 0.4 or 0.55
     end)
+
+    -- 登记到窗口，换背景图 / 调蒙版时统一刷透明度
+    win._cards = win._cards or {}
+    table.insert(win._cards, card)
 
     -- 卡片头
     local bodyTop = 0
@@ -4034,6 +4094,11 @@ function Build.Button(card, config)
         if config.Callback then
             safeCall(config.Callback)
         end
+        if config.Notify ~= false then
+            pcall(function()
+                win:Toast(config.Title or "操作", "已执行", config.Icon or "check", 1.5)
+            end)
+        end
     end)
 
     U.ripple(btn, theme.Text)
@@ -4502,6 +4567,21 @@ function Build.Toggle(card, config)
         render(true, true)
     end
 
+    -- 开关点完给一条短提示：只写标题时就是「自动执行 已开启」，
+    -- 用户不用盯着开关的滑块去猜自己点没点上。
+    local function notifyState()
+        if config.Notify == false then
+            return
+        end
+        pcall(function()
+            win:Toast(
+                config.Title or "开关",
+                state and "已开启" or "已关闭",
+                state and "check" or "minus"
+            )
+        end)
+    end
+
     local function toggle()
         if element.Locked then
             return
@@ -4509,6 +4589,7 @@ function Build.Toggle(card, config)
         state = not state
         element.Value = state
         render(true)
+        notifyState()
     end
 
     -- 只挂一次：行级点击即可切换，避免 track 和 row 同时触发导致切两次
@@ -5958,6 +6039,9 @@ function Window:Close()
     if self.OpenButton and self.OpenButton.Frame then
         self.OpenButton.Frame.Visible = true
     end
+    if self._paintSwitch then
+        self:_paintSwitch()
+    end
     for _, callback in ipairs(self.CloseCallbacks) do
         safeCall(callback)
     end
@@ -5979,6 +6063,9 @@ function Window:Open()
     end
     if self.OpenButton and self.OpenButton.Frame then
         self.OpenButton.Frame.Visible = false
+    end
+    if self._paintSwitch then
+        self:_paintSwitch()
     end
     return self
 end
@@ -6046,8 +6133,9 @@ function Window:SetBackgroundImage(imageId, transparency, dim)
     end
 
     if self.Minimized then
-        -- 最小化时不能建图，否则会糊在胶囊里
+        -- 收起来时先把参数记下，展开后再真正建图
         self._pendingBackground = source
+        self._hasPendingBg = true
         return self
     end
 
@@ -6081,13 +6169,15 @@ function Window:SetBackgroundImage(imageId, transparency, dim)
         self.BackgroundSource = source
 
         if self.Veil then
-            -- dim 越大蒙版越浓，文字越清楚
+            -- dim 越大蒙版越浓，文字越清楚。
+            -- 目的不是「把图压黑」，而是让图透出来又不影响读字，所以默认偏轻。
             local strength = dim
             if strength == nil then
-                -- 深色面板压得重一点，白字才不会被亮图吃掉
-                strength = (self.ThemeTable and self.ThemeTable.Mode == "Light") and 0.34 or 0.7
+                local light = self.ThemeTable and self.ThemeTable.Mode == "Light"
+                strength = light and 0.34 or 0.45
             end
-            self.Veil.BackgroundTransparency = U.clamp(1 - strength, 0, 0.94)
+            self.BackgroundDim = strength
+            self.Veil.BackgroundTransparency = U.clamp(1 - strength, 0.02, 0.98)
             self.Veil.Visible = true
         end
 
@@ -6109,6 +6199,8 @@ function Window:SetBackgroundImage(imageId, transparency, dim)
     if self.Main then
         U.tween(self.Main, 0.18, { BackgroundTransparency = self:_baseAlpha() })
     end
+    -- 卡片 / 侧栏 / 蒙版一起刷新，否则会只剩一块黑底压着图
+    self:_applyGlass()
     return self
 end
 
@@ -6116,7 +6208,7 @@ end
 function Window:SetBackgroundDim(value)
     self.BackgroundDim = U.clamp(value or 0, 0, 0.95)
     if self.Veil then
-        U.tween(self.Veil, 0.16, { BackgroundTransparency = 1 - self.BackgroundDim })
+        U.tween(self.Veil, 0.16, { BackgroundTransparency = U.clamp(1 - self.BackgroundDim, 0.02, 0.98) })
     end
     return self
 end
@@ -6204,6 +6296,17 @@ function Window:Notify(config)
     return WobsinsUI:Notify(config)
 end
 
+-- 控件反馈用的短提示。开关 / 按钮点完都给一条，不然点了没有任何反应，
+-- 用户不知道到底生效没生效。
+function Window:Toast(title, content, icon, duration)
+    return self:Notify({
+        Title = title or "提示",
+        Content = content or "",
+        Icon = icon or "check",
+        Duration = duration or 1.6,
+    })
+end
+
 function Window:Dialog(config)
     config = config or {}
     config.Window = self
@@ -6228,6 +6331,10 @@ function Window:Destroy()
     if self.OpenButton and self.OpenButton.Frame then
         self.OpenButton.Frame:Destroy()
         self.OpenButton = nil
+    end
+    if self.FloatSwitch then
+        self.FloatSwitch:Destroy()
+        self.FloatSwitch = nil
     end
     if self.Stage then
         self.Stage:Destroy()
@@ -10538,318 +10645,321 @@ function WobsinsUI:CleanTranslations()
 end
 
 --//============================================================================
---// 23. 最小化条 / 关闭脚本
+--// 23. 常驻开关 / 关闭脚本
 --//============================================================================
 --
--- 这一节只做两件事，但都是实际用起来最容易出问题的两件：
+-- 这一节做两件事：
 --
---   1. 最小化。不是把窗口压扁成一条 880px 宽的黑条，而是真的缩成一粒
---      「logo + 脚本名 + 关闭」的小胶囊，高度 30px，宽度按名字长度算。
---      点条身恢复，按住条身可以拖着走。
+--   1. 常驻开关。不再是「最小化成一条胶囊再点回来」——那玩意儿一收起就只剩
+--      一条黑条，想找回来得先找到它。现在改成屏幕上一个圆形小开关：
+--      · 永远在屏幕上，窗口开 / 关它都在；
+--      · 按住可以拖到任意位置，拖到哪下次就在哪；
+--      · 点一下切换：开 → 窗口出现，关 → 窗口整个藏起来；
+--      · 开关本身带一个小滑块，一眼能看出当前是开还是关。
 --
---   2. 关闭脚本。右上角 × 不再只是 hide（那样用户以为关掉了，其实脚本
---      还在后台跑），而是弹一个确认框，确认后销毁整个界面、清掉单例、
+--   2. 关闭脚本。右上角 × 不弹确认就真退出，确认后销毁整个界面、清掉单例、
 --      触发 OnShutdown 回调，脚本主循环据此退出。
 --
 --//----------------------------------------------------------------------------
---// 23.1 常量与小工具
+--// 23.1 常量
 --//----------------------------------------------------------------------------
 
-local MIN_BAR_HEIGHT = 30
-local MIN_BAR_EDGE = 8
-local MIN_BAR_MIN_WIDTH = 132
-
--- Roblox 没有「量一段文字多宽」的公开 API（TextService:GetTextSize 在不同
--- 执行器上行为不一致），这里按字符给一个够用的估算：CJK 算一个字号宽，
--- 拉丁字符算半个多一点。只用来定小胶囊的宽度，不需要像素级准确。
-local function estimateTextWidth(text, size)
-    text = tostring(text or "")
-    local width = 0
-    local ok = pcall(function()
-        for _, code in utf8.codes(text) do
-            if code >= 0x2E80 then
-                width = width + size
-            else
-                width = width + size * 0.56
-            end
-        end
-    end)
-    if not ok then
-        width = #text * size * 0.72
-    end
-    return width
-end
-
-local function stagePlace(stage, width, height, left, top)
-    local vp = WobsinsUI:_viewport()
-    left = U.clamp(left, MIN_BAR_EDGE, math.max(MIN_BAR_EDGE, vp.X - width - MIN_BAR_EDGE))
-    top = U.clamp(top, MIN_BAR_EDGE, math.max(MIN_BAR_EDGE, vp.Y - height - MIN_BAR_EDGE))
-    -- Stage 的 AnchorPoint 是 (0.5, 0.5)，所以位置要加上一半尺寸才是左上角
-    return UDim2.fromOffset(left + width / 2, top + height / 2), left, top
-end
+local SWITCH_HEIGHT = 34
+local SWITCH_MARGIN = 16
+local SWITCH_MIN_WIDTH = 96
 
 --//----------------------------------------------------------------------------
---// 23.2 小胶囊本体
+--// 23.2 常驻开关本体
 --//----------------------------------------------------------------------------
 
-function Window:_minBarWidth()
-    local title = (self.Title ~= "" and self.Title) or "WobsinsUI"
-    local width = math.floor(34 + estimateTextWidth(title, 11.5) + 30)
-    return U.clamp(width, MIN_BAR_MIN_WIDTH, math.max(MIN_BAR_MIN_WIDTH, math.min(self.Width, 280)))
+function Window:_switchText()
+    return self.SwitchText or "开关"
 end
 
-function Window:_buildMinBar(config)
-    if self.MinBar or not self.Main then
+function Window:_switchWidth()
+    local textWidth = U.textWidth(self:_switchText(), 11.5)
+    -- [8] icon 18 [7] label [?] [9] track 26 [10]
+    local width = 8 + 18 + 7 + textWidth + 9 + 26 + 10
+    return math.floor(U.clamp(width, SWITCH_MIN_WIDTH, 172))
+end
+
+function Window:_buildFloatSwitch(config)
+    if self.FloatSwitch or not self.Root then
         return self
     end
     config = config or self.Config or {}
+    if config.FloatSwitch == false then
+        return self
+    end
 
-    local bar = new("TextButton", {
-        Name = "MinBar",
+    local width = self:_switchWidth()
+    local position = config.SwitchPosition
+    if typeof(position) ~= "UDim2" then
+        -- 默认贴在右上角，离屏幕边 16px。
+        -- 开多个窗口时往下排，别让两个开关叠在一起。
+        local above = 0
+        for _, other in ipairs(WobsinsUI.Windows or {}) do
+            if other ~= self and other.FloatSwitch and not other.Destroyed then
+                above = above + 1
+            end
+        end
+        position = UDim2.new(
+            1, -SWITCH_MARGIN - width,
+            0, SWITCH_MARGIN + above * (SWITCH_HEIGHT + 8)
+        )
+    end
+
+    local btn = new("TextButton", {
+        Name = "FloatSwitch",
         BackgroundTransparency = 1,
         AutoButtonColor = false,
-        Size = UDim2.fromScale(1, 1),
         Text = "",
-        Visible = false,
-        ZIndex = WobsinsUI.Layers.Header,
-    }, self.Main)
-    self.MinBar = bar
+        Size = UDim2.fromOffset(width, SWITCH_HEIGHT),
+        Position = position,
+        ClipsDescendants = false,
+        ZIndex = WobsinsUI.Layers.Toast - 1,
+    }, self.Root)
+    self.FloatSwitch = btn
 
-    -- 深色底，和参考图里的小条一致：不跟主题走，永远是黑的
+    -- 深色药丸底：不跟主题走。它浮在游戏画面上，浅色主题配深底反而更清楚
     local bg = new("Frame", {
-        Name = "MinBarBg",
-        BackgroundColor3 = Color3.fromRGB(21, 22, 24),
-        BackgroundTransparency = 0.04,
+        Name = "SwitchBg",
+        BackgroundColor3 = Color3.fromRGB(19, 20, 22),
+        BackgroundTransparency = 0.06,
         Size = UDim2.fromScale(1, 1),
-        ZIndex = WobsinsUI.Layers.Header - 1,
-    }, bar)
-    U.corner(bg, 9)
-    local bgStroke = U.stroke(bg, Color3.fromRGB(52, 54, 58), 1, 0.35)
-    self.MinBarBg = bg
+        ZIndex = WobsinsUI.Layers.Toast - 1,
+    }, btn)
+    U.corner(bg, SWITCH_HEIGHT / 2)
+    local bgStroke = U.stroke(bg, Color3.fromRGB(58, 60, 64), 1, 0.3)
+    btn.Bg = bg
 
-    -- 条身：既能拖，也能点开
-    local handle = new("TextButton", {
-        Name = "MinHandle",
-        BackgroundTransparency = 1,
-        AutoButtonColor = false,
-        Size = UDim2.new(1, -30, 1, 0),
-        Text = "",
-        ZIndex = WobsinsUI.Layers.HeaderItem,
-    }, bar)
-    self.MinHandle = handle
-
+    -- 左侧小方块：放脚本图标，和标题栏那个 logo 一致
     local dot = new("Frame", {
-        BackgroundColor3 = Color3.fromRGB(240, 241, 243),
-        Size = UDim2.fromOffset(16, 16),
+        BackgroundColor3 = Color3.fromRGB(238, 239, 242),
+        Size = UDim2.fromOffset(18, 18),
         Position = UDim2.new(0, 8, 0.5, 0),
         AnchorPoint = Vector2.new(0, 0.5),
-        ZIndex = WobsinsUI.Layers.HeaderItem + 1,
-    }, handle)
-    U.corner(dot, 4)
+        ZIndex = WobsinsUI.Layers.Toast,
+    }, bg)
+    U.corner(dot, 5)
+    U.stroke(dot, Color3.fromRGB(255, 255, 255), 1, 0.7)
 
-    local dotIcon = U.icon(dot, self.Icon, 9, Color3.fromRGB(20, 22, 24), WobsinsUI.Layers.HeaderItem + 2)
+    local dotIcon = U.icon(dot, self.Icon, 10, Color3.fromRGB(18, 19, 21), WobsinsUI.Layers.Toast + 1)
     if dotIcon then
         dotIcon.AnchorPoint = Vector2.new(0.5, 0.5)
         dotIcon.Position = UDim2.fromScale(0.5, 0.5)
     end
-    self.MinBarIcon = dotIcon
 
     local label = new("TextLabel", {
         BackgroundTransparency = 1,
-        Position = UDim2.fromOffset(30, 0),
-        Size = UDim2.new(1, -34, 1, 0),
+        Position = UDim2.fromOffset(33, 0),
+        Size = UDim2.new(1, -33 - 45, 1, 0),
         Font = Enum.Font.GothamMedium,
-        Text = (self.Title ~= "" and self.Title) or "WobsinsUI",
-        TextColor3 = Color3.fromRGB(232, 233, 236),
+        Text = self:_switchText(),
+        TextColor3 = Color3.fromRGB(236, 237, 240),
         TextSize = 11.5,
         TextXAlignment = Enum.TextXAlignment.Left,
         TextTruncate = Enum.TextTruncate.AtEnd,
-        ZIndex = WobsinsUI.Layers.HeaderItem + 1,
-    }, handle)
-    self.MinBarLabel = label
+        ZIndex = WobsinsUI.Layers.Toast,
+    }, bg)
+    btn.Label = label
 
-    -- 右侧：红底白 ×，和参考图一致
-    local close = new("TextButton", {
-        BackgroundColor3 = self:Color("Danger"),
-        BackgroundTransparency = 0,
-        AutoButtonColor = false,
-        Size = UDim2.fromOffset(18, 18),
-        Position = UDim2.new(1, -25, 0.5, 0),
+    -- 右侧小滑块：开 = 亮底深点，关 = 灰底浅点
+    local track = new("Frame", {
+        BackgroundColor3 = Color3.fromRGB(235, 236, 239),
+        Size = UDim2.fromOffset(26, 14),
+        Position = UDim2.new(1, -36, 0.5, 0),
         AnchorPoint = Vector2.new(0, 0.5),
-        Text = "",
-        ZIndex = WobsinsUI.Layers.HeaderItem + 3,
-    }, bar)
-    U.corner(close, 4)
-    local closeIcon = U.icon(close, "close", 10, Color3.fromRGB(255, 255, 255), WobsinsUI.Layers.HeaderItem + 4)
-    if closeIcon then
-        closeIcon.AnchorPoint = Vector2.new(0.5, 0.5)
-        closeIcon.Position = UDim2.fromScale(0.5, 0.5)
-    end
+        ZIndex = WobsinsUI.Layers.Toast,
+    }, bg)
+    U.corner(track, 7)
+    btn.Track = track
 
-    close.MouseEnter:Connect(function()
-        U.tween(close, 0.12, { BackgroundColor3 = U.mix(self:Color("Danger"), Color3.new(1, 1, 1), 0.18) })
-    end)
-    close.MouseLeave:Connect(function()
-        U.tween(close, 0.12, { BackgroundColor3 = self:Color("Danger") })
-    end)
-    close.Activated:Connect(function()
-        self:RequestClose()
-    end)
-    U.tooltip(close, "关闭脚本")
-    self.MinBarClose = close
+    local knob = new("Frame", {
+        BackgroundColor3 = Color3.fromRGB(19, 20, 22),
+        Size = UDim2.fromOffset(10, 10),
+        Position = UDim2.fromOffset(2, 2),
+        ZIndex = WobsinsUI.Layers.Toast + 1,
+    }, track)
+    U.corner(knob, 5)
+    btn.Knob = knob
 
-    -- 悬停时整条微微提亮，暗示「点一下就展开」
-    bar.MouseEnter:Connect(function()
-        U.tween(bg, 0.12, { BackgroundColor3 = Color3.fromRGB(30, 31, 34) })
-        bgStroke.Transparency = 0.2
-    end)
-    bar.MouseLeave:Connect(function()
-        U.tween(bg, 0.12, { BackgroundColor3 = Color3.fromRGB(21, 22, 24) })
-        bgStroke.Transparency = 0.35
-    end)
+    -- 交互：点一下切换；按住拖动则只挪位置
+    local dragging = false
+    local startPointer = nil
+    local startLeft, startTop = 0, 0
+    local moved = 0
 
-    -- 拖动
-    self:_makeDraggable(handle)
-    -- 拖完记住位置，下次最小化回到上次放的地方
-    handle.InputEnded:Connect(function(input)
+    btn.InputBegan:Connect(function(input)
         if input.UserInputType ~= Enum.UserInputType.MouseButton1
             and input.UserInputType ~= Enum.UserInputType.Touch then
             return
         end
-        if (self._dragDistance or 0) > 4 and self.Stage then
-            self._minBarLeft = self.Stage.AbsolutePosition.X
-            self._minBarTop = self.Stage.AbsolutePosition.Y
+        dragging = true
+        moved = 0
+        startPointer = input.Position
+        startLeft = btn.AbsolutePosition.X
+        startTop = btn.AbsolutePosition.Y
+    end)
+
+    btn.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1
+            or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
         end
     end)
 
-    handle.Activated:Connect(function()
-        if (self._dragDistance or 0) > 6 then
+    if S.UserInputService then
+        S.UserInputService.InputChanged:Connect(function(input)
+            if not dragging then
+                return
+            end
+            if input.UserInputType ~= Enum.UserInputType.MouseMovement
+                and input.UserInputType ~= Enum.UserInputType.Touch then
+                return
+            end
+            local delta = input.Position - startPointer
+            moved = math.max(moved, math.abs(delta.X) + math.abs(delta.Y))
+            if moved < 3 then
+                return
+            end
+            local vp = WobsinsUI:_viewport()
+            local size = btn.AbsoluteSize
+            local left = U.clamp(startLeft + delta.X, 4, math.max(4, vp.X - size.X - 4))
+            local top = U.clamp(startTop + delta.Y, 4, math.max(4, vp.Y - size.Y - 4))
+            btn.Position = UDim2.fromOffset(left, top)
+        end)
+    end
+
+    btn.Activated:Connect(function()
+        -- 拖过就不算点击，避免「想挪个位置结果把窗口关了」
+        if moved > 5 then
+            moved = 0
             return
         end
-        self:SetMinimized(false)
+        self:ToggleSwitch()
     end)
 
-    self.MinBarWidth = self:_minBarWidth()
+    btn.MouseEnter:Connect(function()
+        U.tween(bg, 0.12, { BackgroundColor3 = Color3.fromRGB(30, 31, 34) })
+        bgStroke.Transparency = 0.18
+    end)
+    btn.MouseLeave:Connect(function()
+        U.tween(bg, 0.12, { BackgroundColor3 = Color3.fromRGB(19, 20, 22) })
+        bgStroke.Transparency = 0.3
+    end)
+
+    U.tooltip(btn, "点击开关界面，按住可拖动")
+
+    self:_paintSwitch()
+    return self
+end
+
+-- 开关的视觉状态：窗口开着滑块在右（亮），关着在左（灰）
+function Window:_paintSwitch()
+    local sw = self.FloatSwitch
+    if not sw then
+        return
+    end
+    local shown = self:IsShown()
+
+    U.tween(sw.Track, 0.18, {
+        BackgroundColor3 = shown and Color3.fromRGB(236, 237, 240) or Color3.fromRGB(62, 64, 68),
+    }, Enum.EasingStyle.Quad)
+    U.tween(sw.Knob, 0.18, {
+        Position = UDim2.fromOffset(shown and 14 or 2, 2),
+        BackgroundColor3 = shown and Color3.fromRGB(19, 20, 22) or Color3.fromRGB(152, 154, 160),
+    }, Enum.EasingStyle.Quad)
+    U.tween(sw.Label, 0.18, {
+        TextColor3 = shown and Color3.fromRGB(236, 237, 240) or Color3.fromRGB(148, 150, 156),
+    }, Enum.EasingStyle.Quad)
+end
+
+function Window:IsShown()
+    if self.Destroyed then
+        return false
+    end
+    return self.Visible ~= false and self.Minimized ~= true
+end
+
+function Window:SetSwitchText(text)
+    self.SwitchText = tostring(text or "开关")
+    local sw = self.FloatSwitch
+    if sw and sw.Label then
+        sw.Label.Text = self.SwitchText
+        local width = self:_switchWidth()
+        sw.Size = UDim2.fromOffset(width, SWITCH_HEIGHT)
+    end
+    return self
+end
+
+function Window:SetSwitchVisible(state)
+    if self.FloatSwitch then
+        self.FloatSwitch.Visible = state ~= false
+    end
     return self
 end
 
 --//----------------------------------------------------------------------------
---// 23.3 展开 / 收起
+--// 23.3 开 / 关
 --//----------------------------------------------------------------------------
 
 function Window:SetMinimized(state)
     state = state and true or false
-    if not self.Stage then
+    if self.Destroyed or not self.Stage then
         return self
     end
-    if self.Minimized == state then
+    if self.Minimized == state and self.Stage.Visible == (not state) then
+        self:_paintSwitch()
         return self
-    end
-
-    if not self.MinBar then
-        self:_buildMinBar(self.Config)
     end
 
     self.Minimized = state
-    local show = not state
 
-    for _, part in ipairs({ self.Header, self.Sidebar, self.Content, self.Footer }) do
-        if part then
-            part.Visible = show
-        end
-    end
-    if self.MinBar then
-        self.MinBar.Visible = state
-    end
-
-    -- 这些挂在 Main 上，不收起来会跑到胶囊角落里
-    if self.ResizeGrip then
-        self.ResizeGrip.Visible = show
-    end
-
-    -- 收起后不要再带青色外发光，那样深色胶囊边上会有一圈脏光
-    if self.MainStroke then
-        self.MainStroke.Transparency = state and 1 or (self.Glass and 0.2 or 0.55)
-    end
-    if self.Glow then
-        self.Glow.Visible = show
-    end
-    if self.BgImage then
-        self.BgImage.Visible = show
-    end
-    if self.Veil then
-        self.Veil.Visible = show
-    end
-    if show and self._pendingBackground then
-        local source = self._pendingBackground
-        self._pendingBackground = nil
-        self:SetBackgroundImage(source)
-    end
-
-    local abs = self.Stage.AbsolutePosition
-    local targetW = show and self.Width or (self.MinBarWidth or self:_minBarWidth())
-    local targetH = show and self.Height or MIN_BAR_HEIGHT
-    local config = self.Config or {}
-
-    local left, top
-    if show then
-        -- 展开：回到收起前的位置
-        left = self._preMinLeft or abs.X
-        top = self._preMinTop or abs.Y
-        self._preMinLeft, self._preMinTop = nil, nil
+    if state then
+        -- 关：整窗藏起来，屏幕上只留那个开关
+        self.Visible = false
+        self.Stage.Visible = false
     else
-        -- 收起：记下原位置，然后固定到屏幕顶部正中（可以再拖走）
-        self._preMinLeft = abs.X
-        self._preMinTop = abs.Y
-        if config.MinBarAnchor == false then
-            left, top = abs.X, abs.Y
-        elseif self._minBarLeft and self._minBarTop then
-            -- 之前拖过：回到拖到的位置，不要每次都被拽回屏幕中央
-            left, top = self._minBarLeft, self._minBarTop
-        else
-            local vp = WobsinsUI:_viewport()
-            left = (vp.X - targetW) / 2
-            top = config.MinBarTop or 18
+        self.Visible = true
+        self.Stage.Visible = true
+        -- 收起期间被设置 / 换过的背景图，这时候补建
+        if self._hasPendingBg then
+            local source = self._pendingBackground
+            self._pendingBackground = nil
+            self._hasPendingBg = false
+            self:SetBackgroundImage(source)
+        end
+        if self.Scale then
+            self.Scale.Scale = 0.97
+            U.tween(self.Scale, 0.18, { Scale = 1 }, Enum.EasingStyle.Quad)
         end
     end
 
-    local position, realLeft, realTop = stagePlace(self.Stage, targetW, targetH, left, top)
-    if not show then
-        self._minBarLeft, self._minBarTop = realLeft, realTop
-    end
-
-    U.tween(self.Stage, 0.2, {
-        Size = UDim2.fromOffset(targetW, targetH),
-        Position = position,
-    }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
-
-    if self.Shadow then
-        -- 玻璃主题的阴影是浅青色，缩成小黑条后会变成一圈脏光，直接收掉
-        self.Shadow.Visible = show
-        U.tween(self.Shadow, 0.2, {
-            Size = UDim2.new(1, 4, 1, show and 10 or 3),
-            Position = UDim2.fromOffset(-2, show and 6 or 2),
-        })
-    end
-
-    if self.Corner then
-        self.Corner.CornerRadius = UDim.new(0, show and (self.Radius or 6) or 9)
-    end
-
+    self:_paintSwitch()
     return self
 end
 
--- 覆盖 12 里的旧实现：旧版只是把窗口压成一条 880px 的黑条
-function Window:Minimize()
-    if not self.Stage then
-        return self
+function Window:ToggleSwitch()
+    if self:IsShown() then
+        self:SetMinimized(true)
+    else
+        self:SetMinimized(false)
     end
-    self:SetMinimized(not self.Minimized)
     return self
+end
+
+function Window:Minimize()
+    return self:ToggleSwitch()
 end
 
 function Window:IsMinimized()
     return self.Minimized == true
+end
+
+-- 旧名字留着，别让已经写在脚本里的调用直接断掉
+function Window:_buildMinBar(config)
+    return self:_buildFloatSwitch(config)
 end
 
 --//----------------------------------------------------------------------------
@@ -10895,16 +11005,15 @@ function Window:Shutdown()
     end
     self.ShutdownRequested = true
 
-    -- 收起成小胶囊再淡出，比「啪一下全没」自然一点
+    -- 先淡出再销毁，别「啪一下全没」
     if self.Stage and not self.Minimized then
         pcall(function()
             self:SetMinimized(true)
         end)
     end
 
-    -- 比确认框淡出（0.16 + 0.18）稍慢一点，避免「弹窗还没关、界面先没了」
     local win = self
-    U.delay(0.26, function()
+    U.delay(0.16, function()
         if win.Destroyed then
             return
         end
@@ -10977,7 +11086,7 @@ function Window:RequestClose()
 end
 
 --//----------------------------------------------------------------------------
---// 23.5 收尾：构建小胶囊
+--// 23.5 收尾：构建常驻开关
 --//----------------------------------------------------------------------------
 
 local _createWindowPrev = WobsinsUI._createWindow
@@ -10986,16 +11095,12 @@ function WobsinsUI:_createWindow(config)
     local win = _createWindowPrev(self, config)
     if win and not win.Destroyed then
         pcall(function()
-            win:_buildMinBar(config)
+            win:_buildFloatSwitch(config)
 
-            -- 标题改过之后胶囊宽度要跟着变
+            -- 标题改过之后，开关上的文字跟着变
             local rawSetTitle = win.SetTitle
             win.SetTitle = function(self_, text)
                 local result = rawSetTitle(self_, text)
-                if self_.MinBarLabel then
-                    self_.MinBarLabel.Text = self_.Title
-                end
-                self_.MinBarWidth = self_:_minBarWidth()
                 return result
             end
         end)
