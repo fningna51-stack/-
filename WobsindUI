@@ -1,70 +1,13 @@
---[[
-    ██╗    ██╗ ██████╗ ██████╗ ███████╗██╗███╗   ██╗███████╗    ██╗   ██╗██╗
-    ██║    ██║██╔═══██╗██╔══██╗██╔════╝██║████╗  ██║██╔════╝    ██║   ██║██║
-    ██║ █╗ ██║██║   ██║██████╔╝███████╗██║██╔██╗ ██║███████╗    ██║   ██║██║
-    ██║███╗██║██║   ██║██╔══██╗╚════██║██║██║╚██╗██║╚════██║    ██║   ██║██║
-    ╚███╔███╔╝╚██████╔╝██████╔╝███████║██║██║ ╚████║███████║    ╚██████╔╝██║
-     ╚══╝╚══╝  ╚═════╝ ╚═════╝ ╚══════╝╚═╝╚═╝  ╚═══╝╚══════╝     ╚═════╝ ╚═╝
-
-    WobsinsUI · v2.4.1
-    单文件 Roblox 脚本 UI 库（Luau）
-
-    ============================================================================
-    设计来源
-    ============================================================================
-    · WindUI        —— 玻璃窗体、背景图、悬浮开启按钮、通知 / 弹窗 / 配置 / 主题
-    · Obsidian      —— 石墨面板、图标侧栏、可折叠卡片、双列布局、顶栏搜索、药丸开关
-    两者合并为同一套组件树，默认走 Obsidian 的冷黑扁平风，切主题即变 WindUI 玻璃风。
-
-    ============================================================================
-    可靠性设计（针对上一版“加载出空气”的问题）
-    ============================================================================
-    1. 全屏根节点固定 DisplayOrder，窗口、浮层、通知、弹窗各自分层，层级用常量表管理，
-       不会再出现阴影 / 蒙版盖住内容的情况。
-    2. 每个元素构建都包在 pcall 里，单个组件出错只会让这一行显示成错误条，
-       不会中断整个窗口的构建（以前一个报错会让后面全部不渲染）。
-    3. CreateWindow 外层 xpcall；真出异常时会弹一个可见的错误面板并 print 出来，
-       而不是静默给你一块黑屏。
-    4. 构建完成后做一次自检：窗口、侧栏、内容区尺寸必须大于 0，
-       否则补一张“空状态”卡片，保证屏幕上一定有可见内容。
-    5. 主题色全部显式绑定，不依赖 Roblox 默认值；文字色永远从主题取，
-       不会出现纯黑字压在纯黑底上。
-
-    ============================================================================
-    快速开始
-    ============================================================================
-      local WobsinsUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/你的名字/WobsinsUI/main/source/WobsinsUI.lua"))()
-
-      local Window = WobsinsUI:CreateWindow({
-          Title = "WobsinsUI",
-          Author = "by you",
-          Theme = "Graphite",
-      })
-
-      local Tab = Window:Tab({ Title = "通用", Icon = "home" })
-      Tab:Toggle({ Title = "自动执行", Value = false, Callback = function(v) print(v) end })
-
-    MIT License · 可自由修改、二次分发。
-]]
-
---//============================================================================
---// 0. 库对象 / 单例保护
---//============================================================================
-
 local WobsinsUI = {}
 WobsinsUI.__index = WobsinsUI
-WobsinsUI.Version = "2.7.0"
-WobsinsUI.Build = "20261103h"
+WobsinsUI.Version = "2.8.0"
+WobsinsUI.Build = "20261103i"
 WobsinsUI.Name = "WobsinsUI"
 
--- 全局字号系数：所有 TextSize 在构造时统一乘这个值。
--- 手机端窗口整体缩到 0.78 左右，字号不补回来就小得看不清；桌面端 1.2 也还宽松。
--- 做成全局是因为 TextSize 是逐组件写死的，运行时改不回来 —— 改了要重建窗口。
+WobsinsUI.LiquidGlass = true
+WobsinsUI.Particles = true
+WobsinsUI.ParticleCount = nil
 WobsinsUI.TextScale = 1.22
-
--- 同一个执行器里重复执行脚本时复用已有实例，避免出现两个 ScreenGui 叠在一起。
--- 但如果拿到的是旧构建（比如上次跑的是坏掉的版本），先把旧界面清掉再重建，
--- 否则会出现“重新执行了还是空白的”这种情况。
 local genv = (getgenv and getgenv()) or _G
 if genv.__WobsinsUIV2 then
     local existing = genv.__WobsinsUIV2
@@ -84,10 +27,6 @@ if genv.__WobsinsUIV2 then
     end)
 end
 genv.__WobsinsUIV2 = WobsinsUI
-
---//============================================================================
---// 1. 服务
---//============================================================================
 
 local function service(name)
     local ok, svc = pcall(function()
@@ -115,16 +54,10 @@ local S = {
 local LocalPlayer = S.Players and (S.Players.LocalPlayer or S.Players.PlayerAdded:Wait())
 local Mouse = (LocalPlayer and LocalPlayer.GetMouse) and LocalPlayer:GetMouse() or nil
 
--- cloneref 能避免某些执行器把 CoreGui 实例标记成可疑对象
 local cloneref = cloneref or clonereference or function(inst)
     return inst
 end
 
---//============================================================================
---// 2. 基础工具
---//============================================================================
-
--- Luau 有 warn，标准 Lua 没有，统一兜底
 local function logWarn(...)
     if warn then
         warn(...)
@@ -134,7 +67,7 @@ local function logWarn(...)
 end
 
 local U = {}
-local L = {}   -- 组件类统一放这里，后面各段直接挂方法
+local L = {}
 
 local function safeCall(fn, ...)
     local ok, result = pcall(fn, ...)
@@ -145,20 +78,13 @@ local function safeCall(fn, ...)
 end
 
 U.safeCall = safeCall
-
--- Instance 构造：先写属性再挂父级，避免父级布局在属性未就绪时先跑一遍
---
--- 这里顺便把全局字号系数（TextScale）乘进去：手机上窗口整体缩到 0.78 之后，
--- 10.5pt 的正文渲染出来只有 8px 左右，字小得看不清。统一在构造时放大字号，
--- 组件里的固定高度（26 / 34 / 44）不用逐个改，行高靠 AutomaticSize 自己长。
 function U.new(class, props, parent)
     local inst = Instance.new(class)
     if props then
         local textScale = WobsinsUI.TextScale or 1
         for key, value in pairs(props) do
             if value ~= nil then
-                if key == "TextSize" and textScale ~= 1 and type(value) == "number" then
-                    -- 取到 0.5 的整数倍，避免出现 12.599999 这种字号
+                if key == "TextSize" and textScale ~= 1 and type(value) == "number" then                  
                     value = math.floor(value * textScale * 2 + 0.5) / 2
                 end
                 inst[key] = value
@@ -217,7 +143,6 @@ function U.grid(inst, gap)
     }, inst)
 end
 
--- 兼容不同执行器的 tween；TweenService 不可用时直接瞬间赋值
 function U.tween(inst, time, props, style, dir)
     if not inst then
         return
@@ -651,6 +576,9 @@ WobsinsUI.Layers = {
     Main = 10,
     Art = 11,
     Veil = 12,
+    Glass = 13,
+    Particle = 15,
+    Sheen = 60,
     Content = 20,
     Card = 22,
     Row = 24,
@@ -1124,6 +1052,9 @@ function WobsinsUI:_applyTheme(rebuildRadius)
         end
         if self.MainStroke then
             self.MainStroke.Transparency = self.Glass and 0.08 or 0.55
+        end
+        if self._refreshGlassTint then
+            self:_refreshGlassTint()
         end
         if self.OnRadius then
             safeCall(self.OnRadius)
@@ -2186,6 +2117,12 @@ function WobsinsUI:_createWindow(config)
         FooterHeight = FOOTER_HEIGHT,
         Transparency = config.Transparent == true or self.Transparency,
         Glass = theme.Glass == true,
+        -- 液态玻璃 + 粒子：默认全开，配置 / 全局开关都能单独关
+        LiquidGlass = config.LiquidGlass ~= false
+            and (WobsinsUI.LiquidGlass == nil or WobsinsUI.LiquidGlass ~= false),
+        Particles = config.Particles ~= false
+            and (WobsinsUI.Particles == nil or WobsinsUI.Particles ~= false),
+        ParticleCount = tonumber(config.ParticleCount) or tonumber(WobsinsUI.ParticleCount),
         Radius = theme.Radius or 6,
         ToggleKey = config.ToggleKey or Enum.KeyCode.RightShift,
         OpenButton = nil,
@@ -2351,6 +2288,11 @@ function Window:_buildShell(config)
     -- 背景图（可选）：图本身只是最底一层，上面压一层同色蒙版保证文字可读
     if config.Background ~= nil and config.Background ~= "" then
         self:SetBackgroundImage(config.Background, config.BackgroundTransparency, config.BackgroundDim)
+    end
+
+    -- 液态玻璃 + 动态粒子（24 / 25 模块实现，挂在主体之上、内容之下）
+    if self._buildLiquidGlass then
+        self:_buildLiquidGlass(config)
     end
 end
 
@@ -3133,6 +3075,9 @@ function Window:Resize(width, height)
     end
     if self._relayoutColumns then
         self:_relayoutColumns()
+    end
+    if self._layoutGlass then
+        self:_layoutGlass()
     end
     self:_centerStage()
     return self
@@ -6480,6 +6425,9 @@ function Window:Destroy()
     end
     self.Destroyed = true
     self.Visible = false
+    if self._setFxActive then
+        self:_setFxActive(false)
+    end
 
     if self.OpenButton and self.OpenButton.Frame then
         self.OpenButton.Frame:Destroy()
@@ -11263,6 +11211,11 @@ function Window:SetMinimized(state)
         self.OpenButton.Frame.Visible = state
     end
 
+    -- 收起时暂停粒子 / 光斑动画，展开时恢复（省帧）
+    if self._setFxActive then
+        self:_setFxActive(not state)
+    end
+
     if self.FloatSwitch then
         self:_paintSwitch()
     end
@@ -11454,6 +11407,560 @@ function WobsinsUI:_createWindow(config)
         end)
     end
     return win
+end
+
+--//============================================================================
+--// 24. 液态玻璃
+--//============================================================================
+--
+-- Roblox 没有真正的实时背景模糊，所以「液态玻璃」用几层叠出来的：
+--   1. 底部渐变底色    —— 上浅下深，让面板有厚度
+--   2. 边缘高光描边    —— 左上亮、右下隐，模拟玻璃「吃光」的棱边
+--   3. 顶部光泽        —— 一层极淡的白色渐变，像灯打在一整块玻璃上
+--   4. 斜向光条        —— 对角划过的一抹反光，最出「玻璃味」的一层
+--   5. 漂浮光斑        —— 两三团柔光在玻璃内部缓慢漂移（动态）
+--   6. 鼠标光斑        —— 跟着鼠标走的一团微光（动态，浅色更明显）
+-- 全部都是普通 Frame + UIGradient，不挡点击、不吃帧数。
+--
+-- 开关：CreateWindow({ LiquidGlass = false })，或全局 WobsinsUI.LiquidGlass = false。
+
+local white = Color3.new(1, 1, 1)
+
+local function colorSeq(c0, c1)
+    return ColorSequence.new(
+        ColorSequenceKeypoint.new(0, c0),
+        ColorSequenceKeypoint.new(1, c1 or c0)
+    )
+end
+
+local function numSeq(a0, a1)
+    return NumberSequence.new(
+        NumberSequenceKeypoint.new(0, a0),
+        NumberSequenceKeypoint.new(1, a1 or a0)
+    )
+end
+
+-- 给一个透明 Frame 挂上线性渐变。透明度全部编码在渐变里（元素底色全透明），
+-- 这样主题切换 / 深浅色切换时只需原地换渐变，不用重建节点。
+local function addGradient(inst, rotation, c0, a0, c1, a1)
+    return new("UIGradient", {
+        Rotation = rotation,
+        Color = colorSeq(c0, c1),
+        Transparency = numSeq(a0, a1),
+    }, inst)
+end
+
+-- 深浅色两套参数。数值全是「透明度」：越小越实、越大越透。
+function Window:_glassPalette()
+    local mode = self.ThemeTable and self.ThemeTable.Mode or "Dark"
+    if mode == "Light" then
+        return {
+            backdropTop = Color3.new(1, 1, 1), backdropTopA = 0.50,
+            backdropBottom = self:Color("SurfaceAlt"), backdropBottomA = 0.72,
+            edgeC = white, edgeC1 = self:Color("SubText"), edgeA0 = 0.15, edgeA1 = 0.45,
+            sheenA0 = 0.62, sheenA1 = 1.0,
+            streakA0 = 0.78, streakA1 = 1.0,
+            blobC = white, blobA = 0.86,
+            accentA = 0.87,
+            frontA0 = 0.74, frontA1 = 1.0,
+            cursorC = white, cursorA = 0.91,
+        }
+    end
+    return {
+        backdropTop = self:Color("SurfaceAlt"), backdropTopA = 0.62,
+        backdropBottom = self:Color("Background"), backdropBottomA = 0.82,
+        edgeC = white, edgeC1 = white, edgeA0 = 0.40, edgeA1 = 0.97,
+        sheenA0 = 0.84, sheenA1 = 1.0,
+        streakA0 = 0.93, streakA1 = 1.0,
+        blobC = white, blobA = 0.965,
+        accentA = 0.96,
+        frontA0 = 0.92, frontA1 = 1.0,
+        cursorC = white, cursorA = 0.975,
+    }
+end
+
+function Window:_buildLiquidGlass(config)
+    if not self.LiquidGlass or not self.Main then
+        return
+    end
+    local radius = self.Radius or 6
+    local main = self.Main
+
+    -- 光效容器：夹在主体与内容之间，圆角裁掉溢出
+    local glass = new("Frame", {
+        Name = "LiquidGlass",
+        BackgroundTransparency = 1,
+        Size = UDim2.fromScale(1, 1),
+        ClipsDescendants = true,
+        ZIndex = WobsinsUI.Layers.Glass,
+    }, main)
+    U.corner(glass, radius)
+    self.GlassLayer = glass
+
+    -- 1) 底部渐变底色
+    local backdrop = new("Frame", {
+        Name = "GlassBackdrop",
+        BackgroundColor3 = self:Color("Background"),
+        BackgroundTransparency = 1,
+        Size = UDim2.fromScale(1, 1),
+        ZIndex = WobsinsUI.Layers.Glass,
+    }, glass)
+    U.corner(backdrop, radius)
+    self.GlassBackdrop = backdrop
+    self.GlassBackdropGrad = addGradient(backdrop, 90, white, 0, white, 0)
+
+    -- 2) 边缘高光：一条带渐变的白描边，左上亮、右下隐
+    local edge = new("Frame", {
+        Name = "GlassEdge",
+        BackgroundTransparency = 1,
+        Size = UDim2.fromScale(1, 1),
+        ZIndex = WobsinsUI.Layers.Glass,
+    }, glass)
+    U.corner(edge, radius)
+    self.GlassEdge = edge
+    self.GlassEdgeStroke = U.stroke(edge, white, 1.5, 0)
+    pcall(function()
+        -- 老执行器不支持给 UIStroke 挂渐变时，退回一条纯描边，不影响使用
+        self.GlassEdgeGrad = addGradient(self.GlassEdgeStroke, -45, white, 0.1, white, 0.9)
+    end)
+
+    -- 3) 顶部光泽
+    local sheen = new("Frame", {
+        Name = "GlassSheen",
+        BackgroundColor3 = white,
+        BackgroundTransparency = 1,
+        Size = UDim2.new(1, 0, 0.44, 0),
+        Position = UDim2.fromScale(0, 0),
+        ZIndex = WobsinsUI.Layers.Glass,
+    }, glass)
+    U.corner(sheen, radius)
+    self.GlassSheen = sheen
+    self.GlassSheenGrad = addGradient(sheen, 90, white, 0.9, white, 1)
+
+    -- 4) 斜向光条（对角反光）
+    local streak = new("Frame", {
+        Name = "GlassStreak",
+        BackgroundColor3 = white,
+        BackgroundTransparency = 1,
+        Size = UDim2.new(1.1, 0, 0, 64),
+        Position = UDim2.fromOffset(-40, -16),
+        Rotation = -16,
+        ZIndex = WobsinsUI.Layers.Glass,
+    }, glass)
+    self.GlassStreak = streak
+    self.GlassStreakGrad = addGradient(streak, 90, white, 0.94, white, 1)
+
+    -- 5) 漂浮光斑（动态）
+    self._glassBlobs = {}
+    self:_spawnGlassBlob("BlobA", 90, "blob", false)
+    self:_spawnGlassBlob("BlobB", 60, "blob", false)
+    self:_spawnGlassBlob("BlobC", 44, "accent", true)
+
+    -- 6) 鼠标光斑（浮在内容之上、跟着鼠标走）。用一块极淡的扁平柔盘而不是
+    --    渐变月牙：渐变在圆上会呈现明显的「半边亮」，静止截图里像一枚戒指。
+    local cursor = new("Frame", {
+        Name = "GlassCursor",
+        BackgroundColor3 = white,
+        BackgroundTransparency = 0.97,
+        Size = UDim2.fromOffset(120, 120),
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        Position = UDim2.fromScale(0.5, 0.5),
+        ZIndex = WobsinsUI.Layers.Sheen,
+    }, main)
+    U.corner(cursor, 90)
+    self.GlassCursor = cursor
+    self._cursorTarget = Vector2.new(self.Width / 2, self.Height / 2)
+
+    -- 前景光泽：压在内容上面、又比弹窗低的极淡高光，让整块面板连成一体
+    local front = new("Frame", {
+        Name = "FrontSheen",
+        BackgroundColor3 = white,
+        BackgroundTransparency = 1,
+        Size = UDim2.new(1, 0, 0.38, 0),
+        Position = UDim2.fromScale(0, 0),
+        ZIndex = WobsinsUI.Layers.Sheen,
+    }, main)
+    U.corner(front, radius)
+    self.FrontSheen = front
+    self.FrontSheenGrad = addGradient(front, 90, white, 0.96, white, 1)
+
+    -- 用鼠标移动更新目标点（不做逐帧 tween，靠下面的 chase 循环慢慢追上）
+    if S.UserInputService then
+        S.UserInputService.InputChanged:Connect(function(input)
+            if self.Destroyed or not self._fxActive or not self.Main then
+                return
+            end
+            if input.UserInputType == Enum.UserInputType.MouseMovement then
+                local abs = self.Main.AbsolutePosition
+                local scale = self.ScaleValue or 1
+                if scale <= 0 then
+                    scale = 1
+                end
+                self._cursorTarget = Vector2.new(
+                    (input.Position.X - abs.X) / scale,
+                    (input.Position.Y - abs.Y) / scale
+                )
+            end
+        end)
+    end
+
+    self:_refreshGlassTint()
+    self._fxActive = true
+
+    -- 粒子场（25 模块）：要在 _fxActive 生效之后再建，粒子才会开始漂
+    if self._buildParticles then
+        self:_buildParticles(config)
+    end
+
+    self:_chaseCursor()
+end
+
+-- 强调色光斑要按深浅色取不同色调：深色主题直接用强调色，浅色主题把强调色
+-- 往白里掺，得到一抹柔和的粉彩，避免在浅底上变成一块「脏灰」。
+function Window:_glassAccent()
+    local accent = self:Color("Accent")
+    local mode = self.ThemeTable and self.ThemeTable.Mode or "Dark"
+    if mode == "Light" then
+        return U.mix(accent, white, 0.6)
+    end
+    return U.mix(accent, white, 0.25)
+end
+
+-- 生成一团柔光，然后进入漂移循环
+function Window:_spawnGlassBlob(name, size, kind, accent)
+    local glass = self.GlassLayer
+    if not glass then
+        return
+    end
+    local color = accent and self:_glassAccent() or white
+    -- 扁平柔盘：透明底 + 极低不透明度的实心圆。不挂渐变 ——
+    -- 线性渐变落在圆上会变成「半边亮」的月牙，截图里像一枚戒指。
+    local blob = new("Frame", {
+        Name = name,
+        BackgroundColor3 = color,
+        BackgroundTransparency = 0.96,
+        Size = UDim2.fromOffset(size, size),
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        Position = UDim2.fromOffset(math.random() * self.Width, math.random() * self.Height),
+        ZIndex = WobsinsUI.Layers.Glass,
+    }, glass)
+    U.corner(blob, size / 2)
+    blob._size = size
+    blob._accent = accent
+    table.insert(self._glassBlobs, blob)
+    self:_driftBlob(blob)
+    return blob
+end
+
+-- 光斑漂移：一段 tween 结束后再随机下一个目标。用 Completed 回调续命，
+-- 不用 wait 循环（老执行器 / 无头测试里 wait 会直接空转）。
+function Window:_driftBlob(blob)
+    if self.Destroyed or not self._fxActive or not blob or not blob.Parent then
+        return
+    end
+    local margin = (blob._size or 150) * 0.3
+    local tx = U.clamp(math.random() * self.Width, margin, math.max(margin, self.Width - margin))
+    local ty = U.clamp(math.random() * self.Height, margin, math.max(margin, self.Height - margin))
+    local dur = 5 + math.random() * 6
+    local tw = U.tween(blob, dur, {
+        Position = UDim2.fromOffset(tx, ty),
+    }, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+    if tw and tw.Completed then
+        tw.Completed:Once(function()
+            self:_driftBlob(blob)
+        end)
+    end
+end
+
+-- 鼠标光斑慢慢追上目标点（同样用 Completed 续命）
+function Window:_chaseCursor()
+    if self.Destroyed or not self._fxActive or not self.GlassCursor then
+        return
+    end
+    local target = self._cursorTarget
+    if target then
+        local tw = U.tween(self.GlassCursor, 0.6, {
+            Position = UDim2.fromOffset(target.X, target.Y),
+        }, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        if tw and tw.Completed then
+            tw.Completed:Once(function()
+                self:_chaseCursor()
+            end)
+            return
+        end
+    end
+    -- 没有 tween 可续（目标丢失）时也不空转，等下一次调用
+end
+
+-- 主题 / 深浅色切换时原地重刷所有渐变的颜色与透明度
+function Window:_refreshGlassTint()
+    if not self.LiquidGlass or not self.GlassLayer then
+        return
+    end
+    local p = self:_glassPalette()
+
+    local function set(grad, c0, a0, c1, a1)
+        if not grad then
+            return
+        end
+        pcall(function()
+            grad.Color = colorSeq(c0, c1)
+            grad.Transparency = numSeq(a0, a1)
+        end)
+    end
+
+    set(self.GlassBackdropGrad, p.backdropTop, p.backdropTopA, p.backdropBottom, p.backdropBottomA)
+    set(self.GlassSheenGrad, white, p.sheenA0, white, p.sheenA1)
+    set(self.GlassStreakGrad, white, p.streakA0, white, p.streakA1)
+    set(self.FrontSheenGrad, white, p.frontA0, white, p.frontA1)
+    if self.GlassCursor then
+        self.GlassCursor.BackgroundColor3 = p.cursorC
+        self.GlassCursor.BackgroundTransparency = p.cursorA
+    end
+
+    if self.GlassEdgeStroke then
+        self.GlassEdgeStroke.Color = p.edgeC
+    end
+    if self.GlassEdgeGrad then
+        set(self.GlassEdgeGrad, p.edgeC, p.edgeA0, p.edgeC1 or p.edgeC, p.edgeA1)
+    end
+
+    for _, blob in ipairs(self._glassBlobs or {}) do
+        local c = blob._accent and self:_glassAccent() or p.blobC
+        local a = blob._accent and p.accentA or p.blobA
+        blob.BackgroundColor3 = c
+        blob.BackgroundTransparency = a
+    end
+    if self.GlassEdgeStroke and (self.ThemeTable and self.ThemeTable.Mode == "Light") then
+        self.GlassEdgeStroke.Thickness = 2
+    end
+end
+
+-- 窗口尺寸变化后：夹住鼠标光斑目标，避免它跑到面板外
+function Window:_layoutGlass()
+    if not self.LiquidGlass then
+        return
+    end
+    if self._cursorTarget then
+        self._cursorTarget = Vector2.new(
+            U.clamp(self._cursorTarget.X, 0, self.Width),
+            U.clamp(self._cursorTarget.Y, 0, self.Height)
+        )
+    end
+end
+
+-- 暂停 / 恢复所有动态光效（最小化时省帧）
+function Window:_setFxActive(state)
+    self._fxActive = state and true or false
+    if state then
+        -- 恢复时把漂移循环重新拉起来
+        for _, blob in ipairs(self._glassBlobs or {}) do
+            self:_driftBlob(blob)
+        end
+        self:_chaseCursor()
+    end
+    -- 粒子场在 25 模块里定义，这里只做转发
+    if self._resumeParticles then
+        self:_resumeParticles(state)
+    end
+end
+
+-- 运行时开关
+function Window:SetLiquidGlass(state)
+    self.LiquidGlass = state ~= false
+    if not self.LiquidGlass then
+        if self.GlassLayer then
+            self.GlassLayer.Visible = false
+        end
+        if self.GlassCursor then
+            self.GlassCursor.Visible = false
+        end
+        if self.FrontSheen then
+            self.FrontSheen.Visible = false
+        end
+        return self
+    end
+    if not self.GlassLayer then
+        self:_buildLiquidGlass(self.Config or {})
+        return self
+    end
+    self.GlassLayer.Visible = true
+    if self.GlassCursor then
+        self.GlassCursor.Visible = true
+    end
+    if self.FrontSheen then
+        self.FrontSheen.Visible = true
+    end
+    self:_setFxActive(true)
+    return self
+end
+
+--//============================================================================
+--// 25. 动态粒子
+--//============================================================================
+--
+-- 在窗口内部撒一层缓慢漂浮的微光粒子：大多数是柔光圆点，少数是星形闪光，
+-- 颜色以白为主、掺一两颗强调色，像悬浮在玻璃里的尘埃 / 星屑。
+--
+-- 性能：桌面 16 颗、小屏 10 颗，每颗只是一个小 Frame + 一个渐变 + 一段
+-- tween，帧开销可忽略。最小化时会整体暂停。
+--
+-- 开关：CreateWindow({ Particles = false })、CreateWindow({ ParticleCount = 24 })，
+-- 或全局 WobsinsUI.Particles = false / WobsinsUI.ParticleCount = 16。
+
+local white = Color3.new(1, 1, 1)
+local SPARKLES = { "✦", "✧", "·", "⋆" }
+
+local function numSeq(a0, a1)
+    return NumberSequence.new(
+        NumberSequenceKeypoint.new(0, a0),
+        NumberSequenceKeypoint.new(1, a1 or a0)
+    )
+end
+
+function Window:_buildParticles(config)
+    if not self.Particles or not self.Main then
+        return
+    end
+
+    local main = self.Main
+    local field = new("Frame", {
+        Name = "ParticleField",
+        BackgroundTransparency = 1,
+        Size = UDim2.fromScale(1, 1),
+        ClipsDescendants = true,
+        ZIndex = WobsinsUI.Layers.Particle,
+    }, main)
+    U.corner(field, self.Radius or 6)
+    self.ParticleField = field
+
+    local count = self.ParticleCount
+    if not count or count <= 0 then
+        count = (self.Width >= 620) and 16 or 10
+    end
+    count = U.clamp(math.floor(count), 0, 40)
+
+    -- 粒子颜色按深浅色取：深色用白、偶尔掺强调色；浅色用强调色的粉彩版，
+    -- 白色粒子落在白底上等于隐形。
+    local mode = self.ThemeTable and self.ThemeTable.Mode or "Dark"
+    local accent = self:Color("Accent")
+    local base = white
+    if mode == "Light" then
+        base = U.mix(accent, white, 0.5)
+    end
+
+    self._particles = {}
+    for i = 1, count do
+        self:_spawnParticle(field, accent, base, i)
+    end
+end
+
+function Window:_spawnParticle(field, accent, base, index)
+    local isSparkle = (index % 4 == 0)
+    local size = 3 + math.random() * 4
+    local color = base
+    if index % 7 == 0 then
+        color = accent
+    end
+
+    local p
+    if isSparkle then
+        p = new("TextLabel", {
+            BackgroundTransparency = 1,
+            Text = SPARKLES[(index % #SPARKLES) + 1],
+            TextColor3 = color,
+            TextTransparency = 0.55,
+            Font = Enum.Font.GothamBold,
+            TextSize = math.max(8, math.floor(size * 2.4)),
+            Size = UDim2.fromOffset(size * 2.4, size * 2.4),
+            AnchorPoint = Vector2.new(0.5, 0.5),
+            Position = UDim2.fromOffset(math.random() * self.Width, math.random() * self.Height),
+            ZIndex = WobsinsUI.Layers.Particle,
+        }, field)
+    else
+        p = new("Frame", {
+            BackgroundColor3 = color,
+            BackgroundTransparency = 0.55,
+            Size = UDim2.fromOffset(size, size),
+            AnchorPoint = Vector2.new(0.5, 0.5),
+            Position = UDim2.fromOffset(math.random() * self.Width, math.random() * self.Height),
+            ZIndex = WobsinsUI.Layers.Particle,
+        }, field)
+        U.corner(p, size / 2)
+        -- 渐变只做「柔边」，透明度交给 BackgroundTransparency 控制呼吸
+        pcall(function()
+            p._soft = new("UIGradient", {
+                Rotation = 135,
+                Color = ColorSequence.new(
+                    ColorSequenceKeypoint.new(0, color),
+                    ColorSequenceKeypoint.new(1, color)
+                ),
+                Transparency = numSeq(0.15, 1),
+            }, p)
+        end)
+    end
+
+    p._particle = true
+    p._size = size
+    p._sparkle = isSparkle
+    table.insert(self._particles, p)
+    self:_driftParticle(p)
+    return p
+end
+
+-- 粒子动画：位置漂移 + 透明度呼吸，全部用 Completed 回调续命（同 24 的
+-- 光斑，避免 wait 空转）。每一段随机方向、随机时长，看起来没有机械感。
+function Window:_driftParticle(p)
+    if self.Destroyed or not self._fxActive or not p or not p.Parent then
+        return
+    end
+    local range = 60 + math.random() * 90
+    local px = p.Position.X.Offset
+    local py = p.Position.Y.Offset
+    local tx = U.clamp(px + (math.random() - 0.5) * 2 * range, 4, math.max(4, self.Width - 4))
+    local ty = U.clamp(py + (math.random() - 0.5) * 2 * range, 4, math.max(4, self.Height - 4))
+    local dur = 2.5 + math.random() * 3.5
+
+    local props = { Position = UDim2.fromOffset(tx, ty) }
+    if p._sparkle then
+        props.TextTransparency = 0.35 + math.random() * 0.45
+        props.Rotation = (math.random() - 0.5) * 120
+    else
+        props.BackgroundTransparency = 0.35 + math.random() * 0.45
+    end
+
+    local tw = U.tween(p, dur, props, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+    if tw and tw.Completed then
+        tw.Completed:Once(function()
+            self:_driftParticle(p)
+        end)
+    end
+end
+
+function Window:_resumeParticles(state)
+    if not self.Particles then
+        return
+    end
+    if state then
+        for _, p in ipairs(self._particles or {}) do
+            self:_driftParticle(p)
+        end
+    end
+end
+
+function Window:SetParticles(state)
+    self.Particles = state ~= false
+    if self.ParticleField then
+        self.ParticleField.Visible = self.Particles
+    end
+    if self.Particles then
+        if not self.ParticleField then
+            self:_buildParticles(self.Config or {})
+        else
+            self:_resumeParticles(true)
+        end
+    end
+    return self
 end
 
 return WobsinsUI
